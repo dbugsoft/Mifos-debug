@@ -4,6 +4,16 @@ on:
   push:
     branches:
       - staging
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Connect and diff, but upload nothing'
+        type: boolean
+        default: false
+
+concurrency:
+  group: deploy-staging
+  cancel-in-progress: false
 
 jobs:
   build-and-deploy:
@@ -25,14 +35,44 @@ jobs:
       - name: Build for production
         run: npm run build
 
-      - name: Push built files to dist-staging branch
+      - name: Verify build output
         run: |
-          cd dist/web-app/browser
-          git init
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-          git checkout -b dist-staging
-          git add -A
-          git commit -m "deploy: built files from commit ${{ github.sha }}"
-          git push origin dist-staging --force
+          test -f dist/web-app/browser/index.html
+          test -f dist/web-app/browser/main.js
+          test -f dist/web-app/browser/web.config
+          echo "main.js  $(sha256sum dist/web-app/browser/main.js | cut -c1-16)"
+
+      - name: Deploy to Plesk over FTPS
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
+        with:
+          server: ${{ secrets.PLESK_HOST }}
+          username: ${{ secrets.PLESK_USER }}
+          password: ${{ secrets.PLESK_PASSWORD }}
+          protocol: ftps
+          port: 21
+          # The Plesk FTPS service presents a self-signed certificate, so strict
+          # CA validation can never succeed against it. Traffic stays encrypted;
+          # what is given up is authentication of the server. Accepted knowingly.
+          # To harden: assign a real cert to the FTP service in Plesk
+          # (Tools & Settings > SSL/TLS Certificates), then switch this to strict.
+          security: loose
+          local-dir: ./dist/web-app/browser/
+          server-dir: /httpdocs/
+          dangerous-clean-slate: false
+          dry-run: ${{ inputs.dry_run == true }}
+          exclude: |
+            **/assets/env.js
+            **/.git*
+            **/.git*/**
+
+      - name: Verify the deployed build is live
+        if: inputs.dry_run != true
+        run: |
+          expected=$(sha256sum dist/web-app/browser/main.js | cut -d' ' -f1)
+          live=$(curl -fsS --retry 3 --retry-delay 5 https://coopmis.dibugsoft.com/main.js | sha256sum | cut -d' ' -f1)
+          echo "expected: ${expected:0:16}"
+          echo "live:     ${live:0:16}"
+          if [ "$expected" != "$live" ]; then
+            echo "::error::Deployed main.js does not match the build. The upload did not land."
+            exit 1
+          fi
