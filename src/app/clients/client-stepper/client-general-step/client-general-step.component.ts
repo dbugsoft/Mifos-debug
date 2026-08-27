@@ -9,6 +9,7 @@
 /** Angular Imports */
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   DestroyRef,
   EventEmitter,
@@ -33,6 +34,7 @@ import { MatCheckbox } from '@angular/material/checkbox';
 import { MatStepperPrevious, MatStepperNext } from '@angular/material/stepper';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { NepaliDateInputComponent } from 'app/shared/nepali-date-input/nepali-date-input.component';
 
 /**
  * Create Client Component
@@ -49,7 +51,8 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     MatCheckbox,
     MatStepperPrevious,
     FaIconComponent,
-    MatStepperNext
+    MatStepperNext,
+    NepaliDateInputComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -60,6 +63,7 @@ export class ClientGeneralStepComponent implements OnInit {
   private clientService = inject(ClientsService);
   externalNationalIdService = inject(ExternalNationalIdService);
   private destroyRef = inject(DestroyRef);
+  private cdr = inject(ChangeDetectorRef);
 
   @Output() legalFormChangeEvent = new EventEmitter<{ legalForm: number }>();
 
@@ -110,6 +114,9 @@ export class ClientGeneralStepComponent implements OnInit {
     this.setOptions();
     this.buildDependencies();
     this.externalNationalIdService.watchExternalId(this.createClientForm, this.genderOptions);
+    this.createClientForm.statusChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.cdr.markForCheck());
   }
 
   /**
@@ -132,7 +139,10 @@ export class ClientGeneralStepComponent implements OnInit {
       accountNo: [''],
       externalId: [''],
       genderId: [''],
-      mobileNo: [''],
+      mobileNo: [
+        '',
+        Validators.pattern(/^\d{10}$/)
+      ],
       emailAddress: [
         '',
         Validators.email

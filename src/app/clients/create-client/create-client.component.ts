@@ -8,7 +8,9 @@
 
 /** Angular Imports */
 import {
+  AfterViewInit,
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   DestroyRef,
   QueryList,
@@ -18,6 +20,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, ActivatedRoute } from '@angular/router';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 /** Custom Services */
 import { ClientsService } from '../clients.service';
@@ -57,12 +60,25 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CreateClientComponent {
+export class CreateClientComponent implements AfterViewInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private clientsService = inject(ClientsService);
   private settingsService = inject(SettingsService);
   private destroyRef = inject(DestroyRef);
+  private snackBar = inject(MatSnackBar);
+  private cdr = inject(ChangeDetectorRef);
+
+  /** Step labels for toast messages — built dynamically to match the actual rendered steps */
+  private get stepLabels(): string[] {
+    const labels = ['GENERAL'];
+    if (this.clientTemplate?.isAddressEnabled) {
+      labels.push('ADDRESS');
+    }
+    this.datatables.forEach((dt: any) => labels.push(dt.registeredTableName));
+    labels.push('PREVIEW');
+    return labels;
+  }
 
   /** Client General Step */
   @ViewChild(ClientGeneralStepComponent, { static: true }) clientGeneralStep: ClientGeneralStepComponent;
@@ -98,6 +114,12 @@ export class CreateClientComponent {
       });
   }
 
+  ngAfterViewInit() {
+    this.clientGeneralStep.createClientForm.statusChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.cdr.markForCheck());
+  }
+
   /**
    * Retrieves general information about client.
    */
@@ -112,13 +134,13 @@ export class CreateClientComponent {
     if (this.clientTemplate.isAddressEnabled) {
       return {
         ...this.clientGeneralStep.clientGeneralDetails,
-        ...this.clientFamilyMembersStep.familyMembers,
+        ...this.clientFamilyMembersStep?.familyMembers,
         ...this.clientAddressStep.address
       };
     } else {
       return {
         ...this.clientGeneralStep.clientGeneralDetails,
-        ...this.clientFamilyMembersStep.familyMembers
+        ...this.clientFamilyMembersStep?.familyMembers
       };
     }
   }
@@ -152,6 +174,18 @@ export class CreateClientComponent {
     }
   }
 
+  onStepChange(event: any) {
+    if (event.selectedIndex <= event.previouslySelectedIndex) return;
+    const previousLabel = this.stepLabels[event.previouslySelectedIndex];
+    if (previousLabel) {
+      this.snackBar.open(`${previousLabel} step completed!`, 'Close', {
+        duration: 2000,
+        verticalPosition: 'top',
+        horizontalPosition: 'right'
+      });
+    }
+  }
+
   legalFormChange(eventData: { legalForm: number }) {
     this.legalFormType = eventData.legalForm;
     this.setDatatables();
@@ -161,6 +195,7 @@ export class CreateClientComponent {
    * Submits the create client form.
    */
   submit() {
+    if (!this.areFormvalids()) return;
     const locale = this.settingsService.language.code;
     const dateFormat = this.settingsService.dateFormat;
     const clientData = {

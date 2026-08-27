@@ -135,6 +135,18 @@ $input-border: #e2e8f0;
   overflow: hidden auto;
 }
 
+// ===== Language Selector (absolute top-right of login panel) =====
+.login-lang-selector {
+  position: absolute;
+  top: 0.1rem;
+  right: 0.1rem;
+  z-index: 10;
+
+  ::ng-deep mifosx-language-selector {
+    width: 130px;
+  }
+}
+
 // ===== Login Card =====
 .login-card-container {
   flex: 1;
@@ -279,6 +291,49 @@ $input-border: #e2e8f0;
         border-color: $brand-blue !important;
       }
     }
+  }
+}
+
+// ===== Form Section =====
+.form-section {
+  width: 100%;
+}
+
+// ===== Resources Section =====
+.resources-section {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid $input-border;
+
+  .resources-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: $text-muted;
+    margin: 0 0 0.75rem;
+  }
+
+  .resources-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+
+    a {
+      font-size: 0.825rem;
+      color: $brand-blue;
+      text-decoration: none;
+      font-weight: 500;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+/* stylelint-disable-next-line media-feature-range-notation -- Safari compatibility */
+@media (max-width: 1024px) {
+  .resources-section {
+    display: none;
   }
 }
 

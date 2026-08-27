@@ -7,7 +7,14 @@
 -->
 
 <div class="container">
-  <mat-stepper orientation="vertical" [linear]="false" class="mat-elevation-z8" labelPosition="bottom" #clientStepper>
+  <mat-stepper
+    orientation="vertical"
+    [linear]="true"
+    class="mat-elevation-z8"
+    labelPosition="bottom"
+    #clientStepper
+    (selectionChange)="onStepChange($event)"
+  >
     <ng-template matStepperIcon="number">
       <fa-icon icon="pencil-alt" size="sm"></fa-icon>
     </ng-template>
@@ -28,7 +35,7 @@
       <fa-icon icon="eye" size="sm"></fa-icon>
     </ng-template>
 
-    <mat-step [stepControl]="clientGeneralForm">
+    <mat-step [completed]="clientGeneralForm.valid">
       <ng-template matStepLabel>{{ 'labels.inputs.GENERAL' | translate }}</ng-template>
 
       <mifosx-client-general-step
@@ -37,17 +44,17 @@
       ></mifosx-client-general-step>
     </mat-step>
 
-    <mat-step>
+    <!-- <mat-step>
       <ng-template matStepLabel>{{ 'labels.inputs.FAMILY MEMBERS' | translate }}</ng-template>
 
       <mifosx-client-family-members-step
         #clientFamily
         [clientTemplate]="clientTemplate"
       ></mifosx-client-family-members-step>
-    </mat-step>
+    </mat-step> -->
 
     @if (clientTemplate.isAddressEnabled) {
-      <mat-step>
+      <mat-step [optional]="true">
         <ng-template matStepLabel>{{ 'labels.inputs.ADDRESS' | translate }}</ng-template>
         <mifosx-client-address-step
           #clientAddress
@@ -59,23 +66,21 @@
     }
 
     @for (datatable of datatables; track datatable) {
-      <mat-step>
+      <mat-step [optional]="true">
         <ng-template matStepLabel>{{ datatable.registeredTableName }}</ng-template>
         <mifosx-client-datatable-step [datatableData]="datatable" #dtclient></mifosx-client-datatable-step>
       </mat-step>
     }
 
-    @if (areFormvalids()) {
-      <mat-step completed>
-        <ng-template matStepLabel>{{ 'labels.inputs.PREVIEW' | translate }}</ng-template>
-        <mifosx-client-preview-step
-          [clientTemplate]="clientTemplate"
-          [clientAddressFieldConfig]="clientAddressFieldConfig"
-          [client]="client"
-          (submitEvent)="submit()"
-        >
-        </mifosx-client-preview-step>
-      </mat-step>
-    }
+    <mat-step [completed]="areFormvalids()">
+      <ng-template matStepLabel>{{ 'labels.inputs.PREVIEW' | translate }}</ng-template>
+      <mifosx-client-preview-step
+        [clientTemplate]="clientTemplate"
+        [clientAddressFieldConfig]="clientAddressFieldConfig"
+        [client]="client"
+        (submitEvent)="submit()"
+      >
+      </mifosx-client-preview-step>
+    </mat-step>
   </mat-stepper>
 </div>

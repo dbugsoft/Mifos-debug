@@ -23,7 +23,7 @@
 @include mat.all-component-typographies();
 
 $mifosx-typography-level: mat.m2-define-typography-level(
-  $font-family: Roboto,
+  $font-family: Inter,
   $font-weight: 400,
   $font-size: 14px,
   $line-height: 1.5,
@@ -42,6 +42,7 @@ $mifosx-color-config: (
 );
 
 $mifosx-typography: mat.m2-define-typography-config(
+  $font-family: Inter,
   $body-1: $mifosx-typography-level,
   $body-2: $mifosx-typography-level,
   $headline-1: $mifosx-typography-level,
@@ -65,6 +66,20 @@ $mifosx-app-theme: mat.m2-define-light-theme(
 
 @include mat.typography-hierarchy($mifosx-typography);
 @include mat.all-component-themes($mifosx-app-theme);
+
+// Medium / compact form fields app-wide. Default density (0) renders ~56px tall;
+// -2 brings it to a medium ~48px and tightens the internal + subscript spacing,
+// so forms read more compact without hand-tuning field heights. The density
+// mixin takes a theme (not a bare number), so build one with density -2.
+$mifosx-form-field-dense-theme: mat.m2-define-light-theme(
+  (
+    color: $mifosx-color-config,
+    typography: $mifosx-typography,
+    density: -2
+  )
+);
+
+@include mat.form-field-density($mifosx-form-field-dense-theme);
 @include groups-view-component-theme($mifosx-app-theme);
 @include centers-view-component-theme($mifosx-app-theme);
 @include dashboard-component-theme($mifosx-app-theme);
