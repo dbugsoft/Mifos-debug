@@ -8,7 +8,9 @@
 
 import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-
+import { Router } from '@angular/router';
+import { CoopAuthService } from '../../services/coop-auth.service';
+import { CoopTokenService } from '../../services/coop-token.service';
 import { CommonModule } from '@angular/common';
 
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -37,6 +39,9 @@ import { CoopLocation, CoopProfile, CoopProfileService } from '../../services/co
 export class CoopProfileComponent implements OnInit {
   private fb = inject(FormBuilder);
   private coopProfileService = inject(CoopProfileService);
+  private router = inject(Router);
+  private coopAuthService = inject(CoopAuthService);
+  private coopTokenService = inject(CoopTokenService);
 
   isSubmitting = false;
 
@@ -482,6 +487,31 @@ export class CoopProfileComponent implements OnInit {
     });
 
     return changedFields;
+  }
+
+  // =====================================================
+  // LOGOUT
+  // =====================================================
+
+  logout(): void {
+    const refreshToken = this.coopTokenService.getRefreshToken();
+
+    if (!refreshToken) {
+      this.coopTokenService.clearSession();
+      this.router.navigate(['/coop/login']);
+      return;
+    }
+
+    this.coopAuthService.logout({ refreshToken }).subscribe({
+      next: () => {
+        this.coopTokenService.clearSession();
+        this.router.navigate(['/coop/login']);
+      },
+      error: (error) => {
+        this.coopTokenService.clearSession();
+        this.router.navigate(['/coop/login']);
+      }
+    });
   }
 
   // =====================================================

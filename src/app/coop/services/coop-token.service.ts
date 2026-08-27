@@ -61,6 +61,33 @@ export class CoopTokenService {
   }
 
   /**
+   * Patch just the token fields on the existing session
+   * after a successful call to the /refresh endpoint.
+   *
+   * Keeps everything else in the session (e.g. status)
+   * untouched, and rotates the refreshToken since the
+   * backend issues a new one on every refresh.
+   *
+   * Does nothing if there is no existing session to
+   * patch - refresh should never be called without one.
+   */
+  updateTokens(tokens: { accessToken: string; refreshToken: string; tokenType: string; expiresIn: number }): void {
+    const currentSession = this.getSession();
+
+    if (!currentSession) {
+      return;
+    }
+
+    this.setSession({
+      ...currentSession,
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
+      tokenType: tokens.tokenType,
+      expiresIn: tokens.expiresIn
+    });
+  }
+
+  /**
    * Check whether user is authenticated
    */
   isAuthenticated(): boolean {

@@ -48,6 +48,16 @@ export interface CoopLoginResponse {
   refreshToken: string;
   accessToken: string;
 }
+export interface CoopRefreshTokenRequest {
+  refreshToken: string;
+}
+
+export interface CoopRefreshTokenResponse {
+  expiresIn: number;
+  tokenType: string;
+  accessToken: string;
+  refreshToken: string;
+}
 
 export interface CoopResendOtpRequest {
   email: string;
@@ -57,6 +67,14 @@ export interface CoopResendOtpResponse {
   userId: number;
   message?: string;
   [key: string]: any;
+}
+
+export interface CoopLogoutRequest {
+  refreshToken: string;
+}
+
+export interface CoopLogoutResponse {
+  message: string;
 }
 
 @Injectable({
@@ -81,5 +99,13 @@ export class CoopAuthService {
 
   resendOtp(data: CoopResendOtpRequest): Observable<CoopResendOtpResponse> {
     return this.http.post<CoopResendOtpResponse>(`${this.baseUrl}/resend-otp`, data);
+  }
+
+  logout(data: CoopLogoutRequest): Observable<CoopLogoutResponse> {
+    return this.http.post<CoopLogoutResponse>(`${this.baseUrl}/logout`, data);
+  }
+
+  refresh(data: CoopRefreshTokenRequest): Observable<CoopRefreshTokenResponse> {
+    return this.http.post<CoopRefreshTokenResponse>(`${this.baseUrl}/refresh`, data);
   }
 }
