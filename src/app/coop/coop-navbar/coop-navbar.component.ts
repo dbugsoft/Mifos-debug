@@ -14,9 +14,13 @@ import { Router, RouterModule } from '@angular/router';
 
 import { MatButtonModule } from '@angular/material/button';
 
+import { QueryClient } from '@tanstack/angular-query-experimental';
+
 import { CoopAuthService } from '../services/coop-auth.service';
 
 import { CoopTokenService } from '../services/coop-token.service';
+
+import { clearCoopUserQueries } from '../queries/coop-cache.util';
 
 @Component({
   selector: 'mifosx-coop-navbar',
@@ -58,6 +62,8 @@ export class CoopNavbarComponent {
 
   private readonly coopTokenService = inject(CoopTokenService);
 
+  private readonly queryClient = inject(QueryClient);
+
   // =====================================================
   // LOGOUT
   // =====================================================
@@ -70,7 +76,7 @@ export class CoopNavbarComponent {
     // ---------------------------------------------------
 
     if (!refreshToken) {
-      this.coopTokenService.clearSession();
+      this.clearCoopSession();
 
       this.router.navigate([
         '/coop/login'
@@ -93,7 +99,7 @@ export class CoopNavbarComponent {
         // ---------------------------------------------
 
         next: () => {
-          this.coopTokenService.clearSession();
+          this.clearCoopSession();
 
           this.router.navigate([
             '/coop/login'
@@ -110,12 +116,23 @@ export class CoopNavbarComponent {
            * clear local session.
            */
 
-          this.coopTokenService.clearSession();
+          this.clearCoopSession();
 
           this.router.navigate([
             '/coop/login'
           ]);
         }
       });
+  }
+
+  /**
+   * Clears tokens plus every user-specific cached query, so
+   * a different account logging in afterwards never sees
+   * this user's cached profile/admin data.
+   */
+  private clearCoopSession(): void {
+    this.coopTokenService.clearSession();
+
+    clearCoopUserQueries(this.queryClient);
   }
 }

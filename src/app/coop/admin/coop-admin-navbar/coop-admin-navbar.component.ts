@@ -9,8 +9,10 @@
 import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { Router, RouterLink } from '@angular/router';
+import { QueryClient } from '@tanstack/angular-query-experimental';
 import { CoopAuthService } from '../../services/coop-auth.service';
 import { CoopTokenService } from '../../services/coop-token.service';
+import { clearCoopUserQueries } from '../../queries/coop-cache.util';
 
 @Component({
   selector: 'mifosx-coop-admin-navbar',
@@ -26,25 +28,36 @@ export class CoopAdminNavbarComponent {
   private readonly router = inject(Router);
   private readonly coopAuthService = inject(CoopAuthService);
   private readonly coopTokenService = inject(CoopTokenService);
+  private readonly queryClient = inject(QueryClient);
 
   logout(): void {
     const refreshToken = this.coopTokenService.getRefreshToken();
 
     if (!refreshToken) {
-      this.coopTokenService.clearSession();
+      this.clearCoopSession();
       this.router.navigate(['/coop/login']);
       return;
     }
 
     this.coopAuthService.logout({ refreshToken }).subscribe({
       next: () => {
-        this.coopTokenService.clearSession();
+        this.clearCoopSession();
         this.router.navigate(['/coop/login']);
       },
       error: () => {
-        this.coopTokenService.clearSession();
+        this.clearCoopSession();
         this.router.navigate(['/coop/login']);
       }
     });
+  }
+
+  /**
+   * Clears tokens plus every user-specific cached query, so
+   * a different account logging in afterwards never sees
+   * this user's cached profile/admin data.
+   */
+  private clearCoopSession(): void {
+    this.coopTokenService.clearSession();
+    clearCoopUserQueries(this.queryClient);
   }
 }

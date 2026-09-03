@@ -72,6 +72,15 @@ export interface CoopAdminStats {
   REJECTED: number;
 }
 
+/**
+ * Plain HTTP access for Coop admin data.
+ *
+ * This service intentionally does NOT cache anything - server-state
+ * caching (in-memory storage, staleness, per-mutation invalidation)
+ * is owned entirely by TanStack Query, wired up in
+ * ../queries/coop-admin.queries.ts and consumed via
+ * injectQuery()/injectMutation() in the components.
+ */
 @Injectable({
   providedIn: 'root'
 })

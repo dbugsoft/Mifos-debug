@@ -6,12 +6,17 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 
-import { CoopMe, CoopProfileService } from '../services/coop-profile.service';
+import { injectQuery } from '@tanstack/angular-query-experimental';
+
+import { CoopProfileService } from '../services/coop-profile.service';
 import { CoopNavbarComponent } from '../coop-navbar/coop-navbar.component';
+import { meQueryOptions } from '../queries/coop-profile.queries';
+import { extractCoopErrorMessage } from '../queries/coop-error.util';
+
 @Component({
   selector: 'mifosx-coop-me',
   standalone: true,
@@ -22,47 +27,24 @@ import { CoopNavbarComponent } from '../coop-navbar/coop-navbar.component';
   templateUrl: './coop-me.component.html',
   styleUrl: './coop-me.component.scss'
 })
-export class CoopMeComponent implements OnInit {
+export class CoopMeComponent {
   private coopProfileService = inject(CoopProfileService);
 
-  private cdr = inject(ChangeDetectorRef);
+  private meQuery = injectQuery(() => meQueryOptions(this.coopProfileService));
 
-  me: CoopMe | null = null;
+  get me() {
+    return this.meQuery.data() ?? null;
+  }
 
-  loading = true;
+  get loading(): boolean {
+    return this.meQuery.isPending();
+  }
 
-  errorMessage = '';
+  get errorMessage(): string {
+    if (!this.meQuery.isError()) {
+      return '';
+    }
 
-  ngOnInit(): void {
-    console.log('ME PAGE INIT');
-
-    this.coopProfileService.getMe().subscribe({
-      next: (response) => {
-        console.log('NEXT FIRED:', response);
-
-        this.me = response;
-
-        this.loading = false;
-
-        console.log('LOADING:', this.loading);
-        console.log('ME:', this.me);
-
-        this.cdr.detectChanges();
-      },
-
-      error: (error) => {
-        console.error('ME ERROR:', error);
-
-        this.loading = false;
-
-        this.errorMessage = error?.error?.message || error?.error?.error || 'Unable to load user information.';
-
-        this.cdr.detectChanges();
-      },
-
-      complete: () => {
-        console.log('COMPLETE FIRED');
-      }
-    });
+    return extractCoopErrorMessage(this.meQuery.error(), 'Unable to load user information.');
   }
 }
