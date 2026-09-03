@@ -12,6 +12,7 @@ import { Router, RouterLink } from '@angular/router';
 
 import { CoopAuthService } from '../../services/coop-auth.service';
 import { CoopTokenService } from '../../services/coop-token.service';
+
 @Component({
   selector: 'mifosx-coop-login',
   standalone: true,
@@ -54,6 +55,8 @@ export class CoopLoginComponent {
     this.successMessage = '';
     this.errorMessage = '';
 
+    console.log('1. Login button clicked');
+
     /* =========================
        FORM VALIDATION
     ========================= */
@@ -68,6 +71,8 @@ export class CoopLoginComponent {
 
     this.isSubmitting = true;
 
+    console.log('2. Calling login API');
+
     /* =========================
        LOGIN API
     ========================= */
@@ -78,54 +83,117 @@ export class CoopLoginComponent {
         password: formValue.password
       })
       .subscribe({
-        next: (response) => {
-          /* =========================
-           VERIFIED USER
-        ========================= */
+        /* =========================
+         LOGIN SUCCESS
+      ========================= */
 
-          if (response.isEmailVerified === true && response.status === 'VERIFIED') {
+        next: (response) => {
+          console.log('LOGIN SUCCESS RESPONSE:', response);
+
+          console.log('isEmailVerified:', response.isEmailVerified);
+
+          console.log('status:', response.status);
+
+          console.log('accessToken:', response.accessToken);
+
+          console.log('refreshToken:', response.refreshToken);
+
+          /* =========================
+           VERIFIED / ACTIVE USER
+        =========================
+         
+         Customer:
+           isEmailVerified = true
+           status = VERIFIED
+
+         Admin:
+           isEmailVerified = true
+           status = ACTIVE
+
+         Both are valid login responses.
+        */
+
+          if (response.isEmailVerified === true && (response.status === 'VERIFIED' || response.status === 'ACTIVE')) {
+            console.log('VALID LOGIN RESPONSE');
+
+            /* =========================
+             SAVE TOKENS
+          ========================= */
+
             this.coopTokenService.setSession({
               accessToken: response.accessToken,
+
               refreshToken: response.refreshToken,
+
               tokenType: response.tokenType,
+
               expiresIn: response.expiresIn,
-              status: response.status
+
+              status: response.status === 'ACTIVE' ? 'VERIFIED' : response.status
             });
+
+            console.log('AUTH SESSION SAVED:', this.coopTokenService.getSession());
+
+            /*
+             * Stop loading immediately after
+             * successful login.
+             */
 
             this.isSubmitting = false;
 
             this.successMessage = 'Login successful. Redirecting...';
 
-            /*
-             * Go to profile page
-             */
+            /* =========================
+             ROLE BASED REDIRECT
+          ========================= */
 
-            setTimeout(() => {
-              this.router.navigate([
-                '/coop/profile'
-              ]);
-            }, 1000);
+            let destination = '/coop/profile';
+
+            try {
+              const isAdmin = this.coopTokenService.isAdmin();
+
+              console.log('IS ADMIN:', isAdmin);
+
+              if (isAdmin) {
+                destination = '/coop/admin';
+
+                console.log('Redirecting to ADMIN dashboard');
+              } else {
+                destination = '/coop/profile';
+
+                console.log('Redirecting to COOP profile');
+              }
+            } catch (error) {
+              console.error('Role detection failed:', error);
+
+              /*
+               * Safe fallback for normal
+               * cooperative users.
+               */
+
+              destination = '/coop/profile';
+            }
+
+            console.log('FINAL DESTINATION:', destination);
+
+            /* =========================
+             NAVIGATE
+          ========================= */
+
+            this.router.navigate([
+              destination
+            ]);
 
             return;
           }
 
           /* =========================
            UNVERIFIED USER
-        =========================
-         *
-         * NOTE: as observed, the live API
-         * currently always returns unverified
-         * logins as an HTTP error (403), not
-         * as a 200 response with this status
-         * field. This branch is kept as a
-         * defensive fallback in case the API
-         * ever responds this way instead -
-         * it shares the same handler as the
-         * 403 case below, so there is nothing
-         * to keep in sync if that changes.
-         */
+        ========================= */
 
           if (response.status === 'UNVERIFIED') {
+            console.log('USER IS UNVERIFIED');
+
             this.handleUnverifiedUser(formValue.email);
 
             return;
@@ -137,30 +205,35 @@ export class CoopLoginComponent {
 
           this.isSubmitting = false;
 
+          console.log('UNKNOWN LOGIN STATUS:', response.status);
+
           this.errorMessage = 'Unable to determine your account status.';
         },
 
         /* =========================
-         LOGIN API ERROR
+         LOGIN ERROR
       ========================= */
 
         error: (error) => {
+          console.error('LOGIN API ERROR:', error);
+
           const serverError = error?.error?.error || error?.error?.message || error?.error?.defaultUserMessage || '';
 
-          /* =================================
-           EMAIL NOT VERIFIED (actual API
-           behaviour: 403 with this message)
-        ================================= */
+          /* =========================
+           EMAIL NOT VERIFIED
+        ========================= */
 
           if (error.status === 403 && serverError.includes('Email not verified')) {
+            console.log('EMAIL NOT VERIFIED - RESENDING OTP');
+
             this.handleUnverifiedUser(this.loginForm.getRawValue().email);
 
             return;
           }
 
-          /* =================================
-           OTHER LOGIN ERRORS
-        ================================= */
+          /* =========================
+           OTHER ERRORS
+        ========================= */
 
           this.isSubmitting = false;
 
@@ -170,28 +243,13 @@ export class CoopLoginComponent {
   }
 
   // =====================================================
-  // HANDLE UNVERIFIED USER (shared by both code paths)
+  // HANDLE UNVERIFIED USER
   // =====================================================
 
-  /**
-   * Resends the OTP for an unverified account and
-   * navigates to the verify-email page on success.
-   *
-   * Called from both:
-   * - the success handler, if the API ever returns
-   *   200 with status: 'UNVERIFIED'
-   * - the error handler, for the current 403
-   *   "Email not verified" response
-   *
-   * so the resend/navigate logic only lives in one place.
-   */
   private handleUnverifiedUser(email: string): void {
-    /*
-     * Keep loading while resend OTP
-     * API is running.
-     */
-
     this.isSubmitting = true;
+
+    console.log('Resending OTP for:', email);
 
     this.coopAuthService
       .resendOtp({
@@ -205,11 +263,9 @@ export class CoopLoginComponent {
         next: (resendResponse) => {
           this.isSubmitting = false;
 
-          const userId = resendResponse.userId;
+          console.log('OTP RESEND SUCCESS:', resendResponse);
 
-          /*
-           * Make sure userId exists
-           */
+          const userId = resendResponse.userId;
 
           if (!userId) {
             this.errorMessage = 'OTP was sent, but user ID was not returned.';
@@ -217,19 +273,15 @@ export class CoopLoginComponent {
             return;
           }
 
-          /*
-           * Show backend message
-           */
-
           this.successMessage = resendResponse.message || 'A new OTP has been sent to your email.';
 
-          /*
-           * Navigate to OTP page
-           */
+          /* =========================
+           NAVIGATE TO VERIFY EMAIL
+        ========================= */
 
           setTimeout(() => {
             this.router.navigate(['/coop/verify-email'], {
-              state: {
+              queryParams: {
                 userId: userId
               }
             });
@@ -242,6 +294,8 @@ export class CoopLoginComponent {
 
         error: (error) => {
           this.isSubmitting = false;
+
+          console.error('RESEND OTP ERROR:', error);
 
           this.errorMessage =
             error?.error?.message ||

@@ -1,0 +1,187 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  background: #f5f8fa;
+}
+
+.me-page {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  background: #f5f8fa;
+  overflow: hidden;
+}
+
+/* CONTENT AREA */
+.me-card {
+  width: min(760px, calc(100% - 56px));
+  margin: 30px auto;
+  padding: 30px 34px;
+  box-sizing: border-box;
+  background: #fff;
+  border: 1px solid #e3e8ec;
+  border-radius: 12px;
+  box-shadow: 0 4px 18px rgb(16 42 67 / 7%);
+}
+
+/* TITLE */
+.me-card h2 {
+  margin: 0 0 26px;
+  color: #172b3a;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.3;
+  padding-bottom: 18px;
+  border-bottom: 1px solid #e8edf1;
+}
+
+/* DETAILS */
+.me-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.me-details p {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 52px;
+  margin: 0;
+  padding: 0 4px;
+  border-bottom: 1px solid #eef2f4;
+  transition:
+    background 0.18s ease,
+    padding 0.18s ease;
+}
+
+.me-details p:last-child {
+  border-bottom: none;
+}
+
+/* HOVER */
+.me-details p:hover {
+  padding-left: 10px;
+  padding-right: 10px;
+  border-radius: 6px;
+  background: #f8fbfd;
+}
+
+/* LABEL */
+.me-details strong {
+  color: #5f707c;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* NORMAL VALUE */
+.me-details p > span {
+  color: #172b3a;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* EMAIL */
+.me-details p:nth-child(2) > span {
+  color: #1074b9;
+}
+
+/* BADGES */
+.status-badge,
+.verification-status {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+}
+
+/* VERIFIED = GREEN */
+.status-badge.verified,
+.verification-status.verified {
+  background: #edf8f1 !important;
+  color: #23834a !important;
+}
+
+/* OTHER STATUS = BLUE */
+.status-badge.other {
+  background: #eef7fc !important;
+  color: #1074b9 !important;
+}
+
+/* NOT VERIFIED = BLUE */
+.verification-status.not-verified {
+  background: #eef7fc !important;
+  color: #1074b9 !important;
+}
+
+/* ERROR MESSAGE */
+.error-message {
+  margin: 18px 0;
+  padding: 12px 14px;
+  border: 1px solid #f2caca;
+  border-radius: 7px;
+  background: #fff5f5;
+  color: #c62828;
+  font-size: 13px;
+}
+
+/* RESPONSIVE */
+@media (width <= 700px) {
+  .me-card {
+    width: calc(100% - 32px);
+    margin: 20px auto;
+    padding: 24px;
+  }
+
+  .me-card h2 {
+    font-size: 20px;
+  }
+
+  .me-details p {
+    align-items: flex-start;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    padding: 12px 4px;
+  }
+
+  .me-details p:hover {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+}
+
+/* SMALL SCREEN */
+@media (width <= 450px) {
+  .me-card {
+    width: calc(100% - 20px);
+    margin: 14px auto;
+    padding: 20px 16px;
+  }
+
+  .me-card h2 {
+    font-size: 18px;
+    margin-bottom: 18px;
+  }
+
+  .me-details strong {
+    font-size: 12px;
+  }
+
+  .me-details p > span {
+    font-size: 13px;
+  }
+}

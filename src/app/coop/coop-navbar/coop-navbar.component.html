@@ -1,0 +1,37 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="page-header">
+  <!-- HEADER LEFT -->
+
+  <div class="header-left">
+    <div class="header-icon">🏢</div>
+
+    <div>
+      <h1>{{ title }}</h1>
+
+      <p>
+        {{ subtitle }}
+      </p>
+    </div>
+  </div>
+
+  <!-- NAVIGATION -->
+
+  <nav class="navbar-links">
+    <a> Home </a>
+
+    <a routerLink="/coop/profile" routerLinkActive="active"> Profile </a>
+
+    <a routerLink="/coop/me" routerLinkActive="active"> Me </a>
+  </nav>
+
+  <!-- LOGOUT -->
+
+  <button mat-raised-button type="button" class="logout-button" (click)="logout()">Logout</button>
+</div>
