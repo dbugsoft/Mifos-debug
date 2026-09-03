@@ -6,16 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-//coop profile.component.ts
-/**
- * Copyright since 2025 Mifos Initiative
- *
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/.
- */
-
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, effect, inject } from '@angular/core';
 
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
@@ -31,12 +22,19 @@ import { MatButtonModule } from '@angular/material/button';
 
 import { MatSelectModule } from '@angular/material/select';
 
+import { firstValueFrom } from 'rxjs';
+
+import { QueryClient, injectMutation, injectQuery } from '@tanstack/angular-query-experimental';
+
 import { CoopAuthService } from '../../services/coop-auth.service';
 
 import { CoopTokenService } from '../../services/coop-token.service';
 
 import { CoopLocation, CoopProfile, CoopProfileService } from '../../services/coop-profile.service';
 import { CoopNavbarComponent } from '../../coop-navbar/coop-navbar.component';
+import { locationsQueryOptions, profileQueryOptions } from '../../queries/coop-profile.queries';
+import { coopQueryKeys } from '../../queries/coop-query-keys';
+import { extractCoopErrorMessage } from '../../queries/coop-error.util';
 
 @Component({
   selector: 'mifosx-coop-profile',
@@ -59,7 +57,7 @@ import { CoopNavbarComponent } from '../../coop-navbar/coop-navbar.component';
 
   styleUrl: './coop-profile.component.scss'
 })
-export class CoopProfileComponent implements OnInit {
+export class CoopProfileComponent {
   // =====================================================
   // SERVICES
   // =====================================================
@@ -73,6 +71,40 @@ export class CoopProfileComponent implements OnInit {
   private coopAuthService = inject(CoopAuthService);
 
   private coopTokenService = inject(CoopTokenService);
+
+  private queryClient = inject(QueryClient);
+
+  // =====================================================
+  // SERVER STATE (TanStack Query)
+  // =====================================================
+
+  private profileQuery = injectQuery(() => profileQueryOptions(this.coopProfileService));
+
+  private locationsQuery = injectQuery(() => locationsQueryOptions(this.coopProfileService));
+
+  private createProfileMutation = injectMutation(() => ({
+    mutationFn: (profile: CoopProfile) => firstValueFrom(this.coopProfileService.createProfile(profile)),
+
+    onSuccess: (created) => {
+      this.queryClient.setQueryData(coopQueryKeys.profile(), created);
+    }
+  }));
+
+  private updateProfileMutation = injectMutation(() => ({
+    mutationFn: (profile: Partial<CoopProfile>) => firstValueFrom(this.coopProfileService.updateProfile(profile)),
+
+    onSuccess: (updated) => {
+      /*
+       * PATCH may return only the changed fields rather than
+       * the full profile, so merge onto the previously cached
+       * value instead of replacing it outright.
+       */
+      this.queryClient.setQueryData(coopQueryKeys.profile(), (previous?: CoopProfile) => ({
+        ...(previous ?? updated),
+        ...updated
+      }));
+    }
+  }));
 
   // =====================================================
   // UI STATE
@@ -120,7 +152,9 @@ export class CoopProfileComponent implements OnInit {
   // LOCATION LOADING STATE
   // =====================================================
 
-  locationsLoading = true;
+  get locationsLoading(): boolean {
+    return this.locationsQuery.isPending();
+  }
 
   // =====================================================
   // PROFILE FORM
@@ -205,177 +239,82 @@ export class CoopProfileComponent implements OnInit {
   // INIT
   // =====================================================
 
-  ngOnInit(): void {
-    console.log('COOP PROFILE PAGE INITIALIZED');
-
+  constructor() {
     /*
-     * IMPORTANT:
-     *
-     * Profile and locations are loaded
-     * independently.
-     *
-     * Profile does NOT wait for locations.
+     * Profile and locations are queried independently by
+     * TanStack Query (profile does NOT wait for locations).
+     * Each effect re-runs whenever ITS OWN query settles, and
+     * reads whatever the other side currently holds - so
+     * whichever of the two arrives second is the one that
+     * builds the location dropdowns, exactly as before.
      */
 
-    this.loadProfile();
+    effect(() => {
+      const profile = this.profileQuery.data();
 
-    this.loadLocations();
-  }
+      if (profile) {
+        this.profileForm.patchValue(profile);
 
-  // =====================================================
-  // LOAD PROFILE
-  // =====================================================
-
-  private loadProfile(): void {
-    console.time('PROFILE REQUEST');
-
-    this.coopProfileService.getProfile().subscribe({
-      // =================================================
-      // SUCCESS
-      // =================================================
-
-      next: (response) => {
-        console.timeEnd('PROFILE REQUEST');
-
-        console.log('PROFILE RESPONSE:', response);
-
-        // -----------------------------------------------
-        // PATCH PROFILE IMMEDIATELY
-        // -----------------------------------------------
-
-        console.time('PROFILE PATCH');
-
-        this.profileForm.patchValue(response);
-
-        console.timeEnd('PROFILE PATCH');
-
-        // -----------------------------------------------
-        // EXISTING PROFILE
-        // -----------------------------------------------
+        // patchValue() should not make the form dirty.
+        this.profileForm.markAsPristine();
 
         this.isEditMode = true;
 
-        /*
-         * IMPORTANT:
-         *
-         * patchValue() should not make
-         * the form dirty.
-         */
+        this.profileStatus = profile.status ?? '';
 
-        this.profileForm.markAsPristine();
+        this.isActive = profile.status === 'ACTIVE' || profile.status === 'PROVISIONED';
 
-        /*
-         * Locations may already be loaded
-         * or may still be loading.
-         *
-         * If they are already available,
-         * build the dropdowns now.
-         *
-         * If not, loadLocations() will build
-         * them when it finishes.
-         */
-        this.profileStatus = response.status ?? '';
-
-        this.isActive = response.status === 'ACTIVE' || response.status === 'PROVISIONED';
-
-        if (this.isActive) {
-        }
         if (this.locations.length > 0) {
-          this.buildLocationDropdowns(response);
+          this.buildLocationDropdowns(profile);
         }
-      },
 
-      // =================================================
-      // ERROR
-      // =================================================
+        return;
+      }
 
-      error: (error) => {
-        console.error('PROFILE API ERROR:', error);
-
-        /*
-         * New user may not have a profile yet.
-         */
-
-        if (error?.error?.error === 'No profile submitted yet') {
-          console.log('NO PROFILE FOUND - CREATE MODE');
-
+      if (this.profileQuery.isError()) {
+        // New user may not have a profile yet.
+        if (this.isNoProfileError(this.profileQuery.error())) {
           this.isEditMode = false;
 
           return;
         }
 
-        this.errorMessage =
-          error?.error?.message ||
-          error?.error?.error ||
-          error?.error?.defaultUserMessage ||
-          'Unable to load cooperative profile.';
+        this.errorMessage = extractCoopErrorMessage(this.profileQuery.error(), 'Unable to load cooperative profile.');
+      }
+    });
+
+    effect(() => {
+      const locations = this.locationsQuery.data();
+
+      if (!locations) {
+        if (this.locationsQuery.isError()) {
+          this.errorMessage = 'Unable to load address information.';
+        }
+
+        return;
+      }
+
+      this.locations = locations;
+
+      this.provinces = this.getUniqueProvinces();
+
+      /*
+       * Profile may already have been loaded. If provinceId
+       * exists, build the dependent dropdowns now.
+       */
+
+      const profile = this.profileForm.getRawValue();
+
+      if (profile.provinceId !== null || profile.districtId !== null || profile.localLevelId !== null) {
+        this.buildLocationDropdowns(profile);
       }
     });
   }
 
-  // =====================================================
-  // LOAD LOCATIONS
-  // =====================================================
+  private isNoProfileError(error: unknown): boolean {
+    const httpError = error as { error?: { error?: string } } | null | undefined;
 
-  private loadLocations(): void {
-    console.time('LOCATIONS REQUEST');
-
-    this.locationsLoading = true;
-
-    this.coopProfileService.getLocations().subscribe({
-      // =================================================
-      // SUCCESS
-      // =================================================
-
-      next: (locations) => {
-        console.timeEnd('LOCATIONS REQUEST');
-
-        console.log('LOCATIONS LOADED:', locations.length);
-
-        // -----------------------------------------------
-        // STORE LOCATIONS
-        // -----------------------------------------------
-
-        this.locations = locations;
-
-        // -----------------------------------------------
-        // CREATE PROVINCES
-        // -----------------------------------------------
-
-        this.provinces = this.getUniqueProvinces();
-
-        // -----------------------------------------------
-        // MARK LOCATION LOADING COMPLETE
-        // -----------------------------------------------
-
-        this.locationsLoading = false;
-
-        /*
-         * Profile may already have been loaded.
-         *
-         * If provinceId exists,
-         * build dependent dropdowns.
-         */
-
-        const profile = this.profileForm.getRawValue();
-
-        if (profile.provinceId !== null || profile.districtId !== null || profile.localLevelId !== null) {
-          this.buildLocationDropdowns(profile);
-        }
-      },
-
-      // =================================================
-      // ERROR
-      // =================================================
-
-      error: (error) => {
-        console.error('LOCATIONS API ERROR:', error);
-
-        this.locationsLoading = false;
-
-        this.errorMessage = 'Unable to load address information.';
-      }
-    });
+    return httpError?.error?.error === 'No profile submitted yet';
   }
 
   // =====================================================
@@ -697,9 +636,6 @@ export class CoopProfileComponent implements OnInit {
 
     return changedFields;
   }
-  // =====================================================
-  // LOGOUT
-  // =====================================================
 
   // =====================================================
   // SUBMIT
@@ -749,8 +685,8 @@ export class CoopProfileComponent implements OnInit {
       // PATCH
       // ---------------------------------------------
 
-      this.coopProfileService.updateProfile(changedFields).subscribe({
-        next: () => {
+      this.updateProfileMutation.mutate(changedFields, {
+        onSuccess: () => {
           this.isSubmitting = false;
 
           this.successMessage = 'Cooperative profile updated successfully.';
@@ -758,14 +694,10 @@ export class CoopProfileComponent implements OnInit {
           this.profileForm.markAsPristine();
         },
 
-        error: (error) => {
+        onError: (error) => {
           this.isSubmitting = false;
 
-          this.errorMessage =
-            error?.error?.message ||
-            error?.error?.error ||
-            error?.error?.defaultUserMessage ||
-            'Unable to update profile. Please try again.';
+          this.errorMessage = extractCoopErrorMessage(error, 'Unable to update profile. Please try again.');
         }
       });
 
@@ -778,8 +710,8 @@ export class CoopProfileComponent implements OnInit {
 
     const profileData: CoopProfile = this.profileForm.getRawValue();
 
-    this.coopProfileService.createProfile(profileData).subscribe({
-      next: () => {
+    this.createProfileMutation.mutate(profileData, {
+      onSuccess: () => {
         this.isSubmitting = false;
 
         this.successMessage = 'Cooperative profile created successfully.';
@@ -789,14 +721,10 @@ export class CoopProfileComponent implements OnInit {
         this.profileForm.markAsPristine();
       },
 
-      error: (error) => {
+      onError: (error) => {
         this.isSubmitting = false;
 
-        this.errorMessage =
-          error?.error?.message ||
-          error?.error?.error ||
-          error?.error?.defaultUserMessage ||
-          'Unable to create profile. Please try again.';
+        this.errorMessage = extractCoopErrorMessage(error, 'Unable to create profile. Please try again.');
       }
     });
   }

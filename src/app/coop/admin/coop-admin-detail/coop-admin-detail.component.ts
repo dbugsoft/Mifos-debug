@@ -6,15 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-/**
- * Copyright since 2025 Mifos Initiative
- *
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with
- * this file, You can obtain one at http://mozilla.org/MPL/2.0/.
- */
-
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { CoopAdminNavbarComponent } from '../coop-admin-navbar/coop-admin-navbar.component';
 import { CommonModule } from '@angular/common';
 
@@ -22,9 +14,9 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
-import { ChangeDetectorRef } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 
-import { forkJoin } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 
 import { MatButtonModule } from '@angular/material/button';
 
@@ -32,9 +24,15 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 
 import { MatInputModule } from '@angular/material/input';
 
+import { QueryClient, injectMutation, injectQuery } from '@tanstack/angular-query-experimental';
+
 import { CoopLocation, CoopProfileService } from 'app/coop/services/coop-profile.service';
 
 import { CoopAdminRegistration, CoopAdminService } from '../../services/coop-admin.service';
+import { adminDetailQueryOptions } from '../../queries/coop-admin.queries';
+import { locationsQueryOptions } from '../../queries/coop-profile.queries';
+import { coopQueryKeys } from '../../queries/coop-query-keys';
+import { extractCoopErrorMessage } from '../../queries/coop-error.util';
 
 @Component({
   selector: 'mifosx-coop-admin-detail',
@@ -55,7 +53,7 @@ import { CoopAdminRegistration, CoopAdminService } from '../../services/coop-adm
 
   styleUrl: './coop-admin-detail.component.scss'
 })
-export class CoopAdminDetailComponent implements OnInit {
+export class CoopAdminDetailComponent {
   // =====================================================
   // SERVICES
   // =====================================================
@@ -70,29 +68,141 @@ export class CoopAdminDetailComponent implements OnInit {
 
   private coopAdminService = inject(CoopAdminService);
 
-  private cdr = inject(ChangeDetectorRef);
+  private queryClient = inject(QueryClient);
 
   // =====================================================
-  // COOPERATIVE DATA
+  // ROUTE ID
   // =====================================================
 
-  cooperative: CoopAdminRegistration | null = null;
+  private paramMap = toSignal(this.route.paramMap, { initialValue: null });
 
-  locations: CoopLocation[] = [];
+  private id = computed(() => {
+    const idParam = this.paramMap()?.get('id');
 
-  provinceName = '--';
-
-  districtName = '--';
-
-  localLevelName = '--';
+    return idParam ? Number(idParam) : NaN;
+  });
 
   // =====================================================
-  // LOADING / ERROR
+  // SERVER STATE (TanStack Query)
   // =====================================================
 
-  loading = true;
+  private cooperativeQuery = injectQuery(() => adminDetailQueryOptions(this.coopAdminService, this.id()));
 
-  loadError = '';
+  private locationsQuery = injectQuery(() => locationsQueryOptions(this.coopProfileService));
+
+  get cooperative(): CoopAdminRegistration | null {
+    return this.cooperativeQuery.data() ?? null;
+  }
+
+  get loading(): boolean {
+    return this.cooperativeQuery.isPending() || this.locationsQuery.isPending();
+  }
+
+  get loadError(): string {
+    if (!Number.isFinite(this.id())) {
+      return 'Invalid cooperative id.';
+    }
+
+    if (this.cooperativeQuery.isError()) {
+      return extractCoopErrorMessage(this.cooperativeQuery.error(), 'Unable to load cooperative details.');
+    }
+
+    return '';
+  }
+
+  private locationNames = computed(() => {
+    const cooperative = this.cooperativeQuery.data();
+
+    const locations = this.locationsQuery.data();
+
+    const fallback = { provinceName: '--', districtName: '--', localLevelName: '--' };
+
+    if (!cooperative || !locations?.length) {
+      return fallback;
+    }
+
+    const localLevelId = Number(cooperative.localLevelId);
+
+    const location = locations.find((loc) => Number(loc.id) === localLevelId);
+
+    if (!location) {
+      return fallback;
+    }
+
+    return {
+      provinceName: location.provinceNameEn || '--',
+      districtName: location.districtNameEn || '--',
+      localLevelName: location.localLevelNameEn || '--'
+    };
+  });
+
+  get provinceName(): string {
+    return this.locationNames().provinceName;
+  }
+
+  get districtName(): string {
+    return this.locationNames().districtName;
+  }
+
+  get localLevelName(): string {
+    return this.locationNames().localLevelName;
+  }
+
+  // =====================================================
+  // MUTATIONS
+  // =====================================================
+
+  /**
+   * All three mutations share the same aftermath: the
+   * mutated cooperative's own detail is known from the
+   * response (no refetch needed), while any cached
+   * filtered/paginated list and the stats counts may now
+   * be wrong and must be invalidated so the next read is
+   * correct.
+   */
+  private applyMutationResult(updated: CoopAdminRegistration): void {
+    this.queryClient.setQueryData(coopQueryKeys.admin.detail(updated.id), updated);
+
+    this.queryClient.invalidateQueries({ queryKey: coopQueryKeys.admin.listRoot() });
+
+    this.queryClient.invalidateQueries({ queryKey: coopQueryKeys.admin.stats() });
+  }
+
+  private verifyMutation = injectMutation(() => ({
+    mutationFn: (variables: { id: number; remarks: string }) =>
+      firstValueFrom(this.coopAdminService.verifyCooperative(variables.id, variables.remarks)),
+
+    onSuccess: (updated) => this.applyMutationResult(updated)
+  }));
+
+  private rejectMutation = injectMutation(() => ({
+    mutationFn: (variables: { id: number; reason: string }) =>
+      firstValueFrom(this.coopAdminService.rejectCooperative(variables.id, variables.reason)),
+
+    onSuccess: (updated) => this.applyMutationResult(updated)
+  }));
+
+  private activateMutation = injectMutation(() => ({
+    mutationFn: (id: number) => firstValueFrom(this.coopAdminService.activateCooperative(id)),
+
+    onSuccess: (updated) => this.applyMutationResult(updated)
+  }));
+
+  get isVerifying(): boolean {
+    return this.verifyMutation.isPending();
+  }
+
+  get isRejecting(): boolean {
+    return this.rejectMutation.isPending();
+  }
+
+  get isActivating(): boolean {
+    return this.activateMutation.isPending();
+  }
+
+  // =====================================================
+  // UI STATE
+  // =====================================================
 
   successMessage = '';
 
@@ -109,8 +219,6 @@ export class CoopAdminDetailComponent implements OnInit {
     ]
   });
 
-  isVerifying = false;
-
   // =====================================================
   // REJECT FORM
   // =====================================================
@@ -124,8 +232,6 @@ export class CoopAdminDetailComponent implements OnInit {
     ]
   });
 
-  isRejecting = false;
-
   // =====================================================
   // ACTIVATE FORM
   // =====================================================
@@ -134,207 +240,7 @@ export class CoopAdminDetailComponent implements OnInit {
     remarks: ['']
   });
 
-  isActivating = false;
-
   showActivateConfirm = false;
-
-  // =====================================================
-  // INIT
-  // =====================================================
-
-  ngOnInit(): void {
-    this.route.paramMap.subscribe((params) => {
-      const idParam = params.get('id');
-
-      const id = idParam ? Number(idParam) : NaN;
-
-      // -----------------------------------------------
-      // INVALID ID
-      // -----------------------------------------------
-
-      if (!idParam || Number.isNaN(id)) {
-        this.cooperative = null;
-
-        this.loading = false;
-
-        this.loadError = 'Invalid cooperative id.';
-
-        return;
-      }
-
-      // -----------------------------------------------
-      // LOAD
-      // -----------------------------------------------
-
-      this.loadCooperative(id);
-    });
-  }
-
-  // =====================================================
-  // LOAD COOPERATIVE + LOCATIONS
-  // =====================================================
-
-  private loadCooperative(id: number): void {
-    this.loading = true;
-
-    this.loadError = '';
-
-    this.errorMessage = '';
-
-    this.successMessage = '';
-
-    this.cooperative = null;
-
-    /*
-     * Reset location names while loading.
-     */
-
-    this.provinceName = '--';
-
-    this.districtName = '--';
-
-    this.localLevelName = '--';
-
-    /*
-     * IMPORTANT:
-     *
-     * Cooperative API and Locations API are now
-     * requested in parallel.
-     *
-     * Before:
-     *
-     * cooperative API
-     *       ↓
-     * locations API
-     *
-     * Now:
-     *
-     * cooperative API ─────┐
-     *                       ├──> continue
-     * locations API ───────┘
-     *
-     * This prevents unnecessary sequential waiting.
-     */
-
-    forkJoin({
-      cooperative: this.coopAdminService.getCooperativeById(id),
-
-      locations: this.coopProfileService.getLocations()
-    }).subscribe({
-      // =================================================
-      // SUCCESS
-      // =================================================
-
-      next: ({ cooperative, locations }) => {
-        console.log('COOPERATIVE DETAILS:', cooperative);
-
-        console.log('LOCATIONS:', locations);
-
-        // -----------------------------------------------
-        // SET DATA
-        // -----------------------------------------------
-
-        this.cooperative = cooperative;
-
-        this.locations = locations;
-
-        // -----------------------------------------------
-        // FIND LOCATION
-        // -----------------------------------------------
-
-        this.setLocationNames();
-
-        // -----------------------------------------------
-        // FINISHED
-        // -----------------------------------------------
-
-        this.loading = false;
-
-        this.cdr.detectChanges();
-      },
-
-      // =================================================
-      // ERROR
-      // =================================================
-
-      error: (error) => {
-        console.error('COOPERATIVE / LOCATION API ERROR:', error);
-
-        console.error('STATUS:', error?.status);
-
-        console.error('ERROR BODY:', error?.error);
-
-        this.cooperative = null;
-
-        this.loading = false;
-
-        this.loadError = error?.error?.error || error?.error?.message || 'Unable to load cooperative details.';
-
-        this.cdr.detectChanges();
-      }
-    });
-  }
-
-  // =====================================================
-  // SET LOCATION NAMES
-  // =====================================================
-
-  private setLocationNames(): void {
-    if (!this.cooperative) {
-      return;
-    }
-
-    if (!this.locations.length) {
-      console.warn('Locations list is empty.');
-
-      this.provinceName = '--';
-
-      this.districtName = '--';
-
-      this.localLevelName = '--';
-
-      return;
-    }
-
-    const localLevelId = Number(this.cooperative.localLevelId);
-
-    console.log('Looking for local level:', localLevelId);
-
-    /*
-     * Match localLevelId with location.id.
-     */
-
-    const location = this.locations.find((loc) => Number(loc.id) === localLevelId);
-
-    console.log('MATCHED LOCATION:', location);
-
-    // ===================================================
-    // MATCH FOUND
-    // ===================================================
-
-    if (location) {
-      this.provinceName = location.provinceNameEn || '--';
-
-      this.districtName = location.districtNameEn || '--';
-
-      this.localLevelName = location.localLevelNameEn || '--';
-    }
-
-    // ===================================================
-    // MATCH NOT FOUND
-    // ===================================================
-    else {
-      console.warn('Location not found for localLevelId:', localLevelId);
-
-      this.provinceName = '--';
-
-      this.districtName = '--';
-
-      this.localLevelName = '--';
-    }
-
-    this.cdr.detectChanges();
-  }
 
   // =====================================================
   // VERIFY COOPERATIVE
@@ -342,7 +248,9 @@ export class CoopAdminDetailComponent implements OnInit {
   // =====================================================
 
   submitVerify(): void {
-    if (!this.cooperative) {
+    const cooperative = this.cooperative;
+
+    if (!cooperative) {
       return;
     }
 
@@ -358,34 +266,20 @@ export class CoopAdminDetailComponent implements OnInit {
 
     const remarks = this.verifyForm.getRawValue().remarks;
 
-    this.isVerifying = true;
+    this.verifyMutation.mutate(
+      { id: cooperative.id, remarks },
+      {
+        onSuccess: () => {
+          this.successMessage = 'Cooperative verified and tenant provisioned successfully.';
 
-    this.coopAdminService.verifyCooperative(this.cooperative.id, remarks).subscribe({
-      next: (updated) => {
-        console.log('VERIFY SUCCESS:', updated);
+          this.verifyForm.reset();
+        },
 
-        this.isVerifying = false;
-
-        this.cooperative = updated;
-
-        this.successMessage = 'Cooperative verified and tenant provisioned successfully.';
-
-        this.verifyForm.reset();
-
-        this.cdr.detectChanges();
-      },
-
-      error: (error) => {
-        console.error('VERIFY ERROR:', error);
-
-        this.isVerifying = false;
-
-        this.errorMessage =
-          error?.error?.error || error?.error?.message || 'Unable to verify this cooperative. Please try again.';
-
-        this.cdr.detectChanges();
+        onError: (error) => {
+          this.errorMessage = extractCoopErrorMessage(error, 'Unable to verify this cooperative. Please try again.');
+        }
       }
-    });
+    );
   }
 
   // =====================================================
@@ -405,7 +299,9 @@ export class CoopAdminDetailComponent implements OnInit {
   // =====================================================
 
   submitReject(): void {
-    if (!this.cooperative) {
+    const cooperative = this.cooperative;
+
+    if (!cooperative) {
       return;
     }
 
@@ -421,36 +317,22 @@ export class CoopAdminDetailComponent implements OnInit {
 
     const reason = this.rejectForm.getRawValue().reason;
 
-    this.isRejecting = true;
+    this.rejectMutation.mutate(
+      { id: cooperative.id, reason },
+      {
+        onSuccess: () => {
+          this.successMessage = 'Cooperative has been rejected.';
 
-    this.coopAdminService.rejectCooperative(this.cooperative.id, reason).subscribe({
-      next: (updated) => {
-        console.log('REJECT SUCCESS:', updated);
+          this.showRejectForm = false;
 
-        this.isRejecting = false;
+          this.rejectForm.reset();
+        },
 
-        this.cooperative = updated;
-
-        this.successMessage = 'Cooperative has been rejected.';
-
-        this.showRejectForm = false;
-
-        this.rejectForm.reset();
-
-        this.cdr.detectChanges();
-      },
-
-      error: (error) => {
-        console.error('REJECT ERROR:', error);
-
-        this.isRejecting = false;
-
-        this.errorMessage =
-          error?.error?.error || error?.error?.message || 'Unable to reject this cooperative. Please try again.';
-
-        this.cdr.detectChanges();
+        onError: (error) => {
+          this.errorMessage = extractCoopErrorMessage(error, 'Unable to reject this cooperative. Please try again.');
+        }
       }
-    });
+    );
   }
 
   // =====================================================
@@ -471,11 +353,13 @@ export class CoopAdminDetailComponent implements OnInit {
   // =====================================================
 
   confirmActivate(): void {
-    if (!this.cooperative) {
+    const cooperative = this.cooperative;
+
+    if (!cooperative) {
       return;
     }
 
-    if (this.cooperative.status !== 'PROVISIONED') {
+    if (cooperative.status !== 'PROVISIONED') {
       this.errorMessage = 'Only a provisioned tenant can be activated.';
 
       return;
@@ -485,41 +369,22 @@ export class CoopAdminDetailComponent implements OnInit {
 
     this.errorMessage = '';
 
-    this.isActivating = true;
-
-    console.log('Activating cooperative ID:', this.cooperative.id);
-
-    this.coopAdminService.activateCooperative(this.cooperative.id).subscribe({
-      next: (updated) => {
-        console.log('ACTIVATE SUCCESS:', updated);
-
-        this.isActivating = false;
-
-        this.cooperative = updated;
-
+    this.activateMutation.mutate(cooperative.id, {
+      onSuccess: () => {
         this.successMessage = 'Tenant has been activated successfully.';
 
         this.showActivateConfirm = false;
 
         this.activateForm.reset();
-
-        this.cdr.detectChanges();
       },
 
-      error: (error) => {
-        console.error('ACTIVATE ERROR:', error);
-
-        this.isActivating = false;
-
+      onError: (error: any) => {
         if (error?.status === 403) {
           this.errorMessage =
             'You are not authorized to activate this tenant. Please check the backend authorization/permission for the activate endpoint.';
         } else {
-          this.errorMessage =
-            error?.error?.error || error?.error?.message || 'Unable to activate this tenant. Please try again.';
+          this.errorMessage = extractCoopErrorMessage(error, 'Unable to activate this tenant. Please try again.');
         }
-
-        this.cdr.detectChanges();
       }
     });
   }

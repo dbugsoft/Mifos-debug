@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { Component, DestroyRef, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
@@ -21,15 +21,14 @@ import { MatTableModule } from '@angular/material/table';
 import { MatChipsModule } from '@angular/material/chips';
 
 import { debounceTime, distinctUntilChanged } from 'rxjs';
+import { QueryClient, injectQuery } from '@tanstack/angular-query-experimental';
 
-import {
-  CoopAdminRegistration,
-  CoopAdminService,
-  CoopAdminStats,
-  CoopAdminStatus
-} from '../../services/coop-admin.service';
+import { CoopAdminRegistration, CoopAdminService, CoopAdminStatus } from '../../services/coop-admin.service';
 import { CoopAuthService } from '../../services/coop-auth.service';
 import { CoopTokenService } from '../../services/coop-token.service';
+import { adminListQueryOptions, adminStatsQueryOptions } from '../../queries/coop-admin.queries';
+import { extractCoopErrorMessage } from '../../queries/coop-error.util';
+import { clearCoopUserQueries } from '../../queries/coop-cache.util';
 
 @Component({
   selector: 'mifosx-coop-admin-dashboard',
@@ -49,21 +48,14 @@ import { CoopTokenService } from '../../services/coop-token.service';
   templateUrl: './coop-admin-dashboard.component.html',
   styleUrl: './coop-admin-dashboard.component.scss'
 })
-export class CoopAdminDashboardComponent implements OnInit {
+export class CoopAdminDashboardComponent {
   private fb = inject(FormBuilder);
   private coopAdminService = inject(CoopAdminService);
   private coopAuthService = inject(CoopAuthService);
   private coopTokenService = inject(CoopTokenService);
+  private queryClient = inject(QueryClient);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
-  private cdr = inject(ChangeDetectorRef);
-  // =====================================================
-  // STATS
-  // =====================================================
-
-  stats: CoopAdminStats | null = null;
-  statsLoading = true;
-  statsError = '';
 
   // =====================================================
   // LIST / SEARCH / PAGINATION
@@ -91,22 +83,17 @@ export class CoopAdminDashboardComponent implements OnInit {
     q: ''
   });
 
-  cooperatives: CoopAdminRegistration[] = [];
-
   readonly pageSizeOptions = [
     10,
     20,
     50
   ];
 
-  pageSize = 20;
-  currentPage = 1;
+  pageSize = signal(20);
+  currentPage = signal(1);
 
-  hasMore = false;
-  isFirstPage = true;
-
-  listLoading = false;
-  listError = '';
+  private statusFilter = signal<CoopAdminStatus | ''>('');
+  private searchTerm = signal('');
 
   /*
    * The list endpoint can be noticeably slow, so the
@@ -116,58 +103,82 @@ export class CoopAdminDashboardComponent implements OnInit {
    */
 
   // =====================================================
+  // SERVER STATE (TanStack Query)
+  // =====================================================
+
+  private queryParams = computed(() => ({
+    status: this.statusFilter() || undefined,
+    q: this.searchTerm() || undefined,
+    limit: this.pageSize(),
+    offset: (this.currentPage() - 1) * this.pageSize()
+  }));
+
+  private statsQuery = injectQuery(() => adminStatsQueryOptions(this.coopAdminService));
+
+  private cooperativesQuery = injectQuery(() => adminListQueryOptions(this.coopAdminService, this.queryParams()));
+
+  get stats() {
+    return this.statsQuery.data() ?? null;
+  }
+
+  get statsLoading(): boolean {
+    return this.statsQuery.isPending();
+  }
+
+  get statsError(): string {
+    if (!this.statsQuery.isError()) {
+      return '';
+    }
+
+    return extractCoopErrorMessage(this.statsQuery.error(), 'Unable to load cooperative statistics.');
+  }
+
+  get cooperatives(): CoopAdminRegistration[] {
+    return this.cooperativesQuery.data() ?? [];
+  }
+
+  get listLoading(): boolean {
+    return this.cooperativesQuery.isFetching();
+  }
+
+  get listError(): string {
+    if (!this.cooperativesQuery.isError()) {
+      return '';
+    }
+
+    return extractCoopErrorMessage(this.cooperativesQuery.error(), 'Unable to load cooperatives. Please try again.');
+  }
+
+  get hasMore(): boolean {
+    return this.cooperatives.length === this.pageSize();
+  }
+
+  get isFirstPage(): boolean {
+    return this.currentPage() === 1;
+  }
+
+  // =====================================================
   // INIT
   // =====================================================
 
-  ngOnInit(): void {
-    console.log('========== ADMIN DASHBOARD INIT ==========');
-
-    // Empty string = ALL statuses
-    this.filterForm.controls.status.setValue('', {
-      emitEvent: false
-    });
-
-    console.log('1. Filter initialized');
-
-    console.log('2. Calling loadStats()');
-    this.loadStats();
-
-    console.log('3. Calling loadCooperatives()');
-    this.loadCooperatives(true);
-
+  constructor() {
+    /*
+     * Only the free-text search is debounced - status and
+     * pagination changes call statusFilter.set()/currentPage.set()
+     * directly and take effect immediately. A 3s debounce means
+     * no Admin List request fires per keystroke; the searchTerm
+     * signal (and therefore the TanStack Query key/queryFn) only
+     * updates once the user has stopped typing for 3000ms.
+     * distinctUntilChanged() additionally skips re-triggering the
+     * query when debounce settles on the same value it already
+     * had (e.g. typing then deleting back to the original text).
+     */
     this.filterForm.controls.q.valueChanges
-      .pipe(debounceTime(400), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
-        console.log('SEARCH CHANGED');
-
-        this.loadCooperatives(true);
+      .pipe(debounceTime(3000), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
+      .subscribe((q) => {
+        this.searchTerm.set(q);
+        this.currentPage.set(1);
       });
-  }
-  // =====================================================
-  // STATS
-  // =====================================================
-  private loadStats(): void {
-    this.statsLoading = true;
-    this.statsError = '';
-
-    this.coopAdminService.getStats().subscribe({
-      next: (stats) => {
-        this.stats = {
-          PENDING: stats?.PENDING ?? 0,
-          PROVISIONED: stats?.PROVISIONED ?? 0,
-          ACTIVE: stats?.ACTIVE ?? 0,
-          REJECTED: stats?.REJECTED ?? 0
-        };
-
-        this.statsLoading = false;
-      },
-
-      error: (error) => {
-        this.statsLoading = false;
-
-        this.statsError = error?.error?.error || error?.error?.message || 'Unable to load cooperative statistics.';
-      }
-    });
   }
 
   // =====================================================
@@ -175,90 +186,20 @@ export class CoopAdminDashboardComponent implements OnInit {
   // =====================================================
 
   onStatusFilterChange(): void {
-    this.loadCooperatives(true);
+    this.statusFilter.set(this.filterForm.controls.status.value);
+    this.currentPage.set(1);
   }
 
-  /**
-   * @param reset true for a fresh search/filter (starts
-   * back at offset 0 and replaces the list); false to
-   * append the next page onto the existing list.
-   */
-  loadCooperatives(reset: boolean = false): void {
-    console.log('========== loadCooperatives() ENTERED ==========');
-    console.log('reset:', reset);
-
-    if (reset) {
-      this.currentPage = 1;
-      this.cooperatives = [];
-    }
-
-    this.listLoading = true;
-    this.listError = '';
-
-    const { status, q } = this.filterForm.getRawValue();
-
-    console.log('Current page:', this.currentPage);
-    console.log('STATUS:', status);
-    console.log('SEARCH:', q);
-
-    const apiParams = {
-      status: status || undefined,
-      q: q || undefined,
-      limit: this.pageSize,
-      offset: (this.currentPage - 1) * this.pageSize
-    };
-
-    console.log('API PARAMS:', apiParams);
-    console.log('========== CALLING getCooperatives() ==========');
-
-    this.coopAdminService.getCooperatives(apiParams).subscribe({
-      next: (results) => {
-        console.log('========== API SUCCESS ==========');
-        console.log('COOPERATIVE RESULTS:', results);
-        console.log('RESULT COUNT:', results?.length);
-
-        // IMPORTANT
-        this.cooperatives = [...(results || [])];
-
-        this.hasMore = this.cooperatives.length === this.pageSize;
-
-        this.isFirstPage = this.currentPage === 1;
-
-        this.listLoading = false;
-
-        console.log('COOPERATIVES AFTER ASSIGN:', this.cooperatives);
-
-        console.log('LIST LOADING:', this.listLoading);
-
-        // Force Angular UI update
-        this.cdr.detectChanges();
-
-        console.log('========== CHANGE DETECTION DONE ==========');
-      },
-
-      error: (error) => {
-        console.error('========== API ERROR ==========');
-
-        console.error(error);
-
-        this.listLoading = false;
-
-        this.listError =
-          error?.error?.error || error?.error?.message || 'Unable to load cooperatives. Please try again.';
-
-        this.cdr.detectChanges();
-      }
-    });
+  goToFirstPage(): void {
+    this.currentPage.set(1);
   }
 
   goToPreviousPage(): void {
-    if (this.currentPage <= 1 || this.listLoading) {
+    if (this.isFirstPage || this.listLoading) {
       return;
     }
 
-    this.currentPage--;
-
-    this.loadCooperatives();
+    this.currentPage.update((page) => page - 1);
   }
 
   goToNextPage(): void {
@@ -266,15 +207,11 @@ export class CoopAdminDashboardComponent implements OnInit {
       return;
     }
 
-    this.currentPage++;
-
-    this.loadCooperatives();
+    this.currentPage.update((page) => page + 1);
   }
 
   changePageSize(): void {
-    this.currentPage = 1;
-
-    this.loadCooperatives();
+    this.currentPage.set(1);
   }
 
   viewDetails(cooperative: CoopAdminRegistration): void {
@@ -292,20 +229,30 @@ export class CoopAdminDashboardComponent implements OnInit {
     const refreshToken = this.coopTokenService.getRefreshToken();
 
     if (!refreshToken) {
-      this.coopTokenService.clearSession();
+      this.clearCoopSession();
       this.router.navigate(['/coop/login']);
       return;
     }
 
     this.coopAuthService.logout({ refreshToken }).subscribe({
       next: () => {
-        this.coopTokenService.clearSession();
+        this.clearCoopSession();
         this.router.navigate(['/coop/login']);
       },
       error: () => {
-        this.coopTokenService.clearSession();
+        this.clearCoopSession();
         this.router.navigate(['/coop/login']);
       }
     });
+  }
+
+  /**
+   * Clears tokens plus every user-specific cached query, so
+   * a different account logging in afterwards never sees
+   * this user's cached profile/admin data.
+   */
+  private clearCoopSession(): void {
+    this.coopTokenService.clearSession();
+    clearCoopUserQueries(this.queryClient);
   }
 }
