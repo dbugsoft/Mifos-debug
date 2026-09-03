@@ -1,0 +1,352 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="admin-dashboard-page">
+  <!-- =========================
+       FIXED NAVBAR
+       Stays in place while the
+       content area below scrolls.
+  ========================== -->
+
+  <mifosx-coop-admin-navbar></mifosx-coop-admin-navbar>
+
+  <!-- =========================
+       SCROLLABLE CONTENT
+  ========================== -->
+
+  <div class="dashboard-scroll-area">
+    <!-- =========================
+         OVERVIEW
+    ========================== -->
+
+    <section class="dashboard-section">
+      <div class="section-heading">
+        <div>
+          <span class="section-kicker">OVERVIEW</span>
+
+          <h2>Registration Summary</h2>
+
+          <p>Current status of cooperative registrations.</p>
+        </div>
+      </div>
+
+      <!-- ERROR -->
+
+      <div class="message error-message" *ngIf="statsError">
+        {{ statsError }}
+      </div>
+
+      <!-- STAT CARDS -->
+
+      <div class="stats-grid" *ngIf="stats">
+        <!-- PENDING -->
+
+        <mat-card class="stat-card">
+          <div class="stat-card-header">
+            <div class="stat-icon pending-icon">⏳</div>
+
+            <span class="stat-title"> Pending </span>
+          </div>
+
+          <div class="stat-number">
+            {{ stats.PENDING }}
+          </div>
+
+          <div class="stat-description">Awaiting review</div>
+        </mat-card>
+
+        <!-- PROVISIONED -->
+
+        <mat-card class="stat-card">
+          <div class="stat-card-header">
+            <div class="stat-icon provisioned-icon">◈</div>
+
+            <span class="stat-title"> Provisioned </span>
+          </div>
+
+          <div class="stat-number">
+            {{ stats.PROVISIONED }}
+          </div>
+
+          <div class="stat-description">Tenant provisioned</div>
+        </mat-card>
+
+        <!-- ACTIVE -->
+
+        <mat-card class="stat-card">
+          <div class="stat-card-header">
+            <div class="stat-icon active-icon">✓</div>
+
+            <span class="stat-title"> Active </span>
+          </div>
+
+          <div class="stat-number">
+            {{ stats.ACTIVE }}
+          </div>
+
+          <div class="stat-description">Active cooperatives</div>
+        </mat-card>
+
+        <!-- REJECTED -->
+
+        <mat-card class="stat-card">
+          <div class="stat-card-header">
+            <div class="stat-icon rejected-icon">×</div>
+
+            <span class="stat-title"> Rejected </span>
+          </div>
+
+          <div class="stat-number">
+            {{ stats.REJECTED }}
+          </div>
+
+          <div class="stat-description">Rejected applications</div>
+        </mat-card>
+      </div>
+    </section>
+
+    <!-- =========================
+         COOPERATIVE LIST
+    ========================== -->
+
+    <section class="dashboard-section cooperative-section">
+      <div class="section-heading list-heading">
+        <div>
+          <span class="section-kicker"> MANAGEMENT </span>
+
+          <h2>Cooperatives</h2>
+
+          <p>Search and review registered cooperatives.</p>
+        </div>
+
+        <div class="total-badge">{{ cooperatives.length }} Records</div>
+      </div>
+
+      <!-- =========================
+           FILTER BAR
+      ========================== -->
+
+      <div class="filter-bar" [formGroup]="filterForm">
+        <mat-form-field appearance="outline" class="status-filter">
+          <mat-label>Status</mat-label>
+
+          <mat-select formControlName="status" (selectionChange)="onStatusFilterChange()">
+            <mat-option *ngFor="let option of statusOptions" [value]="option.value">
+              {{ option.label }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="search-filter">
+          <mat-label>Search cooperatives</mat-label>
+
+          <input matInput formControlName="q" placeholder="Name, registration number or code..." />
+        </mat-form-field>
+      </div>
+
+      <!-- =========================
+           ERROR
+      ========================== -->
+
+      <div class="message error-message" *ngIf="listError">
+        {{ listError }}
+      </div>
+
+      <!-- =========================
+           EMPTY STATE
+      ========================== -->
+
+      <div class="empty-state" *ngIf="!listLoading && !listError && cooperatives.length === 0">
+        <div class="empty-icon">⌕</div>
+
+        <h3>No cooperatives found</h3>
+
+        <p>Try changing your search or status filter.</p>
+      </div>
+
+      <!-- =========================
+           TABLE
+      ========================== -->
+
+      <div class="table-wrapper" *ngIf="cooperatives.length > 0">
+        <table mat-table [dataSource]="cooperatives" class="cooperative-table">
+          <!-- COOPERATIVE -->
+
+          <ng-container matColumnDef="nameEn">
+            <th mat-header-cell *matHeaderCellDef>Cooperative</th>
+
+            <td mat-cell *matCellDef="let coop">
+              <div class="coop-info">
+                <div class="coop-avatar">
+                  {{ (coop.nameEn || 'C').charAt(0).toUpperCase() }}
+                </div>
+
+                <div class="coop-details">
+                  <div class="coop-name">
+                    {{ coop.nameEn }}
+                  </div>
+
+                  <div class="coop-name-np" *ngIf="coop.nameNp">
+                    {{ coop.nameNp }}
+                  </div>
+                </div>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- REGISTRATION NUMBER -->
+
+          <ng-container matColumnDef="coopRegdNo">
+            <th mat-header-cell *matHeaderCellDef>Registration No.</th>
+
+            <td mat-cell *matCellDef="let coop">
+              <span class="code-text">
+                {{ coop.coopRegdNo }}
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- COOPERATIVE CODE -->
+
+          <ng-container matColumnDef="cooperativeCode">
+            <th mat-header-cell *matHeaderCellDef>Cooperative Code</th>
+
+            <td mat-cell *matCellDef="let coop">
+              <span class="code-text">
+                {{ coop.cooperativeCode }}
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- MOBILE -->
+
+          <ng-container matColumnDef="mobilePhone">
+            <th mat-header-cell *matHeaderCellDef>Mobile</th>
+
+            <td mat-cell *matCellDef="let coop">
+              {{ coop.mobilePhone }}
+            </td>
+          </ng-container>
+
+          <!-- STATUS -->
+
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+
+            <td mat-cell *matCellDef="let coop">
+              <span class="status-chip" [ngClass]="'status-' + coop.status.toLowerCase()">
+                <span class="status-dot"></span>
+
+                {{ coop.status }}
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- ACTION -->
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef></th>
+
+            <td mat-cell *matCellDef="let coop">
+              <button mat-button type="button" class="view-button" (click)="viewDetails(coop)">View details →</button>
+            </td>
+          </ng-container>
+
+          <!-- HEADER ROW -->
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+
+          <!-- DATA ROW -->
+
+          <tr
+            mat-row
+            *matRowDef="let row; columns: displayedColumns"
+            class="cooperative-row"
+            (click)="viewDetails(row)"
+          ></tr>
+        </table>
+      </div>
+
+      <!-- =========================
+           PAGINATION
+      ========================== -->
+
+      <div class="pagination-container" *ngIf="cooperatives.length > 0">
+        <!-- ITEMS PER PAGE -->
+
+        <div class="items-per-page">
+          <span class="pagination-label"> Items per page </span>
+
+          <mat-form-field appearance="outline" class="page-size-select">
+            <mat-select [(value)]="pageSize" (selectionChange)="changePageSize()">
+              <mat-option *ngFor="let size of pageSizeOptions" [value]="size">
+                {{ size }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <!-- PAGE NUMBER -->
+
+        <div class="page-info">Page {{ currentPage }}</div>
+
+        <!-- NAVIGATION -->
+
+        <div class="pagination-controls">
+          <!-- FIRST -->
+
+          <button
+            mat-icon-button
+            type="button"
+            aria-label="First page"
+            [disabled]="isFirstPage || listLoading"
+            (click)="currentPage = 1; loadCooperatives()"
+          >
+            <span>«</span>
+          </button>
+
+          <!-- PREVIOUS -->
+
+          <button
+            mat-icon-button
+            type="button"
+            aria-label="Previous page"
+            [disabled]="isFirstPage || listLoading"
+            (click)="goToPreviousPage()"
+          >
+            <span>‹</span>
+          </button>
+
+          <!-- NEXT -->
+
+          <button
+            mat-icon-button
+            type="button"
+            aria-label="Next page"
+            [disabled]="!hasMore || listLoading"
+            (click)="goToNextPage()"
+          >
+            <span>›</span>
+          </button>
+
+          <!-- LAST -->
+
+          <button
+            mat-icon-button
+            type="button"
+            aria-label="Next page"
+            [disabled]="!hasMore || listLoading"
+            (click)="goToNextPage()"
+          >
+            <span>»</span>
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>

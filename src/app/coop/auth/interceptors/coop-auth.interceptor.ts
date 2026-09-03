@@ -20,15 +20,15 @@ import { CoopTokenService } from '../../services/coop-token.service';
  * these persist for the lifetime of the app).
  *
  * isRefreshing:
- *   True while a /refresh call is in flight, so that if
- *   several requests 401 at the same time we only call
- *   /refresh ONCE instead of once per failed request.
+ * True while a /refresh call is in flight, so that if
+ * several requests 401 at the same time we only call
+ * /refresh ONCE instead of once per failed request.
  *
  * refreshTokenSubject:
- *   Emits the new accessToken once a refresh completes.
- *   Any request that arrived while a refresh was already
- *   in progress waits on this instead of triggering its
- *   own refresh call.
+ * Emits the new accessToken once a refresh completes.
+ * Any request that arrived while a refresh was already
+ * in progress waits on this instead of triggering its
+ * own refresh call.
  */
 let isRefreshing = false;
 
@@ -93,15 +93,15 @@ export const coopAuthInterceptor: HttpInterceptorFn = (req, next) => {
  * Handles a 401 from any protected Coop API call:
  *
  * - If no refresh is currently in flight, start one.
- *   On success, save the new tokens and retry the
- *   original request with the new access token.
- *   On failure, the refresh token is no longer valid -
- *   clear the session and send the user to login.
+ * On success, save the new tokens and retry the
+ * original request with the new access token.
+ * On failure, the refresh token is no longer valid -
+ * clear the session and send the user to login.
  *
  * - If a refresh is already in flight (triggered by a
- *   different request that also 401'd around the same
- *   time), wait for it to finish and reuse its result
- *   instead of calling /refresh again.
+ * different request that also 401'd around the same
+ * time), wait for it to finish and reuse its result
+ * instead of calling /refresh again.
  */
 function handleUnauthorized(
   originalReq: Parameters<HttpInterceptorFn>[0],
@@ -129,7 +129,17 @@ function handleUnauthorized(
 
     return coopAuthService.refresh({ refreshToken }).pipe(
       switchMap((tokens) => {
+        console.log('========== REFRESH SUCCESS ==========');
+
+        console.log('New Access Token:', tokens.accessToken);
+
+        console.log('New Refresh Token:', tokens.refreshToken);
+
         coopTokenService.updateTokens(tokens);
+
+        console.log('Roles after refresh:', coopTokenService.getRoles());
+
+        console.log('Is Admin after refresh:', coopTokenService.isAdmin());
 
         isRefreshing = false;
 
@@ -145,6 +155,8 @@ function handleUnauthorized(
       }),
 
       catchError((refreshError) => {
+        console.error('========== REFRESH FAILED ==========', refreshError);
+
         isRefreshing = false;
 
         coopTokenService.clearSession();

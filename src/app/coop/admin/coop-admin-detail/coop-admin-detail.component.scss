@@ -1,0 +1,1326 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+
+  /* =========================================================
+     DESIGN TOKENS
+  ========================================================= */
+
+  --primary: #1074b9;
+  --primary-dark: #1074b9;
+  --primary-light: #eff6ff;
+  --text-primary: #172033;
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
+  --border: #e5e7eb;
+  --border-light: #eef2f7;
+  --surface: #fff;
+  --background: #f6f8fc;
+  --success: #16a34a;
+  --success-bg: #f0fdf4;
+  --success-border: #bbf7d0;
+  --warning: #d97706;
+  --warning-bg: #fffbeb;
+  --warning-border: #fde68a;
+  --danger: #dc2626;
+  --danger-bg: #fef2f2;
+  --danger-border: #fecaca;
+  --purple: #1074b9;
+  --purple-bg: #f5f3ff;
+  --purple-border: #ddd6fe;
+  --primary-border: #bfdbfe;
+  --shadow-sm: 0 1px 2px rgb(15 23 42 / 4%);
+  --shadow-md: 0 8px 24px rgb(15 23 42 / 7%);
+  --shadow-lg: 0 16px 40px rgb(15 23 42 / 9%);
+}
+
+/* =========================================================
+   PAGE
+
+   Flex column: the navbar is a normal (non-scrolling) flex
+   child, and .admin-detail-content is the only part that
+   scrolls - see below. This is what actually makes the
+   navbar "fixed" while the page underneath scrolls.
+========================================================= */
+
+.admin-detail-page {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  background: radial-gradient(circle at 10% 0%, rgb(37 99 235 / 5.5%), transparent 27%), var(--background);
+  color: var(--text-primary);
+  overflow: hidden;
+}
+
+/*
+ * The navbar component itself owns its internal styling -
+ * this just guarantees it behaves as a fixed, non-shrinking
+ * header no matter what display type it defaults to.
+ */
+mifosx-coop-admin-navbar {
+  display: block;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 30;
+}
+
+.admin-detail-content {
+  flex: 1;
+  min-height: 0;
+  padding: 30px clamp(20px, 5vw, 72px) 60px;
+  box-sizing: border-box;
+  overflow: hidden auto;
+  scroll-behavior: smooth;
+}
+
+/* Slim, unobtrusive scrollbar for the content area */
+
+.admin-detail-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.admin-detail-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.admin-detail-content::-webkit-scrollbar-thumb {
+  background: #d3dbe4;
+  border-radius: 10px;
+}
+
+.admin-detail-content::-webkit-scrollbar-thumb:hover {
+  background: #b7c2cd;
+}
+
+/* =========================================================
+   BACK LINK
+========================================================= */
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 22px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.back-link:hover {
+  color: var(--primary);
+  transform: translateX(-2px);
+}
+
+/* =========================================================
+   ALERTS
+========================================================= */
+
+.error-message,
+.alert {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 15px;
+  margin-bottom: 18px;
+  border-radius: 11px;
+  font-size: 12px;
+  font-weight: 500;
+  box-sizing: border-box;
+}
+
+.error-message,
+.error-alert {
+  color: #991b1b;
+  background: var(--danger-bg);
+  border: 1px solid var(--danger-border);
+}
+
+.success-alert {
+  color: #166534;
+  background: var(--success-bg);
+  border: 1px solid var(--success-border);
+}
+
+.alert-icon {
+  width: 23px;
+  height: 23px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.error-message .alert-icon,
+.error-alert .alert-icon {
+  background: #fee2e2;
+  color: var(--danger);
+}
+
+.success-alert .alert-icon {
+  background: #dcfce7;
+  color: var(--success);
+}
+
+/* =========================================================
+   DETAIL HEADER
+========================================================= */
+
+.detail-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 25px;
+  min-height: 155px;
+  padding: 28px 32px;
+  margin-bottom: 18px;
+  overflow: hidden;
+  box-sizing: border-box;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #172554 0%, #1074b9 45%, #1074b9 100%);
+  color: white;
+  box-shadow: 0 12px 32px rgb(30 64 175 / 18%);
+}
+
+/* =========================================================
+   HEADER DECORATION
+========================================================= */
+
+.detail-header::before {
+  content: '';
+  position: absolute;
+  width: 340px;
+  height: 340px;
+  right: -130px;
+  top: -180px;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 7%);
+  pointer-events: none;
+}
+
+.detail-header::after {
+  content: '';
+  position: absolute;
+  width: 190px;
+  height: 190px;
+  right: 23%;
+  bottom: -150px;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 4%);
+  pointer-events: none;
+}
+
+/* =========================================================
+   HEADER LEFT
+========================================================= */
+
+.detail-header .header-left {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-width: 0;
+}
+
+.coop-icon {
+  width: 68px;
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  border-radius: 18px;
+  background: rgb(255 255 255 / 13%);
+  border: 1px solid rgb(255 255 255 / 18%);
+  color: white;
+  font-size: 25px;
+  font-weight: 800;
+  backdrop-filter: blur(10px);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 15%);
+}
+
+.header-text {
+  min-width: 0;
+}
+
+.header-text h1 {
+  margin: 0;
+  overflow: hidden;
+  color: white;
+  font-size: clamp(22px, 3vw, 30px);
+  line-height: 1.2;
+  font-weight: 750;
+  letter-spacing: -0.025em;
+  text-overflow: ellipsis;
+}
+
+.name-np {
+  margin: 5px 0 0;
+  color: rgb(255 255 255 / 72%);
+  font-size: 13px;
+}
+
+.subtitle {
+  margin: 7px 0 0;
+  color: rgb(255 255 255 / 57%);
+  font-size: 12px;
+}
+
+/* =========================================================
+   STATUS BADGE
+========================================================= */
+
+.header-status {
+  position: relative;
+  z-index: 2;
+  flex: 0 0 auto;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 13px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentcolor;
+}
+
+.status-pending {
+  color: #fbbf24;
+  background: rgb(245 158 11 / 14%);
+  border-color: rgb(253 230 138 / 25%);
+}
+
+.status-provisioned {
+  color: #c4b5fd;
+  background: rgb(124 58 237 / 18%);
+  border-color: rgb(221 214 254 / 22%);
+}
+
+.status-active {
+  color: #86efac;
+  background: rgb(22 163 74 / 16%);
+  border-color: rgb(187 247 208 / 22%);
+}
+
+.status-rejected {
+  color: #fca5a5;
+  background: rgb(220 38 38 / 16%);
+  border-color: rgb(254 202 202 / 22%);
+}
+
+/* =========================================================
+   INFORMATION PAPER
+========================================================= */
+
+.information-paper {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
+}
+
+.information-section {
+  padding: 30px 32px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.information-section:last-child {
+  border-bottom: 0;
+}
+
+/* =========================================================
+   SECTION HEADING
+========================================================= */
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-bottom: 24px;
+}
+
+.section-icon {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  border-radius: 11px;
+  background: var(--primary-light);
+  color: var(--primary);
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.section-heading h2 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 16px;
+  font-weight: 750;
+  letter-spacing: -0.01em;
+}
+
+.section-heading p {
+  margin: 4px 0 0;
+  color: var(--text-muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   DETAIL GRID
+========================================================= */
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  overflow: hidden;
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.detail-field {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  min-height: 72px;
+  padding: 15px 17px;
+  box-sizing: border-box;
+  background: #fff;
+  border-right: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--border-light);
+  transition: background 0.15s ease;
+}
+
+.detail-field:hover {
+  background: #fafbfd;
+}
+
+.detail-field:nth-child(3n) {
+  border-right: none;
+}
+
+.detail-label {
+  display: block;
+  margin-bottom: 7px;
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+}
+
+.detail-value {
+  display: block;
+  overflow-wrap: anywhere;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+/* =========================================================
+   WEBSITE
+========================================================= */
+
+.website-link {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.45;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.website-link:hover {
+  color: var(--primary-dark);
+  text-decoration: underline;
+}
+
+/* =========================================================
+   TENANT
+========================================================= */
+
+.tenant-value {
+  display: inline-flex;
+  align-self: flex-start;
+  padding: 6px 9px;
+  border: 1px solid #e2e8f0;
+  border-radius: 7px;
+  background: #f8fafc;
+  color: #475569;
+  font-family: SFMono-Regular, Consolas, 'Liberation Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* =========================================================
+   DESCRIPTION
+========================================================= */
+
+.description {
+  min-height: 90px;
+  padding: 17px 19px;
+  box-sizing: border-box;
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  background: #fafbfc;
+  color: #475569;
+  font-size: 13px;
+  line-height: 1.75;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.empty-value {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* =========================================================
+   REMARKS
+========================================================= */
+
+.remarks-container {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.remark-box {
+  min-height: 125px;
+  padding: 18px;
+  box-sizing: border-box;
+  border-radius: 13px;
+}
+
+.applicant-remark {
+  border: 1px solid #dbeafe;
+  background: #fff;
+}
+
+.admin-remark {
+  border: 1px solid #e2e8f0;
+  background: #fff;
+}
+
+.remark-label {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--text-primary);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.remark-box p {
+  margin: 0;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* =========================================================
+   ACTION CARD
+========================================================= */
+
+.action-card {
+  margin-top: 20px;
+  padding: 25px 28px;
+  box-sizing: border-box;
+  border-radius: 18px;
+  box-shadow: var(--shadow-sm);
+}
+
+/* =========================================================
+   PENDING ACTION
+
+   Background changed to solid white per request
+   ("tenant verification paper background white") -
+   was previously a cream gradient.
+========================================================= */
+
+.pending-action {
+  border: 1px solid var(--primary-border);
+  background: #fff;
+}
+
+.pending-action .action-icon {
+  background: var(--warning-bg);
+  color: var(--warning);
+}
+
+/* =========================================================
+   VERIFY / REJECT — SIDE-BY-SIDE COLUMNS
+
+   Two columns inside the pending-action card:
+   left = verify form, right = reject panel (red-tinted).
+   Stacks vertically on mobile (see media query below).
+========================================================= */
+
+.verify-reject-columns {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  margin-top: 4px;
+}
+
+.verify-column {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.reject-column {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 16px;
+  box-sizing: border-box;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.reject-column .reject-button {
+  width: 100%;
+}
+
+/* =========================================================
+   VERIFY ICON — keep the existing blue (primary) color,
+   overriding the yellow/warning color inherited from
+   .pending-action .action-icon
+========================================================= */
+
+.verify-icon {
+  background: var(--primary-light) !important;
+  color: var(--primary) !important;
+}
+
+/* =========================================================
+   PROVISIONED ACTION
+========================================================= */
+
+.provisioned-action {
+  border: 1px solid var(--purple-border);
+  background: linear-gradient(135deg, #fbfaff, #fff);
+}
+
+.provisioned-action .action-icon {
+  background: var(--purple-bg);
+  color: var(--purple);
+}
+
+/* =========================================================
+   ACTION HEADER
+========================================================= */
+
+.action-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.action-icon {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  border-radius: 12px;
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.action-header h2 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 16px;
+  font-weight: 750;
+}
+
+.action-header p {
+  max-width: 700px;
+  margin: 5px 0 0;
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+/* =========================================================
+   VERIFY FORM
+========================================================= */
+
+.verify-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 720px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.verify-form textarea {
+  resize: vertical;
+  min-height: 90px;
+}
+
+::ng-deep .verify-form .mat-mdc-form-field-subscript-wrapper {
+  min-height: 0;
+}
+
+/*
+ * Single-border fix for both the Admin Remarks (input)
+ * and Reject Reason (textarea) fields.
+ *
+ * mat-form-field appearance="outline" already draws its
+ * own box via Material's internal .mdc-notched-outline -
+ * that one is left untouched. Everything below strips
+ * border/box-shadow/outline from every OTHER wrapper
+ * layer and the native input/textarea itself, so only
+ * Material's own outline box remains visible.
+ */
+
+::ng-deep .verify-form .mat-mdc-form-field-flex,
+::ng-deep .reject-form .mat-mdc-form-field-flex,
+::ng-deep .verify-form .mat-mdc-text-field-wrapper,
+::ng-deep .reject-form .mat-mdc-text-field-wrapper,
+::ng-deep .verify-form .mat-mdc-form-field-infix,
+::ng-deep .reject-form .mat-mdc-form-field-infix {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+::ng-deep .verify-form [matInput],
+::ng-deep .reject-form [matInput] {
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  background: transparent !important;
+}
+
+/* =========================================================
+   PRIMARY BUTTON
+========================================================= */
+
+.primary-button {
+  min-height: 43px;
+  align-self: flex-start;
+  padding: 0 19px !important;
+  border-radius: 9px !important;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark)) !important;
+  color: white !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  box-shadow: 0 5px 12px rgb(37 99 235 / 20%) !important;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease !important;
+}
+
+.primary-button:hover:not([disabled]) {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgb(37 99 235 / 26%) !important;
+}
+
+.primary-button[disabled] {
+  opacity: 0.65;
+}
+
+/* =========================================================
+   CONFIRM BAR
+========================================================= */
+
+.confirm-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 17px 18px;
+  margin-top: 5px;
+  border: 1px solid var(--purple-border);
+  border-radius: 12px;
+  background: var(--purple-bg);
+}
+
+.confirm-bar strong {
+  display: block;
+  color: #1074b9;
+  font-size: 13px;
+}
+
+.confirm-bar p {
+  margin: 4px 0 0;
+  color: #1074b9;
+  font-size: 11px;
+}
+
+.button-group {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex: 0 0 auto;
+}
+
+/* =========================================================
+   ACTIVE / REJECTED STATUS INFO CARD
+========================================================= */
+
+.status-info-card {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-top: 20px;
+  padding: 25px 28px;
+  box-sizing: border-box;
+  border-radius: 18px;
+  border: 1px solid var(--success-border);
+  background: linear-gradient(135deg, #f7fff9, #fff);
+  box-shadow: var(--shadow-sm);
+}
+
+.status-info-icon {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  border-radius: 12px;
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.active-card .status-info-icon {
+  background: var(--success-bg);
+  color: var(--success);
+}
+
+.status-info-card h2 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 16px;
+  font-weight: 750;
+}
+
+.status-info-card p {
+  max-width: 700px;
+  margin: 5px 0 0;
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+/* =========================================================
+   REJECTED STATUS
+========================================================= */
+
+.status-info-card.rejected-card {
+  border: 1px solid var(--danger-border);
+  background: linear-gradient(135deg, #fffafa, #fff);
+}
+
+.status-info-card.rejected-card .status-info-icon {
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+
+/* =========================================================
+   RESPONSIVE — TABLET
+========================================================= */
+
+@media (width <= 1000px) {
+  .detail-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .remarks-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================================
+   RESPONSIVE — MOBILE
+========================================================= */
+
+@media (width <= 700px) {
+  .admin-detail-content {
+    padding: 20px 14px 40px;
+  }
+
+  .detail-header {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 23px 20px;
+    border-radius: 16px;
+  }
+
+  .detail-header .header-left {
+    width: 100%;
+    align-items: flex-start;
+  }
+
+  .coop-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    font-size: 20px;
+  }
+
+  .header-text h1 {
+    font-size: 20px;
+  }
+
+  .name-np {
+    font-size: 11px;
+  }
+
+  .subtitle {
+    font-size: 10px;
+  }
+
+  .header-status {
+    align-self: flex-start;
+  }
+
+  .information-paper {
+    border-radius: 16px;
+  }
+
+  .information-section {
+    padding: 23px 18px;
+  }
+
+  .section-heading {
+    margin-bottom: 18px;
+  }
+
+  .section-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+  }
+
+  .section-heading h2 {
+    font-size: 15px;
+  }
+
+  .detail-grid {
+    grid-template-columns: 1fr;
+    border-radius: 11px;
+  }
+
+  .detail-field {
+    min-height: 66px;
+    padding: 13px 14px;
+  }
+
+  .remarks-container {
+    grid-template-columns: 1fr;
+  }
+
+  .remark-box {
+    min-height: 110px;
+  }
+
+  .action-card,
+  .status-info-card {
+    padding: 20px 18px;
+    border-radius: 15px;
+  }
+
+  .action-header {
+    gap: 11px;
+  }
+
+  .action-icon,
+  .status-info-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+  }
+
+  .action-header h2,
+  .status-info-card h2 {
+    font-size: 15px;
+  }
+
+  /* Verify/Reject columns stack on mobile */
+  .verify-reject-columns {
+    flex-direction: column;
+  }
+
+  .confirm-bar {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .button-group {
+    width: 100%;
+  }
+
+  .button-group .primary-button {
+    flex: 1;
+  }
+
+  .primary-button {
+    width: 100%;
+    align-self: stretch;
+  }
+}
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (width <= 430px) {
+  .admin-detail-content {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .detail-header {
+    padding: 20px 16px;
+  }
+
+  .coop-icon {
+    width: 46px;
+    height: 46px;
+    font-size: 18px;
+  }
+
+  .header-text h1 {
+    font-size: 18px;
+  }
+
+  .information-section {
+    padding: 20px 14px;
+  }
+
+  .detail-field {
+    min-height: 64px;
+  }
+
+  .description {
+    padding: 14px;
+    font-size: 12px;
+  }
+
+  .remarks-container {
+    gap: 10px;
+  }
+
+  .remark-box {
+    padding: 15px;
+  }
+
+  .status-info-card {
+    align-items: flex-start;
+  }
+
+  .button-group {
+    flex-direction: column;
+  }
+
+  .button-group button {
+    width: 100%;
+  }
+}
+
+/* =========================================================
+   ACCESSIBILITY
+========================================================= */
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid rgb(37 99 235 / 25%);
+  outline-offset: 2px;
+}
+
+/* =========================================================
+   REDUCE MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .detail-header,
+  .back-link,
+  .primary-button,
+  .reject-button,
+  .confirm-reject-button,
+  .provisioning-loader .spinner {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+/* =====================================================
+   REJECT COOPERATIVE (button + inline form)
+===================================================== */
+
+.reject-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: var(--danger) !important;
+  color: #fff !important;
+  font-weight: 700;
+  font-size: 12.5px;
+  letter-spacing: 0.01em;
+  min-height: 44px;
+  padding: 0 20px;
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgb(220 38 38 / 18%) !important;
+  transition:
+    background-color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.18s ease;
+}
+
+.reject-button:hover:not(:disabled) {
+  background-color: #b91c1c !important;
+  box-shadow: 0 6px 14px rgb(220 38 38 / 24%) !important;
+  transform: translateY(-1px);
+}
+
+.reject-button:disabled {
+  opacity: 0.6;
+  box-shadow: none !important;
+  cursor: not-allowed;
+}
+
+/* Reject form */
+
+.reject-form-container {
+  margin-top: 16px;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+}
+
+.reject-form-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.reject-form-icon {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--danger-bg);
+  color: var(--danger);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.reject-form-header h3 {
+  margin: 0 0 4px;
+  color: var(--text-primary);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.reject-form-header p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.reject-form {
+  width: 100%;
+}
+
+.reject-form mat-form-field {
+  width: 100%;
+}
+
+.reject-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.reject-actions button {
+  min-height: 40px;
+  border-radius: 9px;
+}
+
+.cancel-reject-button {
+  color: var(--text-secondary) !important;
+  font-weight: 600 !important;
+}
+
+.cancel-reject-button:hover:not(:disabled) {
+  background: var(--border-light) !important;
+}
+
+.confirm-reject-button {
+  background-color: var(--danger) !important;
+  color: #fff !important;
+  font-weight: 700;
+  padding: 0 20px;
+  box-shadow: 0 4px 10px rgb(220 38 38 / 18%) !important;
+}
+
+.confirm-reject-button:hover:not(:disabled) {
+  background-color: #b91c1c !important;
+  box-shadow: 0 6px 14px rgb(220 38 38 / 24%) !important;
+}
+
+.confirm-reject-button:disabled {
+  opacity: 0.6;
+  box-shadow: none !important;
+}
+
+/* =====================================================
+   FULL SCREEN PROVISIONING LOADING
+===================================================== */
+
+.provisioning-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  overflow: hidden;
+
+  /* Prevent selecting anything behind overlay */
+  user-select: none;
+
+  /* Prevent interaction with page behind */
+  pointer-events: all;
+}
+
+.provisioning-loader {
+  width: min(90%, 480px);
+  text-align: center;
+  padding: 40px;
+}
+
+.provisioning-loader .spinner {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 28px;
+  border: 5px solid #e0e0e0;
+  border-top-color: #3f51b5;
+  border-radius: 50%;
+  animation: provisioning-spin 0.9s linear infinite;
+}
+
+.provisioning-loader h2 {
+  margin: 0 0 12px;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.provisioning-loader p {
+  margin: 0 auto 12px;
+  line-height: 1.6;
+  color: #555;
+}
+
+.provisioning-loader .please-wait {
+  margin: 0 auto 12px;
+  font-weight: 700;
+  color: #1074b9;
+}
+
+.provisioning-loader .loading-note {
+  margin-top: 20px;
+  font-size: 14px;
+  color: #777;
+}
+
+@keyframes provisioning-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive */
+
+@media (width <= 600px) {
+  .reject-form-container {
+    padding: 18px;
+  }
+
+  .reject-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .reject-actions button {
+    width: 100%;
+  }
+
+  .reject-button {
+    width: 100%;
+  }
+}

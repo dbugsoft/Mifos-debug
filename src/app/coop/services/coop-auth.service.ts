@@ -42,7 +42,7 @@ export interface CoopLoginRequest {
 
 export interface CoopLoginResponse {
   tokenType: string;
-  status: 'UNVERIFIED' | 'VERIFIED';
+  status: 'UNVERIFIED' | 'VERIFIED' | 'ACTIVE';
   isEmailVerified: boolean;
   expiresIn: number;
   refreshToken: string;

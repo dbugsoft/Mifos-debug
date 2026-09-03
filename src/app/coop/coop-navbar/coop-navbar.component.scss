@@ -1,0 +1,205 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+/* =========================================================
+   PAGE HEADER / FIXED NAVBAR
+========================================================= */
+
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-shrink: 0;
+  width: 100%;
+  padding: 16px 28px;
+  box-sizing: border-box;
+  background: linear-gradient(180deg, #fff 0%, #fbfdff 100%);
+  border-bottom: 1px solid #e3e8ec;
+  box-shadow: 0 2px 10px rgb(16 42 67 / 6%);
+  z-index: 20;
+}
+
+/* =========================================================
+   HEADER LEFT
+========================================================= */
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.header-icon {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 11px;
+  background: linear-gradient(135deg, #1074b9 0%, #0d5d94 100%);
+  font-size: 20px;
+  box-shadow: 0 3px 8px rgb(16 116 185 / 28%);
+}
+
+.page-header h1 {
+  margin: 0;
+  color: #172b3a;
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.page-header p {
+  margin: 4px 0 0;
+  color: #75838e;
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+  margin-left: auto;
+  margin-right: 28px;
+}
+
+.navbar-links a {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 50px;
+  color: #667783;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.18s ease;
+}
+
+.navbar-links a:hover {
+  color: #1074b9;
+}
+
+.navbar-links a.active {
+  color: #1074b9;
+}
+
+.navbar-links a.active::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  background: #1074b9;
+}
+
+/* =========================================================
+   LOGOUT BUTTON
+========================================================= */
+
+.logout-button {
+  min-width: 82px;
+  height: 36px;
+  border-radius: 7px !important;
+  background: #1074b9 !important;
+  color: #fff !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  box-shadow: 0 3px 9px rgb(16 116 185 / 28%) !important;
+  transition:
+    background 0.15s ease,
+    transform 0.15s ease;
+}
+
+.logout-button:hover {
+  background: #0c639e !important;
+  transform: translateY(-1px);
+}
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (width <= 1100px) {
+  .page-header p {
+    display: none;
+  }
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (width <= 700px) {
+  .page-header {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 16px;
+  }
+
+  .page-header h1 {
+    font-size: 19px;
+  }
+
+  .logout-button {
+    width: 100%;
+  }
+}
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (width <= 450px) {
+  .navbar-links {
+    gap: 18px;
+  }
+
+  .navbar-links a {
+    font-size: 11px;
+  }
+}
+
+/* =========================================================
+   VERY SMALL MOBILE
+========================================================= */
+
+@media (width <= 400px) {
+  .page-header {
+    padding: 14px 10px;
+  }
+
+  .navbar-links {
+    gap: 14px;
+  }
+
+  .navbar-links a {
+    font-size: 10px;
+  }
+
+  .logout-button {
+    padding: 0 12px !important;
+    min-width: 70px;
+    font-size: 11px !important;
+  }
+}
