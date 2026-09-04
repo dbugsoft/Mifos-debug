@@ -57,7 +57,11 @@ jobs:
           # (Tools & Settings > SSL/TLS Certificates), then switch this to strict.
           security: loose
           local-dir: ./dist/web-app/browser/
-          server-dir: /httpdocs/
+          # coopmis.dibugsoft.com is a subdomain of the dibugsoft.com
+          # subscription, and DbugHost's FTP home is the webspace root shared by
+          # 169 domains. This path is the document root of THIS site only --
+          # /httpdocs/ would overwrite the parent dibugsoft.com website.
+          server-dir: /coopmis.dibugsoft.com/
           dangerous-clean-slate: false
           dry-run: ${{ inputs.dry_run == true }}
           exclude: |
