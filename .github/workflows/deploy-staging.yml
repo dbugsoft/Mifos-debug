@@ -70,6 +70,12 @@ jobs:
           find out -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
           cp -a dist/web-app/browser/. out/
 
+          # Plesk checks this branch out on Windows, where git's autocrlf
+          # rewrites LF to CRLF in anything it considers text. That mutates the
+          # deployed bytes and, if a binary asset were ever misdetected, would
+          # corrupt it. Turn conversion off for every path in this branch.
+          printf '* -text\n' > out/.gitattributes
+
           cd out
           git add -A
           if git diff --cached --quiet; then
@@ -97,12 +103,15 @@ jobs:
       - name: Verify the deployed build is live
         run: |
           set -uo pipefail
-          expected=$(sha256sum dist/web-app/browser/main.js | cut -d' ' -f1)
+          # Compare with CRs stripped: a Windows checkout may still hold the
+          # pre-.gitattributes line endings for files whose content has not
+          # changed since, and a lone CR difference is not a failed deploy.
+          expected=$(tr -d '\r' < dist/web-app/browser/main.js | sha256sum | cut -d' ' -f1)
           echo "expected: ${expected:0:16}"
 
           # Plesk pulls asynchronously, so poll rather than checking once.
           for attempt in $(seq 1 20); do
-            live=$(curl -fsS "$STAGING_URL/main.js" 2>/dev/null | sha256sum | cut -d' ' -f1) || live=""
+            live=$(curl -fsS "$STAGING_URL/main.js" 2>/dev/null | tr -d '\r' | sha256sum | cut -d' ' -f1) || live=""
             if [ "$expected" = "$live" ]; then
               echo "live:     ${live:0:16}  -- match after ${attempt} attempt(s)"
               exit 0
