@@ -5,19 +5,20 @@ on:
     branches:
       - staging
   workflow_dispatch:
-    inputs:
-      dry_run:
-        description: 'Connect and diff, but upload nothing'
-        type: boolean
-        default: false
 
 concurrency:
   group: deploy-staging
   cancel-in-progress: false
 
+env:
+  DEPLOY_BRANCH: staging-dist
+  STAGING_URL: https://coopmis.dibugsoft.com
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout code
@@ -42,41 +43,73 @@ jobs:
           test -f dist/web-app/browser/web.config
           echo "main.js  $(sha256sum dist/web-app/browser/main.js | cut -c1-16)"
 
-      - name: Deploy to Plesk over FTPS
-        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
-        with:
-          server: ${{ secrets.PLESK_HOST }}
-          username: ${{ secrets.PLESK_USER }}
-          password: ${{ secrets.PLESK_PASSWORD }}
-          protocol: ftps
-          port: 21
-          # The Plesk FTPS service presents a self-signed certificate, so strict
-          # CA validation can never succeed against it. Traffic stays encrypted;
-          # what is given up is authentication of the server. Accepted knowingly.
-          # To harden: assign a real cert to the FTP service in Plesk
-          # (Tools & Settings > SSL/TLS Certificates), then switch this to strict.
-          security: loose
-          local-dir: ./dist/web-app/browser/
-          # coopmis.dibugsoft.com is a subdomain of the dibugsoft.com
-          # subscription, and DbugHost's FTP home is the webspace root shared by
-          # 169 domains. This path is the document root of THIS site only --
-          # /httpdocs/ would overwrite the parent dibugsoft.com website.
-          server-dir: /coopmis.dibugsoft.com/
-          dangerous-clean-slate: false
-          dry-run: ${{ inputs.dry_run == true }}
-          exclude: |
-            **/assets/env.js
-            **/.git*
-            **/.git*/**
+      # Plesk's Git integration pulls this branch into the document root. Its
+      # history must stay continuous: the earlier attempt re-ran `git init` and
+      # force-pushed an unrelated history on every deploy, which makes Plesk's
+      # pull fail while the workflow still reported success. So check the branch
+      # out and commit on top of whatever is already there.
+      - name: Publish build output to the deploy branch
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          if git ls-remote --exit-code --heads origin "$DEPLOY_BRANCH" >/dev/null 2>&1; then
+            git fetch --depth=1 origin "$DEPLOY_BRANCH"
+            git worktree add out "origin/$DEPLOY_BRANCH"
+            git -C out switch -c "$DEPLOY_BRANCH" || git -C out switch "$DEPLOY_BRANCH"
+          else
+            echo "$DEPLOY_BRANCH does not exist yet; creating it"
+            git worktree add --detach out
+            git -C out switch --orphan "$DEPLOY_BRANCH"
+            git -C out rm -r -f -q . || true
+          fi
+
+          # Replace the tree wholesale so files deleted from a build disappear
+          # from the branch too, then let git work out the diff.
+          find out -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          cp -a dist/web-app/browser/. out/
+
+          cd out
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Build output is unchanged; nothing to publish"
+          else
+            git commit -q -m "deploy: build from ${GITHUB_SHA}"
+            git push -q origin "$DEPLOY_BRANCH"
+            echo "Published $(git rev-parse --short HEAD) to $DEPLOY_BRANCH"
+          fi
+
+      # Plesk deploys on its own when the repository webhook fires. Calling the
+      # webhook here as well makes the deploy synchronous with this run, so the
+      # verification below is checking this build and not the previous one.
+      - name: Ask Plesk to pull
+        env:
+          WEBHOOK: ${{ secrets.PLESK_GIT_WEBHOOK }}
+        run: |
+          if [ -z "$WEBHOOK" ]; then
+            echo "PLESK_GIT_WEBHOOK not set; relying on Plesk's own webhook from GitHub"
+            exit 0
+          fi
+          curl -fsS -X POST "$WEBHOOK" -o /dev/null
+          echo "Requested a pull from Plesk"
 
       - name: Verify the deployed build is live
-        if: inputs.dry_run != true
         run: |
+          set -uo pipefail
           expected=$(sha256sum dist/web-app/browser/main.js | cut -d' ' -f1)
-          live=$(curl -fsS --retry 3 --retry-delay 5 https://coopmis.dibugsoft.com/main.js | sha256sum | cut -d' ' -f1)
           echo "expected: ${expected:0:16}"
-          echo "live:     ${live:0:16}"
-          if [ "$expected" != "$live" ]; then
-            echo "::error::Deployed main.js does not match the build. The upload did not land."
-            exit 1
-          fi
+
+          # Plesk pulls asynchronously, so poll rather than checking once.
+          for attempt in $(seq 1 20); do
+            live=$(curl -fsS "$STAGING_URL/main.js" 2>/dev/null | sha256sum | cut -d' ' -f1) || live=""
+            if [ "$expected" = "$live" ]; then
+              echo "live:     ${live:0:16}  -- match after ${attempt} attempt(s)"
+              exit 0
+            fi
+            echo "attempt ${attempt}: live=${live:0:16} (waiting)"
+            sleep 15
+          done
+
+          echo "::error::Deployed main.js never matched the build. Plesk did not pull, or pulled into the wrong path."
+          exit 1
