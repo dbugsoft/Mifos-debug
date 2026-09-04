@@ -6,20 +6,39 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, effect, inject } from '@angular/core';
+
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 
 import { CommonModule } from '@angular/common';
 
 import { MatFormFieldModule } from '@angular/material/form-field';
+
 import { MatInputModule } from '@angular/material/input';
+
 import { MatButtonModule } from '@angular/material/button';
+
 import { MatSelectModule } from '@angular/material/select';
 
+import { firstValueFrom } from 'rxjs';
+
+import { QueryClient, injectMutation, injectQuery } from '@tanstack/angular-query-experimental';
+
+import { CoopAuthService } from '../../services/coop-auth.service';
+
+import { CoopTokenService } from '../../services/coop-token.service';
+
 import { CoopLocation, CoopProfile, CoopProfileService } from '../../services/coop-profile.service';
+import { CoopNavbarComponent } from '../../coop-navbar/coop-navbar.component';
+import { locationsQueryOptions, profileQueryOptions } from '../../queries/coop-profile.queries';
+import { coopQueryKeys } from '../../queries/coop-query-keys';
+import { extractCoopErrorMessage } from '../../queries/coop-error.util';
 
 @Component({
   selector: 'mifosx-coop-profile',
+
   standalone: true,
 
   imports: [
@@ -28,29 +47,92 @@ import { CoopLocation, CoopProfile, CoopProfileService } from '../../services/co
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    MatSelectModule
+    MatSelectModule,
+    RouterLink,
+    RouterLinkActive,
+    CoopNavbarComponent
   ],
 
   templateUrl: './coop-profile.component.html',
+
   styleUrl: './coop-profile.component.scss'
 })
-export class CoopProfileComponent implements OnInit {
+export class CoopProfileComponent {
+  // =====================================================
+  // SERVICES
+  // =====================================================
+
   private fb = inject(FormBuilder);
+
   private coopProfileService = inject(CoopProfileService);
+
+  private router = inject(Router);
+
+  private coopAuthService = inject(CoopAuthService);
+
+  private coopTokenService = inject(CoopTokenService);
+
+  private queryClient = inject(QueryClient);
+
+  // =====================================================
+  // SERVER STATE (TanStack Query)
+  // =====================================================
+
+  private profileQuery = injectQuery(() => profileQueryOptions(this.coopProfileService));
+
+  private locationsQuery = injectQuery(() => locationsQueryOptions(this.coopProfileService));
+
+  private createProfileMutation = injectMutation(() => ({
+    mutationFn: (profile: CoopProfile) => firstValueFrom(this.coopProfileService.createProfile(profile)),
+
+    onSuccess: (created) => {
+      this.queryClient.setQueryData(coopQueryKeys.profile(), created);
+    }
+  }));
+
+  private updateProfileMutation = injectMutation(() => ({
+    mutationFn: (profile: Partial<CoopProfile>) => firstValueFrom(this.coopProfileService.updateProfile(profile)),
+
+    onSuccess: (updated) => {
+      /*
+       * PATCH may return only the changed fields rather than
+       * the full profile, so merge onto the previously cached
+       * value instead of replacing it outright.
+       */
+      this.queryClient.setQueryData(coopQueryKeys.profile(), (previous?: CoopProfile) => ({
+        ...(previous ?? updated),
+        ...updated
+      }));
+    }
+  }));
+
+  // =====================================================
+  // UI STATE
+  // =====================================================
 
   isSubmitting = false;
 
   successMessage = '';
+
   errorMessage = '';
+  selectedLogoFile: File | null = null;
+
+  selectedLogoName = '';
+
+  logoPreview = '';
+
+  // =====================================================
+  // PROFILE MODE
+  // =====================================================
 
   /**
-   * True once an existing profile has been
-   * loaded successfully from the backend.
+   * true = existing profile → PATCH
    *
-   * Determines whether onSubmit() should
-   * CREATE (POST) or UPDATE (PATCH).
+   * false = new profile → POST
    */
   isEditMode = false;
+  isActive = false;
+  profileStatus = '';
 
   // =====================================================
   // LOCATION DATA
@@ -65,6 +147,14 @@ export class CoopProfileComponent implements OnInit {
   localLevels: CoopLocation[] = [];
 
   wards: number[] = [];
+
+  // =====================================================
+  // LOCATION LOADING STATE
+  // =====================================================
+
+  get locationsLoading(): boolean {
+    return this.locationsQuery.isPending();
+  }
 
   // =====================================================
   // PROFILE FORM
@@ -136,10 +226,6 @@ export class CoopProfileComponent implements OnInit {
       ''
     ],
 
-    webUrl: [
-      ''
-    ],
-
     about: [
       ''
     ],
@@ -153,31 +239,120 @@ export class CoopProfileComponent implements OnInit {
   // INIT
   // =====================================================
 
-  ngOnInit(): void {
-    this.loadLocations();
+  constructor() {
+    /*
+     * Profile and locations are queried independently by
+     * TanStack Query (profile does NOT wait for locations).
+     * Each effect re-runs whenever ITS OWN query settles, and
+     * reads whatever the other side currently holds - so
+     * whichever of the two arrives second is the one that
+     * builds the location dropdowns, exactly as before.
+     */
+
+    effect(() => {
+      const profile = this.profileQuery.data();
+
+      if (profile) {
+        this.profileForm.patchValue(profile);
+
+        // patchValue() should not make the form dirty.
+        this.profileForm.markAsPristine();
+
+        this.isEditMode = true;
+
+        this.profileStatus = profile.status ?? '';
+
+        this.isActive = profile.status === 'ACTIVE' || profile.status === 'PROVISIONED';
+
+        if (this.locations.length > 0) {
+          this.buildLocationDropdowns(profile);
+        }
+
+        return;
+      }
+
+      if (this.profileQuery.isError()) {
+        // New user may not have a profile yet.
+        if (this.isNoProfileError(this.profileQuery.error())) {
+          this.isEditMode = false;
+
+          return;
+        }
+
+        this.errorMessage = extractCoopErrorMessage(this.profileQuery.error(), 'Unable to load cooperative profile.');
+      }
+    });
+
+    effect(() => {
+      const locations = this.locationsQuery.data();
+
+      if (!locations) {
+        if (this.locationsQuery.isError()) {
+          this.errorMessage = 'Unable to load address information.';
+        }
+
+        return;
+      }
+
+      this.locations = locations;
+
+      this.provinces = this.getUniqueProvinces();
+
+      /*
+       * Profile may already have been loaded. If provinceId
+       * exists, build the dependent dropdowns now.
+       */
+
+      const profile = this.profileForm.getRawValue();
+
+      if (profile.provinceId !== null || profile.districtId !== null || profile.localLevelId !== null) {
+        this.buildLocationDropdowns(profile);
+      }
+    });
+  }
+
+  private isNoProfileError(error: unknown): boolean {
+    const httpError = error as { error?: { error?: string } } | null | undefined;
+
+    return httpError?.error?.error === 'No profile submitted yet';
   }
 
   // =====================================================
-  // LOAD LOCATIONS
+  // BUILD LOCATION DROPDOWNS
   // =====================================================
 
-  private loadLocations(): void {
-    this.coopProfileService.getLocations().subscribe({
-      next: (locations) => {
-        this.locations = locations;
+  private buildLocationDropdowns(profile: Partial<CoopProfile>): void {
+    console.log('BUILDING LOCATION DROPDOWNS:', profile);
 
-        // Create unique province list
-        this.provinces = this.getUniqueProvinces();
+    // -----------------------------------------------
+    // PROVINCE
+    // -----------------------------------------------
 
-        // After locations are loaded,
-        // load existing profile
-        this.loadProfile();
-      },
+    const provinceId = profile.provinceId;
 
-      error: (error) => {
-        this.errorMessage = 'Unable to load address information.';
-      }
-    });
+    if (provinceId !== null && provinceId !== undefined) {
+      this.setDistricts(Number(provinceId));
+    }
+
+    // -----------------------------------------------
+    // DISTRICT
+    // -----------------------------------------------
+
+    const districtId = profile.districtId;
+
+    if (districtId !== null && districtId !== undefined) {
+      this.setLocalLevels(Number(districtId));
+    }
+
+    // -----------------------------------------------
+    // LOCAL LEVEL
+    // -----------------------------------------------
+
+    const localLevelId = profile.localLevelId;
+
+    if (localLevelId !== null && localLevelId !== undefined) {
+      this.setWards(Number(localLevelId));
+    }
   }
 
   // =====================================================
@@ -197,93 +372,13 @@ export class CoopProfileComponent implements OnInit {
   }
 
   // =====================================================
-  // LOAD EXISTING PROFILE
-  // =====================================================
-
-  private loadProfile(): void {
-    this.coopProfileService.getProfile().subscribe({
-      next: (response) => {
-        /*
-         * First patch all profile values.
-         *
-         * Example:
-         *
-         * provinceId = 3
-         * districtId = 27
-         * localLevelId = 1
-         * wardNo = 4
-         */
-
-        this.profileForm.patchValue(response);
-
-        /*
-         * patchValue() does NOT mark controls
-         * as dirty, so at this point the form
-         * is clean - any edits the user makes
-         * from here on will correctly mark only
-         * the touched controls as dirty.
-         */
-
-        /*
-         * An existing profile was found -
-         * subsequent saves must PATCH, not POST.
-         */
-
-        this.isEditMode = true;
-
-        const provinceId = response.provinceId;
-
-        const districtId = response.districtId;
-
-        const localLevelId = response.localLevelId;
-
-        // ---------------------------------------------
-        // Build District dropdown
-        // ---------------------------------------------
-
-        if (provinceId !== null) {
-          this.setDistricts(provinceId);
-        }
-
-        // ---------------------------------------------
-        // Build Local Level dropdown
-        // ---------------------------------------------
-
-        if (provinceId !== null && districtId !== null) {
-          this.setLocalLevels(districtId);
-        }
-
-        // ---------------------------------------------
-        // Build Ward dropdown
-        // ---------------------------------------------
-
-        if (localLevelId !== null) {
-          this.setWards(localLevelId);
-        }
-      },
-
-      error: (error) => {
-        /*
-         * No profile yet is not a real error.
-         */
-
-        if (error?.error?.error === 'No profile submitted yet') {
-          this.isEditMode = false;
-
-          return;
-        }
-
-        this.errorMessage = error?.error?.message || error?.error?.error || 'Unable to load cooperative profile.';
-      }
-    });
-  }
-
-  // =====================================================
   // PROVINCE CHANGE
   // =====================================================
 
   onProvinceChange(provinceId: number | null): void {
-    // Reset dependent fields
+    // -----------------------------------------------
+    // RESET DEPENDENT VALUES
+    // -----------------------------------------------
 
     this.profileForm.patchValue({
       districtId: null,
@@ -293,7 +388,9 @@ export class CoopProfileComponent implements OnInit {
       wardNo: null
     });
 
-    // Clear dependent dropdowns
+    // -----------------------------------------------
+    // CLEAR DROPDOWNS
+    // -----------------------------------------------
 
     this.districts = [];
 
@@ -301,9 +398,17 @@ export class CoopProfileComponent implements OnInit {
 
     this.wards = [];
 
+    // -----------------------------------------------
+    // NO PROVINCE
+    // -----------------------------------------------
+
     if (provinceId === null) {
       return;
     }
+
+    // -----------------------------------------------
+    // LOAD DISTRICTS
+    // -----------------------------------------------
 
     this.setDistricts(provinceId);
   }
@@ -313,33 +418,33 @@ export class CoopProfileComponent implements OnInit {
   // =====================================================
 
   private setDistricts(provinceId: number): void {
-    /*
-     * Find selected province using ID.
-     */
+    console.log('SETTING DISTRICTS FOR PROVINCE:', provinceId);
 
-    const selectedProvince = this.provinces.find((province) => province.id === provinceId);
+    // -----------------------------------------------
+    // FIND PROVINCE
+    // -----------------------------------------------
+
+    const selectedProvince = this.provinces.find((province) => Number(province.id) === Number(provinceId));
 
     if (!selectedProvince) {
+      console.warn('Province not found:', provinceId);
+
       return;
     }
 
-    /*
-     * IMPORTANT:
-     *
-     * Province ID is used by the form/backend.
-     *
-     * provinceCode is used for
-     * filtering locations.
-     */
+    // -----------------------------------------------
+    // FILTER DISTRICTS
+    // -----------------------------------------------
 
     this.districts = this.locations
 
       .filter((location) => location.provinceCode === selectedProvince.provinceCode)
 
-      // Remove duplicate districts
       .filter(
         (location, index, self) => index === self.findIndex((item) => item.districtCode === location.districtCode)
       );
+
+    console.log('DISTRICTS:', this.districts);
   }
 
   // =====================================================
@@ -347,13 +452,19 @@ export class CoopProfileComponent implements OnInit {
   // =====================================================
 
   onDistrictChange(districtId: number | null): void {
-    // Reset dependent fields
+    // -----------------------------------------------
+    // RESET DEPENDENT VALUES
+    // -----------------------------------------------
 
     this.profileForm.patchValue({
       localLevelId: null,
 
       wardNo: null
     });
+
+    // -----------------------------------------------
+    // CLEAR DROPDOWNS
+    // -----------------------------------------------
 
     this.localLevels = [];
 
@@ -363,6 +474,10 @@ export class CoopProfileComponent implements OnInit {
       return;
     }
 
+    // -----------------------------------------------
+    // LOAD LOCAL LEVELS
+    // -----------------------------------------------
+
     this.setLocalLevels(districtId);
   }
 
@@ -371,24 +486,23 @@ export class CoopProfileComponent implements OnInit {
   // =====================================================
 
   private setLocalLevels(districtId: number): void {
-    /*
-     * Find selected district
-     * using district ID.
-     */
+    console.log('SETTING LOCAL LEVELS FOR DISTRICT:', districtId);
 
-    const selectedDistrict = this.districts.find((district) => district.id === districtId);
+    // -----------------------------------------------
+    // FIND DISTRICT
+    // -----------------------------------------------
+
+    const selectedDistrict = this.districts.find((district) => Number(district.id) === Number(districtId));
 
     if (!selectedDistrict) {
+      console.warn('District not found:', districtId);
+
       return;
     }
 
-    /*
-     * Filter locations using:
-     *
-     * provinceCode
-     * +
-     * districtCode
-     */
+    // -----------------------------------------------
+    // FILTER LOCAL LEVELS
+    // -----------------------------------------------
 
     this.localLevels = this.locations
 
@@ -398,10 +512,11 @@ export class CoopProfileComponent implements OnInit {
           location.districtCode === selectedDistrict.districtCode
       )
 
-      // Remove duplicate local levels
       .filter(
         (location, index, self) => index === self.findIndex((item) => item.localLevelCode === location.localLevelCode)
       );
+
+    console.log('LOCAL LEVELS:', this.localLevels);
   }
 
   // =====================================================
@@ -409,7 +524,9 @@ export class CoopProfileComponent implements OnInit {
   // =====================================================
 
   onLocalLevelChange(localLevelId: number | null): void {
-    // Reset ward
+    // -----------------------------------------------
+    // RESET WARD
+    // -----------------------------------------------
 
     this.profileForm.patchValue({
       wardNo: null
@@ -421,51 +538,87 @@ export class CoopProfileComponent implements OnInit {
       return;
     }
 
+    // -----------------------------------------------
+    // LOAD WARDS
+    // -----------------------------------------------
+
     this.setWards(localLevelId);
   }
 
+  onLogoSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+
+    if (!input.files || input.files.length === 0) {
+      this.selectedLogoFile = null;
+      this.selectedLogoName = '';
+      this.logoPreview = '';
+      return;
+    }
+
+    const file = input.files[0];
+
+    if (!file.type.startsWith('image/')) {
+      this.errorMessage = 'Please select a valid image file.';
+      input.value = '';
+      return;
+    }
+
+    this.errorMessage = '';
+
+    this.selectedLogoFile = file;
+    this.selectedLogoName = file.name;
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      this.logoPreview = reader.result as string;
+    };
+
+    reader.readAsDataURL(file);
+  }
+
+  clearLogoSelection(): void {
+    this.selectedLogoFile = null;
+    this.selectedLogoName = '';
+    this.logoPreview = '';
+  }
   // =====================================================
   // SET WARDS
   // =====================================================
 
   private setWards(localLevelId: number): void {
-    /*
-     * Find local level using ID.
-     */
+    console.log('SETTING WARDS FOR LOCAL LEVEL:', localLevelId);
 
-    const selectedLocalLevel = this.localLevels.find((localLevel) => localLevel.id === localLevelId);
+    // -----------------------------------------------
+    // FIND LOCAL LEVEL
+    // -----------------------------------------------
+
+    const selectedLocalLevel = this.localLevels.find((localLevel) => Number(localLevel.id) === Number(localLevelId));
 
     if (!selectedLocalLevel) {
+      console.warn('Local level not found:', localLevelId);
+
       return;
     }
 
-    /*
-     * totalWard determines
-     * how many ward options exist.
-     */
+    // -----------------------------------------------
+    // CREATE WARDS
+    // -----------------------------------------------
 
     this.wards = Array.from(
       {
         length: selectedLocalLevel.totalWard
       },
+
       (_, index) => index + 1
     );
+
+    console.log('WARDS:', this.wards);
   }
 
   // =====================================================
-  // BUILD PATCH PAYLOAD (CHANGED FIELDS ONLY)
+  // BUILD PATCH PAYLOAD
   // =====================================================
-
-  /**
-   * Walks every control in profileForm and returns
-   * an object containing only the controls that are
-   * "dirty" - i.e. the user actually touched/changed
-   * them since the form was populated.
-   *
-   * This is what gets sent to the PATCH endpoint,
-   * so we never send the whole profile back when
-   * only one or two fields actually changed.
-   */
   private getChangedFields(): Partial<CoopProfile> {
     const changedFields: Partial<CoopProfile> = {};
 
@@ -477,7 +630,7 @@ export class CoopProfileComponent implements OnInit {
       const control = this.profileForm.get(controlKey);
 
       if (control?.dirty) {
-        (changedFields as any)[controlKey] = rawValue[controlKey];
+        (changedFields as any)[controlKey] = (rawValue as any)[controlKey];
       }
     });
 
@@ -489,9 +642,17 @@ export class CoopProfileComponent implements OnInit {
   // =====================================================
 
   onSubmit(): void {
+    if (this.isActive) {
+      return;
+    }
+
     this.successMessage = '';
 
     this.errorMessage = '';
+
+    // -----------------------------------------------
+    // VALIDATION
+    // -----------------------------------------------
 
     if (this.profileForm.invalid) {
       this.profileForm.markAllAsTouched();
@@ -501,17 +662,16 @@ export class CoopProfileComponent implements OnInit {
 
     this.isSubmitting = true;
 
-    // ---------------------------------------------
-    // EDIT MODE -> PATCH only the changed fields
-    // ---------------------------------------------
+    // =================================================
+    // EDIT MODE
+    // =================================================
 
     if (this.isEditMode) {
       const changedFields = this.getChangedFields();
 
-      /*
-       * Nothing was actually changed -
-       * no need to call the API at all.
-       */
+      // ---------------------------------------------
+      // NOTHING CHANGED
+      // ---------------------------------------------
 
       if (Object.keys(changedFields).length === 0) {
         this.isSubmitting = false;
@@ -521,64 +681,50 @@ export class CoopProfileComponent implements OnInit {
         return;
       }
 
-      this.coopProfileService.updateProfile(changedFields).subscribe({
-        next: (response) => {
+      // ---------------------------------------------
+      // PATCH
+      // ---------------------------------------------
+
+      this.updateProfileMutation.mutate(changedFields, {
+        onSuccess: () => {
           this.isSubmitting = false;
 
           this.successMessage = 'Cooperative profile updated successfully.';
 
-          /*
-           * Form is clean again until the
-           * user changes something else.
-           */
-
           this.profileForm.markAsPristine();
         },
 
-        error: (error) => {
+        onError: (error) => {
           this.isSubmitting = false;
 
-          this.errorMessage =
-            error?.error?.message ||
-            error?.error?.error ||
-            error?.error?.defaultUserMessage ||
-            'Unable to update profile. Please try again.';
+          this.errorMessage = extractCoopErrorMessage(error, 'Unable to update profile. Please try again.');
         }
       });
 
       return;
     }
 
-    // ---------------------------------------------
-    // CREATE MODE -> POST the full profile
-    // ---------------------------------------------
+    // =================================================
+    // CREATE MODE
+    // =================================================
 
     const profileData: CoopProfile = this.profileForm.getRawValue();
 
-    this.coopProfileService.createProfile(profileData).subscribe({
-      next: (response) => {
+    this.createProfileMutation.mutate(profileData, {
+      onSuccess: () => {
         this.isSubmitting = false;
 
         this.successMessage = 'Cooperative profile created successfully.';
-
-        /*
-         * A profile now exists -
-         * future saves must PATCH.
-         */
 
         this.isEditMode = true;
 
         this.profileForm.markAsPristine();
       },
 
-      error: (error) => {
+      onError: (error) => {
         this.isSubmitting = false;
 
-        this.errorMessage =
-          error?.error?.message ||
-          error?.error?.error ||
-          error?.error?.defaultUserMessage ||
-          'Unable to create profile. Please try again.';
+        this.errorMessage = extractCoopErrorMessage(error, 'Unable to create profile. Please try again.');
       }
     });
   }

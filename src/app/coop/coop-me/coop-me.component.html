@@ -1,0 +1,60 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="me-page">
+  <mifosx-coop-navbar title="My Account" subtitle="Manage your account information and verification status.">
+  </mifosx-coop-navbar>
+
+  <div class="me-card">
+    <h2>My Account</h2>
+
+    <p *ngIf="errorMessage" class="error-message">
+      {{ errorMessage }}
+    </p>
+
+    <div *ngIf="me" class="me-details">
+      <p>
+        <strong>User ID:</strong>
+        <span>{{ me.userId }}</span>
+      </p>
+
+      <p>
+        <strong>Email:</strong>
+        <span>{{ me.email }}</span>
+      </p>
+
+      <p>
+        <strong>Phone:</strong>
+        <span>{{ me.phone }}</span>
+      </p>
+
+      <p>
+        <strong>Role:</strong>
+        <span>{{ me.role }}</span>
+      </p>
+
+      <!-- STATUS -->
+      <p>
+        <strong>Status:</strong>
+
+        <span class="status-badge" [class.verified]="me.status === 'VERIFIED'" [class.other]="me.status !== 'VERIFIED'">
+          {{ me.status === 'VERIFIED' ? 'VERIFIED' : 'UNVERIFIED' }}
+        </span>
+      </p>
+
+      <!-- EMAIL VERIFIED -->
+      <p>
+        <strong>Email Verified:</strong>
+
+        <span class="verification-status" [class.verified]="me.emailVerified" [class.not-verified]="!me.emailVerified">
+          {{ me.emailVerified ? 'VERIFIED' : 'NOT VERIFIED' }}
+        </span>
+      </p>
+    </div>
+  </div>
+</div>

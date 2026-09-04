@@ -9,6 +9,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+
 import { environment } from '../../../environments/environment';
 
 export interface CoopProfile {
@@ -26,7 +27,7 @@ export interface CoopProfile {
   mobilePhone: string;
   officePhone: string;
   logoUrl: string;
-  webUrl: string;
+  status?: string;
   about: string;
   remarks: string;
 }
@@ -51,6 +52,23 @@ export interface CoopLocation {
   totalWard: number;
   isActive: boolean;
 }
+export interface CoopMe {
+  emailVerified: boolean;
+  phone: string;
+  userId: number;
+  status: string;
+  email: string;
+  role: string;
+}
+
+/**
+ * Plain HTTP access for Coop profile/me/locations data.
+ *
+ * This service intentionally does NOT cache anything - server-state
+ * caching (in-memory storage, staleness, invalidation) is owned
+ * entirely by TanStack Query, wired up in ../queries/coop-profile.queries.ts
+ * and consumed via injectQuery()/injectMutation() in the components.
+ */
 @Injectable({
   providedIn: 'root'
 })
@@ -58,6 +76,14 @@ export class CoopProfileService {
   private http = inject(HttpClient);
 
   private readonly profileUrl = `${environment.coopApiUrl}/nepal/coop-registration/public/profile`;
+
+  private readonly locationsUrl = `${environment.coopApiUrl}/nepal/coop-registration/public/locations`;
+
+  private readonly meUrl = `${environment.coopApiUrl}/nepal/coop-registration/public/me`;
+
+  // =====================================================
+  // PROFILE
+  // =====================================================
 
   createProfile(profile: CoopProfile): Observable<CoopProfile> {
     return this.http.post<CoopProfile>(this.profileUrl, profile);
@@ -71,7 +97,15 @@ export class CoopProfileService {
     return this.http.patch<CoopProfile>(this.profileUrl, profile);
   }
 
+  getMe(): Observable<CoopMe> {
+    return this.http.get<CoopMe>(this.meUrl);
+  }
+
+  // =====================================================
+  // LOCATIONS
+  // =====================================================
+
   getLocations(): Observable<CoopLocation[]> {
-    return this.http.get<CoopLocation[]>(`${environment.coopApiUrl}/nepal/coop-registration/public/locations`);
+    return this.http.get<CoopLocation[]>(this.locationsUrl);
   }
 }
