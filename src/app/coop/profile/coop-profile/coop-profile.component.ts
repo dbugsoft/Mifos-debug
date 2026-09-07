@@ -156,6 +156,17 @@ export class CoopProfileComponent {
     return this.locationsQuery.isPending();
   }
 
+  /**
+   * True only while the profile (and its address dropdown data) are
+   * being fetched for the very first time - drives the shimmer
+   * skeleton. Becomes false as soon as either query settles
+   * (success or error), matching how the existing effects already
+   * treat isPending() as "no usable data yet".
+   */
+  get initialLoading(): boolean {
+    return this.profileQuery.isPending() || this.locationsQuery.isPending();
+  }
+
   // =====================================================
   // PROFILE FORM
   // =====================================================

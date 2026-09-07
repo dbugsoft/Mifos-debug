@@ -41,9 +41,25 @@
         {{ statsError }}
       </div>
 
+      <!-- STAT CARDS SKELETON -->
+
+      <div class="stats-grid" *ngIf="statsLoading" aria-hidden="true">
+        <mat-card class="stat-card" *ngFor="let card of [1, 2, 3, 4]">
+          <div class="stat-card-header">
+            <div class="skeleton skeleton-stat-icon"></div>
+
+            <div class="skeleton skeleton-stat-title"></div>
+          </div>
+
+          <div class="skeleton skeleton-stat-number"></div>
+
+          <div class="skeleton skeleton-stat-desc"></div>
+        </mat-card>
+      </div>
+
       <!-- STAT CARDS -->
 
-      <div class="stats-grid" *ngIf="stats">
+      <div class="stats-grid" *ngIf="!statsLoading && stats">
         <!-- PENDING -->
 
         <mat-card class="stat-card">
@@ -158,6 +174,45 @@
       </div>
 
       <!-- =========================
+           TABLE SKELETON
+           Only for the very first load - a background
+           refetch (search/filter/pagination) keeps the
+           previous page's rows on screen instead (see
+           is-refetching below).
+      ========================== -->
+
+      <div class="table-wrapper" *ngIf="cooperativesInitialLoading" aria-hidden="true">
+        <table class="cooperative-table skeleton-table">
+          <thead>
+            <tr>
+              <th *ngFor="let column of displayedColumns">&nbsp;</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let row of skeletonRows">
+              <td>
+                <div class="coop-info">
+                  <div class="skeleton skeleton-avatar"></div>
+
+                  <div class="coop-details skeleton-line-group">
+                    <div class="skeleton skeleton-line-name"></div>
+                    <div class="skeleton skeleton-line-sub"></div>
+                  </div>
+                </div>
+              </td>
+
+              <td><div class="skeleton skeleton-line"></div></td>
+              <td><div class="skeleton skeleton-line"></div></td>
+              <td><div class="skeleton skeleton-line short"></div></td>
+              <td><div class="skeleton skeleton-chip"></div></td>
+              <td><div class="skeleton skeleton-line short"></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- =========================
            EMPTY STATE
       ========================== -->
 
@@ -173,7 +228,11 @@
            TABLE
       ========================== -->
 
-      <div class="table-wrapper" *ngIf="cooperatives.length > 0">
+      <div
+        class="table-wrapper"
+        [class.is-refetching]="listLoading && !cooperativesInitialLoading"
+        *ngIf="cooperatives.length > 0"
+      >
         <table mat-table [dataSource]="cooperatives" class="cooperative-table">
           <!-- COOPERATIVE -->
 

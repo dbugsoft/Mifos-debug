@@ -32,7 +32,7 @@ export class CoopVerifyEmailComponent {
   /**
    * User ID used for email verification
    */
-  userId: number | null = null;
+  userId: string | null = null;
 
   /**
    * OTP form
@@ -50,7 +50,7 @@ export class CoopVerifyEmailComponent {
   constructor() {
     const storedUserId = localStorage.getItem('coopVerificationUserId');
 
-    this.userId = storedUserId ? Number(storedUserId) : null;
+    this.userId = storedUserId ? String(storedUserId) : null;
 
     console.log('Verify page userId from localStorage:', this.userId);
   }

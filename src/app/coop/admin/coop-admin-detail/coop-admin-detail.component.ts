@@ -98,6 +98,12 @@ export class CoopAdminDetailComponent {
     return this.cooperativeQuery.isPending() || this.locationsQuery.isPending();
   }
 
+  /** Fixed field counts for the shimmer skeleton's detail-grid sections. */
+  readonly skeletonFields6 = Array.from({ length: 6 });
+  readonly skeletonFields4 = Array.from({ length: 4 });
+  readonly skeletonFields3 = Array.from({ length: 3 });
+  readonly skeletonFields2 = Array.from({ length: 2 });
+
   get loadError(): string {
     if (!Number.isFinite(this.id())) {
       return 'Invalid cooperative id.';

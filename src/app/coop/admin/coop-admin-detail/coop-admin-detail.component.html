@@ -45,609 +45,791 @@
   ====================================================== -->
 
   <div class="admin-detail-content">
-    <!-- =====================================================
+    @if (loading) {
+      <!-- =====================================================
+           SHIMMER SKELETON — INITIAL LOAD
+      ====================================================== -->
+
+      <div aria-hidden="true">
+        <!-- HEADER SKELETON -->
+
+        <div class="detail-header">
+          <div class="header-left">
+            <div class="skeleton skeleton-on-dark skeleton-coop-icon"></div>
+
+            <div class="header-text">
+              <div class="skeleton skeleton-on-dark skeleton-title"></div>
+              <div class="skeleton skeleton-on-dark skeleton-subtitle"></div>
+            </div>
+          </div>
+
+          <div class="header-status">
+            <div class="skeleton skeleton-on-dark skeleton-status-badge"></div>
+          </div>
+        </div>
+
+        <!-- INFORMATION PAPER SKELETON -->
+
+        <div class="information-paper">
+          <!-- BASIC INFORMATION -->
+
+          <section class="information-section">
+            <div class="section-heading">
+              <div class="skeleton skeleton-section-icon"></div>
+
+              <div>
+                <div class="skeleton skeleton-section-title"></div>
+                <div class="skeleton skeleton-section-desc"></div>
+              </div>
+            </div>
+
+            <div class="detail-grid">
+              <div class="detail-field" *ngFor="let field of skeletonFields6">
+                <div class="skeleton skeleton-label"></div>
+                <div class="skeleton skeleton-value"></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- CONTACT INFORMATION -->
+
+          <section class="information-section">
+            <div class="section-heading">
+              <div class="skeleton skeleton-section-icon"></div>
+
+              <div>
+                <div class="skeleton skeleton-section-title"></div>
+                <div class="skeleton skeleton-section-desc"></div>
+              </div>
+            </div>
+
+            <div class="detail-grid">
+              <div class="detail-field" *ngFor="let field of skeletonFields3">
+                <div class="skeleton skeleton-label"></div>
+                <div class="skeleton skeleton-value"></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ADDRESS INFORMATION -->
+
+          <section class="information-section">
+            <div class="section-heading">
+              <div class="skeleton skeleton-section-icon"></div>
+
+              <div>
+                <div class="skeleton skeleton-section-title"></div>
+                <div class="skeleton skeleton-section-desc"></div>
+              </div>
+            </div>
+
+            <div class="detail-grid">
+              <div class="detail-field" *ngFor="let field of skeletonFields6">
+                <div class="skeleton skeleton-label"></div>
+                <div class="skeleton skeleton-value"></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ABOUT -->
+
+          <section class="information-section">
+            <div class="section-heading">
+              <div class="skeleton skeleton-section-icon"></div>
+
+              <div>
+                <div class="skeleton skeleton-section-title"></div>
+                <div class="skeleton skeleton-section-desc"></div>
+              </div>
+            </div>
+
+            <div class="skeleton skeleton-description"></div>
+          </section>
+
+          <!-- REMARKS -->
+
+          <section class="information-section">
+            <div class="section-heading">
+              <div class="skeleton skeleton-section-icon"></div>
+
+              <div>
+                <div class="skeleton skeleton-section-title"></div>
+                <div class="skeleton skeleton-section-desc"></div>
+              </div>
+            </div>
+
+            <div class="remarks-container">
+              <div class="skeleton skeleton-remark-box"></div>
+              <div class="skeleton skeleton-remark-box"></div>
+            </div>
+          </section>
+
+          <!-- TENANT INFORMATION -->
+
+          <section class="information-section">
+            <div class="section-heading">
+              <div class="skeleton skeleton-section-icon"></div>
+
+              <div>
+                <div class="skeleton skeleton-section-title"></div>
+                <div class="skeleton skeleton-section-desc"></div>
+              </div>
+            </div>
+
+            <div class="detail-grid">
+              <div class="detail-field" *ngFor="let field of skeletonFields4">
+                <div class="skeleton skeleton-label"></div>
+                <div class="skeleton skeleton-value"></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- SYSTEM INFORMATION -->
+
+          <section class="information-section">
+            <div class="section-heading">
+              <div class="skeleton skeleton-section-icon"></div>
+
+              <div>
+                <div class="skeleton skeleton-section-title"></div>
+                <div class="skeleton skeleton-section-desc"></div>
+              </div>
+            </div>
+
+            <div class="detail-grid">
+              <div class="detail-field" *ngFor="let field of skeletonFields2">
+                <div class="skeleton skeleton-label"></div>
+                <div class="skeleton skeleton-value"></div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- ACTION AREA SKELETON -->
+
+        <section class="action-card pending-action">
+          <div class="action-header">
+            <div class="skeleton skeleton-action-icon"></div>
+
+            <div>
+              <div class="skeleton skeleton-action-title"></div>
+              <div class="skeleton skeleton-action-desc"></div>
+            </div>
+          </div>
+
+          <div class="skeleton skeleton-field-lg"></div>
+
+          <div class="skeleton-action-buttons">
+            <div class="skeleton skeleton-btn-primary"></div>
+            <div class="skeleton skeleton-btn-secondary"></div>
+          </div>
+        </section>
+      </div>
+    } @else {
+      <!-- =====================================================
          LOAD ERROR
     ====================================================== -->
 
-    <div class="error-message" *ngIf="loadError">
-      <span class="alert-icon"> ! </span>
-
-      <span>
-        {{ loadError }}
-      </span>
-    </div>
-
-    <!-- =====================================================
-         COOPERATIVE
-    ====================================================== -->
-
-    <ng-container *ngIf="cooperative">
-      <!-- =====================================================
-           HEADER
-      ====================================================== -->
-
-      <div class="detail-header">
-        <div class="header-left">
-          <div class="coop-icon">
-            {{ cooperative.nameEn?.charAt(0)?.toUpperCase() || 'C' }}
-          </div>
-
-          <div class="header-text">
-            <h1>
-              {{ cooperative.nameEn || 'Cooperative' }}
-            </h1>
-
-            <p class="name-np" *ngIf="cooperative.nameNp">
-              {{ cooperative.nameNp }}
-            </p>
-
-            <p class="subtitle">Cooperative Registration Details</p>
-          </div>
-        </div>
-
-        <!-- STATUS -->
-
-        <div class="header-status">
-          <span
-            class="status-badge"
-            [class.status-pending]="cooperative.status === 'PENDING'"
-            [class.status-provisioned]="cooperative.status === 'PROVISIONED'"
-            [class.status-active]="cooperative.status === 'ACTIVE'"
-            [class.status-rejected]="cooperative.status === 'REJECTED'"
-          >
-            <span class="status-dot"></span>
-
-            {{ cooperative.status || 'UNKNOWN' }}
-          </span>
-        </div>
-      </div>
-
-      <!-- =====================================================
-           SUCCESS MESSAGE
-      ====================================================== -->
-
-      <div class="alert success-alert" *ngIf="successMessage">
-        <span class="alert-icon"> ✓ </span>
-
-        <span>
-          {{ successMessage }}
-        </span>
-      </div>
-
-      <!-- =====================================================
-           ERROR MESSAGE
-      ====================================================== -->
-
-      <div class="alert error-alert" *ngIf="errorMessage">
+      <div class="error-message" *ngIf="loadError">
         <span class="alert-icon"> ! </span>
 
         <span>
-          {{ errorMessage }}
+          {{ loadError }}
         </span>
       </div>
 
       <!-- =====================================================
+         COOPERATIVE
+    ====================================================== -->
+
+      <ng-container *ngIf="cooperative">
+        <!-- =====================================================
+           HEADER
+      ====================================================== -->
+
+        <div class="detail-header">
+          <div class="header-left">
+            <div class="coop-icon">
+              {{ cooperative.nameEn?.charAt(0)?.toUpperCase() || 'C' }}
+            </div>
+
+            <div class="header-text">
+              <h1>
+                {{ cooperative.nameEn || 'Cooperative' }}
+              </h1>
+
+              <p class="name-np" *ngIf="cooperative.nameNp">
+                {{ cooperative.nameNp }}
+              </p>
+
+              <p class="subtitle">Cooperative Registration Details</p>
+            </div>
+          </div>
+
+          <!-- STATUS -->
+
+          <div class="header-status">
+            <span
+              class="status-badge"
+              [class.status-pending]="cooperative.status === 'PENDING'"
+              [class.status-provisioned]="cooperative.status === 'PROVISIONED'"
+              [class.status-active]="cooperative.status === 'ACTIVE'"
+              [class.status-rejected]="cooperative.status === 'REJECTED'"
+            >
+              <span class="status-dot"></span>
+
+              {{ cooperative.status || 'UNKNOWN' }}
+            </span>
+          </div>
+        </div>
+
+        <!-- =====================================================
+           SUCCESS MESSAGE
+      ====================================================== -->
+
+        <div class="alert success-alert" *ngIf="successMessage">
+          <span class="alert-icon"> ✓ </span>
+
+          <span>
+            {{ successMessage }}
+          </span>
+        </div>
+
+        <!-- =====================================================
+           ERROR MESSAGE
+      ====================================================== -->
+
+        <div class="alert error-alert" *ngIf="errorMessage">
+          <span class="alert-icon"> ! </span>
+
+          <span>
+            {{ errorMessage }}
+          </span>
+        </div>
+
+        <!-- =====================================================
            INFORMATION PAPER
       ====================================================== -->
 
-      <div class="information-paper">
-        <!-- ===================================================
+        <div class="information-paper">
+          <!-- ===================================================
              BASIC INFORMATION
         ==================================================== -->
 
-        <section class="information-section">
-          <div class="section-heading">
-            <div class="section-icon">◈</div>
+          <section class="information-section">
+            <div class="section-heading">
+              <div class="section-icon">◈</div>
 
-            <div>
-              <h2>Basic Information</h2>
+              <div>
+                <h2>Basic Information</h2>
 
-              <p>Official cooperative registration information</p>
-            </div>
-          </div>
-
-          <div class="detail-grid">
-            <div class="detail-field">
-              <span class="detail-label"> ID </span>
-
-              <span class="detail-value">
-                {{ cooperative.id }}
-              </span>
+                <p>Official cooperative registration information</p>
+              </div>
             </div>
 
-            <div class="detail-field">
-              <span class="detail-label"> App User ID </span>
+            <div class="detail-grid">
+              <div class="detail-field">
+                <span class="detail-label"> ID </span>
 
-              <span class="detail-value">
-                {{ cooperative.appUserId || '—' }}
-              </span>
+                <span class="detail-value">
+                  {{ cooperative.id }}
+                </span>
+              </div>
+
+              <div class="detail-field">
+                <span class="detail-label"> App User ID </span>
+
+                <span class="detail-value">
+                  {{ cooperative.appUserId || '—' }}
+                </span>
+              </div>
+
+              <div class="detail-field">
+                <span class="detail-label"> Registration No. </span>
+
+                <span class="detail-value">
+                  {{ cooperative.coopRegdNo || '—' }}
+                </span>
+              </div>
+
+              <div class="detail-field">
+                <span class="detail-label"> Cooperative Code </span>
+
+                <span class="detail-value">
+                  {{ cooperative.cooperativeCode || '—' }}
+                </span>
+              </div>
+
+              <div class="detail-field">
+                <span class="detail-label"> Date of Registration </span>
+
+                <span class="detail-value">
+                  {{ cooperative.dateOfRegistered || '—' }}
+                </span>
+              </div>
+
+              <div class="detail-field">
+                <span class="detail-label"> PAN Number </span>
+
+                <span class="detail-value">
+                  {{ cooperative.panNo || '—' }}
+                </span>
+              </div>
             </div>
+          </section>
 
-            <div class="detail-field">
-              <span class="detail-label"> Registration No. </span>
-
-              <span class="detail-value">
-                {{ cooperative.coopRegdNo || '—' }}
-              </span>
-            </div>
-
-            <div class="detail-field">
-              <span class="detail-label"> Cooperative Code </span>
-
-              <span class="detail-value">
-                {{ cooperative.cooperativeCode || '—' }}
-              </span>
-            </div>
-
-            <div class="detail-field">
-              <span class="detail-label"> Date of Registration </span>
-
-              <span class="detail-value">
-                {{ cooperative.dateOfRegistered || '—' }}
-              </span>
-            </div>
-
-            <div class="detail-field">
-              <span class="detail-label"> PAN Number </span>
-
-              <span class="detail-value">
-                {{ cooperative.panNo || '—' }}
-              </span>
-            </div>
-          </div>
-        </section>
-
-        <!-- ===================================================
+          <!-- ===================================================
              CONTACT INFORMATION
         ==================================================== -->
 
-        <section class="information-section">
-          <div class="section-heading">
-            <div class="section-icon">☎</div>
+          <section class="information-section">
+            <div class="section-heading">
+              <div class="section-icon">☎</div>
 
-            <div>
-              <h2>Contact Information</h2>
+              <div>
+                <h2>Contact Information</h2>
 
-              <p>Cooperative contact details</p>
-            </div>
-          </div>
-
-          <div class="detail-grid">
-            <div class="detail-field">
-              <span class="detail-label"> Mobile Phone </span>
-
-              <span class="detail-value">
-                {{ cooperative.mobilePhone || '—' }}
-              </span>
+                <p>Cooperative contact details</p>
+              </div>
             </div>
 
-            <div class="detail-field">
-              <span class="detail-label"> Office Phone </span>
+            <div class="detail-grid">
+              <div class="detail-field">
+                <span class="detail-label"> Mobile Phone </span>
 
-              <span class="detail-value">
-                {{ cooperative.officePhone || '—' }}
-              </span>
+                <span class="detail-value">
+                  {{ cooperative.mobilePhone || '—' }}
+                </span>
+              </div>
+
+              <div class="detail-field">
+                <span class="detail-label"> Office Phone </span>
+
+                <span class="detail-value">
+                  {{ cooperative.officePhone || '—' }}
+                </span>
+              </div>
+
+              <div class="detail-field">
+                <span class="detail-label"> Website </span>
+
+                <ng-container *ngIf="cooperative.webUrl; else noWebsite">
+                  <a [href]="cooperative.webUrl" target="_blank" rel="noopener noreferrer" class="website-link">
+                    {{ cooperative.webUrl }}
+                  </a>
+                </ng-container>
+
+                <ng-template #noWebsite>
+                  <span class="detail-value"> — </span>
+                </ng-template>
+              </div>
             </div>
+          </section>
 
-            <div class="detail-field">
-              <span class="detail-label"> Website </span>
-
-              <ng-container *ngIf="cooperative.webUrl; else noWebsite">
-                <a [href]="cooperative.webUrl" target="_blank" rel="noopener noreferrer" class="website-link">
-                  {{ cooperative.webUrl }}
-                </a>
-              </ng-container>
-
-              <ng-template #noWebsite>
-                <span class="detail-value"> — </span>
-              </ng-template>
-            </div>
-          </div>
-        </section>
-
-        <!-- ===================================================
+          <!-- ===================================================
              ADDRESS INFORMATION
         ==================================================== -->
 
-        <section class="information-section">
-          <div class="section-heading">
-            <div class="section-icon">⌂</div>
+          <section class="information-section">
+            <div class="section-heading">
+              <div class="section-icon">⌂</div>
 
-            <div>
-              <h2>Address Information</h2>
+              <div>
+                <h2>Address Information</h2>
 
-              <p>Registered cooperative office address</p>
-            </div>
-          </div>
-
-          <div class="detail-grid">
-            <div class="detail-field">
-              <span class="detail-label"> Province Name </span>
-
-              <span class="detail-value">
-                {{ provinceName || '—' }}
-              </span>
+                <p>Registered cooperative office address</p>
+              </div>
             </div>
 
-            <div class="detail-field">
-              <span class="detail-label"> District Name </span>
+            <div class="detail-grid">
+              <div class="detail-field">
+                <span class="detail-label"> Province Name </span>
 
-              <span class="detail-value">
-                {{ districtName || '—' }}
-              </span>
+                <span class="detail-value">
+                  {{ provinceName || '—' }}
+                </span>
+              </div>
+
+              <div class="detail-field">
+                <span class="detail-label"> District Name </span>
+
+                <span class="detail-value">
+                  {{ districtName || '—' }}
+                </span>
+              </div>
+
+              <div class="detail-field">
+                <span class="detail-label"> Local Level Name </span>
+
+                <span class="detail-value">
+                  {{ localLevelName || '—' }}
+                </span>
+              </div>
+
+              <div class="detail-field">
+                <span class="detail-label"> Ward No. </span>
+
+                <span class="detail-value">
+                  {{ cooperative.wardNo || '—' }}
+                </span>
+              </div>
+
+              <div class="detail-field">
+                <span class="detail-label"> Tole </span>
+
+                <span class="detail-value">
+                  {{ cooperative.tole || '—' }}
+                </span>
+              </div>
+
+              <div class="detail-field">
+                <span class="detail-label"> House No. </span>
+
+                <span class="detail-value">
+                  {{ cooperative.houseNo || '—' }}
+                </span>
+              </div>
             </div>
+          </section>
 
-            <div class="detail-field">
-              <span class="detail-label"> Local Level Name </span>
-
-              <span class="detail-value">
-                {{ localLevelName || '—' }}
-              </span>
-            </div>
-
-            <div class="detail-field">
-              <span class="detail-label"> Ward No. </span>
-
-              <span class="detail-value">
-                {{ cooperative.wardNo || '—' }}
-              </span>
-            </div>
-
-            <div class="detail-field">
-              <span class="detail-label"> Tole </span>
-
-              <span class="detail-value">
-                {{ cooperative.tole || '—' }}
-              </span>
-            </div>
-
-            <div class="detail-field">
-              <span class="detail-label"> House No. </span>
-
-              <span class="detail-value">
-                {{ cooperative.houseNo || '—' }}
-              </span>
-            </div>
-          </div>
-        </section>
-
-        <!-- ===================================================
+          <!-- ===================================================
              ABOUT
         ==================================================== -->
 
-        <section class="information-section">
-          <div class="section-heading">
-            <div class="section-icon">i</div>
+          <section class="information-section">
+            <div class="section-heading">
+              <div class="section-icon">i</div>
 
-            <div>
-              <h2>About Cooperative</h2>
+              <div>
+                <h2>About Cooperative</h2>
 
-              <p>Additional information provided by the applicant</p>
+                <p>Additional information provided by the applicant</p>
+              </div>
             </div>
-          </div>
 
-          <div class="description">
-            <ng-container *ngIf="cooperative.about; else noAbout">
-              {{ cooperative.about }}
-            </ng-container>
+            <div class="description">
+              <ng-container *ngIf="cooperative.about; else noAbout">
+                {{ cooperative.about }}
+              </ng-container>
 
-            <ng-template #noAbout>
-              <span class="empty-value"> No additional information provided. </span>
-            </ng-template>
-          </div>
-        </section>
+              <ng-template #noAbout>
+                <span class="empty-value"> No additional information provided. </span>
+              </ng-template>
+            </div>
+          </section>
 
-        <!-- ===================================================
+          <!-- ===================================================
              REMARKS
         ==================================================== -->
 
-        <section class="information-section">
-          <div class="section-heading">
-            <div class="section-icon">≡</div>
+          <section class="information-section">
+            <div class="section-heading">
+              <div class="section-icon">≡</div>
 
-            <div>
-              <h2>Remarks</h2>
+              <div>
+                <h2>Remarks</h2>
 
-              <p>Applicant and administrator remarks</p>
-            </div>
-          </div>
-
-          <div class="remarks-container">
-            <div class="remark-box applicant-remark">
-              <span class="remark-label"> Applicant Remarks </span>
-
-              <p *ngIf="cooperative.remarks">
-                {{ cooperative.remarks }}
-              </p>
-
-              <p class="empty-value" *ngIf="!cooperative.remarks">No applicant remarks.</p>
+                <p>Applicant and administrator remarks</p>
+              </div>
             </div>
 
-            <div class="remark-box admin-remark">
-              <span class="remark-label"> Admin Remarks </span>
+            <div class="remarks-container">
+              <div class="remark-box applicant-remark">
+                <span class="remark-label"> Applicant Remarks </span>
 
-              <p *ngIf="cooperative.adminRemarks">
-                {{ cooperative.adminRemarks }}
-              </p>
+                <p *ngIf="cooperative.remarks">
+                  {{ cooperative.remarks }}
+                </p>
 
-              <p class="empty-value" *ngIf="!cooperative.adminRemarks">No administrator remarks.</p>
+                <p class="empty-value" *ngIf="!cooperative.remarks">No applicant remarks.</p>
+              </div>
+
+              <div class="remark-box admin-remark">
+                <span class="remark-label"> Admin Remarks </span>
+
+                <p *ngIf="cooperative.adminRemarks">
+                  {{ cooperative.adminRemarks }}
+                </p>
+
+                <p class="empty-value" *ngIf="!cooperative.adminRemarks">No administrator remarks.</p>
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
 
-        <!-- ===================================================
+          <!-- ===================================================
              TENANT INFORMATION
         ==================================================== -->
 
-        <section class="information-section">
-          <div class="section-heading">
-            <div class="section-icon">◉</div>
+          <section class="information-section">
+            <div class="section-heading">
+              <div class="section-icon">◉</div>
 
-            <div>
-              <h2>Tenant Information</h2>
+              <div>
+                <h2>Tenant Information</h2>
 
-              <p>Fineract tenant provisioning information</p>
-            </div>
-          </div>
-
-          <div class="detail-grid">
-            <div class="detail-field">
-              <span class="detail-label"> Tenant Identifier </span>
-
-              <span class="detail-value tenant-value">
-                {{ cooperative.tenantIdentifier || '—' }}
-              </span>
+                <p>Fineract tenant provisioning information</p>
+              </div>
             </div>
 
-            <div class="detail-field">
-              <span class="detail-label"> Tenant Status </span>
+            <div class="detail-grid">
+              <div class="detail-field">
+                <span class="detail-label"> Tenant Identifier </span>
 
-              <span class="detail-value">
-                {{ cooperative.status || '—' }}
-              </span>
+                <span class="detail-value tenant-value">
+                  {{ cooperative.tenantIdentifier || '—' }}
+                </span>
+              </div>
+
+              <div class="detail-field">
+                <span class="detail-label"> Tenant Status </span>
+
+                <span class="detail-value">
+                  {{ cooperative.status || '—' }}
+                </span>
+              </div>
+
+              <div class="detail-field">
+                <span class="detail-label"> Provisioned At </span>
+
+                <span class="detail-value">
+                  {{ cooperative.provisionedAt || '—' }}
+                </span>
+              </div>
+
+              <div class="detail-field">
+                <span class="detail-label"> Activated At </span>
+
+                <span class="detail-value">
+                  {{ cooperative.activatedAt || '—' }}
+                </span>
+              </div>
             </div>
+          </section>
 
-            <div class="detail-field">
-              <span class="detail-label"> Provisioned At </span>
-
-              <span class="detail-value">
-                {{ cooperative.provisionedAt || '—' }}
-              </span>
-            </div>
-
-            <div class="detail-field">
-              <span class="detail-label"> Activated At </span>
-
-              <span class="detail-value">
-                {{ cooperative.activatedAt || '—' }}
-              </span>
-            </div>
-          </div>
-        </section>
-
-        <!-- ===================================================
+          <!-- ===================================================
              SYSTEM INFORMATION
         ==================================================== -->
 
-        <section class="information-section">
-          <div class="section-heading">
-            <div class="section-icon">⚙</div>
+          <section class="information-section">
+            <div class="section-heading">
+              <div class="section-icon">⚙</div>
 
-            <div>
-              <h2>System Information</h2>
+              <div>
+                <h2>System Information</h2>
 
-              <p>Record creation and update information</p>
-            </div>
-          </div>
-
-          <div class="detail-grid">
-            <div class="detail-field">
-              <span class="detail-label"> Created At </span>
-
-              <span class="detail-value">
-                {{ cooperative.createdAt || '—' }}
-              </span>
+                <p>Record creation and update information</p>
+              </div>
             </div>
 
-            <div class="detail-field">
-              <span class="detail-label"> Updated At </span>
+            <div class="detail-grid">
+              <div class="detail-field">
+                <span class="detail-label"> Created At </span>
 
-              <span class="detail-value">
-                {{ cooperative.updatedAt || '—' }}
-              </span>
+                <span class="detail-value">
+                  {{ cooperative.createdAt || '—' }}
+                </span>
+              </div>
+
+              <div class="detail-field">
+                <span class="detail-label"> Updated At </span>
+
+                <span class="detail-value">
+                  {{ cooperative.updatedAt || '—' }}
+                </span>
+              </div>
             </div>
-          </div>
-        </section>
-      </div>
+          </section>
+        </div>
 
-      <!-- =====================================================
+        <!-- =====================================================
            PENDING — VERIFY & REJECT
       ====================================================== -->
 
-      <section class="action-card pending-action" *ngIf="cooperative.status === 'PENDING'">
-        <!-- HEADER -->
+        <section class="action-card pending-action" *ngIf="cooperative.status === 'PENDING'">
+          <!-- HEADER -->
 
-        <div class="action-header">
-          <div class="action-icon verify-icon">✓</div>
+          <div class="action-header">
+            <div class="action-icon verify-icon">✓</div>
 
-          <div>
-            <h2>Verify Cooperative</h2>
+            <div>
+              <h2>Verify Cooperative</h2>
 
-            <p>Review the cooperative information and verify it to provision the Fineract tenant.</p>
+              <p>Review the cooperative information and verify it to provision the Fineract tenant.</p>
+            </div>
           </div>
-        </div>
 
-        <!-- =================================================
+          <!-- =================================================
              VERIFY FORM
         ================================================== -->
 
-        <form [formGroup]="verifyForm" (ngSubmit)="submitVerify()" class="verify-form">
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label> Admin Remarks </mat-label>
+          <form [formGroup]="verifyForm" (ngSubmit)="submitVerify()" class="verify-form">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label> Admin Remarks </mat-label>
 
-            <input matInput type="text" formControlName="remarks" placeholder="Enter admin remarks" />
+              <input matInput type="text" formControlName="remarks" placeholder="Enter admin remarks" />
 
-            <mat-error *ngIf="verifyForm.get('remarks')?.hasError('required')"> Remarks are required. </mat-error>
-          </mat-form-field>
-        </form>
+              <mat-error *ngIf="verifyForm.get('remarks')?.hasError('required')"> Remarks are required. </mat-error>
+            </mat-form-field>
+          </form>
 
-        <!-- =================================================
+          <!-- =================================================
              VERIFY / REJECT BUTTONS
         ================================================== -->
 
-        <div class="verification-actions">
-          <!-- VERIFY -->
+          <div class="verification-actions">
+            <!-- VERIFY -->
 
-          <button
-            mat-raised-button
-            type="button"
-            class="primary-button verify-button"
-            (click)="submitVerify()"
-            [disabled]="isVerifying || isRejecting"
-          >
-            {{ isVerifying ? 'Verifying & Provisioning...' : '✓ Verify & Provision Tenant' }}
-          </button>
+            <button
+              mat-raised-button
+              type="button"
+              class="primary-button verify-button"
+              (click)="submitVerify()"
+              [disabled]="isVerifying || isRejecting"
+            >
+              {{ isVerifying ? 'Verifying & Provisioning...' : '✓ Verify & Provision Tenant' }}
+            </button>
 
-          <!-- REJECT -->
+            <!-- REJECT -->
 
-          <button
-            mat-raised-button
-            type="button"
-            class="reject-button"
-            (click)="toggleRejectForm()"
-            [disabled]="isRejecting || isVerifying"
-          >
-            ⊘ Reject Cooperative
-          </button>
-        </div>
+            <button
+              mat-raised-button
+              type="button"
+              class="reject-button"
+              (click)="toggleRejectForm()"
+              [disabled]="isRejecting || isVerifying"
+            >
+              ⊘ Reject Cooperative
+            </button>
+          </div>
 
-        <!-- =================================================
+          <!-- =================================================
              REJECTION FORM
         ================================================== -->
 
-        <div class="reject-form-container" *ngIf="showRejectForm">
-          <div class="reject-form-header">
-            <div class="reject-form-icon">!</div>
+          <div class="reject-form-container" *ngIf="showRejectForm">
+            <div class="reject-form-header">
+              <div class="reject-form-icon">!</div>
+
+              <div>
+                <h3>Reject Cooperative</h3>
+
+                <p>
+                  Please provide a reason for rejecting this cooperative. This reason will be recorded for
+                  administrative reference.
+                </p>
+              </div>
+            </div>
+
+            <!-- REJECT FORM -->
+
+            <form [formGroup]="rejectForm" (ngSubmit)="submitReject()" class="reject-form">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label> Rejection Reason </mat-label>
+
+                <input matInput type="text" formControlName="reason" placeholder="Enter reason for rejection" />
+
+                <mat-error *ngIf="rejectForm.get('reason')?.hasError('required')">
+                  Rejection reason is required.
+                </mat-error>
+              </mat-form-field>
+
+              <!-- REJECTION ACTIONS -->
+
+              <div class="reject-actions">
+                <button
+                  mat-button
+                  type="button"
+                  class="cancel-reject-button"
+                  (click)="toggleRejectForm()"
+                  [disabled]="isRejecting"
+                >
+                  Cancel
+                </button>
+
+                <button mat-raised-button type="submit" class="confirm-reject-button" [disabled]="isRejecting">
+                  {{ isRejecting ? 'Rejecting...' : 'Confirm Reject' }}
+                </button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <!-- =====================================================
+           PROVISIONED — ACTIVATE TENANT
+      ====================================================== -->
+
+        <section class="action-card pending-action" *ngIf="cooperative.status === 'PROVISIONED'">
+          <!-- HEADER -->
+
+          <div class="action-header">
+            <div class="action-icon verify-icon">✓</div>
 
             <div>
-              <h3>Reject Cooperative</h3>
+              <h2>Activate Tenant</h2>
 
               <p>
-                Please provide a reason for rejecting this cooperative. This reason will be recorded for administrative
-                reference.
+                The Fineract tenant has been successfully provisioned. Activate the tenant to make it available for use.
               </p>
             </div>
           </div>
 
-          <!-- REJECT FORM -->
-
-          <form [formGroup]="rejectForm" (ngSubmit)="submitReject()" class="reject-form">
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label> Rejection Reason </mat-label>
-
-              <input matInput type="text" formControlName="reason" placeholder="Enter reason for rejection" />
-
-              <mat-error *ngIf="rejectForm.get('reason')?.hasError('required')">
-                Rejection reason is required.
-              </mat-error>
-            </mat-form-field>
-
-            <!-- REJECTION ACTIONS -->
-
-            <div class="reject-actions">
-              <button
-                mat-button
-                type="button"
-                class="cancel-reject-button"
-                (click)="toggleRejectForm()"
-                [disabled]="isRejecting"
-              >
-                Cancel
-              </button>
-
-              <button mat-raised-button type="submit" class="confirm-reject-button" [disabled]="isRejecting">
-                {{ isRejecting ? 'Rejecting...' : 'Confirm Reject' }}
-              </button>
-            </div>
-          </form>
-        </div>
-      </section>
-
-      <!-- =====================================================
-           PROVISIONED — ACTIVATE TENANT
-      ====================================================== -->
-
-      <section class="action-card pending-action" *ngIf="cooperative.status === 'PROVISIONED'">
-        <!-- HEADER -->
-
-        <div class="action-header">
-          <div class="action-icon verify-icon">✓</div>
-
-          <div>
-            <h2>Activate Tenant</h2>
-
-            <p>
-              The Fineract tenant has been successfully provisioned. Activate the tenant to make it available for use.
-            </p>
-          </div>
-        </div>
-
-        <!-- =================================================
+          <!-- =================================================
              ACTIVATE FORM
         ================================================== -->
 
-        <form [formGroup]="activateForm" class="verify-form">
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label> Admin Remarks </mat-label>
+          <form [formGroup]="activateForm" class="verify-form">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label> Admin Remarks </mat-label>
 
-            <input matInput type="text" formControlName="remarks" placeholder="Enter activation remarks" />
-          </mat-form-field>
-        </form>
+              <input matInput type="text" formControlName="remarks" placeholder="Enter activation remarks" />
+            </mat-form-field>
+          </form>
 
-        <!-- =================================================
+          <!-- =================================================
              ACTIVATE BUTTON
         ================================================== -->
 
-        <div class="verification-actions">
-          <button
-            mat-raised-button
-            type="button"
-            class="primary-button verify-button"
-            (click)="confirmActivate()"
-            [disabled]="isActivating"
-          >
-            {{ isActivating ? 'Activating Tenant...' : '✓ Activate Tenant' }}
-          </button>
-        </div>
-      </section>
+          <div class="verification-actions">
+            <button
+              mat-raised-button
+              type="button"
+              class="primary-button verify-button"
+              (click)="confirmActivate()"
+              [disabled]="isActivating"
+            >
+              {{ isActivating ? 'Activating Tenant...' : '✓ Activate Tenant' }}
+            </button>
+          </div>
+        </section>
 
-      <!-- =====================================================
+        <!-- =====================================================
            ACTIVE — STATUS INFO
       ====================================================== -->
 
-      <div class="status-info-card active-card" *ngIf="cooperative.status === 'ACTIVE'">
-        <div class="status-info-icon">✓</div>
+        <div class="status-info-card active-card" *ngIf="cooperative.status === 'ACTIVE'">
+          <div class="status-info-icon">✓</div>
 
-        <div>
-          <h2>Tenant Active</h2>
+          <div>
+            <h2>Tenant Active</h2>
 
-          <p>This cooperative's Fineract tenant has been provisioned and activated, and is now fully operational.</p>
+            <p>This cooperative's Fineract tenant has been provisioned and activated, and is now fully operational.</p>
+          </div>
         </div>
-      </div>
 
-      <!-- =====================================================
+        <!-- =====================================================
            REJECTED — STATUS INFO
       ====================================================== -->
 
-      <div class="status-info-card rejected-card" *ngIf="cooperative.status === 'REJECTED'">
-        <div class="status-info-icon">⊘</div>
+        <div class="status-info-card rejected-card" *ngIf="cooperative.status === 'REJECTED'">
+          <div class="status-info-icon">⊘</div>
 
-        <div>
-          <h2>Cooperative Rejected</h2>
+          <div>
+            <h2>Cooperative Rejected</h2>
 
-          <p>This cooperative's registration was rejected. See the admin remarks above for details.</p>
+            <p>This cooperative's registration was rejected. See the admin remarks above for details.</p>
+          </div>
         </div>
-      </div>
-    </ng-container>
+      </ng-container>
+    }
   </div>
 </div>

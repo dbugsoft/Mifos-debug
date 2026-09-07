@@ -9,16 +9,18 @@
 import { Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-
+import { AuthLayoutComponent } from '../../auth-layout/auth-layout.component';
 import { CoopAuthService } from '../../services/coop-auth.service';
 import { CoopTokenService } from '../../services/coop-token.service';
-
+import { MatIconModule } from '@angular/material/icon';
 @Component({
   selector: 'mifosx-coop-login',
   standalone: true,
   imports: [
     ReactiveFormsModule,
-    RouterLink
+    RouterLink,
+    AuthLayoutComponent,
+    MatIconModule
   ],
   templateUrl: './coop-login.component.html',
   styleUrl: './coop-login.component.scss'
@@ -30,7 +32,7 @@ export class CoopLoginComponent {
   private coopTokenService = inject(CoopTokenService);
 
   isSubmitting = false;
-
+  hidePassword = true;
   successMessage = '';
   errorMessage = '';
 
