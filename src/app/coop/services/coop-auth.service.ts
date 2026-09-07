@@ -18,13 +18,13 @@ export interface CoopRegisterRequest {
 }
 
 export interface CoopRegisterResponse {
-  userId: number;
+  userId: string;
   message?: string;
   [key: string]: any;
 }
 
 export interface CoopVerifyEmailRequest {
-  userId: number;
+  userId: string;
   otp: string;
 }
 
@@ -64,7 +64,7 @@ export interface CoopResendOtpRequest {
 }
 
 export interface CoopResendOtpResponse {
-  userId: number;
+  userId: string;
   message?: string;
   [key: string]: any;
 }

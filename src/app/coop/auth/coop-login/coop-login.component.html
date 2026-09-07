@@ -6,86 +6,101 @@
   file, You can obtain one at http://mozilla.org/MPL/2.0/.
 -->
 
-<div class="coop-login-page">
-  <div class="login-card">
-    <!-- Header -->
+<mifosx-coop-auth-layout>
+  <!-- Header -->
 
-    <div class="login-header">
-      <h1>Welcome</h1>
+  <div class="login-header">
+    <p>Login to access your cooperative account.</p>
+  </div>
 
-      <p>Login to access your cooperative account.</p>
+  <!-- Success Message -->
+
+  @if (successMessage) {
+    <div class="success-message">
+      {{ successMessage }}
     </div>
+  }
 
-    <!-- Success Message -->
+  <!-- Error Message -->
 
-    @if (successMessage) {
-      <div class="success-message">
-        {{ successMessage }}
-      </div>
-    }
+  @if (errorMessage) {
+    <div class="error-message">
+      {{ errorMessage }}
+    </div>
+  }
 
-    <!-- Error Message -->
+  <!-- Login Form -->
 
-    @if (errorMessage) {
-      <div class="error-message">
-        {{ errorMessage }}
-      </div>
-    }
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
+    <!-- Email -->
 
-    <!-- Login Form -->
+    <div class="form-group">
+      <label for="email">Email Address</label>
 
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
-      <!-- Email -->
-
-      <div class="form-group">
-        <label for="email"> Email </label>
+      <div class="input-wrapper">
+        <mat-icon class="input-icon">email</mat-icon>
 
         <input id="email" type="email" formControlName="email" placeholder="Enter your email" autocomplete="email" />
-
-        @if (loginForm.controls.email.touched && loginForm.controls.email.hasError('required')) {
-          <span class="field-error"> Email is required. </span>
-        }
-
-        @if (loginForm.controls.email.touched && loginForm.controls.email.hasError('email')) {
-          <span class="field-error"> Please enter a valid email address. </span>
-        }
       </div>
 
-      <!-- Password -->
+      @if (loginForm.controls.email.touched && loginForm.controls.email.hasError('required')) {
+        <span class="field-error">Email is required.</span>
+      }
 
-      <div class="form-group">
-        <label for="password"> Password </label>
+      @if (loginForm.controls.email.touched && loginForm.controls.email.hasError('email')) {
+        <span class="field-error">Please enter a valid email address.</span>
+      }
+    </div>
+
+    <!-- Password -->
+
+    <div class="form-group">
+      <label for="password">Password</label>
+
+      <div class="input-wrapper">
+        <mat-icon class="input-icon">lock</mat-icon>
 
         <input
           id="password"
-          type="password"
+          [type]="hidePassword ? 'password' : 'text'"
           formControlName="password"
           placeholder="Enter your password"
           autocomplete="current-password"
         />
 
-        @if (loginForm.controls.password.touched && loginForm.controls.password.hasError('required')) {
-          <span class="field-error"> Password is required. </span>
-        }
+        <button
+          type="button"
+          class="password-toggle"
+          (click)="hidePassword = !hidePassword"
+          [attr.aria-label]="hidePassword ? 'Show password' : 'Hide password'"
+        >
+          <mat-icon>
+            {{ hidePassword ? 'visibility' : 'visibility_off' }}
+          </mat-icon>
+        </button>
       </div>
 
-      <!-- Login Button -->
-
-      <button type="submit" class="login-button" [disabled]="isSubmitting">
-        @if (isSubmitting) {
-          Logging in...
-        } @else {
-          Login
-        }
-      </button>
-    </form>
-
-    <!-- Register Link -->
-
-    <div class="register-section">
-      <span> Don't have an account? </span>
-
-      <a routerLink="/coop/register"> Create Account </a>
+      @if (loginForm.controls.password.touched && loginForm.controls.password.hasError('required')) {
+        <span class="field-error">Password is required.</span>
+      }
     </div>
+
+    <!-- Login Button -->
+
+    <button type="submit" class="login-button" [disabled]="isSubmitting">
+      @if (isSubmitting) {
+        Logging in...
+      } @else {
+        Login
+      }
+    </button>
+  </form>
+
+  <!-- Register Link -->
+
+  <div class="register-section">
+    <span> Don't have an account? </span>
+
+    <a routerLink="/coop/register"> Create Account </a>
   </div>
-</div>
+</mifosx-coop-auth-layout>

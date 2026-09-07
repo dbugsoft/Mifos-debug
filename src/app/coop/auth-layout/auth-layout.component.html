@@ -1,0 +1,66 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="login-wrapper">
+  <!-- LEFT HERO PANEL -->
+  <div class="hero-panel">
+    <div class="hero-overlay"></div>
+
+    <div class="hero-content">
+      <h1 class="hero-title">
+        {{ title }}
+      </h1>
+
+      <p class="hero-subtitle">
+        {{ subtitle }}
+      </p>
+
+      <div class="hero-features">
+        @for (feature of features; track feature.title) {
+          <div class="feature-item">
+            <div class="feature-check">
+              <span class="check-mark">&#10003;</span>
+            </div>
+
+            <div class="feature-text">
+              <strong>
+                {{ feature.title }}
+              </strong>
+
+              <span>
+                {{ feature.description }}
+              </span>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT LOGIN / REGISTRATION PANEL -->
+  <div class="login-panel">
+    <div class="login-card-container">
+      <div class="login-card">
+        <!-- DEBUGSOFT LOGO -->
+        <div class="logo-section">
+          <img [src]="logoPath" (error)="onLogoError()" alt="Debugsoft Logo" class="logo-image" />
+        </div>
+
+        <!-- LOGIN OR REGISTRATION CONTENT -->
+        <ng-content></ng-content>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <p class="login-footer">
+      &copy; 2026 CoIMS. All rights reserved. Developed by
+
+      <a href="https://dibugsoft.com/" target="_blank" rel="noopener noreferrer"> Debugsoft </a>
+    </p>
+  </div>
+</div>

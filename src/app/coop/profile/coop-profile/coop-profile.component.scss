@@ -230,15 +230,51 @@
 ========================================================= */
 
 .form-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 4px 16px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 18px 20px;
   width: 100%;
   box-sizing: border-box;
 }
 
-.form-grid.three-column {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+.form-grid > mat-form-field {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+.form-grid > mat-form-field.field-sm {
+  flex: 0 1 200px;
+}
+
+.form-grid > mat-form-field.field-md {
+  flex: 1 1 260px;
+}
+
+.form-grid > mat-form-field.field-xs {
+  flex: 0 1 140px;
+}
+
+/* Keeps a pair of fields (e.g. Mobile/Office Phone) on one row even in a
+   narrow card: they shrink instead of wrapping onto a second line. */
+.form-grid.no-wrap {
+  flex-wrap: nowrap;
+}
+
+.form-grid.no-wrap > mat-form-field {
+  min-width: 0;
+}
+
+.field-sm {
+  max-width: 200px;
+}
+
+.field-md {
+  max-width: 320px;
+}
+
+.field-xs {
+  max-width: 140px;
 }
 
 /* =========================================================
@@ -303,6 +339,27 @@ mat-form-field mat-select {
 }
 
 .two-section-grid > .form-section {
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 20px;
+  align-self: stretch;
+  min-width: 0;
+}
+
+/* =========================================================
+   FOUR -SECTION GRID
+======================================================== */
+
+.four-section-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+  width: 100%;
+  box-sizing: border-box;
+  align-items: stretch;
+}
+
+.four-section-grid > .form-section {
   width: 100%;
   box-sizing: border-box;
   margin-bottom: 20px;
@@ -477,6 +534,16 @@ mat-form-field mat-select {
 }
 
 /* =========================================================
+   WIDE / FOUR-SECTION COLLAPSE
+========================================================= */
+
+@media (width <= 900px) {
+  .four-section-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* =========================================================
    TABLET
 ========================================================= */
 
@@ -485,11 +552,8 @@ mat-form-field mat-select {
     padding: 20px 20px 40px;
   }
 
-  .form-grid.three-column {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .two-section-grid {
+  .two-section-grid,
+  .four-section-grid {
     grid-template-columns: 1fr;
   }
 
@@ -534,13 +598,24 @@ mat-form-field mat-select {
     font-size: 15px;
   }
 
-  .form-grid,
-  .form-grid.three-column {
-    grid-template-columns: 1fr;
-    gap: 2px;
+  .form-grid {
+    gap: 10px;
   }
 
-  .two-section-grid {
+  .form-grid > mat-form-field,
+  .form-grid > mat-form-field.field-sm,
+  .form-grid > mat-form-field.field-md,
+  .form-grid > mat-form-field.field-xs {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
+
+  .form-grid.no-wrap {
+    flex-wrap: wrap;
+  }
+
+  .two-section-grid,
+  .four-section-grid {
     grid-template-columns: 1fr;
     gap: 0;
   }
@@ -672,5 +747,68 @@ mat-form-field mat-select {
     padding: 0 12px !important;
     min-width: 70px;
     font-size: 11px !important;
+  }
+}
+
+/* =========================================================
+   SHIMMER SKELETON
+
+   Mirrors the real form's .form-section / .section-header /
+   .form-grid / .two-section-grid wrappers so the skeleton
+   occupies the same footprint as the loaded form, avoiding
+   layout jump once data arrives.
+========================================================= */
+
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: #e7ecf1;
+  border-radius: 6px;
+}
+
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 65%), transparent);
+  animation: coop-skeleton-shimmer 1.5s infinite;
+}
+
+@keyframes coop-skeleton-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.skeleton-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  flex-shrink: 0;
+}
+
+.skeleton-heading {
+  width: 150px;
+  height: 16px;
+}
+
+.skeleton-field {
+  width: 100%;
+  height: 48px;
+}
+
+.skeleton-field.full-width {
+  height: 56px;
+}
+
+.skeleton-button {
+  width: 140px;
+  height: 40px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton::after {
+    animation: none;
   }
 }

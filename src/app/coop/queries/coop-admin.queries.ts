@@ -7,7 +7,7 @@
  */
 
 import { firstValueFrom } from 'rxjs';
-import { queryOptions } from '@tanstack/angular-query-experimental';
+import { keepPreviousData, queryOptions } from '@tanstack/angular-query-experimental';
 
 import { CoopAdminListParams, CoopAdminService } from '../services/coop-admin.service';
 import { coopQueryKeys } from './coop-query-keys';
@@ -24,7 +24,16 @@ export function adminListQueryOptions(coopAdminService: CoopAdminService, params
   return queryOptions({
     queryKey: coopQueryKeys.admin.list(params),
     queryFn: () => firstValueFrom(coopAdminService.getCooperatives(params)),
-    staleTime: ADMIN_STALE_TIME_MS
+    staleTime: ADMIN_STALE_TIME_MS,
+    /*
+     * Keeps the previous page's rows visible (isPlaceholderData/
+     * isFetching) while a new status/search/page key is in flight,
+     * instead of clearing to undefined. This lets the dashboard keep
+     * showing the existing table during background refetches rather
+     * than a full skeleton, only falling back to isPending() (no
+     * placeholder available) on the very first load.
+     */
+    placeholderData: keepPreviousData
   });
 }
 

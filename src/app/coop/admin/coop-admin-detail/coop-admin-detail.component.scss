@@ -1324,3 +1324,158 @@ textarea:focus-visible {
     width: 100%;
   }
 }
+
+/* =========================================================
+   SHIMMER SKELETON
+
+   Reuses the real .detail-header / .information-paper /
+   .detail-grid / .detail-field / .action-card wrappers so the
+   skeleton occupies the same footprint as the loaded page,
+   avoiding layout jump once data arrives.
+========================================================= */
+
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--border-light);
+  border-radius: 6px;
+}
+
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 55%), transparent);
+  animation: coop-skeleton-shimmer 1.5s infinite;
+}
+
+@keyframes coop-skeleton-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Lighter shimmer for skeleton blocks sitting on the dark
+   gradient header, where the default gray would be invisible. */
+
+.skeleton-on-dark {
+  background: rgb(255 255 255 / 18%);
+}
+
+.skeleton-on-dark::after {
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 35%), transparent);
+}
+
+.skeleton-coop-icon {
+  width: 68px;
+  height: 68px;
+  border-radius: 18px;
+  flex: 0 0 auto;
+}
+
+.skeleton-title {
+  width: 240px;
+  height: 26px;
+}
+
+.skeleton-subtitle {
+  width: 150px;
+  height: 12px;
+  margin-top: 10px;
+}
+
+.skeleton-status-badge {
+  width: 92px;
+  height: 27px;
+  border-radius: 999px;
+}
+
+.skeleton-section-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 11px;
+  flex: 0 0 auto;
+}
+
+.skeleton-section-title {
+  width: 160px;
+  height: 15px;
+}
+
+.skeleton-section-desc {
+  width: 210px;
+  height: 11px;
+  margin-top: 7px;
+}
+
+.skeleton-label {
+  width: 70px;
+  height: 10px;
+  margin-bottom: 8px;
+}
+
+.skeleton-value {
+  width: 100px;
+  height: 13px;
+}
+
+.skeleton-description {
+  min-height: 90px;
+  border-radius: 12px;
+}
+
+.skeleton-remark-box {
+  min-height: 125px;
+  border-radius: 13px;
+}
+
+.skeleton-action-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  flex: 0 0 auto;
+}
+
+.skeleton-action-title {
+  width: 180px;
+  height: 16px;
+}
+
+.skeleton-action-desc {
+  width: 320px;
+  max-width: 100%;
+  height: 11px;
+  margin-top: 7px;
+}
+
+.skeleton-field-lg {
+  width: 100%;
+  max-width: 720px;
+  height: 48px;
+  margin-top: 14px;
+}
+
+.skeleton-action-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.skeleton-btn-primary {
+  width: 220px;
+  height: 43px;
+  border-radius: 9px;
+}
+
+.skeleton-btn-secondary {
+  width: 180px;
+  height: 44px;
+  border-radius: 10px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton::after {
+    animation: none;
+  }
+}
