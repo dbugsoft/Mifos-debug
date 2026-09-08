@@ -144,11 +144,20 @@
             <!-- COOPERATIVE NAME ENGLISH -->
 
             <mat-form-field appearance="outline">
-              <mat-label> Cooperative Name (English) </mat-label>
+              <mat-label>Cooperative Name (English)</mat-label>
 
-              <input matInput formControlName="nameEn" />
+              <input
+                matInput
+                formControlName="nameEn"
+                (keydown)="onEnglishKeydown($event)"
+                (input)="onEnglishInput($event)"
+              />
 
               <mat-error *ngIf="profileForm.get('nameEn')?.hasError('required')"> English name is required. </mat-error>
+
+              <mat-error *ngIf="profileForm.get('nameEn')?.hasError('pattern')">
+                Use English letters, spaces, & and periods only.
+              </mat-error>
             </mat-form-field>
 
             <!-- COOPERATIVE NAME NEPALI -->
@@ -156,9 +165,18 @@
             <mat-form-field appearance="outline">
               <mat-label> Cooperative Name (Nepali) </mat-label>
 
-              <input matInput formControlName="nameNp" />
+              <input
+                matInput
+                formControlName="nameNp"
+                (keydown)="onNepaliKeydown($event)"
+                (input)="onNepaliInput($event)"
+              />
 
               <mat-error *ngIf="profileForm.get('nameNp')?.hasError('required')"> Nepali name is required. </mat-error>
+
+              <mat-error *ngIf="profileForm.get('nameNp')?.hasError('pattern')">
+                Please enter Nepali characters only.
+              </mat-error>
             </mat-form-field>
 
             <!-- DATE OF REGISTRATION -->
@@ -166,7 +184,15 @@
             <mat-form-field appearance="outline" class="field-sm">
               <mat-label> Date of Registration </mat-label>
 
-              <input matInput type="text" formControlName="dateOfRegistered" placeholder="YYYY-MM-DD" />
+              <input
+                matInput
+                type="text"
+                formControlName="dateOfRegistered"
+                placeholder="YYYY-MM-DD"
+                maxlength="10"
+                (input)="onDateInput($event)"
+                (keydown)="onDateKeydown($event)"
+              />
 
               <mat-error *ngIf="profileForm.get('dateOfRegistered')?.hasError('required')">
                 Registration date is required.
@@ -178,9 +204,19 @@
             <mat-form-field appearance="outline" class="field-sm">
               <mat-label> PAN Number </mat-label>
 
-              <input matInput formControlName="panNo" />
+              <input
+                matInput
+                formControlName="panNo"
+                maxlength="9"
+                inputmode="numeric"
+                (keydown)="onPanKeydown($event)"
+                (input)="onPanInput($event)"
+              />
 
               <mat-error *ngIf="profileForm.get('panNo')?.hasError('required')"> PAN number is required. </mat-error>
+              <mat-error *ngIf="profileForm.get('panNo')?.hasError('pattern')">
+                PAN number must be exactly 9 digits.
+              </mat-error>
             </mat-form-field>
           </div>
         </div>
@@ -260,7 +296,7 @@
             <mat-form-field appearance="outline" class="field-sm">
               <mat-label> Tole </mat-label>
 
-              <input matInput formControlName="tole" />
+              <input matInput formControlName="tole" (keydown)="onToleKeydown($event)" (input)="onToleInput($event)" />
             </mat-form-field>
 
             <!-- HOUSE NUMBER -->
@@ -294,14 +330,21 @@
             <div class="form-grid no-wrap">
               <!-- MOBILE PHONE -->
 
-              <mat-form-field appearance="outline" class="field-xs">
-                <mat-label> Mobile Phone </mat-label>
+              <mat-form-field appearance="outline">
+                <mat-label>Mobile Phone</mat-label>
 
-                <input matInput type="tel" formControlName="mobilePhone" />
+                <input
+                  matInput
+                  formControlName="mobilePhone"
+                  maxlength="10"
+                  inputmode="numeric"
+                  (keydown)="onMobileKeydown($event)"
+                  (input)="onMobileInput($event)"
+                />
 
-                <mat-error *ngIf="profileForm.get('mobilePhone')?.hasError('required')">
-                  Mobile phone is required.
-                </mat-error>
+                <mat-error *ngIf="profileForm.get('mobilePhone')?.hasError('required')"> Required </mat-error>
+
+                <mat-error *ngIf="profileForm.get('mobilePhone')?.hasError('pattern')"> Invalid </mat-error>
               </mat-form-field>
 
               <!-- OFFICE PHONE -->
