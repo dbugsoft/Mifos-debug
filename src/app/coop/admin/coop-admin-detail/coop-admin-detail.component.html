@@ -91,26 +91,6 @@
             </div>
           </section>
 
-          <!-- CONTACT INFORMATION -->
-
-          <section class="information-section">
-            <div class="section-heading">
-              <div class="skeleton skeleton-section-icon"></div>
-
-              <div>
-                <div class="skeleton skeleton-section-title"></div>
-                <div class="skeleton skeleton-section-desc"></div>
-              </div>
-            </div>
-
-            <div class="detail-grid">
-              <div class="detail-field" *ngFor="let field of skeletonFields3">
-                <div class="skeleton skeleton-label"></div>
-                <div class="skeleton skeleton-value"></div>
-              </div>
-            </div>
-          </section>
-
           <!-- ADDRESS INFORMATION -->
 
           <section class="information-section">
@@ -131,20 +111,40 @@
             </div>
           </section>
 
-          <!-- ABOUT -->
+          <!-- CONTACT INFORMATION + ABOUT -->
 
-          <section class="information-section">
-            <div class="section-heading">
-              <div class="skeleton skeleton-section-icon"></div>
+          <div class="section-pair">
+            <section class="information-section">
+              <div class="section-heading">
+                <div class="skeleton skeleton-section-icon"></div>
 
-              <div>
-                <div class="skeleton skeleton-section-title"></div>
-                <div class="skeleton skeleton-section-desc"></div>
+                <div>
+                  <div class="skeleton skeleton-section-title"></div>
+                  <div class="skeleton skeleton-section-desc"></div>
+                </div>
               </div>
-            </div>
 
-            <div class="skeleton skeleton-description"></div>
-          </section>
+              <div class="detail-grid">
+                <div class="detail-field" *ngFor="let field of skeletonFields3">
+                  <div class="skeleton skeleton-label"></div>
+                  <div class="skeleton skeleton-value"></div>
+                </div>
+              </div>
+            </section>
+
+            <section class="information-section">
+              <div class="section-heading">
+                <div class="skeleton skeleton-section-icon"></div>
+
+                <div>
+                  <div class="skeleton skeleton-section-title"></div>
+                  <div class="skeleton skeleton-section-desc"></div>
+                </div>
+              </div>
+
+              <div class="skeleton skeleton-description"></div>
+            </section>
+          </div>
 
           <!-- REMARKS -->
 
@@ -164,45 +164,45 @@
             </div>
           </section>
 
-          <!-- TENANT INFORMATION -->
+          <!-- TENANT INFORMATION + SYSTEM INFORMATION -->
 
-          <section class="information-section">
-            <div class="section-heading">
-              <div class="skeleton skeleton-section-icon"></div>
+          <div class="section-pair wide-first">
+            <section class="information-section">
+              <div class="section-heading">
+                <div class="skeleton skeleton-section-icon"></div>
 
-              <div>
-                <div class="skeleton skeleton-section-title"></div>
-                <div class="skeleton skeleton-section-desc"></div>
+                <div>
+                  <div class="skeleton skeleton-section-title"></div>
+                  <div class="skeleton skeleton-section-desc"></div>
+                </div>
               </div>
-            </div>
 
-            <div class="detail-grid">
-              <div class="detail-field" *ngFor="let field of skeletonFields4">
-                <div class="skeleton skeleton-label"></div>
-                <div class="skeleton skeleton-value"></div>
+              <div class="detail-grid">
+                <div class="detail-field" *ngFor="let field of skeletonFields4">
+                  <div class="skeleton skeleton-label"></div>
+                  <div class="skeleton skeleton-value"></div>
+                </div>
               </div>
-            </div>
-          </section>
+            </section>
 
-          <!-- SYSTEM INFORMATION -->
+            <section class="information-section">
+              <div class="section-heading">
+                <div class="skeleton skeleton-section-icon"></div>
 
-          <section class="information-section">
-            <div class="section-heading">
-              <div class="skeleton skeleton-section-icon"></div>
-
-              <div>
-                <div class="skeleton skeleton-section-title"></div>
-                <div class="skeleton skeleton-section-desc"></div>
+                <div>
+                  <div class="skeleton skeleton-section-title"></div>
+                  <div class="skeleton skeleton-section-desc"></div>
+                </div>
               </div>
-            </div>
 
-            <div class="detail-grid">
-              <div class="detail-field" *ngFor="let field of skeletonFields2">
-                <div class="skeleton skeleton-label"></div>
-                <div class="skeleton skeleton-value"></div>
+              <div class="detail-grid">
+                <div class="detail-field" *ngFor="let field of skeletonFields2">
+                  <div class="skeleton skeleton-label"></div>
+                  <div class="skeleton skeleton-value"></div>
+                </div>
               </div>
-            </div>
-          </section>
+            </section>
+          </div>
         </div>
 
         <!-- ACTION AREA SKELETON -->
@@ -379,54 +379,6 @@
           </section>
 
           <!-- ===================================================
-             CONTACT INFORMATION
-        ==================================================== -->
-
-          <section class="information-section">
-            <div class="section-heading">
-              <div class="section-icon">☎</div>
-
-              <div>
-                <h2>Contact Information</h2>
-
-                <p>Cooperative contact details</p>
-              </div>
-            </div>
-
-            <div class="detail-grid">
-              <div class="detail-field">
-                <span class="detail-label"> Mobile Phone </span>
-
-                <span class="detail-value">
-                  {{ cooperative.mobilePhone || '—' }}
-                </span>
-              </div>
-
-              <div class="detail-field">
-                <span class="detail-label"> Office Phone </span>
-
-                <span class="detail-value">
-                  {{ cooperative.officePhone || '—' }}
-                </span>
-              </div>
-
-              <div class="detail-field">
-                <span class="detail-label"> Website </span>
-
-                <ng-container *ngIf="cooperative.webUrl; else noWebsite">
-                  <a [href]="cooperative.webUrl" target="_blank" rel="noopener noreferrer" class="website-link">
-                    {{ cooperative.webUrl }}
-                  </a>
-                </ng-container>
-
-                <ng-template #noWebsite>
-                  <span class="detail-value"> — </span>
-                </ng-template>
-              </div>
-            </div>
-          </section>
-
-          <!-- ===================================================
              ADDRESS INFORMATION
         ==================================================== -->
 
@@ -458,7 +410,7 @@
                 </span>
               </div>
 
-              <div class="detail-field">
+              <div class="detail-field field-lg">
                 <span class="detail-label"> Local Level Name </span>
 
                 <span class="detail-value">
@@ -466,7 +418,7 @@
                 </span>
               </div>
 
-              <div class="detail-field">
+              <div class="detail-field field-xs">
                 <span class="detail-label"> Ward No. </span>
 
                 <span class="detail-value">
@@ -482,7 +434,7 @@
                 </span>
               </div>
 
-              <div class="detail-field">
+              <div class="detail-field field-xs">
                 <span class="detail-label"> House No. </span>
 
                 <span class="detail-value">
@@ -493,30 +445,62 @@
           </section>
 
           <!-- ===================================================
-             ABOUT
+             CONTACT INFORMATION + ABOUT
         ==================================================== -->
 
-          <section class="information-section">
-            <div class="section-heading">
-              <div class="section-icon">i</div>
+          <div class="section-pair">
+            <section class="information-section">
+              <div class="section-heading">
+                <div class="section-icon">☎</div>
 
-              <div>
-                <h2>About Cooperative</h2>
+                <div>
+                  <h2>Contact Information</h2>
 
-                <p>Additional information provided by the applicant</p>
+                  <p>Cooperative contact details</p>
+                </div>
               </div>
-            </div>
 
-            <div class="description">
-              <ng-container *ngIf="cooperative.about; else noAbout">
-                {{ cooperative.about }}
-              </ng-container>
+              <div class="detail-grid">
+                <div class="detail-field">
+                  <span class="detail-label"> Mobile Phone </span>
 
-              <ng-template #noAbout>
-                <span class="empty-value"> No additional information provided. </span>
-              </ng-template>
-            </div>
-          </section>
+                  <span class="detail-value">
+                    {{ cooperative.mobilePhone || '—' }}
+                  </span>
+                </div>
+
+                <div class="detail-field">
+                  <span class="detail-label"> Office Phone </span>
+
+                  <span class="detail-value">
+                    {{ cooperative.officePhone || '—' }}
+                  </span>
+                </div>
+              </div>
+            </section>
+
+            <section class="information-section">
+              <div class="section-heading">
+                <div class="section-icon">i</div>
+
+                <div>
+                  <h2>About Cooperative</h2>
+
+                  <p>Additional information provided by the applicant</p>
+                </div>
+              </div>
+
+              <div class="description">
+                <ng-container *ngIf="cooperative.about; else noAbout">
+                  {{ cooperative.about }}
+                </ng-container>
+
+                <ng-template #noAbout>
+                  <span class="empty-value"> No additional information provided. </span>
+                </ng-template>
+              </div>
+            </section>
+          </div>
 
           <!-- ===================================================
              REMARKS
@@ -557,88 +541,86 @@
           </section>
 
           <!-- ===================================================
-             TENANT INFORMATION
+             TENANT INFORMATION + SYSTEM INFORMATION
         ==================================================== -->
 
-          <section class="information-section">
-            <div class="section-heading">
-              <div class="section-icon">◉</div>
+          <div class="section-pair wide-first">
+            <section class="information-section">
+              <div class="section-heading">
+                <div class="section-icon">◉</div>
 
-              <div>
-                <h2>Tenant Information</h2>
+                <div>
+                  <h2>Tenant Information</h2>
 
-                <p>Fineract tenant provisioning information</p>
-              </div>
-            </div>
-
-            <div class="detail-grid">
-              <div class="detail-field">
-                <span class="detail-label"> Tenant Identifier </span>
-
-                <span class="detail-value tenant-value">
-                  {{ cooperative.tenantIdentifier || '—' }}
-                </span>
+                  <p>Fineract tenant provisioning information</p>
+                </div>
               </div>
 
-              <div class="detail-field">
-                <span class="detail-label"> Tenant Status </span>
+              <div class="detail-grid">
+                <div class="detail-field field-lg">
+                  <span class="detail-label"> Tenant Identifier </span>
 
-                <span class="detail-value">
-                  {{ cooperative.status || '—' }}
-                </span>
+                  <span class="detail-value tenant-value">
+                    {{ cooperative.tenantIdentifier || '—' }}
+                  </span>
+                </div>
+
+                <div class="detail-field field-xs">
+                  <span class="detail-label"> Tenant Status </span>
+
+                  <span class="detail-value">
+                    {{ cooperative.status || '—' }}
+                  </span>
+                </div>
+
+                <div class="detail-field field-xs">
+                  <span class="detail-label"> Provisioned At </span>
+
+                  <span class="detail-value">
+                    {{ cooperative.provisionedAt ? (cooperative.provisionedAt | date: 'MMM dd, yyyy') : '—' }}
+                  </span>
+                </div>
+
+                <div class="detail-field field-xs">
+                  <span class="detail-label"> Activated At </span>
+
+                  <span class="detail-value">
+                    {{ cooperative.activatedAt ? (cooperative.activatedAt | date: 'MMM dd, yyyy') : '—' }}
+                  </span>
+                </div>
+              </div>
+            </section>
+
+            <section class="information-section">
+              <div class="section-heading">
+                <div class="section-icon">⚙</div>
+
+                <div>
+                  <h2>System Information</h2>
+
+                  <p>Record creation and update information</p>
+                </div>
               </div>
 
-              <div class="detail-field">
-                <span class="detail-label"> Provisioned At </span>
+              <div class="detail-grid">
+                <div class="detail-field field-xs">
+                  <span class="detail-label"> Created At </span>
 
-                <span class="detail-value">
-                  {{ cooperative.provisionedAt || '—' }}
-                </span>
+                  <span class="detail-value">
+                    {{ cooperative.createdAt ? (cooperative.createdAt | date: 'MMM dd, yyyy') : '—' }}
+                  </span>
+                </div>
+
+                <div class="detail-field field-xs">
+                  <span class="detail-label"> Updated At </span>
+
+                  <span class="detail-value">
+                    {{ cooperative.updatedAt ? (cooperative.updatedAt | date: 'MMM dd, yyyy') : '—' }}
+                  </span>
+                </div>
               </div>
-
-              <div class="detail-field">
-                <span class="detail-label"> Activated At </span>
-
-                <span class="detail-value">
-                  {{ cooperative.activatedAt || '—' }}
-                </span>
-              </div>
-            </div>
-          </section>
-
-          <!-- ===================================================
-             SYSTEM INFORMATION
-        ==================================================== -->
-
-          <section class="information-section">
-            <div class="section-heading">
-              <div class="section-icon">⚙</div>
-
-              <div>
-                <h2>System Information</h2>
-
-                <p>Record creation and update information</p>
-              </div>
-            </div>
-
-            <div class="detail-grid">
-              <div class="detail-field">
-                <span class="detail-label"> Created At </span>
-
-                <span class="detail-value">
-                  {{ cooperative.createdAt || '—' }}
-                </span>
-              </div>
-
-              <div class="detail-field">
-                <span class="detail-label"> Updated At </span>
-
-                <span class="detail-value">
-                  {{ cooperative.updatedAt || '—' }}
-                </span>
-              </div>
-            </div>
-          </section>
+            </section>
+          </div>
         </div>
 
         <!-- =====================================================

@@ -179,12 +179,18 @@ export class CoopProfileComponent {
 
     nameNp: [
       '',
-      Validators.required
+      [
+        Validators.required,
+        Validators.pattern(/^[\u0900-\u097F\s।,()-]+$/)
+      ]
     ],
 
     nameEn: [
       '',
-      Validators.required
+      [
+        Validators.required,
+        Validators.pattern(/^[A-Za-z]+(?:[A-Za-z&.]+| [A-Za-z&.]+)*$/)
+      ]
     ],
 
     dateOfRegistered: [
@@ -194,7 +200,10 @@ export class CoopProfileComponent {
 
     panNo: [
       '',
-      Validators.required
+      [
+        Validators.required,
+        Validators.pattern(/^\d{9}$/)
+      ]
     ],
 
     provinceId: [
@@ -217,7 +226,10 @@ export class CoopProfileComponent {
     ],
 
     tole: [
-      ''
+      '',
+      [
+        Validators.pattern(/^[A-Za-z]+(?: [A-Za-z]+)*$/)
+      ]
     ],
 
     houseNo: [
@@ -226,7 +238,10 @@ export class CoopProfileComponent {
 
     mobilePhone: [
       '',
-      Validators.required
+      [
+        Validators.required,
+        Validators.pattern(/^(97|98)\d{8}$/)
+      ]
     ],
 
     officePhone: [
@@ -554,6 +569,290 @@ export class CoopProfileComponent {
     // -----------------------------------------------
 
     this.setWards(localLevelId);
+  }
+  //English Name Validation
+  onEnglishKeydown(event: KeyboardEvent): void {
+    const allowedKeys = [
+      'Backspace',
+      'Delete',
+      'ArrowLeft',
+      'ArrowRight',
+      'ArrowUp',
+      'ArrowDown',
+      'Home',
+      'End',
+      'Tab'
+    ];
+
+    // Editing/navigation keys
+    if (allowedKeys.includes(event.key)) {
+      return;
+    }
+
+    // Ctrl/Cmd shortcuts: copy, paste, cut, select all
+    if (event.ctrlKey || event.metaKey) {
+      return;
+    }
+
+    // English letters
+    if (/^[A-Za-z]$/.test(event.key)) {
+      return;
+    }
+
+    // Space
+    if (event.key === ' ') {
+      return;
+    }
+
+    // Allowed special characters
+    if (event.key === '&' || event.key === '.') {
+      return;
+    }
+
+    // Everything else blocked
+    event.preventDefault();
+  }
+  onEnglishInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+
+    const englishOnly = input.value.replace(/[^A-Za-z &.]/g, '');
+
+    if (input.value !== englishOnly) {
+      input.value = englishOnly;
+
+      this.profileForm.get('nameEn')?.setValue(englishOnly, { emitEvent: false });
+    }
+  }
+
+  onNepaliKeydown(event: KeyboardEvent): void {
+    const allowedKeys = [
+      'Backspace',
+      'Delete',
+      'ArrowLeft',
+      'ArrowRight',
+      'ArrowUp',
+      'ArrowDown',
+      'Home',
+      'End',
+      'Tab'
+    ];
+
+    // Backspace, delete, arrow keys etc. allow
+    if (allowedKeys.includes(event.key)) {
+      return;
+    }
+
+    // Ctrl+C, Ctrl+V, Ctrl+A, Cmd+C, Cmd+V etc.
+    if (event.ctrlKey || event.metaKey) {
+      return;
+    }
+
+    // Space allow
+    if (event.key === ' ') {
+      return;
+    }
+
+    // Nepali Unicode characters allow
+    if (/[\u0900-\u097F]/.test(event.key)) {
+      return;
+    }
+
+    // Everything else block
+    event.preventDefault();
+  }
+  onNepaliInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+
+    // Keep only Nepali Unicode characters, spaces and allowed punctuation
+    const nepaliOnly = input.value.replace(/[^\u0900-\u097F\s।,()-]/g, '');
+
+    if (input.value !== nepaliOnly) {
+      input.value = nepaliOnly;
+
+      this.profileForm.get('nameNp')?.setValue(nepaliOnly, { emitEvent: false });
+    }
+  }
+  //date format
+  onDateInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+
+    let value = input.value.replace(/\D/g, '');
+
+    // Maximum 8 digits: YYYYMMDD
+    value = value.substring(0, 8);
+
+    let formatted = value;
+
+    if (value.length >= 4) {
+      formatted = value.substring(0, 4) + '-';
+
+      if (value.length > 4) {
+        formatted += value.substring(4, 6);
+      }
+
+      if (value.length >= 6) {
+        formatted += '-';
+
+        if (value.length > 6) {
+          formatted += value.substring(6, 8);
+        }
+      }
+    }
+
+    this.profileForm.get('dateOfRegistered')?.setValue(formatted, { emitEvent: false });
+  }
+
+  onDateKeydown(event: KeyboardEvent): void {
+    const input = event.target as HTMLInputElement;
+
+    if (event.key === 'Backspace') {
+      const cursorPosition = input.selectionStart ?? 0;
+
+      // If cursor is immediately after "-", delete the "-" and
+      // allow the previous digit to be deleted naturally.
+      if (cursorPosition > 0 && input.value.charAt(cursorPosition - 1) === '-') {
+        event.preventDefault();
+
+        const newValue = input.value.substring(0, cursorPosition - 1) + input.value.substring(cursorPosition);
+
+        this.profileForm.get('dateOfRegistered')?.setValue(newValue, { emitEvent: false });
+
+        setTimeout(() => {
+          input.setSelectionRange(cursorPosition - 1, cursorPosition - 1);
+        });
+      }
+    }
+  }
+  //Pan key
+  onPanKeydown(event: KeyboardEvent): void {
+    const allowedKeys = [
+      'Backspace',
+      'Delete',
+      'ArrowLeft',
+      'ArrowRight',
+      'ArrowUp',
+      'ArrowDown',
+      'Home',
+      'End',
+      'Tab'
+    ];
+
+    if (allowedKeys.includes(event.key)) {
+      return;
+    }
+
+    // Copy, paste, cut, select all
+    if (event.ctrlKey || event.metaKey) {
+      return;
+    }
+
+    // Only digits 0-9
+    if (/^\d$/.test(event.key)) {
+      return;
+    }
+
+    // Block everything else
+    event.preventDefault();
+  }
+
+  onPanInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+
+    const digitsOnly = input.value.replace(/\D/g, '').slice(0, 9);
+
+    if (input.value !== digitsOnly) {
+      input.value = digitsOnly;
+
+      this.profileForm.get('panNo')?.setValue(digitsOnly, { emitEvent: false });
+    }
+  }
+
+  //Tole validation
+  onToleKeydown(event: KeyboardEvent): void {
+    const allowedKeys = [
+      'Backspace',
+      'Delete',
+      'ArrowLeft',
+      'ArrowRight',
+      'ArrowUp',
+      'ArrowDown',
+      'Home',
+      'End',
+      'Tab'
+    ];
+
+    if (allowedKeys.includes(event.key)) {
+      return;
+    }
+
+    // Copy, paste, cut, select all
+    if (event.ctrlKey || event.metaKey) {
+      return;
+    }
+
+    // English letters only
+    if (/^[A-Za-z]$/.test(event.key)) {
+      return;
+    }
+
+    // Space
+    if (event.key === ' ') {
+      return;
+    }
+
+    event.preventDefault();
+  }
+  onToleInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+
+    const lettersOnly = input.value.replace(/[^A-Za-z ]/g, '');
+
+    if (input.value !== lettersOnly) {
+      input.value = lettersOnly;
+
+      this.profileForm.get('tole')?.setValue(lettersOnly, { emitEvent: false });
+    }
+  }
+  //Mobile number validation
+  onMobileKeydown(event: KeyboardEvent): void {
+    const allowedKeys = [
+      'Backspace',
+      'Delete',
+      'ArrowLeft',
+      'ArrowRight',
+      'ArrowUp',
+      'ArrowDown',
+      'Home',
+      'End',
+      'Tab'
+    ];
+
+    if (allowedKeys.includes(event.key)) {
+      return;
+    }
+
+    // Copy, paste, cut, select all
+    if (event.ctrlKey || event.metaKey) {
+      return;
+    }
+
+    // Numbers only
+    if (/^\d$/.test(event.key)) {
+      return;
+    }
+
+    event.preventDefault();
+  }
+  onMobileInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+
+    const numbersOnly = input.value.replace(/\D/g, '').slice(0, 10);
+
+    if (input.value !== numbersOnly) {
+      input.value = numbersOnly;
+
+      this.profileForm.get('mobilePhone')?.setValue(numbersOnly, { emitEvent: false });
+    }
   }
 
   onLogoSelected(event: Event): void {
