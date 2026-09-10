@@ -232,11 +232,16 @@ export class WebAppComponent implements OnInit, OnDestroy {
     if (!this.settingsService.servers) {
       this.settingsService.setServers(environment.baseApiUrls.split(','));
     }
-    // Set the Tenant Identifier(s) list from the env var
-    if (!localStorage.getItem('mifosXTenantIdentifier')) {
+    // Set the Tenant Identifier(s) list from the env var.
+    // The tenant is resolved from the current host (see coop-config.ts), so it has to win over a
+    // value left in localStorage by an earlier visit; only a tenant the current configuration
+    // still offers is kept, since that is one the user picked from the tenant selector.
+    const configuredTenants = environment.fineractPlatformTenantIds.split(',').map((tenantId) => tenantId.trim());
+    const storedTenant = this.settingsService.tenantIdentifier;
+    if (!storedTenant || !configuredTenants.includes(storedTenant)) {
       this.settingsService.setTenantIdentifier(environment.fineractPlatformTenantId || 'default');
     }
-    this.settingsService.setTenantIdentifiers(environment.fineractPlatformTenantIds.split(','));
+    this.settingsService.setTenantIdentifiers(configuredTenants);
 
     // Subscribe to session timeout If IdleTimeout is higher than 0 (zero)
     if (environment.session.timeout.idleTimeout > 0) {
