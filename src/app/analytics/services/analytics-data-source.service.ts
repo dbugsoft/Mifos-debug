@@ -10,7 +10,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 
-import { Observable, forkJoin, of } from 'rxjs';
+import { Observable, forkJoin, of, throwError } from 'rxjs';
 import { catchError, map, shareReplay } from 'rxjs/operators';
 
 import {
@@ -19,6 +19,12 @@ import {
   AnalyticsWidgetDefinition,
   AnalyticsWidgetState
 } from '../models/analytics-dashboard.model';
+
+const ERROR_STATE: AnalyticsWidgetState = {
+  loading: false,
+  empty: false,
+  error: true
+};
 
 @Injectable({
   providedIn: 'root'
@@ -61,38 +67,22 @@ export class AnalyticsDataSourceService {
     return this.loadTrendSeries(filters, type).pipe(
       map((series) => ({
         loading: false,
-        empty: series.every((value) => value === 0),
+        empty: false,
         metricValue: series.reduce((sum, value) => sum + value, 0),
         contextKey: this.getTimescaleKey(filters.timescale)
       })),
-      catchError(() =>
-        of({
-          loading: false,
-          empty: true
-        })
-      )
+      catchError(() => of(ERROR_STATE))
     );
   }
 
   private loadAmountMetric(filters: AnalyticsFilters, reportName: string): Observable<AnalyticsWidgetState> {
     return this.runReport(reportName, this.buildReportParams(filters)).pipe(
-      map((response) => {
-        const [
-          pending,
-          complete
-        ] = this.extractAmountPair(response, reportName);
-        return {
-          loading: false,
-          empty: pending === 0 && complete === 0,
-          metricValue: complete
-        };
-      }),
-      catchError(() =>
-        of({
-          loading: false,
-          empty: true
-        })
-      )
+      map((response) => ({
+        loading: false,
+        empty: false,
+        metricValue: this.extractAmountPair(response, reportName)[1]
+      })),
+      catchError(() => of(ERROR_STATE))
     );
   }
 
@@ -138,12 +128,7 @@ export class AnalyticsDataSourceService {
           ]
         })
       ),
-      catchError(() =>
-        of({
-          loading: false,
-          empty: true
-        })
-      )
+      catchError(() => of(ERROR_STATE))
     );
   }
 
@@ -194,12 +179,7 @@ export class AnalyticsDataSourceService {
           ]
         };
       }),
-      catchError(() =>
-        of({
-          loading: false,
-          empty: true
-        })
-      )
+      catchError(() => of(ERROR_STATE))
     );
   }
 
@@ -245,7 +225,14 @@ export class AnalyticsDataSourceService {
       return cached;
     }
 
-    const request$ = this.http.get(`/runreports/${reportName}`, { params: httpParams }).pipe(shareReplay(1));
+    const request$ = this.http.get(`/runreports/${reportName}`, { params: httpParams }).pipe(
+      // Never cache failures, so a retry actually hits the server again
+      catchError((error) => {
+        this.reportCache.delete(cacheKey);
+        return throwError(() => error);
+      }),
+      shareReplay(1)
+    );
     this.reportCache.set(cacheKey, request$);
     return request$;
   }
@@ -364,9 +351,13 @@ export class AnalyticsDataSourceService {
     return `${date.getDate()}/${date.getMonth() + 1}`;
   }
 
+  /** Sunday-based week of year where the partial first week is week 1 (must match the trend report SQL). */
   private getWeekNumber(date: Date): number {
     const firstDay = new Date(date.getFullYear(), 0, 1);
-    return Math.ceil(((date.getTime() - firstDay.getTime()) / 86400000 + firstDay.getDay() + 1) / 7);
+    const day = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    // Compare midnights and round so time-of-day and DST shifts cannot bump the week
+    const dayOfYear = Math.round((day.getTime() - firstDay.getTime()) / 86400000);
+    return Math.floor((dayOfYear + firstDay.getDay()) / 7) + 1;
   }
 
   private getActiveLocale(): string {

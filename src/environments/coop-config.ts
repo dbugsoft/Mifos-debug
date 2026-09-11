@@ -42,10 +42,16 @@ const coopConfigurations: Record<string, CoopConfig> = {
   '2078sunr0003': {
     tenantId: '2078sunr0003',
     coopName: 'Sunrise Community Savings and Credit Cooperative Ltd.'
+  },
+  // Tenant-neutral entry for local development and any host that maps to no cooperative.
+  // Without it an unrecognised host silently inherits a real cooperative's tenant.
+  default: {
+    tenantId: 'default',
+    coopName: 'Mifos X'
   }
 };
 
-const defaultCoopKey = '2079saji0009';
+const defaultCoopKey = 'default';
 
 const domainMap: Record<string, string> = {
   // Custom domains can be added here eg 'sajilo.example.com': '2079saji0009'

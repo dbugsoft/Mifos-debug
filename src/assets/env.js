@@ -17,6 +17,8 @@
   window["env"]["apiVersion"] = '';
   window["env"]["apiActuator"] = '';
 
+  // Leave empty so the tenant is resolved from the current host by coop-config.ts.
+  // Setting a value here is truthy and permanently overrides subdomain detection.
   window["env"]["fineractPlatformTenantId"] = '';
   window["env"]["fineractPlatformTenantIds"] = '';
 
