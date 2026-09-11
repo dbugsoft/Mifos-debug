@@ -65,6 +65,18 @@
   text-align: center;
 }
 
+.widget-error {
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  background: rgb(211 47 47 / 6%);
+
+  fa-icon {
+    color: #d32f2f;
+    font-size: 20px;
+  }
+}
+
 .metric-body {
   min-height: 120px;
   display: flex;

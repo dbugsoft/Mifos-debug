@@ -13,9 +13,11 @@ import {
   Component,
   DestroyRef,
   ElementRef,
+  EventEmitter,
   Input,
   OnChanges,
   OnDestroy,
+  Output,
   SimpleChanges,
   ViewChild,
   inject
@@ -55,6 +57,8 @@ export class DashboardWidgetComponent implements AfterViewInit, OnChanges, OnDes
 
   @Input({ required: true }) widget!: AnalyticsWidgetDefinition;
   @Input() state?: AnalyticsWidgetState;
+  /** Emitted when the user asks to reload a widget whose data failed to load */
+  @Output() retry = new EventEmitter<void>();
 
   @ViewChild('chartCanvas')
   set chartCanvasRef(value: ElementRef<HTMLCanvasElement> | undefined) {
@@ -101,7 +105,14 @@ export class DashboardWidgetComponent implements AfterViewInit, OnChanges, OnDes
       return;
     }
 
-    if (!this.chartCanvas || !this.state || this.state.loading || this.state.empty || !this.state.datasets?.length) {
+    if (
+      !this.chartCanvas ||
+      !this.state ||
+      this.state.loading ||
+      this.state.error ||
+      this.state.empty ||
+      !this.state.datasets?.length
+    ) {
       this.destroyChart();
       return;
     }

@@ -61,7 +61,10 @@ export interface AnalyticsDetailItem {
 
 export interface AnalyticsWidgetState {
   loading: boolean;
+  /** Data loaded fine but there is nothing to plot (charts only; a metric of 0 is a real value) */
   empty: boolean;
+  /** The underlying report request failed */
+  error?: boolean;
   metricValue?: number;
   contextKey?: string;
   labels?: string[];
