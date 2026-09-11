@@ -40,14 +40,22 @@
     } @else {
       <div class="summary-grid">
         @for (widget of metricWidgets; track widget.id) {
-          <mifosx-dashboard-widget [widget]="widget" [state]="widgetStateMap[widget.id]"></mifosx-dashboard-widget>
+          <mifosx-dashboard-widget
+            [widget]="widget"
+            [state]="widgetStateMap[widget.id]"
+            (retry)="retryWidget(widget)"
+          ></mifosx-dashboard-widget>
         }
       </div>
 
       <div class="chart-grid">
         @for (widget of chartWidgets; track widget.id) {
           <div [class.widget-wide]="widget.layout === 'wide'" [class.widget-half]="widget.layout === 'half'">
-            <mifosx-dashboard-widget [widget]="widget" [state]="widgetStateMap[widget.id]"></mifosx-dashboard-widget>
+            <mifosx-dashboard-widget
+              [widget]="widget"
+              [state]="widgetStateMap[widget.id]"
+              (retry)="retryWidget(widget)"
+            ></mifosx-dashboard-widget>
           </div>
         }
       </div>
