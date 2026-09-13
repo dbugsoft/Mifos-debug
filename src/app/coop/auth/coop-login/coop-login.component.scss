@@ -7,19 +7,6 @@
  */
 
 /* ================================
-   Login Page
-   ================================ */
-
-.coop-login-page {
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 30px;
-  background: #f5f8fa;
-}
-
-/* ================================
    Input Wrapper
    ================================ */
 
@@ -35,13 +22,13 @@
 .input-wrapper input {
   display: block;
   width: 100%;
-  height: 46px;
+  height: 48px;
   box-sizing: border-box;
 
   /* Space for left icon and right password icon */
   padding: 0 48px;
   border: 1px solid #d5dce1;
-  border-radius: 7px;
+  border-radius: 8px;
   font-size: 15px;
   font-family: inherit;
   color: #1e293b;
@@ -56,7 +43,7 @@
 
 .input-wrapper input:focus {
   border-color: #1074b9;
-  box-shadow: 0 0 0 2px rgb(16 116 185 / 10%);
+  box-shadow: 0 0 0 3px rgb(16 116 185 / 10%);
 }
 
 /* Placeholder */
@@ -135,6 +122,10 @@
 .login-card {
   width: 100%;
   max-width: 430px;
+
+  /* Centers the card within the full-width auth panel instead of
+     it sitting flush against the panel's left edge. */
+  margin: 0 auto;
   padding: 40px;
   background: #fff;
   border-radius: 12px;
@@ -200,21 +191,31 @@
 
 .login-button {
   width: 100%;
-  padding: 13px;
+  height: 48px;
+  padding: 0 13px;
   border: none;
-  border-radius: 7px;
+  border-radius: 8px;
   background: #1074b9;
   color: #fff;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
+  box-shadow: 0 4px 12px rgb(16 116 185 / 22%);
   transition:
     background 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease,
     opacity 0.2s ease;
 }
 
 .login-button:hover:not(:disabled) {
   background: #0c619d;
+  box-shadow: 0 6px 16px rgb(16 116 185 / 28%);
+  transform: translateY(-1px);
+}
+
+.login-button:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .login-button:disabled {
@@ -228,7 +229,8 @@
 
 .success-message {
   margin-bottom: 20px;
-  padding: 12px;
+  padding: 12px 14px;
+  border-left: 3px solid #2e7d32;
   border-radius: 6px;
   background: #e8f5e9;
   color: #2e7d32;
@@ -242,7 +244,8 @@
 
 .error-message {
   margin-bottom: 20px;
-  padding: 12px;
+  padding: 12px 14px;
+  border-left: 3px solid #c62828;
   border-radius: 6px;
   background: #ffebee;
   color: #c62828;
@@ -277,10 +280,6 @@
    ================================ */
 
 @media (width <= 500px) {
-  .coop-login-page {
-    padding: 15px;
-  }
-
   .login-card {
     padding: 25px 20px;
   }

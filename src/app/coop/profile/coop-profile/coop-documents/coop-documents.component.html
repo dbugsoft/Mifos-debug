@@ -1,0 +1,426 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="documents-page">
+  <!-- =====================================================
+       HEADER
+       ===================================================== -->
+
+  <mifosx-coop-navbar title="Cooperative Documents" subtitle="Upload and manage your cooperative documents.">
+  </mifosx-coop-navbar>
+
+  <!-- =====================================================
+       CONTENT AREA
+       ===================================================== -->
+
+  <div class="documents-scroll-area">
+    <div class="documents-container">
+      <!-- =================================================
+           INTERNAL STEPPER
+           ================================================= -->
+
+      <mat-stepper class="documents-stepper" [linear]="false">
+        <mat-step>
+          <ng-template matStepLabel> Documents </ng-template>
+
+          <!-- =============================================
+               MAIN CARD
+               ============================================= -->
+
+          <section class="documents-card">
+            <div class="step-content">
+              <!-- =========================================
+                   SECTION HEADER
+                   ========================================= -->
+
+              <div class="step-header">
+                <div class="step-icon">
+                  <mat-icon>description</mat-icon>
+                </div>
+
+                <div class="step-header-text">
+                  <h2>Upload Documents</h2>
+
+                  <p>Upload the required documents for your cooperative.</p>
+                </div>
+              </div>
+
+              <!-- =========================================
+                   DOCUMENT LIST
+                   ========================================= -->
+
+              <div class="documents-grid" *ngIf="documentTypes.length > 0">
+                <article class="document-field" *ngFor="let documentType of documentTypes">
+                  <!-- -------------------------------------
+                       DOCUMENT LABEL
+                       ------------------------------------- -->
+
+                  <div class="doc-label">
+                    {{ documentType.label }}
+                  </div>
+
+                  <!-- -------------------------------------
+                       EMPTY / UPLOAD STATE
+
+                       Only available in PENDING status.
+                       ------------------------------------- -->
+
+                  <label
+                    class="upload-dropzone"
+                    *ngIf="
+                      !isReadOnly && !getSelectedFile(documentType.code) && !getUploadedDocument(documentType.code)
+                    "
+                    [class.has-error]="getFileError(documentType.code)"
+                    (dragover)="onDragOver($event)"
+                    (drop)="onFileDrop($event, documentType)"
+                  >
+                    <mat-icon class="upload-folder-icon"> folder </mat-icon>
+
+                    <span class="upload-title"> Click to upload or drag and drop </span>
+
+                    <span class="upload-limit">
+                      {{
+                        documentType.imagesOnly === true || documentType.imagesOnly === 'true'
+                          ? 'Images only'
+                          : 'Max size: 10MB · Images & PDF only'
+                      }}
+                    </span>
+
+                    <input
+                      type="file"
+                      hidden
+                      [accept]="
+                        documentType.imagesOnly === true || documentType.imagesOnly === 'true'
+                          ? 'image/*'
+                          : 'image/*,.pdf'
+                      "
+                      (change)="onFileSelected($event, documentType)"
+                    />
+                  </label>
+
+                  <!-- -------------------------------------
+                       NOT UPLOADED — READ ONLY
+
+                       PROVISIONED / ACTIVE with nothing on
+                       file for this document type. Upload is
+                       disabled, so this is a plain, non-
+                       interactive placeholder rather than the
+                       clickable dropzone above.
+                       ------------------------------------- -->
+
+                  <div class="not-uploaded-placeholder" *ngIf="isReadOnly && !getUploadedDocument(documentType.code)">
+                    <mat-icon class="not-uploaded-icon"> folder_off </mat-icon>
+
+                    <span class="not-uploaded-text"> Not uploaded </span>
+                  </div>
+
+                  <!-- -------------------------------------
+                       IMAGE PREVIEW
+                       Selected during current session.
+                       ------------------------------------- -->
+
+                  <div
+                    class="file-preview"
+                    *ngIf="getSelectedFile(documentType.code) && getPreviewUrl(documentType.code)"
+                  >
+                    <img [src]="getPreviewUrl(documentType.code)" [alt]="getSelectedFile(documentType.code)?.name" />
+
+                    <button
+                      type="button"
+                      class="remove-file-button"
+                      aria-label="Remove file"
+                      (click)="removeFile(documentType.code)"
+                    >
+                      <mat-icon> close </mat-icon>
+                    </button>
+                  </div>
+
+                  <!-- -------------------------------------
+                       GENERIC FILE PREVIEW
+                       Selected during current session.
+                       ------------------------------------- -->
+
+                  <div
+                    class="file-preview file-preview-generic"
+                    *ngIf="getSelectedFile(documentType.code) && !getPreviewUrl(documentType.code)"
+                  >
+                    <mat-icon> insert_drive_file </mat-icon>
+
+                    <button
+                      type="button"
+                      class="remove-file-button"
+                      aria-label="Remove file"
+                      (click)="removeFile(documentType.code)"
+                    >
+                      <mat-icon> close </mat-icon>
+                    </button>
+                  </div>
+
+                  <!-- -------------------------------------
+                       EXISTING UPLOADED DOCUMENT PREVIEW
+                       IMAGE
+
+                       This is loaded from backend after
+                       login using /public/files/{uuid}.
+                       Clicking the preview opens the full
+                       document viewer.
+                       ------------------------------------- -->
+
+                  <div
+                    class="file-preview file-preview-viewable"
+                    role="button"
+                    tabindex="0"
+                    title="Click to view"
+                    *ngIf="
+                      !getSelectedFile(documentType.code) &&
+                      getUploadedDocument(documentType.code) &&
+                      getPreviewUrl(documentType.code)
+                    "
+                    (click)="viewDocument(getUploadedDocument(documentType.code)!)"
+                    (keydown.enter)="viewDocument(getUploadedDocument(documentType.code)!)"
+                  >
+                    <img
+                      [src]="getPreviewUrl(documentType.code)"
+                      [alt]="getUploadedDocument(documentType.code)?.fileName"
+                    />
+
+                    <span class="file-preview-view-hint">
+                      <mat-icon> visibility </mat-icon>
+                    </span>
+                  </div>
+
+                  <!-- -------------------------------------
+                       EXISTING UPLOADED DOCUMENT PREVIEW
+                       GENERIC FILE / PDF
+
+                       PDF is not converted to an image
+                       preview. Clicking the preview still
+                       opens the document.
+                       ------------------------------------- -->
+
+                  <div
+                    class="file-preview file-preview-generic file-preview-viewable"
+                    role="button"
+                    tabindex="0"
+                    title="Click to view"
+                    *ngIf="
+                      !getSelectedFile(documentType.code) &&
+                      getUploadedDocument(documentType.code) &&
+                      !getPreviewUrl(documentType.code)
+                    "
+                    (click)="viewDocument(getUploadedDocument(documentType.code)!)"
+                    (keydown.enter)="viewDocument(getUploadedDocument(documentType.code)!)"
+                  >
+                    <mat-icon> insert_drive_file </mat-icon>
+
+                    <span class="file-preview-view-hint">
+                      <mat-icon> visibility </mat-icon>
+                    </span>
+                  </div>
+
+                  <!-- -------------------------------------
+                       EXISTING UPLOADED DOCUMENT META
+                       Filename chip + Replace (PENDING only).
+                       ------------------------------------- -->
+
+                  <div
+                    class="file-meta"
+                    *ngIf="!getSelectedFile(documentType.code) && getUploadedDocument(documentType.code)"
+                  >
+                    <div class="file-meta-row">
+                      <span class="file-name-chip" [title]="getUploadedDocument(documentType.code)?.fileName">
+                        {{ getUploadedDocument(documentType.code)?.fileName }}
+                      </span>
+                    </div>
+
+                    <!-- ---------------------------------
+                         REPLACE
+
+                         Only available in PENDING.
+                         --------------------------------- -->
+
+                    <label class="replace-file-link" *ngIf="!isReadOnly">
+                      Replace File
+
+                      <input
+                        type="file"
+                        hidden
+                        [accept]="
+                          documentType.imagesOnly === true || documentType.imagesOnly === 'true'
+                            ? 'image/*'
+                            : 'image/*,.pdf'
+                        "
+                        (change)="onFileSelected($event, documentType)"
+                      />
+                    </label>
+                  </div>
+
+                  <!-- -------------------------------------
+                       FILE INFORMATION
+
+                       Only shown when a new file is selected.
+                       ------------------------------------- -->
+
+                  <div class="file-meta" *ngIf="getSelectedFile(documentType.code)">
+                    <div class="file-meta-row">
+                      <span class="file-name-chip" [title]="getSelectedFile(documentType.code)?.name">
+                        {{ getSelectedFile(documentType.code)?.name }}
+                      </span>
+
+                      <span class="file-size">
+                        {{ formatFileSize(getSelectedFile(documentType.code)!.size) }}
+                      </span>
+                    </div>
+
+                    <!-- ---------------------------------
+                         REPLACE FILE
+
+                         Only available in PENDING.
+                         --------------------------------- -->
+
+                    <label class="replace-file-link" *ngIf="!isReadOnly">
+                      Replace File
+
+                      <input
+                        type="file"
+                        hidden
+                        [accept]="
+                          documentType.imagesOnly === true || documentType.imagesOnly === 'true'
+                            ? 'image/*'
+                            : 'image/*,.pdf'
+                        "
+                        (change)="onFileSelected($event, documentType)"
+                      />
+                    </label>
+                  </div>
+
+                  <!-- -------------------------------------
+                       VALIDATION ERROR
+                       ------------------------------------- -->
+
+                  <div class="file-error" *ngIf="getFileError(documentType.code)">
+                    <mat-icon> error_outline </mat-icon>
+
+                    <span>
+                      {{ getFileError(documentType.code) }}
+                    </span>
+                  </div>
+                </article>
+              </div>
+
+              <!-- =========================================
+                   GENERAL FILE ERROR
+                   ========================================= -->
+
+              <div class="general-file-error" *ngIf="getFileError('_general')">
+                <mat-icon> error_outline </mat-icon>
+
+                <span>
+                  {{ getFileError('_general') }}
+                </span>
+              </div>
+
+              <!-- =========================================
+                   EMPTY STATE
+                   ========================================= -->
+
+              <div class="empty-state" *ngIf="documentTypes.length === 0">
+                <div class="empty-icon">
+                  <mat-icon> description </mat-icon>
+                </div>
+
+                <h3>No documents found</h3>
+
+                <p>No document requirements are currently available.</p>
+              </div>
+
+              <!-- =========================================
+                   ACTION FOOTER
+
+                   Back is always available, in any status -
+                   navigating between steps doesn't require
+                   edit permission. Upload is PENDING only.
+                   ========================================= -->
+
+              <div class="step-actions" *ngIf="documentTypes.length > 0">
+                <!-- Back to General Information -->
+
+                <div class="previous-action">
+                  <button mat-flat-button type="button" class="back-button" (click)="goBack()">
+                    <span> Back </span>
+                  </button>
+                </div>
+
+                <!-- Child-controlled Upload -->
+
+                <button
+                  *ngIf="!isReadOnly"
+                  mat-raised-button
+                  color="primary"
+                  type="button"
+                  class="upload-button"
+                  [disabled]="isUploading || hasFileErrors"
+                  (click)="uploadDocuments()"
+                >
+                  <mat-icon> cloud_upload </mat-icon>
+
+                  <span>
+                    {{ isUploading ? 'Uploading...' : 'Upload Documents' }}
+                  </span>
+                </button>
+              </div>
+            </div>
+          </section>
+        </mat-step>
+      </mat-stepper>
+    </div>
+  </div>
+
+  <!-- =====================================================
+       DOCUMENT VIEWER MODAL
+       ===================================================== -->
+
+  <div class="document-viewer-overlay" *ngIf="isDocumentViewerOpen" (click)="closeDocumentViewer()">
+    <div class="document-viewer-modal" (click)="$event.stopPropagation()">
+      <!-- -----------------------------------------------
+           CLOSE BUTTON
+           ----------------------------------------------- -->
+
+      <button
+        type="button"
+        class="document-viewer-close"
+        aria-label="Close document viewer"
+        (click)="closeDocumentViewer()"
+      >
+        <mat-icon> close </mat-icon>
+      </button>
+
+      <!-- -----------------------------------------------
+           VIEWER HEADER
+           ----------------------------------------------- -->
+
+      <div class="document-viewer-header">
+        <div class="document-viewer-title">
+          <mat-icon> description </mat-icon>
+
+          <h3>
+            {{ selectedDocument?.fileName }}
+          </h3>
+        </div>
+      </div>
+
+      <!-- -----------------------------------------------
+           VIEWER CONTENT
+           ----------------------------------------------- -->
+
+      <div class="document-viewer-content">
+        <img *ngIf="selectedDocumentPreviewUrl" [src]="selectedDocumentPreviewUrl" [alt]="selectedDocument?.fileName" />
+      </div>
+    </div>
+  </div>
+</div>

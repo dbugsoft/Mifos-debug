@@ -7,17 +7,27 @@
 -->
 
 <div class="profile-page">
+  <!-- =====================================================
+       HEADER
+  ====================================================== -->
+
   <mifosx-coop-navbar
     title="Cooperative Profile"
     subtitle="Manage your cooperative's registration and contact information."
   >
   </mifosx-coop-navbar>
 
+  <!-- =====================================================
+       PROFILE STATUS
+  ====================================================== -->
+
   <div class="profile-status" *ngIf="profileStatus">
     <span class="status-badge">
+      <span class="status-dot"></span>
       {{ profileStatus }}
     </span>
   </div>
+
   <!-- =====================================================
        SCROLLABLE CONTENT
   ====================================================== -->
@@ -25,16 +35,20 @@
   <div class="profile-scroll-area">
     @if (initialLoading) {
       <!-- =================================================
-           SHIMMER SKELETON — INITIAL LOAD
+           LOADING SKELETON
       ================================================== -->
 
-      <div class="profile-form" aria-hidden="true">
-        <!-- COOPERATIVE INFORMATION SKELETON -->
+      <div class="profile-form profile-skeleton" aria-hidden="true">
+        <!-- COOPERATIVE INFORMATION -->
 
-        <div class="form-section">
+        <section class="form-section">
           <div class="section-header">
-            <div class="skeleton skeleton-icon"></div>
-            <div class="skeleton skeleton-heading"></div>
+            <div class="section-icon">🏢</div>
+
+            <div class="section-title">
+              <div class="skeleton skeleton-heading"></div>
+              <div class="skeleton skeleton-subheading"></div>
+            </div>
           </div>
 
           <div class="form-grid three-column">
@@ -44,14 +58,18 @@
             <div class="skeleton skeleton-field"></div>
             <div class="skeleton skeleton-field"></div>
           </div>
-        </div>
+        </section>
 
-        <!-- ADDRESS INFORMATION SKELETON -->
+        <!-- ADDRESS INFORMATION -->
 
-        <div class="form-section">
+        <section class="form-section">
           <div class="section-header">
-            <div class="skeleton skeleton-icon"></div>
-            <div class="skeleton skeleton-heading"></div>
+            <div class="section-icon">📍</div>
+
+            <div class="section-title">
+              <div class="skeleton skeleton-heading"></div>
+              <div class="skeleton skeleton-subheading"></div>
+            </div>
           </div>
 
           <div class="form-grid three-column">
@@ -62,77 +80,96 @@
             <div class="skeleton skeleton-field"></div>
             <div class="skeleton skeleton-field"></div>
           </div>
+        </section>
+
+        <!-- CONTACT / MEMBER / ONLINE -->
+
+        <div class="three-section-grid">
+          <section class="form-section">
+            <div class="section-header">
+              <div class="section-icon">📞</div>
+              <div class="section-title">
+                <div class="skeleton skeleton-heading"></div>
+              </div>
+            </div>
+
+            <div class="skeleton skeleton-field"></div>
+          </section>
+
+          <section class="form-section">
+            <div class="section-header">
+              <div class="section-icon">👥</div>
+              <div class="section-title">
+                <div class="skeleton skeleton-heading"></div>
+              </div>
+            </div>
+
+            <div class="skeleton skeleton-field"></div>
+          </section>
+
+          <section class="form-section">
+            <div class="section-header">
+              <div class="section-icon">🌐</div>
+              <div class="section-title">
+                <div class="skeleton skeleton-heading"></div>
+              </div>
+            </div>
+
+            <div class="skeleton skeleton-field"></div>
+          </section>
         </div>
 
-        <!-- CONTACT + ONLINE + ABOUT + REMARKS SKELETON -->
+        <!-- ABOUT / REMARKS -->
 
-        <div class="four-section-grid">
-          <div class="form-section">
+        <div class="two-section-grid">
+          <section class="form-section">
             <div class="section-header">
-              <div class="skeleton skeleton-icon"></div>
-              <div class="skeleton skeleton-heading"></div>
+              <div class="section-icon">ℹ️</div>
+              <div class="section-title">
+                <div class="skeleton skeleton-heading"></div>
+              </div>
             </div>
 
-            <div class="form-grid">
-              <div class="skeleton skeleton-field"></div>
-              <div class="skeleton skeleton-field"></div>
-            </div>
-          </div>
+            <div class="skeleton skeleton-textarea"></div>
+          </section>
 
-          <div class="form-section">
+          <section class="form-section">
             <div class="section-header">
-              <div class="skeleton skeleton-icon"></div>
-              <div class="skeleton skeleton-heading"></div>
+              <div class="section-icon">📝</div>
+              <div class="section-title">
+                <div class="skeleton skeleton-heading"></div>
+              </div>
             </div>
 
-            <div class="skeleton skeleton-field full-width"></div>
-          </div>
-
-          <div class="form-section">
-            <div class="section-header">
-              <div class="skeleton skeleton-icon"></div>
-              <div class="skeleton skeleton-heading"></div>
-            </div>
-
-            <div class="skeleton skeleton-field full-width"></div>
-          </div>
-
-          <div class="form-section">
-            <div class="section-header">
-              <div class="skeleton skeleton-icon"></div>
-              <div class="skeleton skeleton-heading"></div>
-            </div>
-
-            <div class="skeleton skeleton-field full-width"></div>
-          </div>
-        </div>
-
-        <!-- FORM ACTION SKELETON -->
-
-        <div class="form-actions">
-          <div class="skeleton skeleton-button"></div>
+            <div class="skeleton skeleton-textarea"></div>
+          </section>
         </div>
       </div>
     } @else {
-      <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="profile-form">
-        <!-- =================================================
-           COOPERATIVE INFORMATION
+      <!-- =================================================
+           PROFILE FORM
       ================================================== -->
 
-        <div class="form-section">
+      <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="profile-form">
+        <!-- =================================================
+             COOPERATIVE INFORMATION
+        ================================================== -->
+
+        <section class="form-section">
           <div class="section-header">
             <div class="section-icon">🏢</div>
 
             <div>
               <h2>Cooperative Information</h2>
+              <p>Basic registration details of the cooperative</p>
             </div>
           </div>
 
           <div class="form-grid three-column">
-            <!-- COOPERATIVE REGISTRATION NUMBER -->
+            <!-- REGISTRATION NUMBER -->
 
             <mat-form-field appearance="outline" class="field-sm">
-              <mat-label> Cooperative Regd. No. </mat-label>
+              <mat-label>Cooperative Regd. No.</mat-label>
 
               <input matInput formControlName="coopRegdNo" />
 
@@ -141,7 +178,7 @@
               </mat-error>
             </mat-form-field>
 
-            <!-- COOPERATIVE NAME ENGLISH -->
+            <!-- ENGLISH NAME -->
 
             <mat-form-field appearance="outline">
               <mat-label>Cooperative Name (English)</mat-label>
@@ -156,14 +193,14 @@
               <mat-error *ngIf="profileForm.get('nameEn')?.hasError('required')"> English name is required. </mat-error>
 
               <mat-error *ngIf="profileForm.get('nameEn')?.hasError('pattern')">
-                Use English letters, spaces, & and periods only.
+                Use English letters, spaces, &amp; and periods only.
               </mat-error>
             </mat-form-field>
 
-            <!-- COOPERATIVE NAME NEPALI -->
+            <!-- NEPALI NAME -->
 
             <mat-form-field appearance="outline">
-              <mat-label> Cooperative Name (Nepali) </mat-label>
+              <mat-label>Cooperative Name (Nepali)</mat-label>
 
               <input
                 matInput
@@ -179,10 +216,10 @@
               </mat-error>
             </mat-form-field>
 
-            <!-- DATE OF REGISTRATION -->
+            <!-- REGISTRATION DATE -->
 
             <mat-form-field appearance="outline" class="field-sm">
-              <mat-label> Date of Registration </mat-label>
+              <mat-label>Date of Registration</mat-label>
 
               <input
                 matInput
@@ -199,10 +236,10 @@
               </mat-error>
             </mat-form-field>
 
-            <!-- PAN NUMBER -->
+            <!-- PAN -->
 
             <mat-form-field appearance="outline" class="field-sm">
-              <mat-label> PAN Number </mat-label>
+              <mat-label>PAN Number</mat-label>
 
               <input
                 matInput
@@ -214,23 +251,25 @@
               />
 
               <mat-error *ngIf="profileForm.get('panNo')?.hasError('required')"> PAN number is required. </mat-error>
+
               <mat-error *ngIf="profileForm.get('panNo')?.hasError('pattern')">
                 PAN number must be exactly 9 digits.
               </mat-error>
             </mat-form-field>
           </div>
-        </div>
+        </section>
 
         <!-- =================================================
-           ADDRESS INFORMATION
-      ================================================== -->
+             ADDRESS INFORMATION
+        ================================================== -->
 
-        <div class="form-section">
+        <section class="form-section">
           <div class="section-header">
             <div class="section-icon">📍</div>
 
             <div>
               <h2>Address Information</h2>
+              <p>Registered office location and address details</p>
             </div>
           </div>
 
@@ -238,7 +277,7 @@
             <!-- PROVINCE -->
 
             <mat-form-field appearance="outline" class="field-sm">
-              <mat-label> Province </mat-label>
+              <mat-label>Province</mat-label>
 
               <mat-select formControlName="provinceId" (selectionChange)="onProvinceChange($event.value)">
                 <mat-option *ngFor="let province of provinces" [value]="province.id">
@@ -252,7 +291,7 @@
             <!-- DISTRICT -->
 
             <mat-form-field appearance="outline" class="field-sm">
-              <mat-label> District </mat-label>
+              <mat-label>District</mat-label>
 
               <mat-select formControlName="districtId" (selectionChange)="onDistrictChange($event.value)">
                 <mat-option *ngFor="let district of districts" [value]="district.id">
@@ -266,7 +305,7 @@
             <!-- LOCAL LEVEL -->
 
             <mat-form-field appearance="outline" class="field-md">
-              <mat-label> Local Level </mat-label>
+              <mat-label>Local Level</mat-label>
 
               <mat-select formControlName="localLevelId" (selectionChange)="onLocalLevelChange($event.value)">
                 <mat-option *ngFor="let localLevel of localLevels" [value]="localLevel.id">
@@ -282,7 +321,7 @@
             <!-- WARD -->
 
             <mat-form-field appearance="outline" class="field-xs">
-              <mat-label> Ward No. </mat-label>
+              <mat-label>Ward No.</mat-label>
 
               <mat-select formControlName="wardNo">
                 <mat-option *ngFor="let ward of wards" [value]="ward">
@@ -294,7 +333,7 @@
             <!-- TOLE -->
 
             <mat-form-field appearance="outline" class="field-sm">
-              <mat-label> Tole </mat-label>
+              <mat-label>Tole</mat-label>
 
               <input matInput formControlName="tole" (keydown)="onToleKeydown($event)" (input)="onToleInput($event)" />
             </mat-form-field>
@@ -302,34 +341,31 @@
             <!-- HOUSE NUMBER -->
 
             <mat-form-field appearance="outline" class="field-xs">
-              <mat-label> House No. </mat-label>
+              <mat-label>House No.</mat-label>
 
               <input matInput formControlName="houseNo" />
             </mat-form-field>
           </div>
-        </div>
+        </section>
 
         <!-- =================================================
-           CONTACT + ONLINE + ABOUT + REMARKS
-      ================================================== -->
-
-        <div class="four-section-grid">
-          <!-- =================================================
-             CONTACT INFORMATION
+             CONTACT / MEMBERS / ONLINE
         ================================================== -->
 
-          <div class="form-section">
+        <div class="three-section-grid">
+          <!-- CONTACT -->
+
+          <section class="form-section">
             <div class="section-header">
               <div class="section-icon">📞</div>
 
               <div>
                 <h2>Contact Information</h2>
+                <p>Primary contact details</p>
               </div>
             </div>
 
-            <div class="form-grid no-wrap">
-              <!-- MOBILE PHONE -->
-
+            <div class="form-grid contact-grid">
               <mat-form-field appearance="outline">
                 <mat-label>Mobile Phone</mat-label>
 
@@ -342,124 +378,183 @@
                   (input)="onMobileInput($event)"
                 />
 
-                <mat-error *ngIf="profileForm.get('mobilePhone')?.hasError('required')"> Required </mat-error>
+                <mat-error *ngIf="profileForm.get('mobilePhone')?.hasError('required')">
+                  Mobile number is required.
+                </mat-error>
 
-                <mat-error *ngIf="profileForm.get('mobilePhone')?.hasError('pattern')"> Invalid </mat-error>
+                <mat-error *ngIf="profileForm.get('mobilePhone')?.hasError('pattern')">
+                  Enter a valid 10-digit mobile number.
+                </mat-error>
               </mat-form-field>
 
-              <!-- OFFICE PHONE -->
-
-              <mat-form-field appearance="outline" class="field-xs">
-                <mat-label> Office Phone </mat-label>
+              <mat-form-field appearance="outline">
+                <mat-label>Office Phone</mat-label>
 
                 <input matInput type="tel" formControlName="officePhone" />
               </mat-form-field>
             </div>
-          </div>
+          </section>
 
-          <!-- =================================================
-             ONLINE INFORMATION
-        ================================================== -->
+          <!-- MEMBER INFORMATION -->
 
-          <div class="form-section">
+          <section class="form-section">
+            <div class="section-header">
+              <div class="section-icon">👥</div>
+
+              <div>
+                <h2>Member Information</h2>
+                <p>Current member distribution</p>
+              </div>
+            </div>
+
+            <div class="member-grid">
+              <mat-form-field appearance="outline">
+                <mat-label>Male Members</mat-label>
+
+                <input
+                  matInput
+                  type="text"
+                  inputmode="numeric"
+                  formControlName="totalMaleMembers"
+                  (keydown)="onMemberCountKeydown($event)"
+                  (input)="onMemberCountInput($event, 'totalMaleMembers')"
+                />
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Female Members</mat-label>
+
+                <input
+                  matInput
+                  type="text"
+                  inputmode="numeric"
+                  formControlName="totalFemaleMembers"
+                  (keydown)="onMemberCountKeydown($event)"
+                  (input)="onMemberCountInput($event, 'totalFemaleMembers')"
+                />
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Other Members</mat-label>
+
+                <input
+                  matInput
+                  type="text"
+                  inputmode="numeric"
+                  formControlName="totalOtherMembers"
+                  (keydown)="onMemberCountKeydown($event)"
+                  (input)="onMemberCountInput($event, 'totalOtherMembers')"
+                />
+              </mat-form-field>
+            </div>
+          </section>
+
+          <!-- ONLINE -->
+
+          <section class="form-section">
             <div class="section-header">
               <div class="section-icon">🌐</div>
 
               <div>
                 <h2>Online Information</h2>
+                <p>Website and online presence</p>
               </div>
             </div>
 
-            <div class="logo-url-wrapper">
-              <!-- LOGO URL FIELD -->
+            <mat-form-field appearance="outline">
+              <mat-label>Website URL</mat-label>
 
-              <mat-form-field appearance="outline" class="logo-url-field">
-                <mat-label>Logo URL</mat-label>
+              <input matInput type="url" formControlName="webUrl" placeholder="https://example.coop" />
 
-                <input
-                  matInput
-                  type="text"
-                  [value]="selectedLogoName || profileForm.get('logoUrl')?.value || ''"
-                  readonly
-                />
-              </mat-form-field>
+              <mat-error *ngIf="profileForm.get('webUrl')?.hasError('pattern')">
+                Please enter a valid website URL.
+              </mat-error>
+            </mat-form-field>
+          </section>
+        </div>
 
-              <!-- CHOOSE FILE -->
+        <!-- =================================================
+             ABOUT / REMARKS
+        ================================================== -->
 
-              <label class="choose-file-button">
-                Choose File
+        <div class="two-section-grid">
+          <!-- ABOUT -->
 
-                <input type="file" accept="image/*" (change)="onLogoSelected($event)" hidden />
-              </label>
-            </div>
-          </div>
-
-          <!-- ABOUT COOPERATIVE -->
-
-          <div class="form-section">
+          <section class="form-section">
             <div class="section-header">
               <div class="section-icon">ℹ️</div>
 
               <div>
                 <h2>About Cooperative</h2>
+                <p>Brief introduction and description</p>
               </div>
             </div>
 
             <mat-form-field appearance="outline">
-              <mat-label> About Cooperative </mat-label>
+              <mat-label>About Cooperative</mat-label>
 
               <input matInput formControlName="about" placeholder="Enter information about the cooperative" />
             </mat-form-field>
-          </div>
+          </section>
 
           <!-- REMARKS -->
 
-          <div class="form-section">
+          <section class="form-section">
             <div class="section-header">
               <div class="section-icon">📝</div>
 
               <div>
                 <h2>Remarks</h2>
+                <p>Additional notes or remarks</p>
               </div>
             </div>
 
             <mat-form-field appearance="outline">
-              <mat-label> Remarks </mat-label>
+              <mat-label>Remarks</mat-label>
 
               <input matInput formControlName="remarks" placeholder="Enter remarks" />
             </mat-form-field>
-          </div>
+          </section>
         </div>
 
         <!-- =================================================
-           SUCCESS MESSAGE
-      ================================================== -->
+             MESSAGES
+        ================================================== -->
 
         <div class="success-message" *ngIf="successMessage">
-          {{ successMessage }}
+          <span class="message-icon">✓</span>
+          <span>{{ successMessage }}</span>
         </div>
-
-        <!-- =================================================
-           ERROR MESSAGE
-      ================================================== -->
 
         <div class="error-message" *ngIf="errorMessage">
-          {{ errorMessage }}
+          <span class="message-icon">!</span>
+          <span>{{ errorMessage }}</span>
         </div>
 
         <!-- =================================================
-           FORM ACTION
-      ================================================== -->
+             ACTIONS
+        ================================================== -->
 
         <div class="form-actions">
-          <button *ngIf="!isActive" mat-raised-button type="submit" [disabled]="isSubmitting">
-            <span *ngIf="!isSubmitting && !isEditMode"> Save Profile </span>
-
-            <span *ngIf="!isSubmitting && isEditMode"> Update Profile </span>
-
+          <button
+            mat-raised-button
+            color="primary"
+            type="button"
+            class="next-step-button"
+            [disabled]="isSubmitting || isAdvancing"
+            (click)="onNextClick()"
+          >
             <span *ngIf="isSubmitting && !isEditMode"> Saving... </span>
 
             <span *ngIf="isSubmitting && isEditMode"> Updating... </span>
+
+            <span *ngIf="isAdvancing"> Continuing... </span>
+
+            <span *ngIf="!isSubmitting && !isAdvancing && isActive"> Next </span>
+
+            <span *ngIf="!isSubmitting && !isAdvancing && !isActive && !isEditMode"> Save &amp; Next </span>
+
+            <span *ngIf="!isSubmitting && !isAdvancing && !isActive && isEditMode"> Update &amp; Next </span>
           </button>
         </div>
       </form>

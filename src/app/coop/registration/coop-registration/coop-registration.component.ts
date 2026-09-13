@@ -30,6 +30,7 @@ export class CoopRegistrationComponent {
   isSubmitting = false;
   successMessage = '';
   errorMessage = '';
+  showPassword = false;
 
   registrationForm = this.fb.nonNullable.group({
     email: [
@@ -56,6 +57,10 @@ export class CoopRegistrationComponent {
       ]
     ]
   });
+
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
+  }
 
   onSubmit(): void {
     this.successMessage = '';

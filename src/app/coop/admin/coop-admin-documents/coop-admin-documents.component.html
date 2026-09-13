@@ -1,0 +1,260 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="admin-documents-shell">
+  <mifosx-coop-admin-navbar></mifosx-coop-admin-navbar>
+
+  <!-- =====================================================
+        FULL SCREEN VERIFYING / PROVISIONING LOADER
+        Same pattern as coop-admin-detail.component.html -
+        this action can take a while, so it gets a blocking
+        overlay rather than just a disabled button.
+        ===================================================== -->
+
+  <div class="provisioning-overlay" *ngIf="isVerifying">
+    <div class="provisioning-loader">
+      <div class="spinner"></div>
+
+      <h2>Verifying &amp; Provisioning Tenant</h2>
+
+      <p class="please-wait">Please wait!</p>
+
+      <p class="loading-note">This process may take some time. Please do not refresh or close this page.</p>
+    </div>
+  </div>
+
+  <div class="admin-documents-page">
+    <!-- =====================================================
+          HEADER CARD
+          ===================================================== -->
+    <section class="documents-intro-card">
+      <div class="intro-icon">
+        <mat-icon>folder_shared</mat-icon>
+      </div>
+
+      <div class="intro-content">
+        <h1>Submitted Documents</h1>
+
+        <p>Review documents submitted by the cooperative</p>
+      </div>
+
+      <span class="submitted-badge">Submitted</span>
+    </section>
+
+    <!-- =====================================================
+          ERROR
+          ===================================================== -->
+    <div class="documents-error" *ngIf="documentsError">
+      <mat-icon>error_outline</mat-icon>
+
+      <span>
+        {{ documentsError }}
+      </span>
+    </div>
+
+    <!-- =====================================================
+        LOADING SKELETON
+        ===================================================== -->
+    <section class="document-card" *ngIf="!documentsError && documentsLoading">
+      <div class="document-card-header">
+        <div>
+          <div class="skeleton skeleton-heading"></div>
+          <div class="skeleton skeleton-subheading"></div>
+        </div>
+      </div>
+
+      <div class="document-grid">
+        <div class="document-card-item" *ngFor="let item of [1, 2, 3, 4, 5]">
+          <div class="skeleton skeleton-label"></div>
+
+          <div class="skeleton skeleton-thumbnail"></div>
+
+          <div class="skeleton skeleton-file-name"></div>
+
+          <div class="document-actions">
+            <div class="skeleton skeleton-action"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================
+        DOCUMENT CARD
+
+        Laid out by document TYPE (a fixed set of expected
+        slots), not only by what has actually been uploaded -
+        a type with nothing submitted still renders its own
+        placeholder slot instead of being left out.
+        ===================================================== -->
+    <section class="document-card" *ngIf="!documentsError && !documentsLoading && documentTypes.length > 0">
+      <div class="document-grid">
+        <article
+          class="document-card-item"
+          *ngFor="let documentType of getOrderedDocumentTypes(); trackBy: trackByDocumentTypeCode"
+        >
+          <!-- Label -->
+          <div class="document-label">
+            {{ documentType.label }}
+          </div>
+
+          <ng-container *ngIf="getUploadedDocument(documentType.code) as uploadedDoc; else emptyDocumentSlot">
+            <!-- Thumbnail: real image when available, folder icon
+                otherwise. Clickable to open the document viewer -
+                this replaces the removed View button. -->
+            <div
+              class="document-thumbnail document-thumbnail-clickable"
+              role="button"
+              tabindex="0"
+              title="Click to view"
+              (click)="viewDocument(uploadedDoc)"
+              (keydown.enter)="viewDocument(uploadedDoc)"
+            >
+              <img
+                *ngIf="isImage(uploadedDoc) && getThumbnailUrl(uploadedDoc) as thumbnailUrl"
+                [src]="thumbnailUrl"
+                [alt]="uploadedDoc.fileName"
+              />
+
+              <mat-icon *ngIf="!isImage(uploadedDoc) || !getThumbnailUrl(uploadedDoc)" class="document-folder-icon">
+                {{ getDocumentIcon(uploadedDoc) }}
+              </mat-icon>
+
+              <span class="document-thumbnail-view-hint">
+                <mat-icon> visibility </mat-icon>
+              </span>
+            </div>
+
+            <!-- File name -->
+            <p class="document-file-name" [title]="uploadedDoc.fileName">
+              {{ uploadedDoc.fileName }}
+            </p>
+
+            <!-- Actions -->
+            <div class="document-actions">
+              <button mat-stroked-button type="button" class="download-button" (click)="downloadDocument(uploadedDoc)">
+                <mat-icon> download </mat-icon>
+
+                Download
+              </button>
+            </div>
+          </ng-container>
+
+          <!-- Not yet submitted: faded, non-interactive
+              placeholder instead of an empty slot. -->
+          <ng-template #emptyDocumentSlot>
+            <div class="document-thumbnail document-thumbnail-empty">
+              <mat-icon class="document-folder-icon-faded"> folder </mat-icon>
+            </div>
+
+            <p class="document-file-name document-file-name-empty">Not submitted</p>
+          </ng-template>
+        </article>
+      </div>
+    </section>
+
+    <!-- =====================================================
+        EMPTY STATE
+
+        Only when there is no document type data at all
+        (a load issue), not merely because nothing has been
+        uploaded yet - that case is now covered inline above
+        by the faded placeholder slots.
+        ===================================================== -->
+    <section class="empty-state" *ngIf="!documentsError && !documentsLoading && documentTypes.length === 0">
+      <div class="empty-icon">
+        <mat-icon> folder_off </mat-icon>
+      </div>
+
+      <h2>No Documents Submitted</h2>
+
+      <p>No documents have been submitted by this cooperative yet.</p>
+    </section>
+
+    <!-- =====================================================
+          BACK / NEXT NAVIGATION
+          ===================================================== -->
+
+    <div class="navigation-container">
+      <div class="nav-box nav-box-back">
+        <button mat-flat-button type="button" class="nav-button back-button" (click)="goBack()">Back</button>
+      </div>
+
+      <div class="nav-box nav-box-next">
+        <button mat-flat-button type="button" class="nav-button next-button" (click)="goToPower()">Next</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =======================================================
+      DOCUMENT VIEWER
+      ======================================================= -->
+
+<div class="document-viewer-backdrop" *ngIf="documentViewerOpen" (click)="closeDocumentViewer()">
+  <div class="document-viewer" (click)="$event.stopPropagation()">
+    <!-- Viewer Header -->
+    <header class="viewer-header">
+      <div class="viewer-title">
+        <div class="viewer-icon">
+          <mat-icon>
+            {{ selectedDocument ? getDocumentIcon(selectedDocument) : 'description' }}
+          </mat-icon>
+        </div>
+
+        <div>
+          <h2>
+            {{ selectedDocument ? getDocumentLabel(selectedDocument) : 'Document' }}
+          </h2>
+
+          <p *ngIf="selectedDocument">
+            {{ selectedDocument.fileName }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Close -->
+      <button
+        mat-icon-button
+        type="button"
+        class="close-button"
+        aria-label="Close document"
+        (click)="closeDocumentViewer()"
+      >
+        <mat-icon> close </mat-icon>
+      </button>
+    </header>
+
+    <!-- Viewer Content -->
+    <div class="viewer-content">
+      <!-- Loading only ever applies to a non-image document
+            (e.g. PDF) being fetched on click - an image's
+            thumbnail is already cached, so it renders instantly
+            below with no loading state at all. -->
+
+      <div class="viewer-loading" *ngIf="documentViewerLoading">
+        <div class="loading-spinner"></div>
+
+        <p>Loading document…</p>
+      </div>
+
+      <img
+        *ngIf="!documentViewerLoading && selectedDocument && isImage(selectedDocument) && selectedDocumentPreviewUrl"
+        class="document-image"
+        [src]="selectedDocumentPreviewUrl"
+        [alt]="selectedDocument.fileName || getDocumentLabel(selectedDocument)"
+      />
+
+      <!-- PDF -->
+      <iframe
+        *ngIf="!documentViewerLoading && selectedDocument && isPdf(selectedDocument) && selectedPdfPreviewUrl"
+        class="document-pdf"
+        [src]="selectedPdfPreviewUrl"
+      ></iframe>
+    </div>
+  </div>
+</div>

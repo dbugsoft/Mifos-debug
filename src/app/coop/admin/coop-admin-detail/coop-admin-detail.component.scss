@@ -40,6 +40,10 @@
   overflow: hidden;
 }
 
+/* =========================================================
+   MAIN PAGE
+========================================================= */
+
 .admin-detail-page {
   display: flex;
   flex-direction: column;
@@ -61,6 +65,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
   background: rgb(16 42 67 / 55%);
   backdrop-filter: blur(3px);
 }
@@ -123,6 +129,7 @@
   padding: 24px 28px 60px;
   box-sizing: border-box;
   overflow: hidden auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .admin-detail-content > .detail-header,
@@ -131,10 +138,13 @@
 .admin-detail-content > .information-paper,
 .admin-detail-content > .action-card,
 .admin-detail-content > .status-info-card,
+.admin-detail-content > .navigation-container,
 .admin-detail-content > [aria-hidden='true'] {
+  width: 100%;
   max-width: 1180px;
   margin-left: auto;
   margin-right: auto;
+  box-sizing: border-box;
 }
 
 .admin-detail-content::-webkit-scrollbar {
@@ -358,9 +368,6 @@
 
 /* =========================================================
    SECTION PAIR
-   Two .information-section blocks placed side by side
-   instead of stacked. The pair itself carries the divider
-   that would normally sit on each section.
 ========================================================= */
 
 .section-pair {
@@ -369,9 +376,6 @@
   border-bottom: 1px solid var(--border-light);
 }
 
-/* Gives the first section more room than the second - used for
-   Tenant Information (4 fields) next to System Information
-   (2 fields), which doesn't need an even 50/50 split. */
 .section-pair.wide-first {
   grid-template-columns: 3fr 2fr;
 }
@@ -430,10 +434,6 @@
 
 /* =========================================================
    DETAIL GRID
-   Each field is its own small, content-sized box that wraps
-   naturally instead of stretching to fill a fixed column
-   count - a 2-field section and a 6-field section both look
-   equally intentional.
 ========================================================= */
 
 .detail-grid {
@@ -456,19 +456,10 @@
   border-radius: 10px;
 }
 
-/* Compact fields that only need to fit a short value (a date,
-   a status word, a ward number). Small basis so several fit on
-   one row, but still grows to help fill it - just at half the
-   rate of a .field-lg neighbor, so the row is always fully used
-   with no leftover gap. */
 .detail-field.field-xs {
   flex: 1 1 100px;
 }
 
-/* Fields whose value tends to run long (a full local level
-   name, a tenant identifier) - grows twice as fast as a
-   .field-xs neighbor, so it visibly takes the larger share of
-   any extra row width. */
 .detail-field.field-lg {
   flex: 2 1 170px;
 }
@@ -572,16 +563,17 @@
   padding: 17px 18px;
   box-sizing: border-box;
   border-radius: 13px;
+  background: #fff;
 }
 
 .applicant-remark {
   border: 1.5px solid #d6e8fb;
-  background: #f7fbff;
+  background: #fff;
 }
 
 .admin-remark {
   border: 1.5px solid var(--border);
-  background: #fafbfc;
+  background: #fff;
 }
 
 .remark-label {
@@ -604,7 +596,7 @@
 }
 
 /* =========================================================
-   ACTION CARD (verify / reject / activate)
+   ACTION CARD
 ========================================================= */
 
 .action-card {
@@ -698,7 +690,7 @@
   box-shadow: 0 4px 12px rgb(16 116 185 / 26%) !important;
   transition:
     background 0.15s ease,
-    transform 0.15s ease !important;
+    transform 0.15s ease;
 }
 
 .primary-button.verify-button:hover:not(:disabled) {
@@ -820,7 +812,7 @@
 }
 
 /* =========================================================
-   STATUS INFO CARD (active / rejected)
+   STATUS INFO CARD
 ========================================================= */
 
 .status-info-card {
@@ -893,11 +885,82 @@
 }
 
 /* =========================================================
+   BACK / NEXT NAVIGATION
+========================================================= */
+
+.navigation-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+  padding-bottom: 24px;
+}
+
+.nav-box {
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgb(16 116 185 / 14%);
+}
+
+.nav-button {
+  height: 42px;
+  min-width: 110px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 20px !important;
+  border: none;
+  border-radius: 10px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.2px;
+  box-shadow: none !important;
+  transition:
+    background 0.15s ease,
+    transform 0.15s ease;
+}
+
+.nav-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.nav-button mat-icon {
+  width: 17px;
+  height: 17px;
+  font-size: 17px;
+}
+
+.nav-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.nav-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.nav-box-back .back-button {
+  background: var(--primary) !important;
+  color: #fff !important;
+}
+
+.nav-box-back .back-button:hover:not(:disabled) {
+  background: var(--primary-dark) !important;
+}
+
+.nav-box-next .next-button {
+  background: var(--primary) !important;
+  color: #fff !important;
+}
+
+.nav-box-next .next-button:hover:not(:disabled) {
+  background: var(--primary-dark) !important;
+}
+
+/* =========================================================
    SHIMMER SKELETON
-   Reuses the real .detail-header / .information-paper /
-   .section-pair / .detail-grid / .detail-field / .action-card
-   wrappers so the skeleton occupies the same footprint as the
-   loaded page, avoiding layout jump once data arrives.
 ========================================================= */
 
 .skeleton {
@@ -932,6 +995,10 @@
 
 @media (prefers-reduced-motion: reduce) {
   .skeleton::after {
+    animation: none;
+  }
+
+  .spinner {
     animation: none;
   }
 }
@@ -1052,6 +1119,18 @@
 ========================================================= */
 
 @media (width <= 1000px) {
+  .admin-detail-content {
+    padding: 20px 20px 50px;
+  }
+
+  .detail-header {
+    padding: 24px 26px;
+  }
+
+  .information-section {
+    padding: 24px 26px;
+  }
+
   .section-pair,
   .section-pair.wide-first {
     grid-template-columns: 1fr;
@@ -1066,8 +1145,43 @@
     grid-template-columns: 1fr;
   }
 
-  .detail-header {
+  .action-card {
     padding: 24px 26px;
+  }
+
+  .navigation-container {
+    padding-bottom: 20px;
+  }
+}
+
+/* =========================================================
+   RESPONSIVE — SMALL TABLET
+========================================================= */
+
+@media (width <= 800px) {
+  .detail-grid {
+    gap: 8px;
+  }
+
+  .detail-field {
+    flex-basis: calc(50% - 8px);
+  }
+
+  .detail-field.field-xs,
+  .detail-field.field-lg {
+    flex: 1 1 calc(50% - 8px);
+  }
+
+  .detail-header {
+    gap: 16px;
+  }
+
+  .header-text h1 {
+    font-size: 19px;
+  }
+
+  .verification-actions {
+    flex-wrap: wrap;
   }
 }
 
@@ -1088,6 +1202,10 @@
     border-radius: 16px;
   }
 
+  .header-left {
+    width: 100%;
+  }
+
   .header-status {
     align-self: flex-start;
   }
@@ -1102,6 +1220,10 @@
   .header-text h1 {
     overflow: visible;
     font-size: 18px;
+    white-space: normal;
+  }
+
+  .name-np {
     white-space: normal;
   }
 
@@ -1126,6 +1248,10 @@
 
   .section-heading h2 {
     font-size: 14.5px;
+  }
+
+  .section-heading p {
+    font-size: 10.5px;
   }
 
   .detail-grid {
@@ -1158,6 +1284,10 @@
     flex-direction: column;
   }
 
+  .action-header p {
+    max-width: none;
+  }
+
   .verification-actions {
     flex-direction: column;
   }
@@ -1183,6 +1313,27 @@
     padding: 20px;
     border-radius: 14px;
   }
+
+  /* Back / Next navigation on mobile */
+  .navigation-container {
+    justify-content: flex-end;
+    margin-top: 16px;
+    gap: 10px;
+    padding-bottom: 16px;
+  }
+
+  .nav-button {
+    min-width: 0;
+    height: 40px;
+    padding: 0 18px !important;
+    font-size: 13px !important;
+  }
+
+  .provisioning-loader {
+    max-width: calc(100vw - 32px);
+    padding: 32px 24px;
+    border-radius: 16px;
+  }
 }
 
 /* =========================================================
@@ -1196,13 +1347,138 @@
 
   .detail-header {
     padding: 18px 16px;
+    border-radius: 14px;
+  }
+
+  .header-left {
+    gap: 12px;
+  }
+
+  .coop-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    font-size: 18px;
+  }
+
+  .header-text h1 {
+    font-size: 16px;
+  }
+
+  .name-np {
+    font-size: 12px;
+  }
+
+  .subtitle {
+    font-size: 10.5px;
+  }
+
+  .status-badge {
+    padding: 7px 12px;
+    font-size: 10px;
   }
 
   .information-section {
     padding: 18px 14px;
   }
 
+  .section-heading {
+    gap: 10px;
+  }
+
+  .section-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+  }
+
+  .section-heading h2 {
+    font-size: 13.5px;
+  }
+
+  .section-heading p {
+    font-size: 10px;
+  }
+
+  .detail-field {
+    min-height: 58px;
+    padding: 11px 12px;
+  }
+
+  .detail-label {
+    font-size: 9px;
+  }
+
+  .detail-value {
+    font-size: 12.5px;
+  }
+
+  .description {
+    min-height: 70px;
+    padding: 13px 14px;
+    font-size: 12px;
+  }
+
+  .remark-box {
+    min-height: 90px;
+    padding: 13px;
+  }
+
+  .remark-box p {
+    font-size: 12px;
+  }
+
   .action-card {
     padding: 18px 14px;
+    border-radius: 14px;
+  }
+
+  .reject-form-container {
+    padding: 18px 14px;
+  }
+
+  .navigation-container {
+    margin-top: 14px;
+    gap: 8px;
+    padding-bottom: 12px;
+  }
+
+  .nav-button {
+    min-width: 0;
+    height: 38px;
+    padding: 0 16px !important;
+    font-size: 12.5px !important;
+  }
+}
+
+/* =========================================================
+   VERY SMALL DEVICES
+========================================================= */
+
+@media (width <= 320px) {
+  .admin-detail-content {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  .detail-header {
+    padding: 16px 13px;
+  }
+
+  .information-section {
+    padding: 16px 12px;
+  }
+
+  .nav-box {
+    flex: 1;
+  }
+
+  .nav-button {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .navigation-container {
+    justify-content: stretch;
   }
 }

@@ -18,7 +18,7 @@ import { coopQueryKeys } from './coop-query-keys';
  * activate) still force an immediate update/invalidation on top of
  * this - see applyMutationResult() in coop-admin-detail.component.ts.
  */
-const ADMIN_STALE_TIME_MS = 30_000;
+const ADMIN_STALE_TIME_MS = Infinity;
 
 export function adminListQueryOptions(coopAdminService: CoopAdminService, params: CoopAdminListParams) {
   return queryOptions({

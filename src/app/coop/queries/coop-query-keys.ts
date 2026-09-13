@@ -49,6 +49,15 @@ export const coopQueryKeys = {
       'locations'
     ] as const,
 
+  // Document type definitions are static, non-cooperative-specific
+  // reference data (same list for every cooperative) - kept at the
+  // top level alongside locations(), not under admin, so it is
+  // intentionally NOT cleared by clearCoopUserQueries() on logout.
+  documentTypes: () => [
+      ...coopQueryKeys.root(),
+      'documentTypes'
+    ] as const,
+
   admin: {
     root: () => [
         ...coopQueryKeys.root(),
@@ -74,6 +83,24 @@ export const coopQueryKeys = {
     stats: () => [
         ...coopQueryKeys.admin.root(),
         'stats'
+      ] as const,
+
+    // Nested under admin.root() so clearCoopUserQueries()'s existing
+    // removeQueries({ queryKey: coopQueryKeys.admin.root() }) already
+    // covers this on logout - no changes needed there.
+    documents: (appUserId: number) => [
+        ...coopQueryKeys.admin.root(),
+        'documents',
+        appUserId
+      ] as const,
+
+    // Keyed by the uploaded document's own id, which identifies one
+    // specific immutable file - also nested under admin.root() for
+    // the same logout-safety reason as documents() above.
+    documentThumbnail: (documentId: number) => [
+        ...coopQueryKeys.admin.root(),
+        'documentThumbnail',
+        documentId
       ] as const
   }
 };

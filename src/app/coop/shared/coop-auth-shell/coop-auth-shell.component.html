@@ -1,0 +1,68 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="auth-shell">
+  <!-- =========================
+       LEFT HERO - 50%
+  ========================= -->
+  <div class="hero-panel">
+    <div class="hero-content">
+      <span class="hero-eyebrow"> Welcome to </span>
+
+      <div class="hero-icon">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M3 21h18"></path>
+          <path d="M5 21V9l7-5 7 5v12"></path>
+          <path d="M9 21v-6h6v6"></path>
+          <path d="M9 9h.01M12 9h.01M15 9h.01M9 13h.01M15 13h.01"></path>
+        </svg>
+      </div>
+
+      <h1 class="hero-brand">CoIMS</h1>
+
+      <p class="hero-description">
+        Empowering cooperatives with smarter management, streamlined operations, and better member experiences.
+      </p>
+
+      <div class="hero-tagline">
+        <span>Build Better.</span>
+        <span>Manage with Confidence.</span>
+        <span>Grow with Purpose.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================
+       RIGHT SIDE - 50%
+  ========================= -->
+  <div class="right-panel">
+    <div class="auth-panel">
+      <router-outlet hidden></router-outlet>
+    </div>
+
+    <!-- FOOTER ONLY ON RIGHT -->
+    <div class="copyright-footer">
+      <span> © 2026 CoIMS. All rights reserved. </span>
+
+      <span>
+        Developed by
+        <a href="https://dibugsoft.com/" target="_blank" rel="noopener noreferrer">
+          <strong>Debugsoft</strong>
+        </a>
+      </span>
+    </div>
+  </div>
+</div>

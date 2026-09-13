@@ -30,145 +30,56 @@
 }
 
 /* =========================================================
-   PAGE HEADER / FIXED NAVBAR
-========================================================= */
-
-.page-header {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  flex-shrink: 0;
-  width: 100%;
-  padding: 16px 28px;
-  box-sizing: border-box;
-  background: linear-gradient(180deg, #fff 0%, #fbfdff 100%);
-  border-bottom: 1px solid #e3e8ec;
-  box-shadow: 0 2px 10px rgb(16 42 67 / 6%);
-  z-index: 20;
-}
-
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  min-width: 0;
-}
-
-.header-icon {
-  width: 44px;
-  height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  border-radius: 11px;
-  background: linear-gradient(135deg, #1074b9 0%, #0d5d94 100%);
-  font-size: 20px;
-  box-shadow: 0 3px 8px rgb(16 116 185 / 28%);
-}
-
-.page-header h1 {
-  margin: 0;
-  color: #172b3a;
-  font-size: 21px;
-  font-weight: 700;
-  line-height: 1.25;
-}
-
-.page-header p {
-  margin: 4px 0 0;
-  color: #75838e;
-  font-size: 12px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* =========================================================
-   NAVIGATION
-========================================================= */
-
-.navbar-links {
-  display: flex;
-  align-items: center;
-  gap: 26px;
-  margin-left: auto;
-  margin-right: 28px;
-}
-
-.navbar-links a {
-  position: relative;
-  display: flex;
-  align-items: center;
-  height: 50px;
-  color: #667783;
-  font-size: 13px;
-  font-weight: 600;
-  text-decoration: none;
-  transition: color 0.18s ease;
-}
-
-.navbar-links a:hover {
-  color: #1074b9;
-}
-
-.navbar-links a.active {
-  color: #1074b9;
-}
-
-.navbar-links a.active::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 3px;
-  border-radius: 3px 3px 0 0;
-  background: #1074b9;
-}
-
-/* =========================================================
-   LOGOUT BUTTON
-========================================================= */
-
-.logout-button {
-  min-width: 82px;
-  height: 36px;
-  border-radius: 7px !important;
-  background: #1074b9 !important;
-  color: #fff !important;
-  font-size: 12px !important;
-  font-weight: 600 !important;
-  box-shadow: 0 3px 9px rgb(16 116 185 / 28%) !important;
-  transition:
-    background 0.15s ease,
-    transform 0.15s ease;
-}
-
-.logout-button:hover {
-  background: #0c639e !important;
-  transform: translateY(-1px);
-}
-
-/* =========================================================
-   SCROLLABLE CONTENT AREA
+   SCROLL AREA
 ========================================================= */
 
 .profile-scroll-area {
   flex: 1;
   min-height: 0;
-  box-sizing: border-box;
-  padding: 24px 28px 50px;
   overflow: hidden auto;
+  padding: 24px 28px 42px;
+  box-sizing: border-box;
+  scroll-behavior: smooth;
 }
-
-/* =========================================================
-   FORM
-========================================================= */
 
 .profile-form {
   width: 100%;
-  box-sizing: border-box;
+  max-width: 1500px;
+  margin: 0 auto;
+}
+
+/* =========================================================
+   PROFILE STATUS
+========================================================= */
+
+.profile-status {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 10px 28px 0;
+  flex-shrink: 0;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 13px;
+  border-radius: 999px;
+  background: #edf8f0;
+  border: 1px solid #c9e8d1;
+  color: #2f7650;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #55a96d;
 }
 
 /* =========================================================
@@ -177,21 +88,26 @@
 
 .form-section {
   width: 100%;
+  min-width: 0;
   box-sizing: border-box;
   margin-bottom: 20px;
-  padding: 20px 22px;
+  padding: 21px 22px 20px;
   background: #fff;
-  border: 1px solid #e1e7eb;
+  border: 1px solid #e2e8ed;
   border-radius: 12px;
-  box-shadow: 0 2px 7px rgb(16 42 67 / 4%);
+  box-shadow:
+    0 1px 2px rgb(16 42 67 / 3%),
+    0 4px 12px rgb(16 42 67 / 4%);
   transition:
-    box-shadow 0.18s ease,
-    transform 0.18s ease;
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
 }
 
 .form-section:hover {
-  box-shadow: 0 6px 16px rgb(16 42 67 / 8%);
-  transform: translateY(-1px);
+  border-color: #d7e1e8;
+  box-shadow:
+    0 2px 4px rgb(16 42 67 / 4%),
+    0 7px 18px rgb(16 42 67 / 6%);
 }
 
 /* =========================================================
@@ -202,27 +118,40 @@
   display: flex;
   align-items: center;
   gap: 11px;
-  margin-bottom: 18px;
+  margin-bottom: 19px;
 }
 
-.section-icon {
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  border-radius: 9px;
-  background: linear-gradient(135deg, #eaf4fb 0%, #dcedf9 100%);
-  color: #1074b9;
-  font-size: 17px;
+.section-header > div:last-child {
+  min-width: 0;
 }
 
 .section-header h2 {
   margin: 0;
-  color: #263746;
-  font-size: 16px;
+  color: #243746;
+  font-size: 15px;
   font-weight: 700;
+  line-height: 1.3;
+}
+
+.section-header p {
+  margin: 3px 0 0;
+  color: #8a98a3;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.section-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  border-radius: 9px;
+  background: #edf6fb;
+  color: #1074b9;
+  font-size: 16px;
+  box-shadow: inset 0 0 0 1px #dcecf6;
 }
 
 /* =========================================================
@@ -233,8 +162,8 @@
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
-  gap: 18px 20px;
   width: 100%;
+  gap: 16px 18px;
   box-sizing: border-box;
 }
 
@@ -243,38 +172,73 @@
   min-width: 0;
 }
 
-.form-grid > mat-form-field.field-sm {
+.form-grid.three-column > mat-form-field {
+  flex-basis: 220px;
+}
+
+.form-grid > .field-sm {
   flex: 0 1 200px;
-}
-
-.form-grid > mat-form-field.field-md {
-  flex: 1 1 260px;
-}
-
-.form-grid > mat-form-field.field-xs {
-  flex: 0 1 140px;
-}
-
-/* Keeps a pair of fields (e.g. Mobile/Office Phone) on one row even in a
-   narrow card: they shrink instead of wrapping onto a second line. */
-.form-grid.no-wrap {
-  flex-wrap: nowrap;
-}
-
-.form-grid.no-wrap > mat-form-field {
-  min-width: 0;
-}
-
-.field-sm {
   max-width: 200px;
 }
 
-.field-md {
+.form-grid > .field-md {
+  flex: 1 1 260px;
   max-width: 320px;
 }
 
-.field-xs {
+.form-grid > .field-xs {
+  flex: 0 1 140px;
   max-width: 140px;
+}
+
+/* =========================================================
+   CONTACT GRID
+========================================================= */
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: 12px;
+}
+
+/* =========================================================
+   MEMBER GRID
+========================================================= */
+
+.member-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+/* =========================================================
+   TWO SECTION GRID
+========================================================= */
+
+.two-section-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  width: 100%;
+}
+
+.two-section-grid > .form-section {
+  min-width: 0;
+}
+
+/* =========================================================
+   THREE SECTION GRID
+========================================================= */
+
+.three-section-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  width: 100%;
+}
+
+.three-section-grid > .form-section {
+  min-width: 0;
 }
 
 /* =========================================================
@@ -287,13 +251,67 @@ mat-form-field {
 }
 
 mat-form-field input,
+mat-form-field textarea,
 mat-form-field mat-select {
   font-size: 13px;
 }
 
+mat-form-field textarea {
+  min-height: 72px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
 /* =========================================================
-   MATERIAL FIELD CUSTOMIZATION
+   MATERIAL CUSTOMIZATION
 ========================================================= */
+
+/* =========================================================
+   DISABLED / READ-ONLY FORM VALUES
+   Keep existing values black
+========================================================= */
+
+/* Normal disabled input fields */
+::ng-deep .mat-mdc-form-field input.mat-mdc-input-element:disabled {
+  color: #111827 !important;
+  -webkit-text-fill-color: #111827 !important;
+  opacity: 1 !important;
+}
+
+/* Disabled textarea */
+::ng-deep .mat-mdc-form-field textarea.mat-mdc-input-element:disabled {
+  color: #111827 !important;
+  -webkit-text-fill-color: #111827 !important;
+  opacity: 1 !important;
+}
+
+/* =========================================================
+   DISABLED MAT-SELECT
+   Province / District / Local Level / Ward
+========================================================= */
+
+::ng-deep .mat-mdc-form-field .mat-mdc-select.mat-mdc-select-disabled .mat-mdc-select-value {
+  color: #111827 !important;
+  opacity: 1 !important;
+}
+
+/* Actual selected text */
+::ng-deep .mat-mdc-form-field .mat-mdc-select.mat-mdc-select-disabled .mat-mdc-select-value-text {
+  color: #111827 !important;
+  -webkit-text-fill-color: #111827 !important;
+  opacity: 1 !important;
+}
+
+/* Dropdown arrow */
+::ng-deep .mat-mdc-form-field .mat-mdc-select.mat-mdc-select-disabled .mat-mdc-select-arrow {
+  color: #374151 !important;
+  opacity: 1 !important;
+}
+
+/* Disabled Material form-field itself */
+::ng-deep .mat-mdc-form-field.mat-form-field-disabled {
+  opacity: 1 !important;
+}
 
 ::ng-deep .mat-mdc-form-field {
   width: 100%;
@@ -304,12 +322,12 @@ mat-form-field mat-select {
 }
 
 ::ng-deep .mat-mdc-form-field-infix {
-  min-height: 48px;
+  min-height: 46px;
 }
 
-/* =========================================================
-   MATERIAL FIELD FOCUS BORDER
-========================================================= */
+::ng-deep .mat-mdc-form-field .mat-mdc-floating-label {
+  font-size: 13px;
+}
 
 ::ng-deep .mat-mdc-form-field.mat-focused .mdc-notched-outline__leading,
 ::ng-deep .mat-mdc-form-field.mat-focused .mdc-notched-outline__notch,
@@ -317,161 +335,58 @@ mat-form-field mat-select {
   border-color: #1074b9 !important;
 }
 
-/* =========================================================
-   MATERIAL ERROR TEXT
-========================================================= */
-
 ::ng-deep .mat-mdc-form-field-error {
   font-size: 11px;
-}
-
-/* =========================================================
-   TWO -SECTION GRID
-======================================================== */
-
-.two-section-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 20px;
-  width: 100%;
-  box-sizing: border-box;
-  align-items: stretch;
-}
-
-.two-section-grid > .form-section {
-  width: 100%;
-  box-sizing: border-box;
-  margin-bottom: 20px;
-  align-self: stretch;
-  min-width: 0;
-}
-
-/* =========================================================
-   FOUR -SECTION GRID
-======================================================== */
-
-.four-section-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 20px;
-  width: 100%;
-  box-sizing: border-box;
-  align-items: stretch;
-}
-
-.four-section-grid > .form-section {
-  width: 100%;
-  box-sizing: border-box;
-  margin-bottom: 20px;
-  align-self: stretch;
-  min-width: 0;
-}
-
-/* =========================================================
-   FULL WIDTH
-========================================================= */
-
-.full-width {
-  width: 100%;
-}
-
-/* =========================================================
-   LOGO URL FIELD + CHOOSE FILE
-========================================================= */
-
-.logo-url-wrapper {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  gap: 10px;
-  box-sizing: border-box;
-}
-
-.logo-url-field {
-  flex: 1;
-  min-width: 0;
-  margin: 0 !important;
-}
-
-/* =========================================================
-   LOGO URL MATERIAL FIELD
-========================================================= */
-
-/*
-   Remove the empty Material subscript area only
-   from the Logo URL field.
-*/
-
-::ng-deep .logo-url-field .mat-mdc-form-field-subscript-wrapper {
-  min-height: 0 !important;
-  height: 0 !important;
-  overflow: hidden;
-}
-
-/* =========================================================
-   CHOOSE FILE BUTTON
-========================================================= */
-
-.logo-url-wrapper .choose-file-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex: 0 0 auto;
-  height: 48px;
-  margin: 0;
-  padding: 0 15px;
-  box-sizing: border-box;
-  border: 1px solid #1074b9;
-  border-radius: 7px;
-  background: #1074b9;
-  color: #fff;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  white-space: nowrap;
-  transition:
-    background 0.15s ease,
-    box-shadow 0.15s ease,
-    transform 0.1s ease;
-}
-
-.logo-url-wrapper .choose-file-button:hover {
-  background: #0c639e;
-  box-shadow: 0 3px 8px rgb(16 116 185 / 22%);
-}
-
-.logo-url-wrapper .choose-file-button:active {
-  transform: translateY(1px);
 }
 
 /* =========================================================
    SUCCESS MESSAGE
 ========================================================= */
 
-.success-message {
+.success-message,
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 9px;
   margin: 4px 0 16px;
   padding: 11px 14px;
-  border-radius: 7px;
-  background: #eaf7ef;
-  border: 1px solid #c9ead6;
-  color: #24734d;
+  border-radius: 8px;
   font-size: 12px;
-  font-weight: 500;
+  line-height: 1.4;
 }
 
-/* =========================================================
-   ERROR MESSAGE
-========================================================= */
+.success-message {
+  background: #eff9f2;
+  border: 1px solid #cce8d5;
+  color: #397454;
+}
 
 .error-message {
-  margin: 4px 0 16px;
-  padding: 11px 14px;
-  border-radius: 7px;
-  background: #fff1f1;
-  border: 1px solid #f1cccc;
-  color: #b23b3b;
-  font-size: 12px;
-  font-weight: 500;
+  background: #fff3f3;
+  border: 1px solid #f0cccc;
+  color: #b33e3e;
+}
+
+.message-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.success-message .message-icon {
+  background: #d8efdf;
+  color: #397454;
+}
+
+.error-message .message-icon {
+  background: #f8dddd;
+  color: #b33e3e;
 }
 
 /* =========================================================
@@ -483,286 +398,44 @@ mat-form-field mat-select {
   justify-content: flex-end;
   align-items: center;
   width: 100%;
-  margin-top: 4px;
-  padding: 4px 0 20px;
+  padding: 2px 0 12px;
 }
 
-.form-actions button {
-  min-width: 140px;
+.next-step-button {
+  min-width: 150px;
   height: 40px;
   border-radius: 8px !important;
   background: #1074b9 !important;
   color: #fff !important;
   font-size: 12.5px !important;
   font-weight: 600 !important;
-  box-shadow: 0 3px 10px rgb(16 116 185 / 28%) !important;
+  box-shadow: 0 3px 10px rgb(16 116 185 / 22%) !important;
   transition:
-    background 0.15s ease,
-    transform 0.15s ease !important;
+    background 0.18s ease,
+    transform 0.18s ease,
+    box-shadow 0.18s ease !important;
 }
 
-.form-actions button:hover:not(:disabled) {
+.next-step-button:hover:not(:disabled) {
   background: #0c639e !important;
   transform: translateY(-1px);
+  box-shadow: 0 5px 14px rgb(16 116 185 / 28%) !important;
 }
 
-.form-actions button:disabled {
+.next-step-button:disabled {
   opacity: 0.65;
   cursor: not-allowed;
   box-shadow: none !important;
 }
 
 /* =========================================================
-   SCROLLBAR
-========================================================= */
-
-.profile-scroll-area::-webkit-scrollbar {
-  width: 7px;
-}
-
-.profile-scroll-area::-webkit-scrollbar-track {
-  background: #f5f8fa;
-}
-
-.profile-scroll-area::-webkit-scrollbar-thumb {
-  background: #cbd5dc;
-  border-radius: 10px;
-}
-
-.profile-scroll-area::-webkit-scrollbar-thumb:hover {
-  background: #aebbc4;
-}
-
-/* =========================================================
-   WIDE / FOUR-SECTION COLLAPSE
-========================================================= */
-
-@media (width <= 900px) {
-  .four-section-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-/* =========================================================
-   TABLET
-========================================================= */
-
-@media (width <= 1100px) {
-  .profile-scroll-area {
-    padding: 20px 20px 40px;
-  }
-
-  .two-section-grid,
-  .four-section-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .page-header p {
-    display: none;
-  }
-}
-
-/* =========================================================
-   MOBILE
-========================================================= */
-
-@media (width <= 700px) {
-  .page-header {
-    align-items: flex-start;
-    flex-direction: column;
-    padding: 16px;
-  }
-
-  .page-header h1 {
-    font-size: 19px;
-  }
-
-  .logout-button {
-    width: 100%;
-  }
-
-  .profile-scroll-area {
-    padding: 14px 12px 30px;
-  }
-
-  .form-section {
-    padding: 16px;
-    margin-bottom: 16px;
-  }
-
-  .section-header {
-    margin-bottom: 14px;
-  }
-
-  .section-header h2 {
-    font-size: 15px;
-  }
-
-  .form-grid {
-    gap: 10px;
-  }
-
-  .form-grid > mat-form-field,
-  .form-grid > mat-form-field.field-sm,
-  .form-grid > mat-form-field.field-md,
-  .form-grid > mat-form-field.field-xs {
-    flex: 1 1 100%;
-    max-width: 100%;
-  }
-
-  .form-grid.no-wrap {
-    flex-wrap: wrap;
-  }
-
-  .two-section-grid,
-  .four-section-grid {
-    grid-template-columns: 1fr;
-    gap: 0;
-  }
-
-  /* =====================================================
-     LOGO URL MOBILE
-  ===================================================== */
-
-  .logo-url-wrapper {
-    gap: 8px;
-  }
-
-  .logo-url-wrapper .choose-file-button {
-    height: 48px;
-    padding: 0 12px;
-  }
-
-  /* =====================================================
-     SUBMIT BUTTON
-  ===================================================== */
-
-  .form-actions {
-    justify-content: stretch;
-  }
-
-  .form-actions button {
-    width: 100%;
-  }
-}
-
-/* =========================================================
-   SMALL MOBILE
-========================================================= */
-
-@media (width <= 450px) {
-  .logo-url-wrapper {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 8px;
-  }
-
-  .logo-url-wrapper .choose-file-button {
-    width: 100%;
-    height: 46px;
-  }
-
-  /* NAVIGATION */
-
-  .navbar-links {
-    gap: 18px;
-  }
-
-  .navbar-links a {
-    font-size: 11px;
-  }
-}
-
-/* ================================
-   PROFILE STATUS
-================================ */
-
-.profile-status {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  padding: 10px 24px 0;
-}
-
-.status-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  background: #e8f5e9;
-  color: #2e7d32;
-  border: 1px solid #a5d6a7;
-  position: relative;
-}
-
-/* ACTIVE status */
-
-.status-badge::before {
-  content: '';
-  width: 7px;
-  height: 7px;
-  margin-right: 7px;
-  border-radius: 50%;
-  background: #43a047;
-}
-
-/* =========================================================
-   VERY SMALL MOBILE
-========================================================= */
-
-@media (width <= 400px) {
-  .profile-scroll-area {
-    padding: 10px 8px 25px;
-  }
-
-  .form-section {
-    padding: 14px;
-  }
-
-  .section-icon {
-    width: 32px;
-    height: 32px;
-    font-size: 15px;
-  }
-
-  .page-header {
-    padding: 14px 10px;
-  }
-
-  /* NAVIGATION */
-
-  .navbar-links {
-    gap: 14px;
-  }
-
-  .navbar-links a {
-    font-size: 10px;
-  }
-
-  .logout-button {
-    padding: 0 12px !important;
-    min-width: 70px;
-    font-size: 11px !important;
-  }
-}
-
-/* =========================================================
-   SHIMMER SKELETON
-
-   Mirrors the real form's .form-section / .section-header /
-   .form-grid / .two-section-grid wrappers so the skeleton
-   occupies the same footprint as the loaded form, avoiding
-   layout jump once data arrives.
+   SKELETON
 ========================================================= */
 
 .skeleton {
   position: relative;
   overflow: hidden;
-  background: #e7ecf1;
+  background: #e8edf1;
   border-radius: 6px;
 }
 
@@ -775,22 +448,15 @@ mat-form-field mat-select {
   animation: coop-skeleton-shimmer 1.5s infinite;
 }
 
-@keyframes coop-skeleton-shimmer {
-  100% {
-    transform: translateX(100%);
-  }
-}
-
-.skeleton-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 9px;
-  flex-shrink: 0;
-}
-
 .skeleton-heading {
-  width: 150px;
-  height: 16px;
+  width: 145px;
+  height: 15px;
+}
+
+.skeleton-subheading {
+  width: 205px;
+  height: 9px;
+  margin-top: 7px;
 }
 
 .skeleton-field {
@@ -798,17 +464,181 @@ mat-form-field mat-select {
   height: 48px;
 }
 
-.skeleton-field.full-width {
-  height: 56px;
+.skeleton-textarea {
+  width: 100%;
+  height: 82px;
 }
 
-.skeleton-button {
-  width: 140px;
-  height: 40px;
+@keyframes coop-skeleton-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
 }
+
+/* =========================================================
+   SCROLLBAR
+========================================================= */
+
+.profile-scroll-area::-webkit-scrollbar {
+  width: 7px;
+}
+
+.profile-scroll-area::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.profile-scroll-area::-webkit-scrollbar-thumb {
+  background: #cbd5dc;
+  border-radius: 10px;
+}
+
+.profile-scroll-area::-webkit-scrollbar-thumb:hover {
+  background: #aebbc4;
+}
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (width <= 1100px) {
+  .profile-scroll-area {
+    padding: 20px 20px 36px;
+  }
+
+  .three-section-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .two-section-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================================
+   SMALL TABLET
+========================================================= */
+
+@media (width <= 850px) {
+  .three-section-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-grid.three-column {
+    grid-template-columns: 1fr;
+  }
+
+  .member-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .contact-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (width <= 700px) {
+  .profile-scroll-area {
+    padding: 14px 12px 28px;
+  }
+
+  .profile-status {
+    padding: 8px 14px 0;
+  }
+
+  .form-section {
+    margin-bottom: 14px;
+    padding: 17px 15px;
+    border-radius: 10px;
+  }
+
+  .section-header {
+    margin-bottom: 15px;
+  }
+
+  .section-header h2 {
+    font-size: 14px;
+  }
+
+  .section-header p {
+    font-size: 10px;
+  }
+
+  .section-icon {
+    width: 33px;
+    height: 33px;
+    flex-basis: 33px;
+    font-size: 15px;
+  }
+
+  .form-grid {
+    gap: 9px;
+  }
+
+  .form-grid > mat-form-field,
+  .form-grid > mat-form-field.field-sm,
+  .form-grid > mat-form-field.field-md,
+  .form-grid > mat-form-field.field-xs {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
+
+  .form-actions {
+    padding-bottom: 8px;
+  }
+
+  .next-step-button {
+    width: 100%;
+  }
+}
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (width <= 450px) {
+  .profile-scroll-area {
+    padding: 10px 8px 24px;
+  }
+
+  .form-section {
+    padding: 15px 13px;
+  }
+
+  .section-header {
+    gap: 9px;
+  }
+
+  .section-icon {
+    width: 31px;
+    height: 31px;
+    flex-basis: 31px;
+  }
+
+  .status-badge {
+    font-size: 10px;
+    padding: 5px 11px;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
+  .profile-scroll-area {
+    scroll-behavior: auto;
+  }
+
   .skeleton::after {
     animation: none;
+  }
+
+  .form-section,
+  .next-step-button {
+    transition: none !important;
   }
 }
