@@ -6,27 +6,19 @@
   file, You can obtain one at http://mozilla.org/MPL/2.0/.
 -->
 
-<!--
-  Copyright since 2025 Mifos Initiative
-
-  This Source Code Form is subject to the terms of the Mozilla
-  Public License, v. 2.0. If a copy of the MPL was not distributed
-  with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
--->
-
 <div class="admin-detail-page">
   <!-- =====================================================
-       FIXED NAVBAR
-       A direct flex child of .admin-detail-page (not inside
-       the scrollable content area below), so it never moves
-       while the page underneath is scrolled.
-  ====================================================== -->
+        FIXED NAVBAR
+        A direct flex child of .admin-detail-page (not inside
+        the scrollable content area below), so it never moves
+        while the page underneath is scrolled.
+    ====================================================== -->
 
   <mifosx-coop-admin-navbar></mifosx-coop-admin-navbar>
 
   <!-- =====================================================
-       FULL SCREEN PROVISIONING LOADING
-  ====================================================== -->
+        FULL SCREEN PROVISIONING LOADING
+    ====================================================== -->
 
   <div class="provisioning-overlay" *ngIf="isVerifying">
     <div class="provisioning-loader">
@@ -41,14 +33,14 @@
   </div>
 
   <!-- =====================================================
-       SCROLLABLE CONTENT
-  ====================================================== -->
+        SCROLLABLE CONTENT
+    ====================================================== -->
 
   <div class="admin-detail-content">
     @if (loading) {
       <!-- =====================================================
-           SHIMMER SKELETON — INITIAL LOAD
-      ====================================================== -->
+            SHIMMER SKELETON — INITIAL LOAD
+        ====================================================== -->
 
       <div aria-hidden="true">
         <!-- HEADER SKELETON -->
@@ -227,8 +219,8 @@
       </div>
     } @else {
       <!-- =====================================================
-         LOAD ERROR
-    ====================================================== -->
+          LOAD ERROR
+      ====================================================== -->
 
       <div class="error-message" *ngIf="loadError">
         <span class="alert-icon"> ! </span>
@@ -239,13 +231,13 @@
       </div>
 
       <!-- =====================================================
-         COOPERATIVE
-    ====================================================== -->
+          COOPERATIVE
+      ====================================================== -->
 
       <ng-container *ngIf="cooperative">
         <!-- =====================================================
-           HEADER
-      ====================================================== -->
+            HEADER
+        ====================================================== -->
 
         <div class="detail-header">
           <div class="header-left">
@@ -284,8 +276,8 @@
         </div>
 
         <!-- =====================================================
-           SUCCESS MESSAGE
-      ====================================================== -->
+            SUCCESS MESSAGE
+        ====================================================== -->
 
         <div class="alert success-alert" *ngIf="successMessage">
           <span class="alert-icon"> ✓ </span>
@@ -296,8 +288,8 @@
         </div>
 
         <!-- =====================================================
-           ERROR MESSAGE
-      ====================================================== -->
+            ERROR MESSAGE
+        ====================================================== -->
 
         <div class="alert error-alert" *ngIf="errorMessage">
           <span class="alert-icon"> ! </span>
@@ -308,13 +300,13 @@
         </div>
 
         <!-- =====================================================
-           INFORMATION PAPER
-      ====================================================== -->
+            INFORMATION PAPER
+        ====================================================== -->
 
         <div class="information-paper">
           <!-- ===================================================
-             BASIC INFORMATION
-        ==================================================== -->
+              BASIC INFORMATION
+          ==================================================== -->
 
           <section class="information-section">
             <div class="section-heading">
@@ -379,8 +371,8 @@
           </section>
 
           <!-- ===================================================
-             ADDRESS INFORMATION
-        ==================================================== -->
+              ADDRESS INFORMATION
+          ==================================================== -->
 
           <section class="information-section">
             <div class="section-heading">
@@ -445,8 +437,8 @@
           </section>
 
           <!-- ===================================================
-             CONTACT INFORMATION + ABOUT
-        ==================================================== -->
+              CONTACT INFORMATION + ABOUT
+          ==================================================== -->
 
           <div class="section-pair">
             <section class="information-section">
@@ -501,10 +493,78 @@
               </div>
             </section>
           </div>
-
           <!-- ===================================================
-             REMARKS
-        ==================================================== -->
+    MEMBER INFORMATION + ONLINE INFORMATION
+  ==================================================== -->
+
+          <div class="section-pair">
+            <!-- MEMBER INFORMATION -->
+
+            <section class="information-section">
+              <div class="section-heading">
+                <div class="section-icon">♙</div>
+
+                <div>
+                  <h2>Member Information</h2>
+
+                  <p>Current member distribution</p>
+                </div>
+              </div>
+
+              <div class="detail-grid">
+                <div class="detail-field">
+                  <span class="detail-label">Male Members</span>
+
+                  <span class="detail-value">
+                    {{ cooperative.totalMaleMembers ?? '—' }}
+                  </span>
+                </div>
+
+                <div class="detail-field">
+                  <span class="detail-label">Female Members</span>
+
+                  <span class="detail-value">
+                    {{ cooperative.totalFemaleMembers ?? '—' }}
+                  </span>
+                </div>
+
+                <div class="detail-field">
+                  <span class="detail-label">Other Members</span>
+
+                  <span class="detail-value">
+                    {{ cooperative.totalOtherMembers ?? '—' }}
+                  </span>
+                </div>
+              </div>
+            </section>
+
+            <!-- ONLINE INFORMATION -->
+
+            <section class="information-section">
+              <div class="section-heading">
+                <div class="section-icon">◎</div>
+
+                <div>
+                  <h2>Online Information</h2>
+
+                  <p>Website and online presence</p>
+                </div>
+              </div>
+
+              <div class="detail-grid">
+                <div class="detail-field field-lg">
+                  <span class="detail-label">Website URL</span>
+
+                  <span class="detail-value">
+                    {{ cooperative.webUrl || '—' }}
+                  </span>
+                </div>
+              </div>
+            </section>
+          </div>
+          <!-- ===================================================
+              REMARKS
+          ==================================================== -->
 
           <section class="information-section">
             <div class="section-heading">
@@ -541,8 +601,8 @@
           </section>
 
           <!-- ===================================================
-             TENANT INFORMATION + SYSTEM INFORMATION
-        ==================================================== -->
+              TENANT INFORMATION + SYSTEM INFORMATION
+          ==================================================== -->
 
           <div class="section-pair wide-first">
             <section class="information-section">
@@ -622,193 +682,13 @@
             </section>
           </div>
         </div>
-
-        <!-- =====================================================
-           PENDING — VERIFY & REJECT
-      ====================================================== -->
-
-        <section class="action-card pending-action" *ngIf="cooperative.status === 'PENDING'">
-          <!-- HEADER -->
-
-          <div class="action-header">
-            <div class="action-icon verify-icon">✓</div>
-
-            <div>
-              <h2>Verify Cooperative</h2>
-
-              <p>Review the cooperative information and verify it to provision the Fineract tenant.</p>
-            </div>
+        <div class="navigation-container">
+          <div class="nav-box nav-box-back">
+            <button mat-flat-button type="button" class="nav-button back-button" (click)="goBack()">Back</button>
           </div>
 
-          <!-- =================================================
-             VERIFY FORM
-        ================================================== -->
-
-          <form [formGroup]="verifyForm" (ngSubmit)="submitVerify()" class="verify-form">
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label> Admin Remarks </mat-label>
-
-              <input matInput type="text" formControlName="remarks" placeholder="Enter admin remarks" />
-
-              <mat-error *ngIf="verifyForm.get('remarks')?.hasError('required')"> Remarks are required. </mat-error>
-            </mat-form-field>
-          </form>
-
-          <!-- =================================================
-             VERIFY / REJECT BUTTONS
-        ================================================== -->
-
-          <div class="verification-actions">
-            <!-- VERIFY -->
-
-            <button
-              mat-raised-button
-              type="button"
-              class="primary-button verify-button"
-              (click)="submitVerify()"
-              [disabled]="isVerifying || isRejecting"
-            >
-              {{ isVerifying ? 'Verifying & Provisioning...' : '✓ Verify & Provision Tenant' }}
-            </button>
-
-            <!-- REJECT -->
-
-            <button
-              mat-raised-button
-              type="button"
-              class="reject-button"
-              (click)="toggleRejectForm()"
-              [disabled]="isRejecting || isVerifying"
-            >
-              ⊘ Reject Cooperative
-            </button>
-          </div>
-
-          <!-- =================================================
-             REJECTION FORM
-        ================================================== -->
-
-          <div class="reject-form-container" *ngIf="showRejectForm">
-            <div class="reject-form-header">
-              <div class="reject-form-icon">!</div>
-
-              <div>
-                <h3>Reject Cooperative</h3>
-
-                <p>
-                  Please provide a reason for rejecting this cooperative. This reason will be recorded for
-                  administrative reference.
-                </p>
-              </div>
-            </div>
-
-            <!-- REJECT FORM -->
-
-            <form [formGroup]="rejectForm" (ngSubmit)="submitReject()" class="reject-form">
-              <mat-form-field appearance="outline" class="full-width">
-                <mat-label> Rejection Reason </mat-label>
-
-                <input matInput type="text" formControlName="reason" placeholder="Enter reason for rejection" />
-
-                <mat-error *ngIf="rejectForm.get('reason')?.hasError('required')">
-                  Rejection reason is required.
-                </mat-error>
-              </mat-form-field>
-
-              <!-- REJECTION ACTIONS -->
-
-              <div class="reject-actions">
-                <button
-                  mat-button
-                  type="button"
-                  class="cancel-reject-button"
-                  (click)="toggleRejectForm()"
-                  [disabled]="isRejecting"
-                >
-                  Cancel
-                </button>
-
-                <button mat-raised-button type="submit" class="confirm-reject-button" [disabled]="isRejecting">
-                  {{ isRejecting ? 'Rejecting...' : 'Confirm Reject' }}
-                </button>
-              </div>
-            </form>
-          </div>
-        </section>
-
-        <!-- =====================================================
-           PROVISIONED — ACTIVATE TENANT
-      ====================================================== -->
-
-        <section class="action-card pending-action" *ngIf="cooperative.status === 'PROVISIONED'">
-          <!-- HEADER -->
-
-          <div class="action-header">
-            <div class="action-icon verify-icon">✓</div>
-
-            <div>
-              <h2>Activate Tenant</h2>
-
-              <p>
-                The Fineract tenant has been successfully provisioned. Activate the tenant to make it available for use.
-              </p>
-            </div>
-          </div>
-
-          <!-- =================================================
-             ACTIVATE FORM
-        ================================================== -->
-
-          <form [formGroup]="activateForm" class="verify-form">
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label> Admin Remarks </mat-label>
-
-              <input matInput type="text" formControlName="remarks" placeholder="Enter activation remarks" />
-            </mat-form-field>
-          </form>
-
-          <!-- =================================================
-             ACTIVATE BUTTON
-        ================================================== -->
-
-          <div class="verification-actions">
-            <button
-              mat-raised-button
-              type="button"
-              class="primary-button verify-button"
-              (click)="confirmActivate()"
-              [disabled]="isActivating"
-            >
-              {{ isActivating ? 'Activating Tenant...' : '✓ Activate Tenant' }}
-            </button>
-          </div>
-        </section>
-
-        <!-- =====================================================
-           ACTIVE — STATUS INFO
-      ====================================================== -->
-
-        <div class="status-info-card active-card" *ngIf="cooperative.status === 'ACTIVE'">
-          <div class="status-info-icon">✓</div>
-
-          <div>
-            <h2>Tenant Active</h2>
-
-            <p>This cooperative's Fineract tenant has been provisioned and activated, and is now fully operational.</p>
-          </div>
-        </div>
-
-        <!-- =====================================================
-           REJECTED — STATUS INFO
-      ====================================================== -->
-
-        <div class="status-info-card rejected-card" *ngIf="cooperative.status === 'REJECTED'">
-          <div class="status-info-icon">⊘</div>
-
-          <div>
-            <h2>Cooperative Rejected</h2>
-
-            <p>This cooperative's registration was rejected. See the admin remarks above for details.</p>
+          <div class="nav-box nav-box-next">
+            <button mat-flat-button type="button" class="nav-button next-button" (click)="goToDocuments()">Next</button>
           </div>
         </div>
       </ng-container>

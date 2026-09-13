@@ -129,10 +129,12 @@ export class CoopAdminDashboardComponent {
     const data = this.statsQuery.data();
 
     return {
+      UNVERIFIED_EMAIL: data?.UNVERIFIED_EMAIL ?? 0,
       PENDING: data?.PENDING ?? 0,
       PROVISIONED: data?.PROVISIONED ?? 0,
       ACTIVE: data?.ACTIVE ?? 0,
-      REJECTED: data?.REJECTED ?? 0
+      REJECTED: data?.REJECTED ?? 0,
+      WITHDRAWN: data?.WITHDRAWN ?? 0
     };
   }
 
@@ -245,7 +247,7 @@ export class CoopAdminDashboardComponent {
   viewDetails(cooperative: CoopAdminRegistration): void {
     this.router.navigate([
       '/coop/admin',
-      cooperative.id
+      cooperative.appUserId
     ]);
   }
 

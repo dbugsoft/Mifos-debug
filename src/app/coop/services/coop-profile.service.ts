@@ -26,7 +26,10 @@ export interface CoopProfile {
   houseNo: string;
   mobilePhone: string;
   officePhone: string;
-  logoUrl: string;
+  totalMaleMembers: number;
+  totalFemaleMembers: number;
+  totalOtherMembers: number;
+  webUrl: string;
   status?: string;
   about: string;
   remarks: string;

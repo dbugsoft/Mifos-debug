@@ -1,0 +1,80 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="success-page">
+  <!-- =====================================================
+       NAVBAR
+       ===================================================== -->
+
+  <nav class="dashboard-navbar">
+    <!-- BRAND -->
+
+    <div class="navbar-brand">
+      <div class="navbar-icon" aria-hidden="true">⚙</div>
+
+      <div class="navbar-text">
+        <span class="eyebrow"> ADMINISTRATION </span>
+
+        <h1>Cooperative Dashboard</h1>
+
+        <p>Review, verify and manage cooperative registrations.</p>
+      </div>
+    </div>
+
+    <!-- NAVIGATION -->
+
+    <ul class="navbar-links">
+      <li>
+        <a routerLink="/coop/admin" class="nav-link"> Home </a>
+      </li>
+
+      <li>
+        <a href="javascript:void(0)" class="nav-link"> About </a>
+      </li>
+
+      <li>
+        <a href="javascript:void(0)" class="nav-link"> Contact us </a>
+      </li>
+    </ul>
+
+    <!-- LOGOUT -->
+
+    <button mat-raised-button type="button" class="logout-button" (click)="logout()">Logout</button>
+  </nav>
+
+  <!-- =====================================================
+       SUCCESS CONTENT
+       ===================================================== -->
+
+  <main class="success-content">
+    <section class="success-card" aria-labelledby="success-title">
+      <!-- SUCCESS ICON -->
+
+      <div class="success-icon-wrapper">
+        <div class="success-icon" aria-hidden="true">
+          <span class="checkmark"> ✓ </span>
+        </div>
+      </div>
+
+      <!-- SUCCESS MESSAGE -->
+
+      <div class="success-message">
+        <span class="success-label"> Registration Successful </span>
+
+        <h2 id="success-title">Your cooperative registration has been successfully submitted.</h2>
+
+        <p>
+          We’ve received your registration details and submitted documents. Our team will carefully review your
+          application and get back to you soon.
+        </p>
+
+        <p class="stay-tuned">Stay tuned for our message.</p>
+      </div>
+    </section>
+  </main>
+</div>

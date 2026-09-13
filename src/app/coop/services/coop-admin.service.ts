@@ -48,6 +48,9 @@ export interface CoopAdminRegistration {
   activatedAt?: string;
   createdAt: string;
   updatedAt: string;
+  totalMaleMembers?: number;
+  totalFemaleMembers?: number;
+  totalOtherMembers?: number;
 }
 
 export interface CoopAdminListParams {
@@ -66,10 +69,12 @@ export interface CoopAdminRejectRequest {
 }
 
 export interface CoopAdminStats {
+  UNVERIFIED_EMAIL: number;
   PENDING: number;
   PROVISIONED: number;
   ACTIVE: number;
   REJECTED: number;
+  WITHDRAWN: number;
 }
 
 /**
@@ -130,8 +135,8 @@ export class CoopAdminService {
    *
    * Full detail for a single cooperative.
    */
-  getCooperativeById(id: number): Observable<CoopAdminRegistration> {
-    return this.http.get<CoopAdminRegistration>(`${this.baseUrl}/${id}`);
+  getCooperativeById(appUserId: number): Observable<CoopAdminRegistration> {
+    return this.http.get<CoopAdminRegistration>(`${this.baseUrl}/${appUserId}`);
   }
 
   /**
@@ -142,10 +147,10 @@ export class CoopAdminService {
    * response's status becomes PROVISIONED and includes
    * tenantIdentifier / provisionedAt.
    */
-  verifyCooperative(id: number, remarks: string): Observable<CoopAdminRegistration> {
+  verifyCooperative(appUserId: number, remarks: string): Observable<CoopAdminRegistration> {
     const body: CoopAdminVerifyRequest = { remarks };
 
-    return this.http.post<CoopAdminRegistration>(`${this.baseUrl}/${id}/verify`, body);
+    return this.http.post<CoopAdminRegistration>(`${this.baseUrl}/${appUserId}/verify`, body);
   }
 
   /**
@@ -154,10 +159,10 @@ export class CoopAdminService {
    * Valid only while status is PENDING; on success the
    * response's status becomes REJECTED.
    */
-  rejectCooperative(id: number, reason: string): Observable<CoopAdminRegistration> {
+  rejectCooperative(appUserId: number, reason: string): Observable<CoopAdminRegistration> {
     const body: CoopAdminRejectRequest = { reason };
 
-    return this.http.post<CoopAdminRegistration>(`${this.baseUrl}/${id}/reject`, body);
+    return this.http.post<CoopAdminRegistration>(`${this.baseUrl}/${appUserId}/reject`, body);
   }
 
   /**
@@ -167,8 +172,8 @@ export class CoopAdminService {
    * the response's status becomes ACTIVE and includes
    * activatedAt. No request body.
    */
-  activateCooperative(id: number): Observable<CoopAdminRegistration> {
-    return this.http.post<CoopAdminRegistration>(`${this.baseUrl}/${id}/activate`, {});
+  activateCooperative(appUserId: number): Observable<CoopAdminRegistration> {
+    return this.http.post<CoopAdminRegistration>(`${this.baseUrl}/${appUserId}/activate`, {});
   }
 
   /**
