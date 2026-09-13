@@ -1,0 +1,481 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="admin-detail-page">
+  <!-- =====================================================
+       FIXED NAVBAR
+       A direct flex child of .admin-detail-page (not inside
+       the scrollable content area below), so it never moves
+       while the page underneath is scrolled.
+       ===================================================== -->
+
+  <mifosx-coop-admin-navbar></mifosx-coop-admin-navbar>
+
+  <!-- =====================================================
+       FULL PAGE VERIFY + PROVISION LOADER
+       ===================================================== -->
+
+  <div class="provisioning-overlay" *ngIf="isVerifyingAndProvisioning" aria-live="polite" aria-busy="true">
+    <div class="provisioning-loader">
+      <mat-spinner diameter="56" strokeWidth="4"></mat-spinner>
+
+      <h2 class="provisioning-title">Verifying and Provisioning</h2>
+
+      <p class="provisioning-subtitle">Please wait!</p>
+
+      <p class="provisioning-hint">It takes some time...</p>
+    </div>
+  </div>
+
+  <div class="admin-detail-content">
+    <div class="detail-container">
+      <!-- =================================================
+           LOADING SKELETON
+
+           Mirrors the real header + unified card layout so
+           nothing shifts once the actual content swaps in.
+           ================================================= -->
+
+      <div class="loading-skeleton" *ngIf="loading">
+        <!-- Header skeleton -->
+
+        <div class="skeleton-header">
+          <div class="skeleton skeleton-icon-circle"></div>
+
+          <div class="skeleton-header-text">
+            <div class="skeleton skeleton-title-line"></div>
+            <div class="skeleton skeleton-subtitle-line"></div>
+          </div>
+
+          <div class="skeleton skeleton-badge"></div>
+        </div>
+
+        <!-- Unified card skeleton -->
+
+        <div class="skeleton-card">
+          <div class="skeleton-card-heading">
+            <div class="skeleton skeleton-icon-square"></div>
+
+            <div class="skeleton-card-heading-text">
+              <div class="skeleton skeleton-heading-line"></div>
+              <div class="skeleton skeleton-subheading-line"></div>
+            </div>
+          </div>
+
+          <div class="skeleton-grid">
+            <div class="skeleton-grid-item" *ngFor="let item of [1, 2, 3, 4]">
+              <div class="skeleton skeleton-label-line"></div>
+              <div class="skeleton skeleton-value-line"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- =================================================
+           LOAD ERROR
+           ================================================= -->
+
+      <div class="error-card" *ngIf="!loading && loadError">
+        <div class="error-icon">
+          <mat-icon> error_outline </mat-icon>
+        </div>
+
+        <div class="error-content">
+          <h2>Unable to load cooperative</h2>
+
+          <p>
+            {{ loadError }}
+          </p>
+        </div>
+
+        <button mat-stroked-button type="button" class="retry-button" (click)="reload()">
+          <mat-icon> refresh </mat-icon>
+
+          Retry
+        </button>
+      </div>
+
+      <!-- =================================================
+           MAIN CONTENT
+           ================================================= -->
+
+      <ng-container *ngIf="!loading && !loadError && cooperative">
+        <!-- =================================================
+             SUCCESS MESSAGE
+             Hide when cooperative is ACTIVE because the
+             activation success is shown in the ACTIVE card.
+             ================================================= -->
+
+        <div class="message-card success-message" *ngIf="successMessage && cooperative.status !== 'ACTIVE'">
+          <mat-icon> check_circle </mat-icon>
+
+          <span>
+            {{ successMessage }}
+          </span>
+        </div>
+
+        <!-- =================================================
+             ACTION ERROR MESSAGE
+             ================================================= -->
+
+        <div class="message-card error-message" *ngIf="errorMessage">
+          <mat-icon> error_outline </mat-icon>
+
+          <span>
+            {{ errorMessage }}
+          </span>
+        </div>
+
+        <!-- =================================================
+             CARD 1
+             COOPERATIVE NAME + STATUS
+             ================================================= -->
+
+        <section class="detail-header">
+          <div class="header-left">
+            <div class="coop-icon">
+              <mat-icon> account_balance </mat-icon>
+            </div>
+
+            <div class="header-text">
+              <h1>
+                {{ cooperative.nameEn || cooperative.name }}
+              </h1>
+
+              <p class="name-np" *ngIf="cooperative.nameNp">
+                {{ cooperative.nameNp }}
+              </p>
+
+              <p class="subtitle">Cooperative Registration Details</p>
+            </div>
+          </div>
+
+          <div class="header-status">
+            <span
+              class="status-badge"
+              [ngClass]="{
+                'status-pending': cooperative.status === 'PENDING',
+
+                'status-provisioned': cooperative.status === 'PROVISIONED',
+
+                'status-active': cooperative.status === 'ACTIVE',
+
+                'status-rejected': cooperative.status === 'REJECTED'
+              }"
+            >
+              <span class="status-dot"></span>
+
+              {{ cooperative.status }}
+            </span>
+          </div>
+        </section>
+
+        <!-- =================================================
+             CARD 2
+             COOPERATIVE INFORMATION + VERIFY/PROVISION/ACTIVATE
+             Merged into a single unified card - the summary
+             grid and the status-dependent action section below
+             share one card shell instead of two stacked cards.
+             ================================================= -->
+
+        <section class="unified-info-card">
+          <section class="summary-card">
+            <div class="card-heading">
+              <div class="card-heading-icon">
+                <mat-icon> badge </mat-icon>
+              </div>
+
+              <div>
+                <h2>Cooperative Information</h2>
+
+                <p>Basic identification and registration details</p>
+              </div>
+            </div>
+
+            <div class="summary-grid">
+              <!-- COOP ID -->
+
+              <div class="summary-item">
+                <span class="summary-label"> Coop ID </span>
+
+                <span class="summary-value">
+                  {{ cooperative.id || '—' }}
+                </span>
+              </div>
+
+              <!-- COOP CODE -->
+
+              <div class="summary-item">
+                <span class="summary-label"> Coop Code </span>
+
+                <span class="summary-value">
+                  {{ cooperative.cooperativeCode || '—' }}
+                </span>
+              </div>
+
+              <!-- REGISTRATION NUMBER -->
+
+              <div class="summary-item">
+                <span class="summary-label"> Registration Number </span>
+
+                <span class="summary-value">
+                  {{ cooperative.coopRegdNo || '—' }}
+                </span>
+              </div>
+
+              <!-- PAN -->
+
+              <div class="summary-item">
+                <span class="summary-label"> PAN Number </span>
+
+                <span class="summary-value">
+                  {{ cooperative.panNo || '—' }}
+                </span>
+              </div>
+            </div>
+          </section>
+
+          <!-- =================================================
+             CARD 3
+             PENDING — VERIFY + REJECT
+             ================================================= -->
+
+          <section class="action-card pending-action" *ngIf="cooperative.status === 'PENDING'">
+            <div class="action-header">
+              <div class="action-icon verify-icon">
+                <mat-icon> verified_user </mat-icon>
+              </div>
+
+              <div>
+                <h2>Verify & Provision</h2>
+
+                <p>Verify the cooperative information and provision its tenant before activation.</p>
+              </div>
+            </div>
+
+            <!-- VERIFY FORM -->
+
+            <form class="verify-form" [formGroup]="verifyForm" (ngSubmit)="submitVerify()">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label> Verification Remarks </mat-label>
+
+                <input matInput formControlName="remarks" placeholder="Enter verification remarks..." />
+
+                <mat-error *ngIf="verifyForm.controls.remarks.hasError('required')">
+                  Verification remarks are required.
+                </mat-error>
+              </mat-form-field>
+
+              <!-- BUTTONS -->
+
+              <div class="verification-actions">
+                <button mat-flat-button type="submit" class="primary-button verify-button" [disabled]="isVerifying">
+                  <mat-spinner *ngIf="isVerifying" diameter="18"></mat-spinner>
+
+                  <mat-icon *ngIf="!isVerifying"> verified </mat-icon>
+
+                  <span>
+                    {{ isVerifying ? 'Verifying & Provisioning...' : 'Verify & Provision' }}
+                  </span>
+                </button>
+
+                <button
+                  mat-stroked-button
+                  type="button"
+                  class="reject-button"
+                  (click)="toggleRejectForm()"
+                  [disabled]="isVerifying || isRejecting"
+                >
+                  <mat-icon> block </mat-icon>
+
+                  Reject
+                </button>
+              </div>
+            </form>
+
+            <!-- =================================================
+               REJECT FORM
+               ================================================= -->
+
+            <div class="reject-form-container" *ngIf="showRejectForm">
+              <div class="reject-form-header">
+                <div class="reject-form-icon">
+                  <mat-icon> warning </mat-icon>
+                </div>
+
+                <div>
+                  <h3>Reject Cooperative</h3>
+
+                  <p>Please provide a reason for rejecting this cooperative registration.</p>
+                </div>
+              </div>
+
+              <form [formGroup]="rejectForm" (ngSubmit)="submitReject()">
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label> Rejection Reason </mat-label>
+
+                  <textarea
+                    matInput
+                    formControlName="reason"
+                    rows="4"
+                    placeholder="Enter rejection reason..."
+                  ></textarea>
+
+                  <mat-error *ngIf="rejectForm.controls.reason.hasError('required')">
+                    Rejection reason is required.
+                  </mat-error>
+                </mat-form-field>
+
+                <div class="reject-actions">
+                  <button
+                    mat-stroked-button
+                    type="button"
+                    class="cancel-reject-button"
+                    (click)="toggleRejectForm()"
+                    [disabled]="isRejecting"
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    mat-flat-button
+                    type="submit"
+                    class="confirm-reject-button"
+                    [disabled]="rejectForm.invalid || isRejecting || isVerifying"
+                  >
+                    <mat-spinner *ngIf="isRejecting" diameter="18"></mat-spinner>
+
+                    <mat-icon *ngIf="!isRejecting"> block </mat-icon>
+
+                    <span>
+                      {{ isRejecting ? 'Rejecting...' : 'Confirm Rejection' }}
+                    </span>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </section>
+
+          <!-- =================================================
+             CARD 3
+             PROVISIONED — ACTIVATE
+             ================================================= -->
+
+          <section class="action-card provisioned-action" *ngIf="cooperative.status === 'PROVISIONED'">
+            <div class="action-header">
+              <div class="action-icon provisioned-icon">
+                <mat-icon> cloud_done </mat-icon>
+              </div>
+
+              <div>
+                <h2>Activate Cooperative</h2>
+
+                <p>
+                  The cooperative tenant has been successfully provisioned. Activate it to make the cooperative fully
+                  operational.
+                </p>
+              </div>
+            </div>
+
+            <!-- ACTIVATE FORM -->
+
+            <form class="activate-form" [formGroup]="activateForm" (ngSubmit)="confirmActivate()">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label> Activation Remarks </mat-label>
+
+                <textarea
+                  matInput
+                  formControlName="remarks"
+                  rows="3"
+                  placeholder="Enter activation remarks..."
+                ></textarea>
+
+                <mat-error *ngIf="activateForm.controls.remarks.hasError('required')">
+                  Activation remarks are required.
+                </mat-error>
+              </mat-form-field>
+
+              <div class="activation-actions">
+                <button mat-flat-button type="submit" class="primary-button activate-button" [disabled]="isActivating">
+                  <mat-spinner *ngIf="isActivating" diameter="18"></mat-spinner>
+
+                  <mat-icon *ngIf="!isActivating"> check_circle </mat-icon>
+
+                  <span>
+                    {{ isActivating ? 'Activating...' : 'Activate Cooperative' }}
+                  </span>
+                </button>
+              </div>
+            </form>
+          </section>
+        </section>
+
+        <!-- =================================================
+             ACTIVE
+             Tenant Activated Successfully
+             ================================================= -->
+
+        <section class="status-info-card active-status-card" *ngIf="cooperative.status === 'ACTIVE'">
+          <!-- SUCCESS ICON -->
+
+          <div class="status-info-icon">
+            <mat-icon> check_circle </mat-icon>
+          </div>
+
+          <!-- SUCCESS CONTENT -->
+
+          <div class="status-info-content">
+            <h2>Tenant has been activated successfully.</h2>
+
+            <div class="tenant-info">
+              <span class="tenant-label"> Tenant Identifier </span>
+
+              <span class="tenant-value" *ngIf="cooperative.tenantIdentifier">
+                {{ cooperative.tenantIdentifier }}
+              </span>
+
+              <span class="tenant-value tenant-empty" *ngIf="!cooperative.tenantIdentifier"> — </span>
+            </div>
+          </div>
+        </section>
+
+        <!-- =================================================
+             REJECTED
+             ================================================= -->
+
+        <section class="status-info-card rejected-status-card" *ngIf="cooperative.status === 'REJECTED'">
+          <div class="status-info-icon">
+            <mat-icon> cancel </mat-icon>
+          </div>
+
+          <div class="status-info-content">
+            <h2>Cooperative Registration Rejected</h2>
+
+            <p>This cooperative registration has been rejected.</p>
+
+            <div class="rejection-remarks" *ngIf="cooperative.adminRemarks">
+              <span class="remarks-label"> Rejection Reason </span>
+
+              <p>
+                {{ cooperative.adminRemarks }}
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- =================================================
+             BACK BUTTON
+             ================================================= -->
+
+        <div class="page-actions">
+          <button mat-stroked-button type="button" class="back-button" (click)="goBack()">Back</button>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</div>

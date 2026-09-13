@@ -9,7 +9,7 @@
 import { Component, computed, inject } from '@angular/core';
 import { CoopAdminNavbarComponent } from '../coop-admin-navbar/coop-admin-navbar.component';
 import { CommonModule } from '@angular/common';
-
+import { CoopAdminDocumentsComponent } from '../coop-admin-documents/coop-admin-documents.component';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -46,7 +46,8 @@ import { extractCoopErrorMessage } from '../../queries/coop-error.util';
     RouterLink,
     MatButtonModule,
     MatFormFieldModule,
-    MatInputModule
+    MatInputModule,
+    CoopAdminDocumentsComponent
   ],
 
   templateUrl: './coop-admin-detail.component.html',
@@ -175,21 +176,21 @@ export class CoopAdminDetailComponent {
   }
 
   private verifyMutation = injectMutation(() => ({
-    mutationFn: (variables: { id: number; remarks: string }) =>
-      firstValueFrom(this.coopAdminService.verifyCooperative(variables.id, variables.remarks)),
+    mutationFn: (variables: { appUserId: number; remarks: string }) =>
+      firstValueFrom(this.coopAdminService.verifyCooperative(variables.appUserId, variables.remarks)),
 
     onSuccess: (updated) => this.applyMutationResult(updated)
   }));
 
   private rejectMutation = injectMutation(() => ({
-    mutationFn: (variables: { id: number; reason: string }) =>
-      firstValueFrom(this.coopAdminService.rejectCooperative(variables.id, variables.reason)),
+    mutationFn: (variables: { appUserId: number; reason: string }) =>
+      firstValueFrom(this.coopAdminService.rejectCooperative(variables.appUserId, variables.reason)),
 
     onSuccess: (updated) => this.applyMutationResult(updated)
   }));
 
   private activateMutation = injectMutation(() => ({
-    mutationFn: (id: number) => firstValueFrom(this.coopAdminService.activateCooperative(id)),
+    mutationFn: (appUserId: number) => firstValueFrom(this.coopAdminService.activateCooperative(appUserId)),
 
     onSuccess: (updated) => this.applyMutationResult(updated)
   }));
@@ -273,7 +274,7 @@ export class CoopAdminDetailComponent {
     const remarks = this.verifyForm.getRawValue().remarks;
 
     this.verifyMutation.mutate(
-      { id: cooperative.id, remarks },
+      { appUserId: cooperative.appUserId, remarks },
       {
         onSuccess: () => {
           this.successMessage = 'Cooperative verified and tenant provisioned successfully.';
@@ -324,7 +325,7 @@ export class CoopAdminDetailComponent {
     const reason = this.rejectForm.getRawValue().reason;
 
     this.rejectMutation.mutate(
-      { id: cooperative.id, reason },
+      { appUserId: cooperative.appUserId, reason },
       {
         onSuccess: () => {
           this.successMessage = 'Cooperative has been rejected.';
@@ -352,7 +353,32 @@ export class CoopAdminDetailComponent {
 
     this.successMessage = '';
   }
+  // =====================================================
+  // GO BACK
+  // =====================================================
 
+  goBack(): void {
+    this.router.navigate(['/coop/admin']);
+  }
+
+  // =====================================================
+  // GO TO DOCUMENTS
+  // =====================================================
+
+  goToDocuments(): void {
+    const cooperative = this.cooperative;
+
+    if (!cooperative?.appUserId) {
+      return;
+    }
+
+    this.router.navigate([
+      '/coop',
+      'admin',
+      cooperative.appUserId,
+      'documents'
+    ]);
+  }
   // =====================================================
   // ACTIVATE TENANT
   // PROVISIONED -> ACTIVE
@@ -375,7 +401,7 @@ export class CoopAdminDetailComponent {
 
     this.errorMessage = '';
 
-    this.activateMutation.mutate(cooperative.id, {
+    this.activateMutation.mutate(cooperative.appUserId, {
       onSuccess: () => {
         this.successMessage = 'Tenant has been activated successfully.';
 
