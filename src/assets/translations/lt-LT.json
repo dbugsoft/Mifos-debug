@@ -339,8 +339,8 @@
         "message": "Reikalinga dviejų veiksnių autentifikacija"
       },
       "passwordExpired": {
-        "type": "Slaptažodis pasibaigė",
-        "message": "Jūsų slaptažodis pasibaigė, prašome jį atstatyti!"
+        "type": "Nustatykite naują slaptažodį",
+        "message": "Saugumo sumetimais prieš tęsdami pasirinkite naują slaptažodį."
       },
       "success": {
         "type": "Autentifikacija sėkminga",
@@ -3780,6 +3780,17 @@
       "Please select a delivery method": "Pasirinkite pristatymo būdą",
       "Please select a screen report.": "Pasirinkite ekrano ataskaitą.",
       "Please update your password": "Prašome atnaujinti slaptažodį",
+      "Temporary password notice": "If you're signing in with a temporary password, choose a new one to finish setting up your account.",
+      "Your new password must": "Your new password must:",
+      "Signed in as": "Signed in as",
+      "Password rule min length": "Be at least {{min}} characters long",
+      "Password rule max length": "Be at most 50 characters long",
+      "Password rule uppercase": "Include an uppercase letter (A–Z)",
+      "Password rule lowercase": "Include a lowercase letter (a–z)",
+      "Password rule number": "Include a number (0–9)",
+      "Password rule special character": "Include a special character, e.g. # @ !",
+      "Password rule no spaces": "Not contain spaces",
+      "Password rule no repeats": "Not repeat the same character twice in a row (e.g. aa, 11)",
       "Powered by": "Varomas",
       "Precedes of": "Prieštaravimai",
       "Preferences for generating account numbers for client": "Klientų, paskolų ir taupomųjų sąskaitų numerių generavimo nuostatos",

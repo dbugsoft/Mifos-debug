@@ -13,6 +13,8 @@ import { Routes, RouterModule } from '@angular/router';
 // Not Found Component
 import { NotFoundComponent } from './not-found/not-found.component';
 import { CallbackComponent } from './zitadel/callback/callback.component';
+import { UnconfiguredHostComponent } from './unconfigured-host/unconfigured-host.component';
+import { unmappedHostGuard } from './unconfigured-host/unmapped-host.guard';
 
 /**
  * App routing module.
@@ -22,7 +24,13 @@ import { CallbackComponent } from './zitadel/callback/callback.component';
 const routes: Routes = [
   {
     path: 'login',
+    // Opt-in (window.env.blockUnmappedHosts): refuse to sign in on a host mapped to no cooperative.
+    canActivate: [unmappedHostGuard],
     loadChildren: () => import('./login/login.module').then((m) => m.LoginModule)
+  },
+  {
+    path: 'unconfigured-host',
+    component: UnconfiguredHostComponent
   },
   {
     path: 'coop',

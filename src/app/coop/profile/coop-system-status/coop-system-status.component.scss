@@ -1,0 +1,165 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+:host {
+  display: block;
+}
+
+.system-status-card {
+  max-width: 1180px;
+  margin: 0 auto 20px;
+  padding: 20px 24px;
+  box-sizing: border-box;
+  border: 1.5px solid #cfe6f7;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgb(16 42 67 / 5%);
+}
+
+.system-status-card.active {
+  border-color: #c9ead6;
+  background: linear-gradient(180deg, #f3fbf6 0%, #fff 120px);
+}
+
+.system-status-card.danger {
+  border-color: #f1cccc;
+  background: #fdeeee;
+}
+
+.system-status-card.muted-card {
+  border-color: #e2e8ed;
+  background: #fafbfc;
+}
+
+.card-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  border-radius: 11px;
+  background: #eaf4fb;
+  color: #1074b9;
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.active .card-icon {
+  background: #eaf7ef;
+  color: #2e8b57;
+}
+
+.danger .card-icon {
+  background: #c94b4b;
+  color: #fff;
+}
+
+.card-heading h2 {
+  margin: 0 0 4px;
+  color: #172b3a;
+  font-size: 15.5px;
+  font-weight: 750;
+}
+
+.card-heading p {
+  margin: 0;
+  color: #45525c;
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+.sign-in-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 18px 0 14px;
+}
+
+.detail {
+  display: flex;
+  flex: 1 1 220px;
+  flex-direction: column;
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1.5px solid #e2e8ed;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.detail dt {
+  margin-bottom: 6px;
+  color: #7d8b95;
+  font-size: 9.5px;
+  font-weight: 750;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.detail dd {
+  margin: 0;
+  color: #172b3a;
+  font-size: 13px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.copyable {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.copyable code {
+  font-family: SFMono-Regular, Consolas, 'Liberation Mono', monospace;
+  font-size: 12.5px;
+}
+
+.copy-button {
+  padding: 3px 10px;
+  border: 1px solid #e2e8ed;
+  border-radius: 7px;
+  background: #fff;
+  color: #1074b9;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.copy-button:hover {
+  background: #eaf4fb;
+}
+
+.sign-in-link {
+  color: #1074b9;
+  text-decoration: none;
+}
+
+.sign-in-link:hover {
+  text-decoration: underline;
+}
+
+.muted {
+  color: #7d8b95;
+  font-weight: 500;
+}
+
+.guidance {
+  margin: 0;
+  padding-left: 20px;
+  color: #45525c;
+  font-size: 12.5px;
+  line-height: 1.7;
+}

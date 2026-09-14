@@ -58,10 +58,28 @@ export interface CoopLocation {
 export interface CoopMe {
   emailVerified: boolean;
   phone: string;
-  userId: number;
+  /** Opaque public id (a UUID string), never the internal numeric id. */
+  userId: string;
   status: string;
   email: string;
   role: string;
+}
+
+export type CoopApplicationStatus =
+  'NO_PROFILE' | 'UNVERIFIED_EMAIL' | 'PENDING' | 'PROVISIONED' | 'ACTIVE' | 'REJECTED' | 'WITHDRAWN';
+
+/**
+ * GET /public/status. Sign-in details (frontendUrl, tenantAdminUsername)
+ * are present only once the cooperative is ACTIVE. Never a password.
+ */
+export interface CoopSystemStatus {
+  email: string;
+  status: CoopApplicationStatus;
+  cooperativeCode?: string;
+  tenantIdentifier?: string;
+  frontendUrl?: string;
+  tenantAdminUsername?: string;
+  message?: string;
 }
 
 /**
@@ -84,6 +102,8 @@ export class CoopProfileService {
 
   private readonly meUrl = `${environment.coopApiUrl}/nepal/coop-registration/public/me`;
 
+  private readonly statusUrl = `${environment.coopApiUrl}/nepal/coop-registration/public/status`;
+
   // =====================================================
   // PROFILE
   // =====================================================
@@ -102,6 +122,11 @@ export class CoopProfileService {
 
   getMe(): Observable<CoopMe> {
     return this.http.get<CoopMe>(this.meUrl);
+  }
+
+  /** Where the application stands and, once ACTIVE, where and as whom to sign in. */
+  getStatus(): Observable<CoopSystemStatus> {
+    return this.http.get<CoopSystemStatus>(this.statusUrl);
   }
 
   // =====================================================

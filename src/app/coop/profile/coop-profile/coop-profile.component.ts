@@ -32,6 +32,7 @@ import { CoopTokenService } from '../../services/coop-token.service';
 
 import { CoopLocation, CoopProfile, CoopProfileService } from '../../services/coop-profile.service';
 import { CoopNavbarComponent } from '../../coop-navbar/coop-navbar.component';
+import { CoopSystemStatusComponent } from '../coop-system-status/coop-system-status.component';
 import { locationsQueryOptions, profileQueryOptions } from '../../queries/coop-profile.queries';
 import { coopQueryKeys } from '../../queries/coop-query-keys';
 import { extractCoopErrorMessage } from '../../queries/coop-error.util';
@@ -49,7 +50,8 @@ import { extractCoopErrorMessage } from '../../queries/coop-error.util';
     MatButtonModule,
     MatSelectModule,
     MatStepperModule,
-    CoopNavbarComponent
+    CoopNavbarComponent,
+    CoopSystemStatusComponent
   ],
 
   templateUrl: './coop-profile.component.html',
