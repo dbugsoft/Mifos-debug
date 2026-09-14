@@ -53,11 +53,14 @@ export interface CoopAdminRegistration {
   activatedAt?: string;
   createdAt: string;
   updatedAt: string;
+  totalMaleMembers?: number;
+  totalFemaleMembers?: number;
+  totalOtherMembers?: number;
 
   // ---- tenant access handover ----
   /** The web address the cooperative signs in at. Set by a registry admin. */
   frontendUrl?: string;
-  /** The managed administrator account, e.g. admin.2079saji0009. Absent on tenants that predate this feature. */
+  /** The managed administrator account, e.g. sajilo.admin.k7m2. Absent on tenants that predate this feature. */
   tenantAdminUsername?: string;
   accessEmailStatus?: AccessEmailStatus;
   accessEmailLastAttemptAt?: string;
@@ -103,12 +106,12 @@ export interface CoopAdminRejectRequest {
 }
 
 export interface CoopAdminStats {
-  UNVERIFIED_EMAIL?: number;
+  UNVERIFIED_EMAIL: number;
   PENDING: number;
   PROVISIONED: number;
   ACTIVE: number;
   REJECTED: number;
-  WITHDRAWN?: number;
+  WITHDRAWN: number;
 }
 
 /**

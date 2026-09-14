@@ -1,0 +1,792 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="admin-detail-page">
+  <!-- =====================================================
+       FIXED NAVBAR
+       A direct flex child of .admin-detail-page (not inside
+       the scrollable content area below), so it never moves
+       while the page underneath is scrolled.
+       ===================================================== -->
+
+  <mifosx-coop-admin-navbar></mifosx-coop-admin-navbar>
+
+  <!-- =====================================================
+       FULL PAGE LOADER
+       Verify + provision, and the tenant access actions that
+       also touch the tenant database.
+       ===================================================== -->
+
+  <div class="provisioning-overlay" *ngIf="busyOverlay as overlay" role="status" aria-live="polite" aria-busy="true">
+    <div class="provisioning-loader">
+      <mat-spinner diameter="56" strokeWidth="4"></mat-spinner>
+
+      <h2 class="provisioning-title">{{ overlay.title }}</h2>
+
+      <p class="provisioning-subtitle">Please wait!</p>
+
+      <p class="provisioning-hint">{{ overlay.note }}</p>
+    </div>
+  </div>
+
+  <div class="admin-detail-content">
+    <div class="detail-container">
+      <!-- =================================================
+           LOADING SKELETON
+
+           Mirrors the real header + unified card layout so
+           nothing shifts once the actual content swaps in.
+           ================================================= -->
+
+      <div class="loading-skeleton" *ngIf="loading">
+        <!-- Header skeleton -->
+
+        <div class="skeleton-header">
+          <div class="skeleton skeleton-icon-circle"></div>
+
+          <div class="skeleton-header-text">
+            <div class="skeleton skeleton-title-line"></div>
+            <div class="skeleton skeleton-subtitle-line"></div>
+          </div>
+
+          <div class="skeleton skeleton-badge"></div>
+        </div>
+
+        <!-- Unified card skeleton -->
+
+        <div class="skeleton-card">
+          <div class="skeleton-card-heading">
+            <div class="skeleton skeleton-icon-square"></div>
+
+            <div class="skeleton-card-heading-text">
+              <div class="skeleton skeleton-heading-line"></div>
+              <div class="skeleton skeleton-subheading-line"></div>
+            </div>
+          </div>
+
+          <div class="skeleton-grid">
+            <div class="skeleton-grid-item" *ngFor="let item of [1, 2, 3, 4]">
+              <div class="skeleton skeleton-label-line"></div>
+              <div class="skeleton skeleton-value-line"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- =================================================
+           LOAD ERROR
+           ================================================= -->
+
+      <div class="error-card" *ngIf="!loading && loadError">
+        <div class="error-icon">
+          <mat-icon> error_outline </mat-icon>
+        </div>
+
+        <div class="error-content">
+          <h2>Unable to load cooperative</h2>
+
+          <p>
+            {{ loadError }}
+          </p>
+        </div>
+
+        <button mat-stroked-button type="button" class="retry-button" (click)="reload()">
+          <mat-icon> refresh </mat-icon>
+
+          Retry
+        </button>
+      </div>
+
+      <!-- =================================================
+           MAIN CONTENT
+           ================================================= -->
+
+      <ng-container *ngIf="!loading && !loadError && cooperative">
+        <!-- =================================================
+             SUCCESS MESSAGE
+             ================================================= -->
+
+        <div class="message-card success-message" *ngIf="successMessage" role="status">
+          <mat-icon> check_circle </mat-icon>
+
+          <span>
+            {{ successMessage }}
+          </span>
+        </div>
+
+        <!-- =================================================
+             ACTION ERROR MESSAGE
+             ================================================= -->
+
+        <div class="message-card error-message" *ngIf="errorMessage" role="alert">
+          <mat-icon> error_outline </mat-icon>
+
+          <span>
+            {{ errorMessage }}
+          </span>
+        </div>
+
+        <!-- =================================================
+             ACTIVATION RESULT
+             Keyed on whether the sign-in email went out.
+             ================================================= -->
+
+        <div
+          class="message-card"
+          *ngIf="activationResult as banner"
+          [class.success-message]="banner.kind === 'success'"
+          [class.warning-message]="banner.kind === 'warning'"
+          role="status"
+        >
+          <mat-icon>{{ banner.kind === 'success' ? 'check_circle' : 'warning_amber' }}</mat-icon>
+
+          <div class="message-body">
+            <strong>{{ banner.title }}</strong>
+
+            <span *ngIf="banner.detail">{{ banner.detail }}</span>
+          </div>
+        </div>
+
+        <!-- =================================================
+             CARD 1
+             COOPERATIVE NAME + STATUS
+             ================================================= -->
+
+        <section class="detail-header">
+          <div class="header-left">
+            <div class="coop-icon">
+              <mat-icon> account_balance </mat-icon>
+            </div>
+
+            <div class="header-text">
+              <h1>
+                {{ cooperative.nameEn || cooperative.name }}
+              </h1>
+
+              <p class="name-np" *ngIf="cooperative.nameNp">
+                {{ cooperative.nameNp }}
+              </p>
+
+              <p class="subtitle">Cooperative Registration Details</p>
+            </div>
+          </div>
+
+          <div class="header-status">
+            <span
+              class="status-badge"
+              [ngClass]="{
+                'status-pending': cooperative.status === 'PENDING',
+
+                'status-provisioned': cooperative.status === 'PROVISIONED',
+
+                'status-active': cooperative.status === 'ACTIVE',
+
+                'status-rejected': cooperative.status === 'REJECTED'
+              }"
+            >
+              <span class="status-dot"></span>
+
+              {{ cooperative.status }}
+            </span>
+          </div>
+        </section>
+
+        <!-- =================================================
+             CARD 2
+             COOPERATIVE INFORMATION + STATUS-DEPENDENT ACTIONS
+             Merged into a single unified card - the summary
+             grid and the status-dependent action section below
+             share one card shell instead of two stacked cards.
+             ================================================= -->
+
+        <section class="unified-info-card">
+          <section class="summary-card">
+            <div class="card-heading">
+              <div class="card-heading-icon">
+                <mat-icon> badge </mat-icon>
+              </div>
+
+              <div>
+                <h2>Cooperative Information</h2>
+
+                <p>Basic identification and registration details</p>
+              </div>
+            </div>
+
+            <div class="summary-grid">
+              <!-- COOP ID -->
+
+              <div class="summary-item">
+                <span class="summary-label"> Coop ID </span>
+
+                <span class="summary-value">
+                  {{ cooperative.id || '—' }}
+                </span>
+              </div>
+
+              <!-- COOP CODE -->
+
+              <div class="summary-item">
+                <span class="summary-label"> Coop Code </span>
+
+                <span class="summary-value">
+                  {{ cooperative.cooperativeCode || '—' }}
+                </span>
+              </div>
+
+              <!-- REGISTRATION NUMBER -->
+
+              <div class="summary-item">
+                <span class="summary-label"> Registration Number </span>
+
+                <span class="summary-value">
+                  {{ cooperative.coopRegdNo || '—' }}
+                </span>
+              </div>
+
+              <!-- PAN -->
+
+              <div class="summary-item">
+                <span class="summary-label"> PAN Number </span>
+
+                <span class="summary-value">
+                  {{ cooperative.panNo || '—' }}
+                </span>
+              </div>
+            </div>
+          </section>
+
+          <!-- =================================================
+             CARD 3
+             PENDING — VERIFY + REJECT
+             ================================================= -->
+
+          <section class="action-card pending-action" *ngIf="cooperative.status === 'PENDING'">
+            <div class="action-header">
+              <div class="action-icon verify-icon">
+                <mat-icon> verified_user </mat-icon>
+              </div>
+
+              <div>
+                <h2>Verify & Provision</h2>
+
+                <p>Verify the cooperative information and provision its tenant before activation.</p>
+              </div>
+            </div>
+
+            <!-- VERIFY FORM -->
+
+            <form class="verify-form" [formGroup]="verifyForm" (ngSubmit)="submitVerify()">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label> Verification Remarks </mat-label>
+
+                <input matInput formControlName="remarks" placeholder="Enter verification remarks..." />
+
+                <mat-error *ngIf="verifyForm.controls.remarks.hasError('required')">
+                  Verification remarks are required.
+                </mat-error>
+              </mat-form-field>
+
+              <!-- BUTTONS -->
+
+              <div class="verification-actions">
+                <button mat-flat-button type="submit" class="primary-button verify-button" [disabled]="isVerifying">
+                  <mat-spinner *ngIf="isVerifying" diameter="18"></mat-spinner>
+
+                  <mat-icon *ngIf="!isVerifying"> verified </mat-icon>
+
+                  <span>
+                    {{ isVerifying ? 'Verifying & Provisioning...' : 'Verify & Provision' }}
+                  </span>
+                </button>
+
+                <button
+                  mat-stroked-button
+                  type="button"
+                  class="reject-button"
+                  (click)="toggleRejectForm()"
+                  [disabled]="isVerifying || isRejecting"
+                >
+                  <mat-icon> block </mat-icon>
+
+                  Reject
+                </button>
+              </div>
+            </form>
+
+            <!-- =================================================
+               REJECT FORM
+               ================================================= -->
+
+            <div class="reject-form-container" *ngIf="showRejectForm">
+              <div class="reject-form-header">
+                <div class="reject-form-icon">
+                  <mat-icon> warning </mat-icon>
+                </div>
+
+                <div>
+                  <h3>Reject Cooperative</h3>
+
+                  <p>Please provide a reason for rejecting this cooperative registration.</p>
+                </div>
+              </div>
+
+              <form [formGroup]="rejectForm" (ngSubmit)="submitReject()">
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label> Rejection Reason </mat-label>
+
+                  <textarea
+                    matInput
+                    formControlName="reason"
+                    rows="4"
+                    placeholder="Enter rejection reason..."
+                  ></textarea>
+
+                  <mat-error *ngIf="rejectForm.controls.reason.hasError('required')">
+                    Rejection reason is required.
+                  </mat-error>
+                </mat-form-field>
+
+                <div class="reject-actions">
+                  <button
+                    mat-stroked-button
+                    type="button"
+                    class="cancel-reject-button"
+                    (click)="toggleRejectForm()"
+                    [disabled]="isRejecting"
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    mat-flat-button
+                    type="submit"
+                    class="confirm-reject-button"
+                    [disabled]="rejectForm.invalid || isRejecting || isVerifying"
+                  >
+                    <mat-spinner *ngIf="isRejecting" diameter="18"></mat-spinner>
+
+                    <mat-icon *ngIf="!isRejecting"> block </mat-icon>
+
+                    <span>
+                      {{ isRejecting ? 'Rejecting...' : 'Confirm Rejection' }}
+                    </span>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </section>
+
+          <!-- =================================================
+             CARD 3
+             PROVISIONED — HAND OVER TO THE COOPERATIVE
+             ================================================= -->
+
+          <section
+            class="action-card provisioned-action"
+            *ngIf="cooperative.status === 'PROVISIONED' && !isLegacyTenant"
+          >
+            <div class="action-header">
+              <div class="action-icon provisioned-icon">
+                <mat-icon> cloud_done </mat-icon>
+              </div>
+
+              <div>
+                <h2>Hand Over to the Cooperative</h2>
+
+                <p>
+                  The tenant is provisioned. Set where the cooperative will sign in, then activate it. They will be
+                  emailed the web address and username; no password is ever sent.
+                </p>
+              </div>
+            </div>
+
+            <div class="summary-grid facts-grid">
+              <div class="summary-item">
+                <span class="summary-label"> Tenant Identifier </span>
+
+                <span class="summary-value copyable">
+                  <span>{{ cooperative.tenantIdentifier }}</span>
+
+                  <button type="button" class="copy-button" (click)="copy(cooperative.tenantIdentifier, 'tenant')">
+                    {{ copiedField === 'tenant' ? 'Copied' : 'Copy' }}
+                  </button>
+                </span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label"> Administrator Username </span>
+
+                <span class="summary-value copyable">
+                  <span>{{ cooperative.tenantAdminUsername }}</span>
+
+                  <button type="button" class="copy-button" (click)="copy(cooperative.tenantAdminUsername, 'username')">
+                    {{ copiedField === 'username' ? 'Copied' : 'Copy' }}
+                  </button>
+                </span>
+              </div>
+            </div>
+
+            <form class="activate-form url-form" [formGroup]="handoverForm" (ngSubmit)="openActivateDialog()">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Sign-in address (frontend URL)</mat-label>
+
+                <input
+                  matInput
+                  formControlName="frontendUrl"
+                  placeholder="https://coop.example.org"
+                  autocomplete="off"
+                  spellcheck="false"
+                />
+
+                <mat-error>{{ handoverForm.controls.frontendUrl.errors?.['frontendUrl'] }}</mat-error>
+              </mat-form-field>
+
+              <p class="field-hint">
+                The address this cooperative will sign in at. It must already be deployed and mapped to tenant
+                <strong>{{ cooperative.tenantIdentifier }}</strong
+                >.
+              </p>
+
+              <mat-checkbox formControlName="confirmedDeployed" class="confirm-deployed">
+                I have opened {{ normalizedHandoverUrl || 'this address' }} and confirmed it shows the sign-in page for
+                {{ cooperative.nameEn || 'this cooperative' }}.
+              </mat-checkbox>
+
+              <div class="activation-actions">
+                <button mat-flat-button type="submit" class="primary-button activate-button" [disabled]="!canActivate">
+                  <mat-spinner *ngIf="isActivating" diameter="18"></mat-spinner>
+
+                  <mat-icon *ngIf="!isActivating"> check_circle </mat-icon>
+
+                  <span>
+                    {{ isActivating ? 'Activating...' : 'Activate and Send Sign-in Email' }}
+                  </span>
+                </button>
+              </div>
+            </form>
+          </section>
+
+          <!-- =================================================
+             CARD 3
+             ACTIVE — TENANT ACCESS
+             ================================================= -->
+
+          <section class="action-card access-action" *ngIf="cooperative.status === 'ACTIVE' && !isLegacyTenant">
+            <div class="action-header">
+              <div class="action-icon provisioned-icon">
+                <mat-icon> key </mat-icon>
+              </div>
+
+              <div>
+                <h2>Tenant Access</h2>
+
+                <p>
+                  The cooperative's administrator signs in with the details below and must change the password at first
+                  sign-in.
+                </p>
+              </div>
+            </div>
+
+            <div class="summary-grid facts-grid">
+              <div class="summary-item">
+                <span class="summary-label"> Sign-in Address </span>
+
+                <span class="summary-value copyable">
+                  @if (cooperative.frontendUrl) {
+                    <a class="sign-in-link" [href]="cooperative.frontendUrl" target="_blank" rel="noopener noreferrer">
+                      {{ cooperative.frontendUrl }}
+                    </a>
+
+                    <button type="button" class="copy-button" (click)="copy(cooperative.frontendUrl, 'url')">
+                      {{ copiedField === 'url' ? 'Copied' : 'Copy' }}
+                    </button>
+                  } @else {
+                    <span class="empty-value">Not set</span>
+                  }
+                </span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label"> Administrator Username </span>
+
+                <span class="summary-value copyable">
+                  <span>{{ cooperative.tenantAdminUsername }}</span>
+
+                  <button type="button" class="copy-button" (click)="copy(cooperative.tenantAdminUsername, 'username')">
+                    {{ copiedField === 'username' ? 'Copied' : 'Copy' }}
+                  </button>
+                </span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label"> Sign-in Email </span>
+
+                <span class="email-status" [ngClass]="emailStatusClass">{{ emailStatusSummary }}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label"> Last Access Reset </span>
+
+                <span class="summary-value">{{ formatDateTime(cooperative.tenantAccessResetAt) }}</span>
+              </div>
+            </div>
+
+            @if (editingUrl) {
+              <form [formGroup]="editUrlForm" class="url-edit-row" (ngSubmit)="saveFrontendUrl()">
+                <mat-form-field appearance="outline">
+                  <mat-label>New sign-in address</mat-label>
+
+                  <input
+                    matInput
+                    formControlName="frontendUrl"
+                    placeholder="https://coop.example.org"
+                    autocomplete="off"
+                    spellcheck="false"
+                  />
+
+                  <mat-error>{{ editUrlForm.controls.frontendUrl.errors?.['frontendUrl'] }}</mat-error>
+                </mat-form-field>
+
+                <div class="url-edit-buttons">
+                  <button mat-stroked-button type="submit" class="secondary-button" [disabled]="isBusy">
+                    {{ isSavingUrl ? 'Saving...' : 'Save' }}
+                  </button>
+
+                  <button mat-stroked-button type="button" class="cancel-reject-button" (click)="cancelEditUrl()">
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            }
+
+            <div class="access-actions">
+              @if (!editingUrl) {
+                <button
+                  mat-stroked-button
+                  type="button"
+                  class="secondary-button"
+                  (click)="startEditUrl()"
+                  [disabled]="isBusy"
+                >
+                  <mat-icon> link </mat-icon>
+
+                  Change sign-in address
+                </button>
+              }
+
+              <button
+                mat-stroked-button
+                type="button"
+                class="secondary-button"
+                (click)="resendEmail()"
+                [disabled]="isBusy"
+              >
+                <mat-icon> forward_to_inbox </mat-icon>
+
+                {{ isResending ? 'Sending...' : 'Resend sign-in email' }}
+              </button>
+
+              <button
+                mat-stroked-button
+                type="button"
+                class="reject-button"
+                (click)="openResetDialog()"
+                [disabled]="isBusy"
+              >
+                <mat-icon> lock_reset </mat-icon>
+
+                Reset administrator access
+              </button>
+            </div>
+          </section>
+
+          <!-- =================================================
+             CARD 3
+             LEGACY TENANT — SECURITY CHECK
+             Tenants created before managed administrator
+             accounts may still accept the shared default login.
+             ================================================= -->
+
+          <section class="action-card security-action" *ngIf="isLegacyTenant">
+            <div class="action-header">
+              <div class="action-icon warning-icon">
+                <mat-icon> gpp_maybe </mat-icon>
+              </div>
+
+              <div>
+                <h2>Tenant Security Check</h2>
+
+                <p>
+                  This tenant was created before managed administrator accounts. It may still accept the shared default
+                  login. Check it, then apply the changes to secure it.
+                </p>
+              </div>
+            </div>
+
+            @if (!securityReport) {
+              <div class="access-actions">
+                <button
+                  mat-stroked-button
+                  type="button"
+                  class="secondary-button"
+                  (click)="runSecurityCheck()"
+                  [disabled]="isBusy"
+                >
+                  {{ isCheckingSecurity ? 'Checking...' : 'Check tenant security' }}
+                </button>
+              </div>
+            } @else {
+              <p class="report-note">
+                {{
+                  securityReport.dryRun
+                    ? 'Nothing has been changed yet. Applying the changes would do the following:'
+                    : 'These changes were applied:'
+                }}
+              </p>
+
+              <table class="report-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Account</th>
+                    <th scope="col">Action</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  @for (row of securityReportRows; track row.account) {
+                    <tr>
+                      <td>{{ row.account }}</td>
+                      <td>{{ row.action }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+
+              @if (securityReport.dryRun) {
+                @if (remediationNeedsFrontendUrl) {
+                  <p class="field-hint">
+                    Set the sign-in address first. Applying replaces the login this cooperative uses today and emails
+                    them new sign-in details.
+                  </p>
+
+                  <form [formGroup]="editUrlForm" class="url-edit-row" (ngSubmit)="saveFrontendUrl()">
+                    <mat-form-field appearance="outline">
+                      <mat-label>Sign-in address (frontend URL)</mat-label>
+
+                      <input
+                        matInput
+                        formControlName="frontendUrl"
+                        placeholder="https://coop.example.org"
+                        autocomplete="off"
+                        spellcheck="false"
+                      />
+
+                      <mat-error>{{ editUrlForm.controls.frontendUrl.errors?.['frontendUrl'] }}</mat-error>
+                    </mat-form-field>
+
+                    <div class="url-edit-buttons">
+                      <button mat-stroked-button type="submit" class="secondary-button" [disabled]="isBusy">
+                        {{ isSavingUrl ? 'Saving...' : 'Save address' }}
+                      </button>
+                    </div>
+                  </form>
+                }
+
+                <div class="access-actions">
+                  @if (securityReportChangesAccess) {
+                    <button
+                      mat-stroked-button
+                      type="button"
+                      class="reject-button"
+                      (click)="openApplyRemediation()"
+                      [disabled]="isBusy || remediationNeedsFrontendUrl"
+                    >
+                      Apply changes
+                    </button>
+                  }
+
+                  <button
+                    mat-stroked-button
+                    type="button"
+                    class="secondary-button"
+                    (click)="runSecurityCheck()"
+                    [disabled]="isBusy"
+                  >
+                    {{ isCheckingSecurity ? 'Checking...' : 'Check again' }}
+                  </button>
+                </div>
+              }
+            }
+          </section>
+        </section>
+
+        <!-- =================================================
+             ACTIVE
+             Tenant Activated Successfully
+             ================================================= -->
+
+        <section class="status-info-card active-status-card" *ngIf="cooperative.status === 'ACTIVE'">
+          <!-- SUCCESS ICON -->
+
+          <div class="status-info-icon">
+            <mat-icon> check_circle </mat-icon>
+          </div>
+
+          <!-- SUCCESS CONTENT -->
+
+          <div class="status-info-content">
+            <h2>Tenant has been activated successfully.</h2>
+
+            <div class="tenant-info">
+              <span class="tenant-label"> Tenant Identifier </span>
+
+              <span class="tenant-value" *ngIf="cooperative.tenantIdentifier">
+                {{ cooperative.tenantIdentifier }}
+              </span>
+
+              <span class="tenant-value tenant-empty" *ngIf="!cooperative.tenantIdentifier"> — </span>
+            </div>
+          </div>
+        </section>
+
+        <!-- =================================================
+             REJECTED
+             ================================================= -->
+
+        <section class="status-info-card rejected-status-card" *ngIf="cooperative.status === 'REJECTED'">
+          <div class="status-info-icon">
+            <mat-icon> cancel </mat-icon>
+          </div>
+
+          <div class="status-info-content">
+            <h2>Cooperative Registration Rejected</h2>
+
+            <p>This cooperative registration has been rejected.</p>
+
+            <div class="rejection-remarks" *ngIf="cooperative.adminRemarks">
+              <span class="remarks-label"> Rejection Reason </span>
+
+              <p>
+                {{ cooperative.adminRemarks }}
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- =================================================
+             BACK BUTTON
+             ================================================= -->
+
+        <div class="page-actions">
+          <button mat-stroked-button type="button" class="back-button" (click)="goBack()">Back</button>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</div>

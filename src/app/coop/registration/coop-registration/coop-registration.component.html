@@ -6,98 +6,159 @@
   file, You can obtain one at http://mozilla.org/MPL/2.0/.
 -->
 
-<div class="coop-registration-page">
-  <div class="registration-card">
-    <div class="registration-header">
-      <h1>Create Account</h1>
+<div class="registration-form-card">
+  <div class="registration-header">
+    <h1>Create Account</h1>
+    <p>Register to create your cooperative account.</p>
+  </div>
 
-      <p>Register to create your cooperative account.</p>
+  @if (successMessage) {
+    <div class="success-message">
+      {{ successMessage }}
     </div>
+  }
 
-    @if (successMessage) {
-      <div class="success-message">
-        {{ successMessage }}
-      </div>
-    }
+  @if (errorMessage) {
+    <div class="error-message" role="alert">
+      {{ errorMessage }}
+    </div>
+  }
 
-    @if (errorMessage) {
-      <div class="error-message" role="alert">
-        {{ errorMessage }}
-        <!-- if email already exists-->
-        @if (errorMessage.includes('already exists')) {
-          <div style="margin-top: 10px">
-            <a routerLink="/coop/login" class="inline-login-btn">Log In Here</a>
-          </div>
-        }
-      </div>
-    }
+  <form class="registration-form" [formGroup]="registrationForm" (ngSubmit)="onSubmit()" novalidate>
+    <!-- Email -->
+    <div class="form-group">
+      <label for="email">Email</label>
 
-    <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()" novalidate>
-      <!-- Email -->
-
-      <div class="form-group">
-        <label for="email"> Email </label>
+      <div class="input-wrapper">
+        <svg
+          class="input-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.4"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+          <path d="m3 7 9 6 9-6"></path>
+        </svg>
 
         <input id="email" type="email" formControlName="email" placeholder="Enter your email" autocomplete="email" />
-
-        @if (registrationForm.controls.email.touched && registrationForm.controls.email.hasError('required')) {
-          <span class="field-error"> Email is required. </span>
-        }
-
-        @if (registrationForm.controls.email.touched && registrationForm.controls.email.hasError('email')) {
-          <span class="field-error"> Please enter a valid email address. </span>
-        }
-      </div>
-      <!-- Password -->
-
-      <div class="form-group">
-        <label for="password"> Password </label>
-
-        <div class="password-input">
-          <input
-            id="password"
-            [type]="hidePassword ? 'password' : 'text'"
-            formControlName="password"
-            placeholder="Choose a strong password"
-            autocomplete="new-password"
-            aria-describedby="password-help"
-          />
-
-          <button
-            type="button"
-            class="password-toggle"
-            (click)="hidePassword = !hidePassword"
-            [attr.aria-label]="hidePassword ? 'Show password' : 'Hide password'"
-          >
-            <mat-icon>{{ hidePassword ? 'visibility' : 'visibility_off' }}</mat-icon>
-          </button>
-        </div>
-
-        <p id="password-help" class="password-help">
-          This password will also be your first sign-in to your cooperative's banking system, so make it strong. A short
-          sentence works well.
-        </p>
-
-        <mifosx-coop-password-checklist
-          [password]="registrationForm.controls.password.value"
-          [email]="registrationForm.controls.email.value"
-        ></mifosx-coop-password-checklist>
-
-        @if (registrationForm.controls.password.touched && registrationForm.controls.password.hasError('required')) {
-          <span class="field-error"> Password is required. </span>
-        }
-
-        @if (
-          registrationForm.controls.password.touched && registrationForm.controls.password.hasError('coopPassword')
-        ) {
-          <span class="field-error"> Please meet all the password requirements above. </span>
-        }
       </div>
 
-      <!-- Phone -->
+      @if (registrationForm.controls.email.touched && registrationForm.controls.email.hasError('required')) {
+        <span class="field-error"> Email is required. </span>
+      }
 
-      <div class="form-group">
-        <label for="phone"> Phone Number </label>
+      @if (registrationForm.controls.email.touched && registrationForm.controls.email.hasError('email')) {
+        <span class="field-error"> Please enter a valid email address. </span>
+      }
+    </div>
+
+    <!-- Password -->
+    <div class="form-group">
+      <label for="password">Password</label>
+
+      <div class="input-wrapper has-toggle">
+        <svg
+          class="input-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.4"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <rect x="5" y="11" width="14" height="10" rx="2"></rect>
+          <path d="M8 11V7a4 4 0 0 1 8 0v4"></path>
+        </svg>
+
+        <input
+          id="password"
+          [type]="showPassword ? 'text' : 'password'"
+          formControlName="password"
+          placeholder="Choose a strong password"
+          autocomplete="new-password"
+          aria-describedby="password-help"
+        />
+
+        <button
+          type="button"
+          class="password-toggle"
+          (click)="togglePasswordVisibility()"
+          [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+        >
+          @if (showPassword) {
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.4"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a21.6 21.6 0 0 1 5.06-5.94M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 7 11 7a21.6 21.6 0 0 1-2.16 3.19"
+              ></path>
+              <path d="M1 1l22 22"></path>
+              <path d="M9.53 9.53a3 3 0 0 0 4.24 4.24"></path>
+            </svg>
+          } @else {
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.4"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+          }
+        </button>
+      </div>
+
+      <p id="password-help" class="password-help">
+        This password will also be your first sign-in to your cooperative's banking system, so make it strong. A short
+        sentence works well.
+      </p>
+
+      <mifosx-coop-password-checklist
+        [password]="registrationForm.controls.password.value"
+        [email]="registrationForm.controls.email.value"
+      ></mifosx-coop-password-checklist>
+
+      @if (registrationForm.controls.password.touched && registrationForm.controls.password.hasError('required')) {
+        <span class="field-error"> Password is required. </span>
+      }
+
+      @if (registrationForm.controls.password.touched && registrationForm.controls.password.hasError('coopPassword')) {
+        <span class="field-error"> Please meet all the password requirements above. </span>
+      }
+    </div>
+
+    <!-- Phone -->
+    <div class="form-group">
+      <label for="phone">Phone Number</label>
+
+      <div class="input-wrapper">
+        <svg
+          class="input-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.4"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path
+            d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"
+          ></path>
+        </svg>
 
         <input
           id="phone"
@@ -107,29 +168,31 @@
           autocomplete="tel"
           maxlength="10"
         />
-
-        @if (registrationForm.controls.phone.touched && registrationForm.controls.phone.hasError('required')) {
-          <span class="field-error"> Phone number is required. </span>
-        }
-
-        @if (registrationForm.controls.phone.touched && registrationForm.controls.phone.hasError('pattern')) {
-          <span class="field-error"> Enter a valid 10-digit phone number. </span>
-        }
       </div>
 
-      <!-- Submit -->
+      @if (registrationForm.controls.phone.touched && registrationForm.controls.phone.hasError('required')) {
+        <span class="field-error"> Phone number is required. </span>
+      }
 
-      <div class="action-buttons">
-        <button type="submit" class="register-button" [disabled]="isSubmitting">
-          @if (isSubmitting) {
-            Creating Account...
-          } @else {
-            Create Account
-          }
-        </button>
+      @if (registrationForm.controls.phone.touched && registrationForm.controls.phone.hasError('pattern')) {
+        <span class="field-error"> Enter a valid 10-digit phone number. </span>
+      }
+    </div>
 
-        <a routerLink="/coop/login" class="login-button"> Login </a>
+    <!-- Submit -->
+    <div class="action-buttons">
+      <button type="submit" class="register-button" [disabled]="isSubmitting">
+        @if (isSubmitting) {
+          Creating Account...
+        } @else {
+          Create Account
+        }
+      </button>
+
+      <div class="login-link">
+        <span>Already have an account?</span>
+        <a routerLink="/coop/login">Login</a>
       </div>
-    </form>
-  </div>
+    </div>
+  </form>
 </div>

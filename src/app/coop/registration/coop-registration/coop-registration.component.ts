@@ -10,7 +10,6 @@ import { Component, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { MatIconModule } from '@angular/material/icon';
 
 import { CoopAuthService } from '../../services/coop-auth.service';
 import { CoopPasswordChecklistComponent } from '../../shared/coop-password-checklist/coop-password-checklist.component';
@@ -22,7 +21,6 @@ import { coopPasswordValidator } from '../../utils/coop-password-policy';
   imports: [
     ReactiveFormsModule,
     RouterLink,
-    MatIconModule,
     CoopPasswordChecklistComponent
   ],
   templateUrl: './coop-registration.component.html',
@@ -37,9 +35,9 @@ export class CoopRegistrationComponent {
   private router = inject(Router);
 
   isSubmitting = false;
-  hidePassword = true;
   successMessage = '';
   errorMessage = '';
+  showPassword = false;
 
   registrationForm = this.fb.nonNullable.group({
     email: [
@@ -76,6 +74,10 @@ export class CoopRegistrationComponent {
     email.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe(() => password.updateValueAndValidity({ emitEvent: false }));
+  }
+
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
   }
 
   onSubmit(): void {

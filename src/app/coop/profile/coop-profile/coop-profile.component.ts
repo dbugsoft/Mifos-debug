@@ -6,8 +6,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { Component, effect, inject } from '@angular/core';
-
+import { Component, EventEmitter, Output, effect, inject } from '@angular/core';
+import { MatStepperModule } from '@angular/material/stepper';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
@@ -49,8 +49,7 @@ import { extractCoopErrorMessage } from '../../queries/coop-error.util';
     MatInputModule,
     MatButtonModule,
     MatSelectModule,
-    RouterLink,
-    RouterLinkActive,
+    MatStepperModule,
     CoopNavbarComponent,
     CoopSystemStatusComponent
   ],
@@ -109,10 +108,30 @@ export class CoopProfileComponent {
   }));
 
   // =====================================================
+  // STEPPER
+  // =====================================================
+
+  /**
+   * Emitted by the "Next" button (see `onNextClick`) once the profile
+   * save this component already does succeeds - lets the profile
+   * stepper shell advance to Documents without duplicating any of
+   * this component's own validation/save logic.
+   */
+  @Output()
+  nextStep = new EventEmitter<void>();
+
+  // =====================================================
   // UI STATE
   // =====================================================
 
   isSubmitting = false;
+
+  /**
+   * True for the 3s the success banner is shown after a save, before
+   * the stepper's "Next" advances - keeps the button disabled so a
+   * second click can't fire during that wait.
+   */
+  isAdvancing = false;
 
   successMessage = '';
 
@@ -135,7 +154,7 @@ export class CoopProfileComponent {
   isEditMode = false;
   isActive = false;
   profileStatus = '';
-
+  private originalProfile: CoopProfile | null = null;
   // =====================================================
   // LOCATION DATA
   // =====================================================
@@ -224,7 +243,8 @@ export class CoopProfileComponent {
     ],
 
     wardNo: [
-      null as number | null
+      null as number | null,
+      Validators.required
     ],
 
     tole: [
@@ -249,8 +269,22 @@ export class CoopProfileComponent {
     officePhone: [
       ''
     ],
+    totalMaleMembers: [
+      0,
+      Validators.min(0)
+    ],
 
-    logoUrl: [
+    totalFemaleMembers: [
+      0,
+      Validators.min(0)
+    ],
+
+    totalOtherMembers: [
+      0,
+      Validators.min(0)
+    ],
+
+    webUrl: [
       ''
     ],
 
@@ -281,16 +315,35 @@ export class CoopProfileComponent {
       const profile = this.profileQuery.data();
 
       if (profile) {
+        // Keep the original server data for change detection.
+        this.originalProfile = structuredClone(profile);
+
         this.profileForm.patchValue(profile);
 
-        // patchValue() should not make the form dirty.
         this.profileForm.markAsPristine();
 
         this.isEditMode = true;
 
         this.profileStatus = profile.status ?? '';
-
         this.isActive = profile.status === 'ACTIVE' || profile.status === 'PROVISIONED';
+
+        // ================================================
+        // PROFILE EDIT MODE BASED ON STATUS
+        // ================================================
+
+        if (this.isActive) {
+          // PROVISIONED / ACTIVE
+          // Existing profile is view-only.
+          this.profileForm.disable({
+            emitEvent: false
+          });
+        } else {
+          // PENDING
+          // Existing profile can still be edited.
+          this.profileForm.enable({
+            emitEvent: false
+          });
+        }
 
         if (this.locations.length > 0) {
           this.buildLocationDropdowns(profile);
@@ -304,9 +357,17 @@ export class CoopProfileComponent {
         if (this.isNoProfileError(this.profileQuery.error())) {
           this.isEditMode = false;
 
+          this.profileStatus = '';
+
+          this.isActive = false;
+
+          // New profile must be editable.
+          this.profileForm.enable({
+            emitEvent: false
+          });
+
           return;
         }
-
         this.errorMessage = extractCoopErrorMessage(this.profileQuery.error(), 'Unable to load cooperative profile.');
       }
     });
@@ -769,6 +830,48 @@ export class CoopProfileComponent {
     }
   }
 
+  // Member count fields: plain text inputs (digits only) instead of
+  // type="number", which shows native spin-button arrows.
+  onMemberCountKeydown(event: KeyboardEvent): void {
+    const allowedKeys = [
+      'Backspace',
+      'Delete',
+      'ArrowLeft',
+      'ArrowRight',
+      'ArrowUp',
+      'ArrowDown',
+      'Home',
+      'End',
+      'Tab'
+    ];
+
+    if (allowedKeys.includes(event.key)) {
+      return;
+    }
+
+    if (event.ctrlKey || event.metaKey) {
+      return;
+    }
+
+    if (/^\d$/.test(event.key)) {
+      return;
+    }
+
+    event.preventDefault();
+  }
+
+  onMemberCountInput(event: Event, controlName: 'totalMaleMembers' | 'totalFemaleMembers' | 'totalOtherMembers'): void {
+    const input = event.target as HTMLInputElement;
+
+    const digitsOnly = input.value.replace(/\D/g, '');
+
+    if (input.value !== digitsOnly) {
+      input.value = digitsOnly;
+    }
+
+    this.profileForm.get(controlName)?.setValue(digitsOnly === '' ? 0 : Number(digitsOnly), { emitEvent: false });
+  }
+
   //Tole validation
   onToleKeydown(event: KeyboardEvent): void {
     const allowedKeys = [
@@ -934,30 +1037,60 @@ export class CoopProfileComponent {
   private getChangedFields(): Partial<CoopProfile> {
     const changedFields: Partial<CoopProfile> = {};
 
-    const rawValue = this.profileForm.getRawValue();
+    const current = this.profileForm.getRawValue() as Partial<CoopProfile>;
 
-    Object.keys(this.profileForm.controls).forEach((key) => {
-      const controlKey = key as keyof CoopProfile;
+    if (!this.originalProfile) {
+      return changedFields;
+    }
 
-      const control = this.profileForm.get(controlKey);
+    const fields = [
+      'coopRegdNo',
+      'nameNp',
+      'nameEn',
+      'dateOfRegistered',
+      'panNo',
+      'provinceId',
+      'districtId',
+      'localLevelId',
+      'wardNo',
+      'tole',
+      'houseNo',
+      'mobilePhone',
+      'officePhone',
+      'totalMaleMembers',
+      'totalFemaleMembers',
+      'totalOtherMembers',
+      'webUrl',
+      'about',
+      'remarks'
+    ] as const;
 
-      if (control?.dirty) {
-        (changedFields as any)[controlKey] = (rawValue as any)[controlKey];
+    for (const field of fields) {
+      const currentValue = current[field];
+      const originalValue = this.originalProfile[field];
+
+      if (String(currentValue ?? '') !== String(originalValue ?? '')) {
+        changedFields[field] = currentValue as never;
       }
-    });
+    }
+
+    console.log('ORIGINAL PROFILE:', this.originalProfile);
+    console.log('CURRENT PROFILE:', current);
+    console.log('CHANGED FIELDS:', changedFields);
 
     return changedFields;
   }
-
   // =====================================================
   // SUBMIT
   // =====================================================
 
-  onSubmit(): void {
-    if (this.isActive) {
-      return;
-    }
-
+  /**
+   * `onSuccess` is optional and only used by the profile stepper's "Next"
+   * button, which needs to know when the save actually completed before it
+   * advances to the Documents step. The plain form submit (`(ngSubmit)`)
+   * calls this with no argument, so its behavior is unchanged.
+   */
+  onSubmit(onSuccess?: () => void): void {
     this.successMessage = '';
 
     this.errorMessage = '';
@@ -965,6 +1098,23 @@ export class CoopProfileComponent {
     // -----------------------------------------------
     // VALIDATION
     // -----------------------------------------------
+    // Runs unconditionally - including when `isActive` - so the
+    // stepper's "Next" button can never advance past invalid/empty
+    // required fields regardless of profile status.
+
+    // ================================================
+    // READ-ONLY PROFILE
+    // ================================================
+
+    if (this.isActive) {
+      onSuccess?.();
+
+      return;
+    }
+
+    // ================================================
+    // VALIDATION
+    // ================================================
 
     if (this.profileForm.invalid) {
       this.profileForm.markAllAsTouched();
@@ -988,7 +1138,7 @@ export class CoopProfileComponent {
       if (Object.keys(changedFields).length === 0) {
         this.isSubmitting = false;
 
-        this.successMessage = 'No changes to save.';
+        onSuccess?.();
 
         return;
       }
@@ -1001,9 +1151,11 @@ export class CoopProfileComponent {
         onSuccess: () => {
           this.isSubmitting = false;
 
-          this.successMessage = 'Cooperative profile updated successfully.';
+          this.successMessage = 'Profile updated successfully.';
 
           this.profileForm.markAsPristine();
+
+          this.advanceAfterSuccessMessage(onSuccess);
         },
 
         onError: (error) => {
@@ -1031,6 +1183,8 @@ export class CoopProfileComponent {
         this.isEditMode = true;
 
         this.profileForm.markAsPristine();
+
+        this.advanceAfterSuccessMessage(onSuccess);
       },
 
       onError: (error) => {
@@ -1039,5 +1193,39 @@ export class CoopProfileComponent {
         this.errorMessage = extractCoopErrorMessage(error, 'Unable to create profile. Please try again.');
       }
     });
+  }
+
+  /**
+   * Keeps the green `.success-message` banner on screen for 3s before
+   * calling `onSuccess` - a single "Next" click both saves and advances,
+   * but advancing instantly made the save look like it hadn't happened
+   * (the page changes before the confirmation is even readable). The
+   * button stays disabled (`isAdvancing`) for that same window so a
+   * second click can't fire mid-wait.
+   */
+  private advanceAfterSuccessMessage(onSuccess?: () => void): void {
+    this.isAdvancing = true;
+
+    setTimeout(() => {
+      this.isAdvancing = false;
+
+      onSuccess?.();
+    }, 3000);
+  }
+
+  // =====================================================
+  // NEXT (STEPPER)
+  // =====================================================
+
+  /**
+   * `onSubmit` already does everything this button needs - validation
+   * (stays put + shows errors if invalid), the isActive shortcut, the
+   * "no changes" shortcut, and the actual create/update call - so this
+   * only needs to pass a callback for what happens once all of that
+   * succeeds. Re-checking validity or re-computing changed fields here
+   * would just duplicate that logic and risk them drifting apart.
+   */
+  onNextClick(): void {
+    this.onSubmit(() => this.nextStep.emit());
   }
 }

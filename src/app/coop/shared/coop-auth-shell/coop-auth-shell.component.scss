@@ -1,0 +1,541 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+:host {
+  display: block;
+  width: 100%;
+  height: 100vh;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+
+  /*
+   The host itself is the scroll container, not the page. On
+   desktop the two-column layout fits within one viewport so this
+   never visibly kicks in; on mobile the stacked hero + form can
+   grow taller than 100vh, and this is what makes that overflow
+   (including the footer) actually reachable.
+  */
+  overflow: hidden auto;
+  -webkit-overflow-scrolling: touch;
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
+}
+
+/* =========================================================
+   MAIN AUTH SHELL
+   ========================================================= */
+
+.auth-shell {
+  display: grid;
+  grid-template-columns: 50% 50%;
+  width: 100%;
+  height: 100vh;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+  background: #f8fafc;
+}
+
+/* =========================================================
+   LEFT HERO
+   ========================================================= */
+
+.hero-panel {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 100%;
+  padding: 40px;
+  box-sizing: border-box;
+  overflow: hidden;
+  color: #fff;
+  background:
+    radial-gradient(circle at 15% 15%, rgb(255 255 255 / 12%) 0, transparent 30%),
+    radial-gradient(circle at 90% 85%, rgb(255 255 255 / 9%) 0, transparent 32%),
+    linear-gradient(145deg, #0e6fae 0%, #1074b8 50%, #1688cf 100%);
+}
+
+.hero-panel::before {
+  content: '';
+  position: absolute;
+  width: 320px;
+  height: 320px;
+  top: -160px;
+  left: -130px;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 7%);
+  pointer-events: none;
+}
+
+.hero-panel::after {
+  content: '';
+  position: absolute;
+  width: 380px;
+  height: 380px;
+  right: -200px;
+  bottom: -200px;
+  border: 1px solid rgb(255 255 255 / 12%);
+  border-radius: 50%;
+  background: rgb(255 255 255 / 4%);
+  pointer-events: none;
+}
+
+/* =========================================================
+   HERO CONTENT
+   ========================================================= */
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 540px;
+  margin: 0 auto;
+  padding: 25px 20px;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.hero-eyebrow {
+  display: block;
+  margin: 0 0 22px;
+  color: #fff;
+  font-size: clamp(2.2rem, 3.5vw, 3rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.6px;
+}
+
+.hero-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 82px;
+  height: 82px;
+  margin: 0 0 18px;
+  box-sizing: border-box;
+  border: 1px solid rgb(255 255 255 / 25%);
+  border-radius: 20px;
+  background: rgb(255 255 255 / 13%);
+  box-shadow:
+    0 12px 30px rgb(0 35 70 / 12%),
+    inset 0 1px 0 rgb(255 255 255 / 15%);
+  backdrop-filter: blur(8px);
+}
+
+.hero-icon svg {
+  width: 46px;
+  height: 46px;
+  color: #fff;
+  stroke: currentcolor;
+  flex-shrink: 0;
+}
+
+.hero-brand {
+  margin: 0 0 17px;
+  color: #fff;
+  font-size: clamp(3rem, 5vw, 4.4rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -1.8px;
+  text-shadow: 0 4px 16px rgb(0 40 80 / 12%);
+}
+
+.hero-description {
+  width: 100%;
+  max-width: 480px;
+  margin: 0;
+  color: rgb(255 255 255 / 92%);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.7;
+  text-align: center;
+}
+
+.hero-tagline {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-top: 34px;
+  padding-left: 18px;
+  border-left: 2px solid rgb(255 255 255 / 30%);
+  text-align: left;
+}
+
+.hero-tagline span {
+  display: block;
+  margin: 0 0 7px;
+  color: rgb(255 255 255 / 95%);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.hero-tagline span:last-child {
+  margin-bottom: 0;
+}
+
+/* =========================================================
+   RIGHT SIDE
+   ========================================================= */
+
+.right-panel {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  background: #f8fafc;
+  overflow: hidden;
+}
+
+/* =========================================================
+   AUTH AREA
+   ========================================================= */
+
+.auth-panel {
+  display: flex;
+
+  /*
+   "safe center" centers the card when it fits, but falls back
+   to start-alignment once it's taller than the panel - plain
+   "center" here made the top/left of the card unreachable by
+   scrolling once it overflowed.
+  */
+  align-items: safe center;
+  justify-content: safe center;
+  width: 100%;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+
+  /*
+   LEFT = 32px
+   RIGHT = 32px
+  */
+  padding: 35px 32px;
+  margin: 0;
+  box-sizing: border-box;
+  overflow: hidden auto;
+}
+
+/* =========================================================
+   ROUTED COMPONENT
+   ========================================================= */
+
+.auth-panel > [hidden] {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  display: none;
+}
+
+/* =========================================================
+   REGISTRATION CARD
+   ========================================================= */
+
+.registration-form-card {
+  display: block;
+  width: 100%;
+
+  /*
+     IMPORTANT:
+     Do NOT use 500px here.
+  */
+  max-width: 580px;
+  margin: 0 auto;
+  padding: 38px 42px;
+  box-sizing: border-box;
+  border: 1px solid #e4e7ec;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow:
+    0 20px 45px rgb(16 42 67 / 8%),
+    0 4px 12px rgb(16 42 67 / 4%);
+}
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.copyright-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 42px;
+  width: 100%;
+  height: 42px;
+  min-height: 42px;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  color: #64748b;
+  background: #fff;
+  border-top: 1px solid #e2e8f0;
+  font-size: 11.5px;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.copyright-footer a {
+  color: #1074b8;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.copyright-footer a:hover {
+  text-decoration: underline;
+}
+
+/* =========================================================
+   DESKTOP
+   ========================================================= */
+
+@media (width >= 1400px) {
+  .auth-panel {
+    padding-left: 45px;
+    padding-right: 45px;
+  }
+
+  .registration-form-card {
+    max-width: 580px;
+    padding: 42px 44px;
+  }
+}
+
+/* =========================================================
+   LAPTOP
+   ========================================================= */
+
+@media (width >= 901px) and (width <= 1200px) {
+  .auth-panel {
+    padding-left: 25px;
+    padding-right: 25px;
+  }
+
+  .registration-form-card {
+    max-width: 100%;
+    padding: 32px 30px;
+    border-radius: 16px;
+  }
+}
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (width >= 601px) and (width <= 900px) {
+  .auth-shell {
+    grid-template-columns: 42% 58%;
+  }
+
+  .hero-panel {
+    padding: 25px;
+  }
+
+  .auth-panel {
+    padding: 30px 25px;
+  }
+
+  .registration-form-card {
+    max-width: 100%;
+    padding: 34px 32px;
+  }
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (width <= 600px) {
+  .auth-shell {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+  }
+
+  .hero-panel {
+    width: 100%;
+    min-height: 0;
+    height: auto;
+    padding: 32px 20px;
+  }
+
+  .hero-content {
+    padding: 0;
+  }
+
+  .hero-eyebrow {
+    margin-bottom: 12px;
+    font-size: 22px;
+  }
+
+  .hero-icon {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 14px;
+    border-radius: 16px;
+  }
+
+  .hero-icon svg {
+    width: 34px;
+    height: 34px;
+  }
+
+  .hero-brand {
+    margin-bottom: 12px;
+    font-size: 34px;
+  }
+
+  .hero-description {
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .hero-tagline {
+    margin-top: 22px;
+  }
+
+  .auth-panel {
+    width: 100%;
+    padding: 28px 18px;
+    overflow: visible;
+  }
+
+  .registration-form-card {
+    width: 100%;
+    max-width: 100%;
+    padding: 28px 22px;
+    border-radius: 14px;
+  }
+
+  .right-panel {
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+
+  .copyright-footer {
+    height: 42px;
+    min-height: 42px;
+  }
+}
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (width <= 480px) {
+  .hero-panel {
+    padding: 26px 18px;
+  }
+
+  .hero-eyebrow {
+    font-size: 19px;
+  }
+
+  .hero-icon {
+    width: 52px;
+    height: 52px;
+  }
+
+  .hero-icon svg {
+    width: 30px;
+    height: 30px;
+  }
+
+  .hero-brand {
+    font-size: 29px;
+  }
+
+  .hero-tagline {
+    margin-top: 18px;
+  }
+
+  .auth-panel {
+    padding: 20px 15px;
+  }
+
+  .registration-form-card {
+    padding: 25px 18px;
+    border-radius: 13px;
+  }
+}
+
+/* =========================================================
+   VERY SMALL PHONES
+   ========================================================= */
+
+@media (width <= 360px) {
+  .hero-panel {
+    padding: 22px 15px;
+  }
+
+  .hero-icon {
+    width: 46px;
+    height: 46px;
+    margin-bottom: 10px;
+  }
+
+  .hero-icon svg {
+    width: 26px;
+    height: 26px;
+  }
+
+  .hero-brand {
+    font-size: 25px;
+  }
+
+  .hero-description {
+    font-size: 12.5px;
+  }
+
+  .hero-tagline {
+    margin-top: 14px;
+  }
+
+  .hero-tagline span {
+    font-size: 12px;
+  }
+
+  .auth-panel {
+    padding: 18px 12px;
+  }
+
+  .registration-form-card {
+    padding: 22px 15px;
+  }
+}
