@@ -13,6 +13,7 @@ import { CoopLoginComponent } from './auth/coop-login/coop-login.component';
 import { CoopRegistrationComponent } from './registration/coop-registration/coop-registration.component';
 import { CoopVerifyEmailComponent } from './auth/coop-verify-email/coop-verify-email.component';
 import { CoopProfileComponent } from './profile/coop-profile/coop-profile.component';
+import { CoopChangePasswordComponent } from './account/coop-change-password/coop-change-password.component';
 import { CoopAdminDashboardComponent } from './admin/coop-admin-dashboard/coop-admin-dashboard.component';
 import { CoopAdminDetailComponent } from './admin/coop-admin-detail/coop-admin-detail.component';
 import { coopAdminGuard } from './auth/guards/coop-admin.guard';
@@ -39,6 +40,10 @@ const routes: Routes = [
     component: CoopMeComponent
   },
   {
+    path: 'account/password',
+    component: CoopChangePasswordComponent
+  },
+  {
     path: 'admin',
     canActivate: [coopAdminGuard],
     children: [
@@ -47,6 +52,7 @@ const routes: Routes = [
         component: CoopAdminDashboardComponent
       },
       {
+        // :id is the cooperative's appUserId
         path: ':id',
         component: CoopAdminDetailComponent
       }

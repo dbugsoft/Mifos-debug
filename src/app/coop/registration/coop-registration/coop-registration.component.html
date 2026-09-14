@@ -21,7 +21,7 @@
     }
 
     @if (errorMessage) {
-      <div class="error-message">
+      <div class="error-message" role="alert">
         {{ errorMessage }}
         <!-- if email already exists-->
         @if (errorMessage.includes('already exists')) {
@@ -53,20 +53,44 @@
       <div class="form-group">
         <label for="password"> Password </label>
 
-        <input
-          id="password"
-          type="password"
-          formControlName="password"
-          placeholder="Enter your password"
-          autocomplete="new-password"
-        />
+        <div class="password-input">
+          <input
+            id="password"
+            [type]="hidePassword ? 'password' : 'text'"
+            formControlName="password"
+            placeholder="Choose a strong password"
+            autocomplete="new-password"
+            aria-describedby="password-help"
+          />
+
+          <button
+            type="button"
+            class="password-toggle"
+            (click)="hidePassword = !hidePassword"
+            [attr.aria-label]="hidePassword ? 'Show password' : 'Hide password'"
+          >
+            <mat-icon>{{ hidePassword ? 'visibility' : 'visibility_off' }}</mat-icon>
+          </button>
+        </div>
+
+        <p id="password-help" class="password-help">
+          This password will also be your first sign-in to your cooperative's banking system, so make it strong. A short
+          sentence works well.
+        </p>
+
+        <mifosx-coop-password-checklist
+          [password]="registrationForm.controls.password.value"
+          [email]="registrationForm.controls.email.value"
+        ></mifosx-coop-password-checklist>
 
         @if (registrationForm.controls.password.touched && registrationForm.controls.password.hasError('required')) {
           <span class="field-error"> Password is required. </span>
         }
 
-        @if (registrationForm.controls.password.touched && registrationForm.controls.password.hasError('minlength')) {
-          <span class="field-error"> Password must be at least 8 characters. </span>
+        @if (
+          registrationForm.controls.password.touched && registrationForm.controls.password.hasError('coopPassword')
+        ) {
+          <span class="field-error"> Please meet all the password requirements above. </span>
         }
       </div>
 

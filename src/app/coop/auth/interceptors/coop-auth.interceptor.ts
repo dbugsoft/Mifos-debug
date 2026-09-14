@@ -29,6 +29,10 @@ import { CoopTokenService } from '../../services/coop-token.service';
  * Any request that arrived while a refresh was already
  * in progress waits on this instead of triggering its
  * own refresh call.
+ *
+ * Tokens are never logged: anything written to the
+ * console is readable by browser extensions and anyone
+ * with access to the machine.
  */
 let isRefreshing = false;
 
@@ -129,17 +133,7 @@ function handleUnauthorized(
 
     return coopAuthService.refresh({ refreshToken }).pipe(
       switchMap((tokens) => {
-        console.log('========== REFRESH SUCCESS ==========');
-
-        console.log('New Access Token:', tokens.accessToken);
-
-        console.log('New Refresh Token:', tokens.refreshToken);
-
         coopTokenService.updateTokens(tokens);
-
-        console.log('Roles after refresh:', coopTokenService.getRoles());
-
-        console.log('Is Admin after refresh:', coopTokenService.isAdmin());
 
         isRefreshing = false;
 
@@ -155,8 +149,6 @@ function handleUnauthorized(
       }),
 
       catchError((refreshError) => {
-        console.error('========== REFRESH FAILED ==========', refreshError);
-
         isRefreshing = false;
 
         coopTokenService.clearSession();

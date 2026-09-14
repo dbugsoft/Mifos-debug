@@ -243,9 +243,10 @@ export class CoopAdminDashboardComponent {
   }
 
   viewDetails(cooperative: CoopAdminRegistration): void {
+    // appUserId, not id: every admin endpoint addresses a cooperative by its registry account id.
     this.router.navigate([
       '/coop/admin',
-      cooperative.id
+      cooperative.appUserId
     ]);
   }
 

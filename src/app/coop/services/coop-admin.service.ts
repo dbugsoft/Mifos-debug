@@ -11,17 +11,22 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
-export type CoopAdminStatus = 'PENDING' | 'PROVISIONED' | 'ACTIVE' | 'REJECTED';
+export type CoopAdminStatus = 'PENDING' | 'PROVISIONED' | 'ACTIVE' | 'REJECTED' | 'WITHDRAWN';
+
+/** Outcome of the most recent sign-in details email. */
+export type AccessEmailStatus = 'SENT' | 'FAILED' | 'NOT_CONFIGURED';
 
 /**
  * Shape returned by list / get-by-id / verify / reject /
- * activate - all four admin endpoints return this same
- * cooperative object, differing only in which optional
+ * activate and the tenant access endpoints - all return this
+ * same cooperative object, differing only in which optional
  * fields are present (the backend omits null fields
  * rather than sending them as null).
  */
 export interface CoopAdminRegistration {
+  /** The registration row's own id. Display only: no admin endpoint accepts it. */
   id: number;
+  /** The registry account id. Every admin endpoint addresses a cooperative by this. */
   appUserId: number;
   coopRegdNo: string;
   cooperativeCode: string;
@@ -37,7 +42,7 @@ export interface CoopAdminRegistration {
   houseNo?: string;
   mobilePhone: string;
   officePhone?: string;
-  logoUrl?: string;
+  /** The cooperative's own public website, as the applicant typed it. Not where they sign in. */
   webUrl?: string;
   about?: string;
   remarks?: string;
@@ -48,6 +53,38 @@ export interface CoopAdminRegistration {
   activatedAt?: string;
   createdAt: string;
   updatedAt: string;
+
+  // ---- tenant access handover ----
+  /** The web address the cooperative signs in at. Set by a registry admin. */
+  frontendUrl?: string;
+  /** The managed administrator account, e.g. admin.2079saji0009. Absent on tenants that predate this feature. */
+  tenantAdminUsername?: string;
+  accessEmailStatus?: AccessEmailStatus;
+  accessEmailLastAttemptAt?: string;
+  accessEmailSentAt?: string;
+  tenantAccessResetAt?: string;
+}
+
+export type RemediationAction =
+  | 'HARDEN_AND_RENAME'
+  | 'HARDEN'
+  | 'REPLACE_PASSWORD'
+  | 'ENSURE_NEVER_EXPIRES'
+  | 'DISABLE'
+  | 'LEAVE_UNCHANGED'
+  | 'NOT_PRESENT';
+
+/** What remediation of a legacy tenant would do (dry run) or did. */
+export interface TenantRemediationReport {
+  tenantIdentifier: string;
+  dryRun: boolean;
+  administrator: { action: RemediationAction; username?: string };
+  system: { action: RemediationAction };
+  interopUser: { action: RemediationAction };
+  /** True when applying replaces the login the cooperative uses today and emails them. */
+  emailsCooperative: boolean;
+  /** Present only on a real run that emailed the cooperative. */
+  accessEmailStatus?: AccessEmailStatus;
 }
 
 export interface CoopAdminListParams {
@@ -66,10 +103,12 @@ export interface CoopAdminRejectRequest {
 }
 
 export interface CoopAdminStats {
+  UNVERIFIED_EMAIL?: number;
   PENDING: number;
   PROVISIONED: number;
   ACTIVE: number;
   REJECTED: number;
+  WITHDRAWN?: number;
 }
 
 /**
@@ -126,49 +165,111 @@ export class CoopAdminService {
   }
 
   /**
-   * GET /admin/{id}
+   * GET /admin/{appUserId}
    *
    * Full detail for a single cooperative.
    */
-  getCooperativeById(id: number): Observable<CoopAdminRegistration> {
-    return this.http.get<CoopAdminRegistration>(`${this.baseUrl}/${id}`);
+  getCooperativeById(appUserId: number): Observable<CoopAdminRegistration> {
+    return this.http.get<CoopAdminRegistration>(`${this.baseUrl}/${appUserId}`);
   }
 
   /**
-   * POST /admin/{id}/verify
+   * POST /admin/{appUserId}/verify
    *
    * Verifies the cooperative and provisions its tenant.
    * Valid only while status is PENDING; on success the
    * response's status becomes PROVISIONED and includes
-   * tenantIdentifier / provisionedAt.
+   * tenantIdentifier / tenantAdminUsername / provisionedAt.
    */
-  verifyCooperative(id: number, remarks: string): Observable<CoopAdminRegistration> {
+  verifyCooperative(appUserId: number, remarks: string): Observable<CoopAdminRegistration> {
     const body: CoopAdminVerifyRequest = { remarks };
 
-    return this.http.post<CoopAdminRegistration>(`${this.baseUrl}/${id}/verify`, body);
+    return this.http.post<CoopAdminRegistration>(`${this.baseUrl}/${appUserId}/verify`, body);
   }
 
   /**
-   * POST /admin/{id}/reject
+   * POST /admin/{appUserId}/reject
    *
    * Valid only while status is PENDING; on success the
    * response's status becomes REJECTED.
    */
-  rejectCooperative(id: number, reason: string): Observable<CoopAdminRegistration> {
+  rejectCooperative(appUserId: number, reason: string): Observable<CoopAdminRegistration> {
     const body: CoopAdminRejectRequest = { reason };
 
-    return this.http.post<CoopAdminRegistration>(`${this.baseUrl}/${id}/reject`, body);
+    return this.http.post<CoopAdminRegistration>(`${this.baseUrl}/${appUserId}/reject`, body);
   }
 
   /**
-   * POST /admin/{id}/activate
+   * POST /admin/{appUserId}/activate
    *
-   * Valid only while status is PROVISIONED; on success
-   * the response's status becomes ACTIVE and includes
-   * activatedAt. No request body.
+   * Valid only while status is PROVISIONED. Enables the tenant
+   * administrator and emails the cooperative its sign-in details
+   * (never a password). frontendUrl is required unless one is
+   * already saved. A failed email does not fail activation: check
+   * accessEmailStatus on the response.
    */
-  activateCooperative(id: number): Observable<CoopAdminRegistration> {
-    return this.http.post<CoopAdminRegistration>(`${this.baseUrl}/${id}/activate`, {});
+  activateCooperative(appUserId: number, frontendUrl?: string): Observable<CoopAdminRegistration> {
+    return this.http.post<CoopAdminRegistration>(
+      `${this.baseUrl}/${appUserId}/activate`,
+      frontendUrl ? { frontendUrl } : {}
+    );
+  }
+
+  /**
+   * PUT /admin/{appUserId}/frontend-url
+   *
+   * Saves the web address the cooperative signs in at.
+   * Allowed while PROVISIONED or ACTIVE. The server returns
+   * the normalised value.
+   */
+  setFrontendUrl(appUserId: number, frontendUrl: string): Observable<CoopAdminRegistration> {
+    return this.http.put<CoopAdminRegistration>(`${this.baseUrl}/${appUserId}/frontend-url`, { frontendUrl });
+  }
+
+  /**
+   * POST /admin/{appUserId}/access-email/resend
+   *
+   * ACTIVE only. Sends the sign-in details again; changes
+   * nothing in the tenant.
+   */
+  resendAccessEmail(appUserId: number): Observable<CoopAdminRegistration> {
+    return this.http.post<CoopAdminRegistration>(`${this.baseUrl}/${appUserId}/access-email/resend`, {});
+  }
+
+  /**
+   * POST /admin/{appUserId}/tenant-access/reset
+   *
+   * ACTIVE only. The administrator's password becomes the
+   * registrant's current registry password again, must be
+   * changed at next sign-in, and the cooperative is emailed.
+   * The reason is recorded in the audit log.
+   */
+  resetTenantAccess(appUserId: number, reason: string): Observable<CoopAdminRegistration> {
+    return this.http.post<CoopAdminRegistration>(`${this.baseUrl}/${appUserId}/tenant-access/reset`, { reason });
+  }
+
+  /**
+   * POST /admin/{appUserId}/tenant-access/remediate?dryRun=true
+   *
+   * Reports what retiring the default credentials on a legacy
+   * tenant would do. Changes nothing.
+   */
+  checkTenantSecurity(appUserId: number): Observable<TenantRemediationReport> {
+    return this.http.post<TenantRemediationReport>(`${this.baseUrl}/${appUserId}/tenant-access/remediate`, null, {
+      params: new HttpParams().set('dryRun', 'true')
+    });
+  }
+
+  /**
+   * POST /admin/{appUserId}/tenant-access/remediate?dryRun=false
+   *
+   * Applies it. On an ACTIVE tenant still using the default
+   * login, this replaces that login and emails the cooperative.
+   */
+  remediateTenant(appUserId: number): Observable<TenantRemediationReport> {
+    return this.http.post<TenantRemediationReport>(`${this.baseUrl}/${appUserId}/tenant-access/remediate`, null, {
+      params: new HttpParams().set('dryRun', 'false')
+    });
   }
 
   /**

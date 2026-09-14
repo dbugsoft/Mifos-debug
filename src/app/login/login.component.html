@@ -80,12 +80,8 @@
 
         <!-- Login Form -->
         <div class="form-section">
-          @if (!resetPassword && !twoFactorAuthenticationRequired) {
+          @if (!twoFactorAuthenticationRequired) {
             <mifosx-login-form></mifosx-login-form>
-          }
-
-          @if (resetPassword) {
-            <mifosx-reset-password></mifosx-reset-password>
           }
 
           @if (twoFactorAuthenticationRequired) {

@@ -53,7 +53,12 @@ export const environment = {
     redirectUri: loadedEnv.oauthRedirectUri || '',
     scope: loadedEnv.oauthScope || ''
   },
-  /** Feature flag for Remember Me functionality */
+  /**
+   * Feature flag for Remember Me functionality.
+   * Keep false: with basic authentication, "remember me" stores the user's
+   * credentials in localStorage, where they survive browser restarts on shared
+   * office computers - including a cooperative administrator's password.
+   */
   enableRememberMe: false,
   warningDialog: {
     title: 'Warning',

@@ -30,6 +30,11 @@ const authorizationTenantHeader = 'Fineract-Platform-TenantId';
 /** Two factor access token header. */
 const twoFactorAccessTokenHeader = 'Fineract-Platform-TFA-Token';
 
+/** Cooperative Registry API calls authenticate independently of the Mifos session. */
+export function isCoopRegistryUrl(url: string): boolean {
+  return url.includes('/api/nepal/coop-registration/');
+}
+
 /**
  * Http Request interceptor to set the request headers.
  */
@@ -41,7 +46,11 @@ export class AuthenticationInterceptor implements HttpInterceptor {
    * Intercepts a Http request and sets the request headers.
    */
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    if (this.isExternalUrl(request.url)) {
+    // Cooperative Registry calls carry their own Bearer token (coopAuthInterceptor, which runs first).
+    // They are served by the same Fineract host, so without this they count as "internal" and setHeaders
+    // below would overwrite that token with the Mifos session's Basic credentials - the registry's JWT
+    // filter then sees no Bearer token and every protected registry call fails with 403.
+    if (this.isExternalUrl(request.url) || isCoopRegistryUrl(request.url)) {
       return next.handle(request);
     }
     if (this.settingsService.tenantIdentifier) {

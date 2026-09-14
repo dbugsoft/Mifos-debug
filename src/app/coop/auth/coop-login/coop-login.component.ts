@@ -6,13 +6,17 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { Component, inject } from '@angular/core';
+import { Component, OnDestroy, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthLayoutComponent } from '../../auth-layout/auth-layout.component';
 import { CoopAuthService } from '../../services/coop-auth.service';
 import { CoopTokenService } from '../../services/coop-token.service';
 import { MatIconModule } from '@angular/material/icon';
+
+/** Used when a 429 carries neither a Retry-After header nor retryAfterMinutes. */
+const DEFAULT_LOCKOUT_SECONDS = 15 * 60;
+
 @Component({
   selector: 'mifosx-coop-login',
   standalone: true,
@@ -25,16 +29,22 @@ import { MatIconModule } from '@angular/material/icon';
   templateUrl: './coop-login.component.html',
   styleUrl: './coop-login.component.scss'
 })
-export class CoopLoginComponent {
+export class CoopLoginComponent implements OnDestroy {
   private fb = inject(FormBuilder);
   private coopAuthService = inject(CoopAuthService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   private coopTokenService = inject(CoopTokenService);
 
   isSubmitting = false;
   hidePassword = true;
   successMessage = '';
   errorMessage = '';
+
+  /** Seconds until a locked account may try again; 0 when not locked. */
+  lockoutSecondsRemaining = 0;
+
+  private lockoutTimer: ReturnType<typeof setInterval> | null = null;
 
   loginForm = this.fb.nonNullable.group({
     email: [
@@ -53,11 +63,35 @@ export class CoopLoginComponent {
     ]
   });
 
+  constructor() {
+    if (this.route.snapshot.queryParamMap.get('passwordChanged') === '1') {
+      this.successMessage = 'Password changed. Please sign in again with your new password.';
+    }
+  }
+
+  get isLockedOut(): boolean {
+    return this.lockoutSecondsRemaining > 0;
+  }
+
+  /** e.g. "14:05" */
+  get lockoutCountdown(): string {
+    const minutes = Math.floor(this.lockoutSecondsRemaining / 60);
+    const seconds = this.lockoutSecondsRemaining % 60;
+
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  }
+
+  ngOnDestroy(): void {
+    this.stopLockoutCountdown();
+  }
+
   onSubmit(): void {
     this.successMessage = '';
     this.errorMessage = '';
 
-    console.log('1. Login button clicked');
+    if (this.isLockedOut) {
+      return;
+    }
 
     /* =========================
        FORM VALIDATION
@@ -73,10 +107,9 @@ export class CoopLoginComponent {
 
     this.isSubmitting = true;
 
-    console.log('2. Calling login API');
-
     /* =========================
        LOGIN API
+       Never log the response: it carries the access and refresh tokens.
     ========================= */
 
     this.coopAuthService
@@ -85,43 +118,17 @@ export class CoopLoginComponent {
         password: formValue.password
       })
       .subscribe({
-        /* =========================
-         LOGIN SUCCESS
-      ========================= */
-
         next: (response) => {
-          console.log('LOGIN SUCCESS RESPONSE:', response);
-
-          console.log('isEmailVerified:', response.isEmailVerified);
-
-          console.log('status:', response.status);
-
-          console.log('accessToken:', response.accessToken);
-
-          console.log('refreshToken:', response.refreshToken);
-
           /* =========================
            VERIFIED / ACTIVE USER
-        =========================
-         
-         Customer:
-           isEmailVerified = true
-           status = VERIFIED
 
-         Admin:
-           isEmailVerified = true
-           status = ACTIVE
+           Customer: isEmailVerified = true, status = VERIFIED
+           Admin:    isEmailVerified = true, status = ACTIVE
 
-         Both are valid login responses.
-        */
-
-          if (response.isEmailVerified === true && (response.status === 'VERIFIED' || response.status === 'ACTIVE')) {
-            console.log('VALID LOGIN RESPONSE');
-
-            /* =========================
-             SAVE TOKENS
+           Both are valid login responses.
           ========================= */
 
+          if (response.isEmailVerified === true && (response.status === 'VERIFIED' || response.status === 'ACTIVE')) {
             this.coopTokenService.setSession({
               accessToken: response.accessToken,
 
@@ -134,53 +141,22 @@ export class CoopLoginComponent {
               status: response.status === 'ACTIVE' ? 'VERIFIED' : response.status
             });
 
-            console.log('AUTH SESSION SAVED:', this.coopTokenService.getSession());
-
-            /*
-             * Stop loading immediately after
-             * successful login.
-             */
-
             this.isSubmitting = false;
 
             this.successMessage = 'Login successful. Redirecting...';
 
             /* =========================
              ROLE BASED REDIRECT
-          ========================= */
+            ========================= */
 
             let destination = '/coop/profile';
 
             try {
-              const isAdmin = this.coopTokenService.isAdmin();
-
-              console.log('IS ADMIN:', isAdmin);
-
-              if (isAdmin) {
-                destination = '/coop/admin';
-
-                console.log('Redirecting to ADMIN dashboard');
-              } else {
-                destination = '/coop/profile';
-
-                console.log('Redirecting to COOP profile');
-              }
-            } catch (error) {
-              console.error('Role detection failed:', error);
-
-              /*
-               * Safe fallback for normal
-               * cooperative users.
-               */
-
+              destination = this.coopTokenService.isAdmin() ? '/coop/admin' : '/coop/profile';
+            } catch {
+              // Safe fallback for normal cooperative users.
               destination = '/coop/profile';
             }
-
-            console.log('FINAL DESTINATION:', destination);
-
-            /* =========================
-             NAVIGATE
-          ========================= */
 
             this.router.navigate([
               destination
@@ -191,11 +167,9 @@ export class CoopLoginComponent {
 
           /* =========================
            UNVERIFIED USER
-        ========================= */
+          ========================= */
 
           if (response.status === 'UNVERIFIED') {
-            console.log('USER IS UNVERIFIED');
-
             this.handleUnverifiedUser(formValue.email);
 
             return;
@@ -203,31 +177,35 @@ export class CoopLoginComponent {
 
           /* =========================
            UNKNOWN STATUS
-        ========================= */
+          ========================= */
 
           this.isSubmitting = false;
-
-          console.log('UNKNOWN LOGIN STATUS:', response.status);
 
           this.errorMessage = 'Unable to determine your account status.';
         },
 
-        /* =========================
-         LOGIN ERROR
-      ========================= */
-
         error: (error) => {
-          console.error('LOGIN API ERROR:', error);
-
           const serverError = error?.error?.error || error?.error?.message || error?.error?.defaultUserMessage || '';
 
           /* =========================
+           LOCKED AFTER REPEATED FAILURES
+          ========================= */
+
+          if (error?.status === 429) {
+            this.isSubmitting = false;
+
+            this.errorMessage = serverError || 'Too many failed sign-in attempts. Please try again later.';
+
+            this.startLockoutCountdown(retryAfterSeconds(error));
+
+            return;
+          }
+
+          /* =========================
            EMAIL NOT VERIFIED
-        ========================= */
+          ========================= */
 
-          if (error.status === 403 && serverError.includes('Email not verified')) {
-            console.log('EMAIL NOT VERIFIED - RESENDING OTP');
-
+          if (error?.status === 403 && serverError.includes('Email not verified')) {
             this.handleUnverifiedUser(this.loginForm.getRawValue().email);
 
             return;
@@ -235,7 +213,7 @@ export class CoopLoginComponent {
 
           /* =========================
            OTHER ERRORS
-        ========================= */
+          ========================= */
 
           this.isSubmitting = false;
 
@@ -245,27 +223,49 @@ export class CoopLoginComponent {
   }
 
   // =====================================================
+  // LOCKOUT COUNTDOWN
+  // =====================================================
+
+  private startLockoutCountdown(seconds: number): void {
+    this.stopLockoutCountdown();
+
+    this.lockoutSecondsRemaining = Math.max(1, Math.ceil(seconds));
+
+    this.lockoutTimer = setInterval(() => {
+      this.lockoutSecondsRemaining -= 1;
+
+      if (this.lockoutSecondsRemaining <= 0) {
+        this.stopLockoutCountdown();
+
+        this.errorMessage = '';
+      }
+    }, 1000);
+  }
+
+  private stopLockoutCountdown(): void {
+    if (this.lockoutTimer) {
+      clearInterval(this.lockoutTimer);
+
+      this.lockoutTimer = null;
+    }
+
+    this.lockoutSecondsRemaining = 0;
+  }
+
+  // =====================================================
   // HANDLE UNVERIFIED USER
   // =====================================================
 
   private handleUnverifiedUser(email: string): void {
     this.isSubmitting = true;
 
-    console.log('Resending OTP for:', email);
-
     this.coopAuthService
       .resendOtp({
         email: email
       })
       .subscribe({
-        /* =========================
-         RESEND OTP SUCCESS
-      ========================= */
-
         next: (resendResponse) => {
           this.isSubmitting = false;
-
-          console.log('OTP RESEND SUCCESS:', resendResponse);
 
           const userId = resendResponse.userId;
 
@@ -277,10 +277,6 @@ export class CoopLoginComponent {
 
           this.successMessage = resendResponse.message || 'A new OTP has been sent to your email.';
 
-          /* =========================
-           NAVIGATE TO VERIFY EMAIL
-        ========================= */
-
           setTimeout(() => {
             this.router.navigate(['/coop/verify-email'], {
               queryParams: {
@@ -290,14 +286,8 @@ export class CoopLoginComponent {
           }, 1000);
         },
 
-        /* =========================
-         RESEND OTP ERROR
-      ========================= */
-
         error: (error) => {
           this.isSubmitting = false;
-
-          console.error('RESEND OTP ERROR:', error);
 
           this.errorMessage =
             error?.error?.message ||
@@ -307,4 +297,20 @@ export class CoopLoginComponent {
         }
       });
   }
+}
+
+/** Seconds to wait, from the Retry-After header when readable, else the response body. */
+function retryAfterSeconds(error: {
+  headers?: { get?: (name: string) => string | null };
+  error?: { retryAfterMinutes?: number };
+}): number {
+  const header = Number(error?.headers?.get?.('Retry-After'));
+
+  if (Number.isFinite(header) && header > 0) {
+    return header;
+  }
+
+  const minutes = Number(error?.error?.retryAfterMinutes);
+
+  return Number.isFinite(minutes) && minutes > 0 ? minutes * 60 : DEFAULT_LOCKOUT_SECONDS;
 }

@@ -35,7 +35,6 @@ import { environment } from '../../environments/environment';
 import { SettingsService } from 'app/settings/settings.service';
 import { TenantSelectorComponent } from '../shared/tenant-selector/tenant-selector.component';
 import { LoginFormComponent } from './login-form/login-form.component';
-import { ResetPasswordComponent } from './reset-password/reset-password.component';
 import { TwoFactorAuthenticationComponent } from './two-factor-authentication/two-factor-authentication.component';
 import { LanguageSelectorComponent } from '../shared/language-selector/language-selector.component';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
@@ -53,7 +52,6 @@ import { VersionService } from '../system/version.service';
     ...STANDALONE_SHARED_IMPORTS,
     TenantSelectorComponent,
     LoginFormComponent,
-    ResetPasswordComponent,
     TwoFactorAuthenticationComponent,
     LanguageSelectorComponent
   ],
@@ -88,8 +86,6 @@ export class LoginComponent implements OnInit {
     return tenant.charAt(0).toUpperCase() + tenant.slice(1).toLowerCase();
   }
 
-  /** True if password requires a reset. */
-  resetPassword = false;
   /** True if user requires two factor authentication. */
   twoFactorAuthenticationRequired = false;
   logoPath = 'assets/images/debug-bg.png';
@@ -116,13 +112,11 @@ export class LoginComponent implements OnInit {
     this.alertService.alertEvent.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((alertEvent: Alert) => {
       const alertType = alertEvent.type;
       if (alertType === this.translateService.instant('errors.auth.passwordExpired.type')) {
+        // The blocking "set a new password" dialog (opened from WebAppComponent) takes over from here.
         this.twoFactorAuthenticationRequired = false;
-        this.resetPassword = true;
       } else if (alertType === this.translateService.instant('errors.auth.twoFactor.type')) {
-        this.resetPassword = false;
         this.twoFactorAuthenticationRequired = true;
       } else if (alertType === this.translateService.instant('errors.auth.success.type')) {
-        this.resetPassword = false;
         this.twoFactorAuthenticationRequired = false;
         this.router.navigate(['/'], { replaceUrl: true });
       } else if (alertType === this.translateService.instant('errors.tenant.changed.type')) {
