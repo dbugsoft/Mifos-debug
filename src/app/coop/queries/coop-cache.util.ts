@@ -24,5 +24,8 @@ export function clearCoopUserQueries(queryClient: QueryClient): void {
 
   queryClient.removeQueries({ queryKey: coopQueryKeys.me() });
 
+  // Application status carries the cooperative's sign-in address and username.
+  queryClient.removeQueries({ queryKey: coopQueryKeys.status() });
+
   queryClient.removeQueries({ queryKey: coopQueryKeys.admin.root() });
 }

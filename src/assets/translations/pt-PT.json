@@ -339,8 +339,8 @@
         "message": "Autenticação de dois fatores necessária"
       },
       "passwordExpired": {
-        "type": "Palavra-passe expirada",
-        "message": "A sua palavra-passe expirou, redefina a sua palavra-passe!"
+        "type": "Definir nova palavra-passe",
+        "message": "Por motivos de segurança, escolha uma nova palavra-passe antes de continuar."
       },
       "success": {
         "type": "Autenticação bem-sucedida",
@@ -3780,6 +3780,17 @@
       "Please select a delivery method": "Selecione um método de entrega",
       "Please select a screen report.": "Selecione um relatório de tela.",
       "Please update your password": "Atualize sua senha",
+      "Temporary password notice": "If you're signing in with a temporary password, choose a new one to finish setting up your account.",
+      "Your new password must": "Your new password must:",
+      "Signed in as": "Signed in as",
+      "Password rule min length": "Be at least {{min}} characters long",
+      "Password rule max length": "Be at most 50 characters long",
+      "Password rule uppercase": "Include an uppercase letter (A–Z)",
+      "Password rule lowercase": "Include a lowercase letter (a–z)",
+      "Password rule number": "Include a number (0–9)",
+      "Password rule special character": "Include a special character, e.g. # @ !",
+      "Password rule no spaces": "Not contain spaces",
+      "Password rule no repeats": "Not repeat the same character twice in a row (e.g. aa, 11)",
       "Powered by": "Desenvolvido por",
       "Precedes of": "Precede de",
       "Preferences for generating account numbers for client": "Preferências para geração de números de contas para clientes, empréstimos e contas de poupança",

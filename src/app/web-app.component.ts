@@ -8,11 +8,19 @@
 
 /* eslint-disable @angular-eslint/prefer-inject */
 /** Angular Imports */
-import { ChangeDetectionStrategy, Component, OnInit, HostListener, HostBinding, OnDestroy } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  HostListener,
+  HostBinding,
+  OnDestroy,
+  inject
+} from '@angular/core';
 import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { MatSnackBar, MatSnackBarRef } from '@angular/material/snack-bar';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 
 /** rxjs Imports */
 import { merge, Subscription, Subject } from 'rxjs';
@@ -29,6 +37,9 @@ import { Logger } from './core/logger/logger.service';
 import { ThemeStorageService } from './shared/theme-picker/theme-storage.service';
 import { AlertService } from './core/alert/alert.service';
 import { AuthenticationService } from './core/authentication/authentication.service';
+import { PasswordRenewalService } from './core/authentication/password-renewal.service';
+import { ForcePasswordChangeDialogComponent } from './login/force-password-change-dialog/force-password-change-dialog.component';
+import { FORCE_PASSWORD_CHANGE_DIALOG_CONFIG } from './login/force-password-change-dialog/force-password-change-dialog.config';
 import { SettingsService } from './settings/settings.service';
 import { DocumentationLinksService } from 'app/shared/services/documentation-links.service';
 import { IdleTimeoutService } from './home/timeout-dialog/idle-timeout.service';
@@ -105,6 +116,9 @@ export class WebAppComponent implements OnInit, OnDestroy {
   private authSubscription: Subscription;
   private destroy$ = new Subject<void>();
 
+  private passwordRenewal = inject(PasswordRenewalService);
+  private passwordRenewalDialog: MatDialogRef<ForcePasswordChangeDialogComponent> | null = null;
+
   /**
    * @param {Router} router Router for navigation.
    * @param {ActivatedRoute} activatedRoute Activated Route.
@@ -162,6 +176,20 @@ export class WebAppComponent implements OnInit, OnDestroy {
       Logger.enableProductionMode();
     }
     log.debug('init');
+
+    // Blocking "set a new password" dialog whenever Fineract requires a password change (FINERACT-2003),
+    // whether at sign-in or mid-session. It can only be left by changing the password or signing out.
+    this.passwordRenewal.required$.pipe(takeUntil(this.destroy$)).subscribe((required) => {
+      if (required && !this.passwordRenewalDialog) {
+        this.passwordRenewalDialog = this.dialog.open(
+          ForcePasswordChangeDialogComponent,
+          FORCE_PASSWORD_CHANGE_DIALOG_CONFIG
+        );
+        this.passwordRenewalDialog.afterClosed().subscribe(() => (this.passwordRenewalDialog = null));
+      } else if (!required && this.passwordRenewalDialog) {
+        this.passwordRenewalDialog.close();
+      }
+    });
 
     // Setup translations
     this.translateService.addLangs(environment.supportedLanguages.split(','));

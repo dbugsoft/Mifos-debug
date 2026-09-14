@@ -11,6 +11,17 @@ export interface CoopConfig {
   coopName: string;
 }
 
+/*
+ * Cooperative hostname -> tenant mapping.
+ *
+ * ONBOARDING RULE: a cooperative's host must be added here (a subdomain key
+ * below, or a custom domain in domainMap) and deployed BEFORE a registry admin
+ * activates the cooperative. The admin confirms this in the activation dialog;
+ * the backend cannot check it. A host missing from this file silently uses the
+ * "default" tenant (see resolveCoop), which gives the cooperative a confusing
+ * "invalid credentials" error on the wrong tenant. Deployments can block that
+ * with window.env.blockUnmappedHosts (see src/app/unconfigured-host).
+ */
 const coopConfigurations: Record<string, CoopConfig> = {
   '2075ruru0008': {
     tenantId: '2075ruru0008',
@@ -57,31 +68,38 @@ const domainMap: Record<string, string> = {
   // Custom domains can be added here eg 'sajilo.example.com': '2079saji0009'
 };
 
-function detectCoop(): string {
-  const hostname = window.location.hostname;
+export interface CoopResolution {
+  /** Key into the cooperative configurations. */
+  key: string;
+  /** False when the hostname mapped to no cooperative and fell back to the default tenant. */
+  matched: boolean;
+}
 
-  // 1. Check exact/custom domain first
-  if (domainMap[hostname]) {
-    return domainMap[hostname];
+/** Maps a hostname to its cooperative: an exact custom domain first, then the subdomain. */
+export function resolveCoop(hostname: string): CoopResolution {
+  const host = (hostname ?? '').toLowerCase();
+
+  // 1. Exact/custom domain
+  if (domainMap[host]) {
+    return { key: domainMap[host], matched: true };
   }
 
-  // 2. Get tenant ID from subdomain
-  const subdomain = hostname.split('.')[0];
+  // 2. Tenant ID from the subdomain
+  const subdomain = host.split('.')[0];
 
-  // 3. If subdomain matches a configured tenant, use it
-  if (coopConfigurations[subdomain]) {
-    return subdomain;
+  if (subdomain !== defaultCoopKey && coopConfigurations[subdomain]) {
+    return { key: subdomain, matched: true };
   }
 
-  // 4. Plain localhost / unknown domain -> default cooperative
-  return defaultCoopKey;
+  // 3. Plain localhost / unknown domain -> default cooperative
+  return { key: defaultCoopKey, matched: false };
 }
 
 let currentCoopConfig: CoopConfig | null = null;
 
 export function getCoopConfig(): CoopConfig {
   if (!currentCoopConfig) {
-    const coopKey = detectCoop();
+    const coopKey = resolveCoop(window.location.hostname).key;
 
     currentCoopConfig = coopConfigurations[coopKey] ?? coopConfigurations[defaultCoopKey];
   }

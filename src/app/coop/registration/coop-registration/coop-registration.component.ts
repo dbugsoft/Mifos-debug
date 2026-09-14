@@ -7,20 +7,27 @@
  */
 
 import { Component, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 
 import { CoopAuthService } from '../../services/coop-auth.service';
+import { CoopPasswordChecklistComponent } from '../../shared/coop-password-checklist/coop-password-checklist.component';
+import { coopPasswordValidator } from '../../utils/coop-password-policy';
 
 @Component({
   selector: 'mifosx-coop-registration',
   standalone: true,
   imports: [
     ReactiveFormsModule,
-    RouterLink
+    RouterLink,
+    CoopPasswordChecklistComponent
   ],
   templateUrl: './coop-registration.component.html',
-  styleUrl: './coop-registration.component.scss'
+  styleUrls: [
+    './coop-registration.component.scss',
+    './coop-registration.password.scss'
+  ]
 })
 export class CoopRegistrationComponent {
   private fb = inject(FormBuilder);
@@ -41,11 +48,11 @@ export class CoopRegistrationComponent {
       ]
     ],
 
+    // The registry password rules are added in the constructor: they depend on the email.
     password: [
       '',
       [
-        Validators.required,
-        Validators.minLength(8)
+        Validators.required
       ]
     ],
 
@@ -57,6 +64,17 @@ export class CoopRegistrationComponent {
       ]
     ]
   });
+
+  constructor() {
+    const { email, password } = this.registrationForm.controls;
+
+    password.addValidators(coopPasswordValidator(() => email.value));
+
+    // "Must not contain your email name" depends on the email, so re-check the password when it changes.
+    email.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => password.updateValueAndValidity({ emitEvent: false }));
+  }
 
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
@@ -83,42 +101,30 @@ export class CoopRegistrationComponent {
       })
       .subscribe({
         next: (response) => {
-          console.log('Registration successful:', response);
-
           this.isSubmitting = false;
 
-          // IMPORTANT
           const userId = response.userId;
-
-          console.log('User ID received:', userId);
 
           if (!userId) {
             this.errorMessage = 'Registration succeeded but user ID was not returned.';
             return;
           }
 
-          // Store userId for email verification
+          // Store userId for email verification, then go to OTP verification.
           localStorage.setItem('coopVerificationUserId', userId.toString());
-          console.log('Verification userId stored:', localStorage.getItem('coopVerificationUserId'));
-          // Go to OTP verification page
           this.router.navigate(['/coop/verify-email']);
         },
 
         error: (error) => {
-          console.error('Registration failed:', error);
           this.isSubmitting = false;
 
-          //Extracting the error details or console message coming from the backend
+          // The backend's message is written for the user, including password policy violations.
           const serverError = error?.error?.error || error?.error?.message || '';
-          console.log('Extracted server error message context:', serverError);
 
-          //if email is already verified
           if (serverError.includes('status: VERIFIED') || serverError.includes('already registered')) {
-            // error message for user
             this.errorMessage = 'This email already exists and is verified. Please log in.';
             this.registrationForm.controls.email.setErrors({ alreadyExists: true });
           } else {
-            //other errors
             this.errorMessage =
               serverError || 'Registration failed. Please check your inputs or network and try again.';
           }

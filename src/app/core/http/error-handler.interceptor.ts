@@ -21,6 +21,7 @@ import { environment } from '../../../environments/environment';
 import { Logger } from '../logger/logger.service';
 import { AlertService } from '../alert/alert.service';
 import { TranslateService } from '@ngx-translate/core';
+import { PasswordRenewalService, isPasswordOutdatedError } from '../authentication/password-renewal.service';
 
 /** Initialize Logger */
 const log = new Logger('ErrorHandlerInterceptor');
@@ -32,6 +33,7 @@ const log = new Logger('ErrorHandlerInterceptor');
 export class ErrorHandlerInterceptor implements HttpInterceptor {
   private alertService = inject(AlertService);
   private translate = inject(TranslateService);
+  private passwordRenewal = inject(PasswordRenewalService);
   private databaseErrorCodes: string[] = [
     'error.msg.data.integrity.issue.entity.duplicated',
     'error.msg.data.integrity.issue'
@@ -62,6 +64,19 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
   private handleError(response: HttpErrorResponse, request: HttpRequest<any>): Observable<HttpEvent<any>> {
     const status = response.status;
     const errorBody = this.parseErrorBody(response.error);
+
+    // A sign-in whose password must be changed first (FINERACT-2003) is not an error for the user:
+    // AuthenticationService.login() turns it into the password renewal flow. No generic alert.
+    if (status === 403 && errorBody?.shouldRenewPassword === true) {
+      return throwError(() => response);
+    }
+
+    // A signed-in user whose password must now be changed (error.msg.password.outdated): open the blocking
+    // "set a new password" dialog instead of showing a generic error for every refused call.
+    if (isPasswordOutdatedError(errorBody)) {
+      this.passwordRenewal.require();
+      return throwError(() => response);
+    }
 
     // Translate top-level globalisation code if present
     const rawTopLevelMessage = errorBody?.defaultUserMessage || errorBody?.developerMessage;

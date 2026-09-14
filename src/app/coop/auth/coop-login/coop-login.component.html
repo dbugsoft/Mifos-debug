@@ -18,7 +18,7 @@
   <!-- Success Message -->
 
   @if (successMessage) {
-    <div class="success-message">
+    <div class="success-message" role="status">
       {{ successMessage }}
     </div>
   }
@@ -26,7 +26,7 @@
   <!-- Error Message -->
 
   @if (errorMessage) {
-    <div class="error-message">
+    <div class="error-message" role="alert">
       {{ errorMessage }}
     </div>
   }
@@ -89,9 +89,11 @@
 
     <!-- Login Button -->
 
-    <button type="submit" class="login-button" [disabled]="isSubmitting">
+    <button type="submit" class="login-button" [disabled]="isSubmitting || isLockedOut">
       @if (isSubmitting) {
         Logging in...
+      } @else if (isLockedOut) {
+        Try again in {{ lockoutCountdown }}
       } @else {
         Login
       }

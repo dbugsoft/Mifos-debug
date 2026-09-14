@@ -48,6 +48,13 @@ export interface CoopLoginResponse {
   refreshToken: string;
   accessToken: string;
 }
+
+/** Body of a 429 from POST /public/login while the account is locked after repeated failures. */
+export interface CoopLoginLockedResponse {
+  error: string;
+  retryAfterMinutes: number;
+}
+
 export interface CoopRefreshTokenRequest {
   refreshToken: string;
 }
@@ -74,6 +81,15 @@ export interface CoopLogoutRequest {
 }
 
 export interface CoopLogoutResponse {
+  message: string;
+}
+
+export interface CoopChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+}
+
+export interface CoopChangePasswordResponse {
   message: string;
 }
 
@@ -107,5 +123,16 @@ export class CoopAuthService {
 
   refresh(data: CoopRefreshTokenRequest): Observable<CoopRefreshTokenResponse> {
     return this.http.post<CoopRefreshTokenResponse>(`${this.baseUrl}/refresh`, data);
+  }
+
+  /**
+   * POST /public/change-password
+   *
+   * On success the server revokes every session for the account,
+   * so the caller must clear the local session and send the user
+   * back to login.
+   */
+  changePassword(data: CoopChangePasswordRequest): Observable<CoopChangePasswordResponse> {
+    return this.http.post<CoopChangePasswordResponse>(`${this.baseUrl}/change-password`, data);
   }
 }

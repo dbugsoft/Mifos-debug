@@ -26,6 +26,10 @@ const PROFILE_STALE_TIME_MS = 60_000;
 
 const ME_STALE_TIME_MS = 5 * 60_000;
 
+// The application status changes when a registry admin acts on it,
+// which the applicant cannot observe, so it is re-read fairly often.
+const STATUS_STALE_TIME_MS = 60_000;
+
 // Province/district/local level/ward are static reference data - safe
 // to treat as fresh, and to keep cached, for the entire browser session.
 const LOCATIONS_STALE_TIME_MS = Infinity;
@@ -43,6 +47,14 @@ export function meQueryOptions(coopProfileService: CoopProfileService) {
     queryKey: coopQueryKeys.me(),
     queryFn: () => firstValueFrom(coopProfileService.getMe()),
     staleTime: ME_STALE_TIME_MS
+  });
+}
+
+export function statusQueryOptions(coopProfileService: CoopProfileService) {
+  return queryOptions({
+    queryKey: coopQueryKeys.status(),
+    queryFn: () => firstValueFrom(coopProfileService.getStatus()),
+    staleTime: STATUS_STALE_TIME_MS
   });
 }
 

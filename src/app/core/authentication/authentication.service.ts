@@ -8,10 +8,10 @@
 
 /** Angular Imports */
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 /** rxjs Imports */
-import { BehaviorSubject, Observable, of, from } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import { BehaviorSubject, Observable, of, from, throwError } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
 
 /** 3rd party Imports */
 import { OAuthService } from 'angular-oauth2-oidc';
@@ -21,6 +21,7 @@ import { TranslateService } from '@ngx-translate/core';
 
 /** Custom Interceptors */
 import { AuthenticationInterceptor } from './authentication.interceptor';
+import { PasswordRenewalService } from './password-renewal.service';
 
 /** Environment Configuration */
 import { environment } from '../../../environments/environment';
@@ -38,6 +39,7 @@ export class AuthenticationService {
   private http = inject(HttpClient);
   private alertService = inject(AlertService);
   private authenticationInterceptor = inject(AuthenticationInterceptor);
+  private passwordRenewal = inject(PasswordRenewalService);
   private oauthService = inject(OAuthService);
   private translateService = inject(TranslateService);
 
@@ -232,6 +234,16 @@ export class AuthenticationService {
         map((credentials: Credentials) => {
           this.onLoginSuccess(credentials);
           return true;
+        }),
+        // Fineract (FINERACT-2003) answers valid credentials that must be changed first with 403 and the
+        // authenticated user data, shouldRenewPassword: true. That is a successful sign-in into the password
+        // renewal flow, not a failure.
+        catchError((error: HttpErrorResponse) => {
+          if (error.status === 403 && error.error?.shouldRenewPassword === true) {
+            this.onLoginSuccess(error.error as Credentials);
+            return of(true);
+          }
+          return throwError(() => error);
         })
       );
   }
@@ -305,12 +317,14 @@ export class AuthenticationService {
     } else {
       if (credentials.shouldRenewPassword) {
         this.credentials = credentials;
+        this.passwordRenewal.require();
         this.alertService.alert({
           type: this.translateService.instant('errors.auth.passwordExpired.type'),
           message: this.translateService.instant('errors.auth.passwordExpired.message')
         });
       } else {
         this.setCredentials(credentials);
+        this.passwordRenewal.clear();
         this.alertService.alert({
           type: this.translateService.instant('errors.auth.success.type'),
           message: this.translateService.instant('errors.auth.success.message', { username: credentials.username })
@@ -371,6 +385,7 @@ export class AuthenticationService {
 
     this.authenticationInterceptor.removeAuthorization();
     this.setCredentials();
+    this.passwordRenewal.clear();
     this.userLoggedIn$.next(false);
 
     if (this.authMode === AuthMode.OIDC) {
@@ -514,12 +529,14 @@ export class AuthenticationService {
   private onOTPValidateSuccess(response: any): void {
     this.authenticationInterceptor.setTwoFactorAccessToken(response.token);
     if (this.credentials.shouldRenewPassword) {
+      this.passwordRenewal.require();
       this.alertService.alert({
         type: this.translateService.instant('errors.auth.passwordExpired.type'),
         message: this.translateService.instant('errors.auth.passwordExpired.message')
       });
     } else {
       this.setCredentials(this.credentials);
+      this.passwordRenewal.clear();
       this.alertService.alert({
         type: this.translateService.instant('errors.auth.success.type'),
         message: this.translateService.instant('errors.auth.success.message', { username: this.credentials.username })
@@ -534,7 +551,11 @@ export class AuthenticationService {
    * @param {any} passwordDetails New password.
    */
   resetPassword(passwordDetails: any) {
-    return this.http.put(`/users/${this.credentials.userId}`, passwordDetails).pipe(
+    // POST /users/{id}/pwd is the one call Fineract allows while a password change is required, and only for the
+    // user's own account. It clears the requirement on success. (PUT /users/{id} is refused in that state.)
+    // In-memory credentials exist during sign-in; a mid-session "password outdated" uses the stored session instead.
+    const credentials = this.credentials ?? this.getCredentials();
+    return this.http.post(`/users/${credentials.userId}/pwd`, passwordDetails).pipe(
       map(() => {
         this.alertService.alert({
           type: this.translateService.instant('errors.auth.passwordReset.type'),
@@ -543,13 +564,18 @@ export class AuthenticationService {
         this.authenticationInterceptor.removeAuthorization();
         this.authenticationInterceptor.removeTwoFactorAuthorization();
         const loginContext: LoginContext = {
-          username: this.credentials.username,
+          username: credentials.username,
           password: passwordDetails.password,
           remember: this.rememberMe
         };
         this.login(loginContext).subscribe();
       })
     );
+  }
+
+  /** Username of the account whose password must be changed, for display in the renewal dialog. */
+  get pendingPasswordRenewalUsername(): string | null {
+    return (this.credentials ?? this.getCredentials())?.username ?? null;
   }
 
   /*
