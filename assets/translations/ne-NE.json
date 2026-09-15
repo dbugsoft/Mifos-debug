@@ -339,8 +339,8 @@
         "message": "दुई-कारक प्रमाणीकरण आवश्यक छ"
       },
       "passwordExpired": {
-        "type": "पासवर्ड समाप्त भयो",
-        "message": "तपाईंको पासवर्ड समाप्त भएको छ, कृपया पासवर्ड रिसेट गर्नुहोस्!"
+        "type": "नयाँ पासवर्ड राख्नुहोस्",
+        "message": "सुरक्षाका लागि, अगाडि बढ्नुअघि नयाँ पासवर्ड छान्नुहोस्।"
       },
       "success": {
         "type": "प्रमाणीकरण सफल",
@@ -3404,6 +3404,7 @@
       "Configure Maker Checker Tasks": "मेकर जाँचकर्ता कार्यहरू कन्फिगर गर्नुहोस्",
       "Copy": "कापी",
       "Copy Account Number": "खाता नम्बर प्रतिलिपि गर्नुहोस्",
+      "Could not load data": "डाटा लोड गर्न सकिएन",
       "Create": "सिर्जना गर्नुहोस्",
       "Create Account Number Preference": "खाता नम्बर प्राथमिकता सिर्जना गर्नुहोस्",
       "Create Accounting Closure": "लेखा बन्द सिर्जना गर्नुहोस्",
@@ -3642,6 +3643,7 @@
       "Journal entries made at the end of accounting period": "लेखा अवधिको अन्त्यमा जर्नल प्रविष्टिहरू",
       "Journal entry reverse transaction": "यो लेनदेन उल्टाउन नयाँ जर्नल प्रविष्टि सिर्जना गरिएको छ:",
       "Council Approval": "परिषद्को अनुमोदन",
+      "No activity for this period": "यस अवधिमा कुनै गतिविधि छैन",
       "No pending loans for Council Approval": "परिषद्को अनुमोदनको लागि कुनै ऋण बाँकी छैन",
       "Laon Approval": "लाओन स्वीकृति",
       "Launch a page that create new data table": "यसले तपाइँलाई नयाँ डेटा तालिका सिर्जना गर्न अनुमति दिने पृष्ठ सुरु गर्नेछ।",
@@ -3778,6 +3780,17 @@
       "Please select a delivery method": "कृपया डेलिभरी विधि चयन गर्नुहोस्",
       "Please select a screen report.": "कृपया स्क्रिन रिपोर्ट चयन गर्नुहोस्।",
       "Please update your password": "कृपया आफ्नो पासवर्ड अपडेट गर्नुहोस्",
+      "Temporary password notice": "तपाईं अस्थायी पासवर्डबाट साइन इन गर्दै हुनुहुन्छ। आफ्नो खाता सेटअप पूरा गर्न नयाँ पासवर्ड छान्नुहोस्।",
+      "Your new password must": "तपाईंको नयाँ पासवर्डमा:",
+      "Signed in as": "साइन इन गरिएको खाता",
+      "Password rule min length": "कम्तीमा {{min}} अक्षर हुनुपर्छ",
+      "Password rule max length": "बढीमा ५० अक्षर हुनुपर्छ",
+      "Password rule uppercase": "एउटा ठूलो अंग्रेजी अक्षर (A–Z) हुनुपर्छ",
+      "Password rule lowercase": "एउटा सानो अंग्रेजी अक्षर (a–z) हुनुपर्छ",
+      "Password rule number": "एउटा अंक (0–9) हुनुपर्छ",
+      "Password rule special character": "एउटा विशेष चिन्ह (जस्तै # @ !) हुनुपर्छ",
+      "Password rule no spaces": "खाली ठाउँ (स्पेस) हुनु हुँदैन",
+      "Password rule no repeats": "एउटै अक्षर लगातार दोहोरिनु हुँदैन (जस्तै aa, 11)",
       "Powered by": "द्वारा संचालित",
       "Precedes of": "को पूर्ववर्ती",
       "Preferences for generating account numbers for client": "ग्राहक, ऋण र बचत खाताहरूको लागि खाता नम्बरहरू सिर्जना गर्न प्राथमिकताहरू",

@@ -339,8 +339,8 @@
         "message": "Zwei-Faktor-Authentifizierung erforderlich"
       },
       "passwordExpired": {
-        "type": "Passwort abgelaufen",
-        "message": "Ihr Passwort ist abgelaufen, bitte setzen Sie Ihr Passwort zurück!"
+        "type": "Neues Passwort festlegen",
+        "message": "Bitte wählen Sie aus Sicherheitsgründen ein neues Passwort, bevor Sie fortfahren."
       },
       "success": {
         "type": "Authentifizierung erfolgreich",
@@ -3406,6 +3406,7 @@
       "Configure Maker Checker Tasks": "Konfigurieren Sie Maker Checker-Aufgaben",
       "Copy": "Kopieren",
       "Copy Account Number": "Kontonummer kopieren",
+      "Could not load data": "Daten konnten nicht geladen werden",
       "Create": "Erstellen",
       "Create Account Number Preference": "Kontonummernpräferenz erstellen",
       "Create Accounting Closure": "Erstellen Sie einen Buchhaltungsabschluss",
@@ -3644,6 +3645,7 @@
       "Journal entries made at the end of accounting period": "Journalbuchungen, die am Ende des Abrechnungszeitraums vorgenommen werden",
       "Journal entry reverse transaction": "Es wurde ein neuer Journaleintrag erstellt, um diese Transaktion rückgängig zu machen:",
       "Council Approval": "Ratsgenehmigung",
+      "No activity for this period": "Keine Aktivität in diesem Zeitraum",
       "No pending loans for Council Approval": "Keine ausstehenden Kredite zur Ratsgenehmigung",
       "Laon Approval": "Laon-Zulassung",
       "Launch a page that create new data table": "Dadurch wird eine Seite geöffnet, auf der Sie eine neue Datentabelle erstellen können.",
@@ -3780,6 +3782,17 @@
       "Please select a delivery method": "Bitte wählen Sie eine Versandart aus",
       "Please select a screen report.": "Bitte wählen Sie einen Bildschirmbericht aus.",
       "Please update your password": "Bitte aktualisieren Sie Ihr Passwort",
+      "Temporary password notice": "If you're signing in with a temporary password, choose a new one to finish setting up your account.",
+      "Your new password must": "Your new password must:",
+      "Signed in as": "Signed in as",
+      "Password rule min length": "Be at least {{min}} characters long",
+      "Password rule max length": "Be at most 50 characters long",
+      "Password rule uppercase": "Include an uppercase letter (A–Z)",
+      "Password rule lowercase": "Include a lowercase letter (a–z)",
+      "Password rule number": "Include a number (0–9)",
+      "Password rule special character": "Include a special character, e.g. # @ !",
+      "Password rule no spaces": "Not contain spaces",
+      "Password rule no repeats": "Not repeat the same character twice in a row (e.g. aa, 11)",
       "Powered by": "Unterstützt von",
       "Precedes of": "Präzedenzfälle von",
       "Preferences for generating account numbers for client": "Einstellungen zur Generierung von Kontonummern für Kunden-, Kredit- und Sparkonten",

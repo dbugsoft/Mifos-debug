@@ -340,8 +340,8 @@
         "message": "Two Factor Authentication Required"
       },
       "passwordExpired": {
-        "type": "Password Expired",
-        "message": "Your password has expired, please reset your password!"
+        "type": "Set a new password",
+        "message": "For your security, choose a new password before continuing."
       },
       "success": {
         "type": "Authentication Success",
@@ -3415,6 +3415,7 @@
       "Configure Maker Checker Tasks": "Configure Maker Checker Tasks",
       "Copy": "Copy",
       "Copy Account Number": "Copy Account Number",
+      "Could not load data": "Could not load data",
       "Create": "Create",
       "Create Account Number Preference": "Create Account Number Preference",
       "Create Accounting Closure": "Create Accounting Closure",
@@ -3653,6 +3654,7 @@
       "Journal entries made at the end of accounting period": "Journal entries made at the end of accounting period",
       "Journal entry reverse transaction": "A new journal entry has been created to reverse this transaction:",
       "Council Approval": "Council Approval",
+      "No activity for this period": "No activity for this period",
       "No pending loans for Council Approval": "No pending loans for Council Approval",
       "Laon Approval": "Laon Approval",
       "Launch a page that create new data table": "This will launch a page that will allow you to create a new data table.",
@@ -3872,6 +3874,17 @@
       "Please select a delivery method": "Please select a delivery method",
       "Please select a screen report.": "Please select a screen report.",
       "Please update your password": "Please update your password",
+      "Temporary password notice": "If you're signing in with a temporary password, choose a new one to finish setting up your account.",
+      "Your new password must": "Your new password must:",
+      "Signed in as": "Signed in as",
+      "Password rule min length": "Be at least {{min}} characters long",
+      "Password rule max length": "Be at most 50 characters long",
+      "Password rule uppercase": "Include an uppercase letter (A–Z)",
+      "Password rule lowercase": "Include a lowercase letter (a–z)",
+      "Password rule number": "Include a number (0–9)",
+      "Password rule special character": "Include a special character, e.g. # @ !",
+      "Password rule no spaces": "Not contain spaces",
+      "Password rule no repeats": "Not repeat the same character twice in a row (e.g. aa, 11)",
       "Powered by": "Powered by",
       "Precedes of": "Precedes of",
       "Preferences for generating account numbers for client": "Preferences for generating account numbers for client, loan and savings accounts",

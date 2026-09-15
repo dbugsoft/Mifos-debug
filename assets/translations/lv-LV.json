@@ -339,8 +339,8 @@
         "message": "Nepieciešama divu faktoru autentifikācija"
       },
       "passwordExpired": {
-        "type": "Parole ir beigusies",
-        "message": "Jūsu parole ir beigusies, lūdzu, atjaunojiet paroli!"
+        "type": "Iestatiet jaunu paroli",
+        "message": "Drošības nolūkos pirms turpināšanas izvēlieties jaunu paroli."
       },
       "success": {
         "type": "Autentifikācija veiksmīga",
@@ -3404,6 +3404,7 @@
       "Configure Maker Checker Tasks": "Konfigurējiet Maker Checker uzdevumus",
       "Copy": "Kopēt",
       "Copy Account Number": "Kopējiet konta numuru",
+      "Could not load data": "Neizdevās ielādēt datus",
       "Create": "Izveidot",
       "Create Account Number Preference": "Izveidojiet konta numura preferenci",
       "Create Accounting Closure": "Izveidojiet grāmatvedības slēgšanu",
@@ -3642,6 +3643,7 @@
       "Journal entries made at the end of accounting period": "Žurnāla ieraksti, kas veikti pārskata perioda beigās",
       "Journal entry reverse transaction": "Ir izveidots jauns žurnāla ieraksts, lai atsauktu šo darījumu:",
       "Council Approval": "Padomes apstiprinājums",
+      "No activity for this period": "Šajā periodā nav aktivitātes",
       "No pending loans for Council Approval": "Nav aizdevumu, kas gaida Padomes apstiprinājumu",
       "Laon Approval": "Laonas apstiprinājums}",
       "Launch a page that create new data table": "Tiks atvērta lapa, kurā varēsit izveidot jaunu datu tabulu.",
@@ -3778,6 +3780,17 @@
       "Please select a delivery method": "Lūdzu, izvēlieties piegādes veidu",
       "Please select a screen report.": "Lūdzu, atlasiet ekrāna pārskatu.",
       "Please update your password": "Lūdzu, atjauniniet savu paroli",
+      "Temporary password notice": "If you're signing in with a temporary password, choose a new one to finish setting up your account.",
+      "Your new password must": "Your new password must:",
+      "Signed in as": "Signed in as",
+      "Password rule min length": "Be at least {{min}} characters long",
+      "Password rule max length": "Be at most 50 characters long",
+      "Password rule uppercase": "Include an uppercase letter (A–Z)",
+      "Password rule lowercase": "Include a lowercase letter (a–z)",
+      "Password rule number": "Include a number (0–9)",
+      "Password rule special character": "Include a special character, e.g. # @ !",
+      "Password rule no spaces": "Not contain spaces",
+      "Password rule no repeats": "Not repeat the same character twice in a row (e.g. aa, 11)",
       "Powered by": "Darbojas ar",
       "Precedes of": "Iepriekšējie",
       "Preferences for generating account numbers for client": "Preferences kontu numuru ģenerēšanai klientu, kredītu un krājkontiem",

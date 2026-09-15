@@ -339,8 +339,8 @@
         "message": "Uthibitishaji wa hatua mbili unahitajika"
       },
       "passwordExpired": {
-        "type": "Nenosiri limeisha",
-        "message": "Nenosiri lako limeisha, tafadhali weka upya nenosiri lako!"
+        "type": "Weka nenosiri jipya",
+        "message": "Kwa usalama wako, chagua nenosiri jipya kabla ya kuendelea."
       },
       "success": {
         "type": "Uthibitishaji umefanikiwa",
@@ -3401,6 +3401,7 @@
       "Configure Maker Checker Tasks": "Sanidi Majukumu ya Kikagua Kitengeneza",
       "Copy": "Nakili",
       "Copy Account Number": "Nakili Nambari ya Akaunti",
+      "Could not load data": "Imeshindwa kupakia data",
       "Create": "Unda",
       "Create Account Number Preference": "Unda Upendeleo wa Nambari ya Akaunti",
       "Create Accounting Closure": "Unda Kufungwa kwa Uhasibu",
@@ -3639,6 +3640,7 @@
       "Journal entries made at the end of accounting period": "Maingizo ya jarida yaliyofanywa mwishoni mwa kipindi cha uhasibu",
       "Journal entry reverse transaction": "Jarida jipya limeundwa ili kubadilisha muamala huu:",
       "Council Approval": "Idhini ya Baraza",
+      "No activity for this period": "Hakuna shughuli katika kipindi hiki",
       "No pending loans for Council Approval": "Hakuna mikopo inayozubiri idhini ya Baraza",
       "Laon Approval": "Idhini ya Laon",
       "Launch a page that create new data table": "Hii itazindua ukurasa ambao utakuruhusu kuunda jedwali mpya la data.",
@@ -3775,6 +3777,17 @@
       "Please select a delivery method": "Tafadhali chagua njia ya kuwasilisha",
       "Please select a screen report.": "Tafadhali chagua ripoti ya skrini.",
       "Please update your password": "Tafadhali sasisha nenosiri lako",
+      "Temporary password notice": "If you're signing in with a temporary password, choose a new one to finish setting up your account.",
+      "Your new password must": "Your new password must:",
+      "Signed in as": "Signed in as",
+      "Password rule min length": "Be at least {{min}} characters long",
+      "Password rule max length": "Be at most 50 characters long",
+      "Password rule uppercase": "Include an uppercase letter (A–Z)",
+      "Password rule lowercase": "Include a lowercase letter (a–z)",
+      "Password rule number": "Include a number (0–9)",
+      "Password rule special character": "Include a special character, e.g. # @ !",
+      "Password rule no spaces": "Not contain spaces",
+      "Password rule no repeats": "Not repeat the same character twice in a row (e.g. aa, 11)",
       "Powered by": "Imeendeshwa na",
       "Precedes of": "Hutangulia",
       "Preferences for generating account numbers for client": "Mapendeleo ya kutengeneza nambari za akaunti za mteja, mkopo na akaunti za akiba",
