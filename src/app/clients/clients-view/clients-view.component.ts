@@ -7,7 +7,7 @@
  */
 
 /** Angular Imports */
-import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { environment } from '../../../environments/environment';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
@@ -141,8 +141,12 @@ export class ClientsViewComponent implements OnInit {
 
   clientViewData: any;
   clientDatatables: any;
-  /** blob: URL of the client's photo, or null when there is none. */
-  clientImage: string | null = null;
+  /**
+   * blob: URL of the client's photo, or null when there is none.
+   * A signal, because this component is OnPush: a plain field set in the HTTP callback would not
+   * re-render the template, and the placeholder would stay until something else marked the view dirty.
+   */
+  readonly clientImage = signal<string | null>(null);
   clientTemplateData: any;
 
   constructor() {
@@ -181,20 +185,21 @@ export class ClientsViewComponent implements OnInit {
           this.releaseClientImage();
           // A null image means the client has no profile image. A blob: URL passes Angular's URL
           // sanitizer as it is, so no bypassSecurityTrust call is needed.
-          this.clientImage = image ? URL.createObjectURL(image) : null;
+          this.clientImage.set(image ? URL.createObjectURL(image) : null);
         },
         error: (error: any) => {
           // Handle any unexpected errors
           console.error('Error loading client profile image:', error);
-          this.clientImage = null;
+          this.releaseClientImage();
         }
       });
   }
 
   private releaseClientImage() {
-    if (this.clientImage) {
-      URL.revokeObjectURL(this.clientImage);
-      this.clientImage = null;
+    const url = this.clientImage();
+    if (url) {
+      URL.revokeObjectURL(url);
+      this.clientImage.set(null);
     }
   }
 

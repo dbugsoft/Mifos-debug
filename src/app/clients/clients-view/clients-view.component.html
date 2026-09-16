@@ -11,11 +11,7 @@
     <mat-card-title-group class="header-title-group">
       <div class="profile-image-container">
         <div>
-          <img
-            mat-card-md-image
-            class="profile-image"
-            [src]="clientImage ? clientImage : 'assets/images/user_placeholder.png'"
-          />
+          <img mat-card-md-image class="profile-image" [src]="clientImage() ?? 'assets/images/user_placeholder.png'" />
         </div>
         <div class="m-b-5 flex-center">
           <button

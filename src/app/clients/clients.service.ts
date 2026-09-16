@@ -23,6 +23,9 @@ import { environment } from 'environments/environment';
   providedIn: 'root'
 })
 export class ClientsService {
+  /** Bounding box, in pixels, for the profile photo thumbnail. */
+  static readonly PROFILE_IMAGE_SIZE = 150;
+
   private http = inject(HttpClient);
   private httpBackend = inject(HttpBackend);
 
@@ -189,14 +192,22 @@ export class ClientsService {
   /**
    * Fetches the client's photo as a small binary thumbnail.
    *
+   * Both `maxWidth` and `maxHeight` are sent: Fineract only resizes when it gets both (a height alone
+   * returned the full-size original, and upstream's rewritten resizer requires both outright), so the
+   * photo fits a 150 px box with its aspect ratio kept.
+   *
    * `output=inline_octet` makes Fineract send the image bytes with their real content type instead of a
-   * base64 data URL, which was a third larger and could not be cached. The browser may keep the response
-   * for a short while (the backend sends `Cache-Control: private`, varied by tenant and credentials).
-   * The request still goes through HttpClient so the auth and tenant headers are attached as usual;
-   * turn the Blob into a URL with `URL.createObjectURL`, and revoke it when done.
+   * base64 data URL, which was a third larger and could not be cached. The backend sends
+   * `Cache-Control: private` (varied by tenant and credentials) and an ETag, so the browser reuses or
+   * cheaply revalidates the photo. The request still goes through HttpClient so the auth and tenant
+   * headers are attached as usual; turn the Blob into a URL with `URL.createObjectURL`, and revoke it
+   * when done.
    */
   getClientProfileImage(clientId: string): Observable<Blob | null> {
-    let httpParams = new HttpParams().set('maxHeight', '150').set('output', 'inline_octet');
+    let httpParams = new HttpParams()
+      .set('maxWidth', String(ClientsService.PROFILE_IMAGE_SIZE))
+      .set('maxHeight', String(ClientsService.PROFILE_IMAGE_SIZE))
+      .set('output', 'inline_octet');
     const version = this.profileImageVersions.get(String(clientId));
     if (version) {
       // Changed from this browser: step past the browser's cached copy so the new photo shows at once.
