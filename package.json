@@ -151,7 +151,10 @@
       "node scripts/check-file-headers.js",
       "stylelint"
     ],
-    "*.html": "node scripts/check-file-headers.js",
+    "*.html": [
+      "node scripts/check-file-headers.js",
+      "htmlhint --config .htmlhintrc"
+    ],
     "*": "prettier --check --ignore-unknown"
   },
   "overrides": {

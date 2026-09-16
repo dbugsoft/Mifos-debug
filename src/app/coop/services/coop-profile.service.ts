@@ -66,7 +66,13 @@ export interface CoopMe {
 }
 
 export type CoopApplicationStatus =
-  'NO_PROFILE' | 'UNVERIFIED_EMAIL' | 'PENDING' | 'PROVISIONED' | 'ACTIVE' | 'REJECTED' | 'WITHDRAWN';
+  | 'NO_PROFILE'
+  | 'UNVERIFIED_EMAIL'
+  | 'PENDING'
+  | 'PROVISIONED'
+  | 'ACTIVE'
+  | 'REJECTED'
+  | 'WITHDRAWN';
 
 /**
  * GET /public/status. Sign-in details (frontendUrl, tenantAdminUsername)
