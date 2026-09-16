@@ -3,6 +3,7 @@
   "plugins": [
     "prettier-plugin-multiline-arrays"
   ],
+  "endOfLine": "auto",
   "singleQuote": true,
   "trailingComma": "none"
 }
