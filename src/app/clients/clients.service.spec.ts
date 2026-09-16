@@ -191,11 +191,13 @@ describe('ClientsService', () => {
   });
 
   describe('Client Profile Image', () => {
-    it('should fetch a binary thumbnail with maxHeight and output=inline_octet (GET)', async () => {
+    it('should fetch a binary thumbnail bounded in both dimensions (GET)', async () => {
       const mockImage = new Blob(['jpeg-bytes'], { type: 'image/jpeg' });
       const resultPromise = firstValueFrom(service.getClientProfileImage('123'));
 
       const req = httpMock.expectOne((r) => r.url === '/clients/123/images' && r.method === 'GET');
+      // Fineract resizes only when both are present.
+      expect(req.request.params.get('maxWidth')).toBe('150');
       expect(req.request.params.get('maxHeight')).toBe('150');
       expect(req.request.params.get('output')).toBe('inline_octet');
       expect(req.request.params.has('v')).toBe(false);
