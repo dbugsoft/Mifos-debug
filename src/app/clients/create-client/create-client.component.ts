@@ -21,6 +21,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { catchError, map, of, switchMap } from 'rxjs';
 
 /** Custom Services */
 import { ClientsService } from '../clients.service';
@@ -37,6 +38,10 @@ import { MatStepper, MatStepperIcon, MatStep, MatStepLabel } from '@angular/mate
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { ClientPreviewStepComponent } from '../client-stepper/client-preview-step/client-preview-step.component';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { MemberAddressStepComponent } from '../member-address/member-address-step/member-address-step.component';
+import { MemberAddressPreviewComponent } from '../member-address/member-address-preview/member-address-preview.component';
+import { MemberAddressService } from '../member-address/member-address.service';
+import { ClientActionNotifierService } from '../clients-view/client-actions/client-action-notifier.service';
 
 /**
  * Create Client Component.
@@ -56,7 +61,9 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     ClientFamilyMembersStepComponent,
     ClientAddressStepComponent,
     ClientDatatableStepComponent,
-    ClientPreviewStepComponent
+    ClientPreviewStepComponent,
+    MemberAddressStepComponent,
+    MemberAddressPreviewComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -68,10 +75,15 @@ export class CreateClientComponent implements AfterViewInit {
   private destroyRef = inject(DestroyRef);
   private snackBar = inject(MatSnackBar);
   private cdr = inject(ChangeDetectorRef);
+  private memberAddressService = inject(MemberAddressService);
+  private notifier = inject(ClientActionNotifierService);
 
   /** Step labels for toast messages — built dynamically to match the actual rendered steps */
   private get stepLabels(): string[] {
-    const labels = ['GENERAL'];
+    const labels = [
+      'GENERAL',
+      'ADDRESS'
+    ];
     if (this.clientTemplate?.isAddressEnabled) {
       labels.push('ADDRESS');
     }
@@ -86,6 +98,8 @@ export class CreateClientComponent implements AfterViewInit {
   @ViewChild('clientFamily') clientFamilyMembersStep: ClientFamilyMembersStepComponent;
   /** Client Address Step */
   @ViewChild('clientAddress') clientAddressStep: ClientAddressStepComponent;
+  /** Member (Nepal) Address Step, which replaces Fineract's address step (ADR-0014) */
+  @ViewChild('memberAddress', { static: true }) memberAddressStep: MemberAddressStepComponent;
   /** Get handle on dtclient tags in the template */
   @ViewChildren('dtclient') clientDatatables: QueryList<ClientDatatableStepComponent>;
 
@@ -146,7 +160,7 @@ export class CreateClientComponent implements AfterViewInit {
   }
 
   areFormvalids(): boolean {
-    let areValids = this.clientGeneralForm.valid;
+    let areValids = this.clientGeneralForm.valid && this.memberAddressStep.valid();
     if (this.clientTemplate.isAddressEnabled) {
       areValids = areValids && this.clientAddressStep.address.address.length > 0;
     }
@@ -214,14 +228,41 @@ export class CreateClientComponent implements AfterViewInit {
       }
     }
 
-    this.clientsService.createClient(clientData).subscribe((response: any) => {
-      this.router.navigate(
-        [
-          '../',
-          response.resourceId
-        ],
-        { relativeTo: this.route }
-      );
-    });
+    const addressDraft = this.memberAddressStep.draft();
+    this.clientsService
+      .createClient(clientData)
+      .pipe(
+        switchMap((response: any) => {
+          if (!addressDraft) {
+            return of({ clientId: response.resourceId, addressSaved: true });
+          }
+          // The member exists at this point; if the address fails, take the user to it rather than lose the member.
+          return this.memberAddressService.saveDraft(response.resourceId, addressDraft).pipe(
+            map(() => ({ clientId: response.resourceId, addressSaved: true })),
+            catchError(() => of({ clientId: response.resourceId, addressSaved: false }))
+          );
+        })
+      )
+      .subscribe(({ clientId, addressSaved }) => {
+        if (addressSaved) {
+          this.router.navigate(
+            [
+              '../',
+              clientId
+            ],
+            { relativeTo: this.route }
+          );
+        } else {
+          this.notifier.notify('clients.memberAddress.messages.createdWithoutAddress');
+          this.router.navigate(
+            [
+              '../',
+              clientId,
+              'address'
+            ],
+            { relativeTo: this.route }
+          );
+        }
+      });
   }
 }

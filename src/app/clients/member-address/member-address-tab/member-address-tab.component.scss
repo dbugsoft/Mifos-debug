@@ -1,0 +1,89 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+@use '../../../../assets/styles/colours' as *;
+
+.tab-container {
+  padding: 16px;
+  margin: 16px 0;
+
+  h3 {
+    margin: 0 0 16px;
+  }
+}
+
+.address-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+  gap: 16px;
+}
+
+.address-card {
+  display: flex;
+  flex-direction: column;
+
+  .card-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgb(127 127 127 / 12%);
+  }
+
+  .card-body {
+    flex: 1;
+    padding-top: 16px;
+  }
+
+  mat-card-actions {
+    gap: 8px;
+  }
+}
+
+.follows-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 8px;
+  padding: 0 8px;
+  border-radius: 16px;
+  background: rgb(127 127 127 / 12%);
+  font-size: 0.8125rem;
+  line-height: 24px;
+}
+
+.empty {
+  margin: 0;
+  opacity: 0.64;
+}
+
+.banner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border-left: 4px solid;
+
+  button {
+    margin-left: auto;
+  }
+}
+
+.banner-warning {
+  border-left-color: $msg-warning;
+  background: rgb(240 173 78 / 12%);
+}
+
+.banner-error {
+  border-left-color: $msg-danger;
+  background: rgb(217 83 79 / 12%);
+}

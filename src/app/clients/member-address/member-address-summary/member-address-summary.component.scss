@@ -1,0 +1,43 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+@use '../../../../assets/styles/colours' as *;
+
+.member-address {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-style: normal;
+  line-height: 1.5;
+}
+
+.street {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 8px;
+  font-weight: 500;
+}
+
+.house {
+  opacity: 0.8;
+}
+
+.place {
+  font-size: 1rem;
+}
+
+.place-other {
+  opacity: 0.72;
+  font-size: 0.875rem;
+}
+
+.notice {
+  margin-top: 4px;
+  color: $carrot;
+  font-size: 0.8125rem;
+}
