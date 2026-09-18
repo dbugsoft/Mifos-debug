@@ -7,9 +7,17 @@
  */
 
 .add-family-member-container {
-  width: 70%;
-  margin: 0 auto;
-  padding: 5%;
+  width: 100%;
+  max-width: 1040px;
+  margin: 24px auto;
+  padding: 32px 40px 28px;
+  box-sizing: border-box;
+  background: #fff;
+  border: 1px solid #e2e8ed;
+  border-radius: 12px;
+  box-shadow:
+    0 1px 2px rgb(16 42 67 / 3%),
+    0 4px 12px rgb(16 42 67 / 4%);
 
   @media screen and (width >= 960px) {
     .flex-50-minus-25px:nth-child(odd) {
@@ -19,6 +27,42 @@
     .flex-50-minus-25px:last-child {
       margin-right: 0;
     }
+  }
+
+  // Vertical rhythm between the field rows.
+  .layout-row-wrap {
+    margin-bottom: 22px;
+  }
+
+  @media (width <= 768px) {
+    padding: 20px;
+    margin: 12px;
+  }
+}
+
+.flex-33-minus-25px {
+  flex: 1 1 calc(33.333% - 25px);
+}
+
+.flex-25-minus-25px {
+  flex: 1 1 calc(25% - 25px);
+}
+
+// mat-checkbox has no reserved label row above it the way
+// mat-form-field does, so centering it in the row otherwise leaves
+// it sitting visibly lower than the adjacent fields.
+.is-dependent-checkbox {
+  align-self: center;
+  margin-top: -40px;
+  white-space: nowrap;
+}
+
+// Tablet: step down to 2 columns before the rows fully stack to 1
+// column at 768px via the existing .responsive-column class.
+@media screen and (width <= 1024px) and (width > 768px) {
+  .flex-33-minus-25px,
+  .flex-25-minus-25px {
+    flex-basis: calc(50% - 25px);
   }
 }
 
