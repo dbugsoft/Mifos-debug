@@ -1,4 +1,5 @@
 ﻿{
+  "error.msg.upload.file.too.big": "El archivo seleccionado supera el límite de {{args.0.value}} MB. Elija un archivo más pequeño e inténtelo de nuevo.",
   "APP_NAME": "COIMS",
   "Logged in as": "Conectado como",
   "Remember me": "Recordar me",
@@ -420,6 +421,8 @@
     "error.server.internal.message": "Ocurrió un error inesperado en el servidor. Por favor intente más tarde.",
     "error.unknown.type": "Error desconocido",
     "error.unknown.message": "Ocurrió un error inesperado.",
+    "error.file.too.large.type": "Archivo demasiado grande",
+    "error.file.too.large.message": "El archivo seleccionado es demasiado grande. Elija un archivo más pequeño e inténtelo de nuevo.",
     "validation.required": "Este campo es obligatorio",
     "validation.minLength": "La longitud mínima es {{requiredLength}}",
     "validation.emailInvalid": "Correo electrónico no válido",
@@ -3724,6 +3727,7 @@
       "Manage your Services": "Gestiona tus servicios",
       "Mandatory": "Obligatorio",
       "Manual journal entry transactions recorded in a journal": "Transacciones de asiento de diario manuales registradas en un diario",
+      "Maximum file size": "Tamaño máximo de archivo: {{size}} MB",
       "Message Gateway": "Puerta de enlace de mensajes",
       "Mifos Initiative": "Iniciativa Mifos®",
       "Mifos X data-tables allow the user to add custom fields": "Las tablas de datos de Mifos X permiten al usuario agregar campos personalizados además de los campos integrados a un perfil de cliente, cuenta de Crédito/ahorro, grupo, centro u oficina.",

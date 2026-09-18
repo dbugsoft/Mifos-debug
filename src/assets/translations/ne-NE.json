@@ -1,4 +1,5 @@
 ﻿{
+  "error.msg.upload.file.too.big": "चयन गरिएको फाइल {{args.0.value}} MB सीमाभन्दा ठूलो छ। कृपया सानो फाइल छान्नुहोस् र फेरि प्रयास गर्नुहोस्।",
   "APP_NAME": "COIMS",
   "Logged in as": "को रूपमा लग इन गरियो",
   "Remember me": "मलाई सम्झनुहोस्",
@@ -420,6 +421,8 @@
     "error.server.internal.message": "सर्भरमा अप्रत्याशित त्रुटि भयो। कृपया पछि पुन: प्रयास गर्नुहोस्।",
     "error.unknown.type": "अज्ञात त्रुटि",
     "error.unknown.message": "अप्रत्याशित त्रुटि भयो।",
+    "error.file.too.large.type": "फाइल धेरै ठूलो छ",
+    "error.file.too.large.message": "चयन गरिएको फाइल धेरै ठूलो छ। कृपया सानो फाइल छान्नुहोस् र फेरि प्रयास गर्नुहोस्।",
     "validation.required": "यो फिल्ड आवश्यक छ",
     "validation.minLength": "न्यूनतम लम्बाइ {{requiredLength}} हो",
     "validation.emailInvalid": "इमेल मान्य छैन",
@@ -3722,6 +3725,7 @@
       "Manage your Services": "आफ्नो सेवाहरू प्रबन्ध गर्नुहोस्",
       "Mandatory": "अनिवार्य",
       "Manual journal entry transactions recorded in a journal": "जर्नलमा रेकर्ड गरिएको म्यानुअल जर्नल प्रविष्टि लेनदेन",
+      "Maximum file size": "अधिकतम फाइल आकार: {{size}} MB",
       "Message Gateway": "सन्देश गेटवे",
       "Mifos Initiative": "Mifos® पहल",
       "Mifos X data-tables allow the user to add custom fields": "Mifos X डाटा-टेबलहरूले प्रयोगकर्तालाई ग्राहक प्रोफाइल, ऋण/बचत खाता, समूह, केन्द्र वा कार्यालयमा निर्मित क्षेत्रहरू बाहेक अनुकूलन क्षेत्रहरू थप्न अनुमति दिन्छ।",

@@ -232,6 +232,14 @@ export class ClientsService {
       );
   }
 
+  /**
+   * Upload limits the server enforces. Compare files against the *Bytes fields and show the *Mb fields,
+   * so the displayed and enforced numbers never drift.
+   */
+  getUploadLimits(): Observable<{ imageMaxFileSizeBytes: number; imageMaxFileSizeMb: number }> {
+    return this.http.get<{ imageMaxFileSizeBytes: number; imageMaxFileSizeMb: number }>('/upload-limits');
+  }
+
   uploadClientProfileImage(clientId: string, image: File) {
     const formData = new FormData();
     formData.append('file', image);

@@ -1,4 +1,5 @@
 ﻿{
+  "error.msg.upload.file.too.big": "Atlasītais fails pārsniedz {{args.0.value}} MB ierobežojumu. Lūdzu, izvēlieties mazāku failu un mēģiniet vēlreiz.",
   "APP_NAME": "COIMS",
   "Logged in as": "ielogojies Kā",
   "Remember me": "Atceries mani",
@@ -420,6 +421,8 @@
     "error.server.internal.message": "Serverī radās neparedzēta kļūda. Lūdzu, mēģiniet vēlāk.",
     "error.unknown.type": "Nezināma kļūda",
     "error.unknown.message": "Radās neparedzēta kļūda.",
+    "error.file.too.large.type": "Fails ir pārāk liels",
+    "error.file.too.large.message": "Atlasītais fails ir pārāk liels. Lūdzu, izvēlieties mazāku failu un mēģiniet vēlreiz.",
     "validation.required": "Šis lauks ir obligāts",
     "validation.minLength": "Minimālais garums ir {{requiredLength}}",
     "validation.emailInvalid": "E-pasts nav derīgs",
@@ -3722,6 +3725,7 @@
       "Manage your Services": "Pārvaldiet savus pakalpojumus",
       "Mandatory": "Obligāts",
       "Manual journal entry transactions recorded in a journal": "Manuālā žurnāla ieraksta darījumi, kas ierakstīti žurnālā",
+      "Maximum file size": "Maksimālais faila izmērs: {{size}} MB",
       "Message Gateway": "Ziņojumu vārteja",
       "Mifos Initiative": "Mifos® iniciatīva",
       "Mifos X data-tables allow the user to add custom fields": "Mifos X datu tabulas ļauj lietotājam papildus iebūvētajiem laukiem pievienot pielāgotus laukus klienta profilam, aizdevuma/uzkrājuma kontam, grupai, centram vai birojam.",
