@@ -92,6 +92,12 @@ export class CoopDocumentsComponent implements OnInit, OnDestroy {
 
   hasLoadError = false;
 
+  /**
+   * Set only once the user clicks "Upload Documents" with a required
+   * PENDING document missing - required errors stay hidden until then.
+   */
+  uploadAttempted = false;
+
   // Profile status
   profileStatus = '';
 
@@ -530,11 +536,36 @@ export class CoopDocumentsComponent implements OnInit, OnDestroy {
   }
 
   // =====================================================
+  // REQUIRED DOCUMENTS (PENDING ONLY)
+  // =====================================================
+
+  /**
+   * PAN and Board Decision are required only during initial
+   * registration (PENDING) - drives the "*" label indicator and the
+   * per-field required error below.
+   */
+  isDocumentTypeRequired(code: string): boolean {
+    return this.profileStatus === 'PENDING' && (code === 'PAN' || code === 'BOARD_DECISION');
+  }
+
+  private isRequiredDocumentMissing(code: string): boolean {
+    return this.isDocumentTypeRequired(code) && !this.selectedFiles[code] && !this.getUploadedDocument(code);
+  }
+
+  // =====================================================
   // GET FILE ERROR
   // =====================================================
 
   getFileError(documentType: string): string | null {
-    return this.fileErrors[documentType] ?? null;
+    if (this.fileErrors[documentType]) {
+      return this.fileErrors[documentType];
+    }
+
+    if (this.uploadAttempted && this.isRequiredDocumentMissing(documentType)) {
+      return documentType === 'PAN' ? 'PAN is required.' : 'Board Decision is required.';
+    }
+
+    return null;
   }
 
   // =====================================================
@@ -610,13 +641,37 @@ export class CoopDocumentsComponent implements OnInit, OnDestroy {
     }
 
     // ===================================================
-    // AT LEAST ONE DOCUMENT REQUIRED
+    // PENDING: PAN + BOARD DECISION REQUIRED
+    //
+    // Required errors stay hidden until this first blocked
+    // attempt - selecting a file afterwards clears them
+    // immediately via `isRequiredDocumentMissing` in
+    // `getFileError`, without resetting this flag.
     // ===================================================
 
-    if (!this.hasSelectedFile) {
-      console.warn('[Documents] At least one document is required.');
+    if (this.profileStatus === 'PENDING') {
+      const hasMissingRequiredDocuments = this.documentTypes.some((documentType) =>
+        this.isRequiredDocumentMissing(documentType.code)
+      );
 
-      this.fileErrors['_general'] = 'Please select at least one document to upload.';
+      if (hasMissingRequiredDocuments) {
+        this.uploadAttempted = true;
+
+        this.changeDetectorRef.detectChanges();
+
+        return;
+      }
+    }
+
+    // ===================================================
+    // PENDING: AT LEAST ONE NEW/UPDATED DOCUMENT
+    // MUST BE SELECTED
+    // ===================================================
+
+    if (this.profileStatus === 'PENDING' && !this.hasSelectedFile) {
+      console.warn('[Documents] No new or updated document selected.');
+
+      this.fileErrors['_general'] = 'Please select at least one document to upload or update.';
 
       this.changeDetectorRef.detectChanges();
 

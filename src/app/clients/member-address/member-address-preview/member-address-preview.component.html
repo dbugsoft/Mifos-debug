@@ -1,0 +1,30 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="address-preview">
+  <div class="preview-item">
+    <span class="label">{{ 'clients.memberAddress.titles.PERMANENT' | translate }}</span>
+    @if (permanent(); as address) {
+      <mifosx-member-address-summary [address]="address"></mifosx-member-address-summary>
+    } @else {
+      <span class="missing">{{ 'clients.memberAddress.labels.notRecorded' | translate }}</span>
+    }
+  </div>
+
+  <div class="preview-item">
+    <span class="label">{{ 'clients.memberAddress.titles.TEMPORARY' | translate }}</span>
+    @if (temporaryChoice() === 'SAME') {
+      <span class="tag">{{ 'clients.memberAddress.labels.sameAsPermanent' | translate }}</span>
+    }
+    @if (temporary(); as address) {
+      <mifosx-member-address-summary [address]="address"></mifosx-member-address-summary>
+    } @else {
+      <span class="missing">{{ 'clients.memberAddress.labels.notRecorded' | translate }}</span>
+    }
+  </div>
+</div>

@@ -44,7 +44,6 @@ export const coopQueryKeys = {
       'me'
     ] as const,
 
-  /** The applicant's application status and sign-in details (GET /public/status). */
   status: () => [
       ...coopQueryKeys.root(),
       'status'
@@ -80,11 +79,10 @@ export const coopQueryKeys = {
         normalizeListParams(params)
       ] as const,
 
-    /** Keyed by appUserId - the id every admin endpoint uses. */
-    detail: (appUserId: number) => [
+    detail: (id: number) => [
         ...coopQueryKeys.admin.root(),
         'detail',
-        appUserId
+        id
       ] as const,
 
     stats: () => [

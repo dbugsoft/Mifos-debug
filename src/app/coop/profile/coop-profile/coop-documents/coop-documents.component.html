@@ -11,8 +11,7 @@
        HEADER
        ===================================================== -->
 
-  <mifosx-coop-navbar title="Cooperative Documents" subtitle="Upload and manage your cooperative documents.">
-  </mifosx-coop-navbar>
+  <mifosx-coop-navbar></mifosx-coop-navbar>
 
   <!-- =====================================================
        CONTENT AREA
@@ -62,6 +61,7 @@
 
                   <div class="doc-label">
                     {{ documentType.label }}
+                    <span class="required-indicator" *ngIf="isDocumentTypeRequired(documentType.code)">*</span>
                   </div>
 
                   <!-- -------------------------------------

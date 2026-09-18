@@ -58,8 +58,7 @@ export interface CoopLocation {
 export interface CoopMe {
   emailVerified: boolean;
   phone: string;
-  /** Opaque public id (a UUID string), never the internal numeric id. */
-  userId: string;
+  userId: number;
   status: string;
   email: string;
   role: string;
@@ -74,10 +73,6 @@ export type CoopApplicationStatus =
   | 'REJECTED'
   | 'WITHDRAWN';
 
-/**
- * GET /public/status. Sign-in details (frontendUrl, tenantAdminUsername)
- * are present only once the cooperative is ACTIVE. Never a password.
- */
 export interface CoopSystemStatus {
   email: string;
   status: CoopApplicationStatus;
@@ -130,7 +125,6 @@ export class CoopProfileService {
     return this.http.get<CoopMe>(this.meUrl);
   }
 
-  /** Where the application stands and, once ACTIVE, where and as whom to sign in. */
   getStatus(): Observable<CoopSystemStatus> {
     return this.http.get<CoopSystemStatus>(this.statusUrl);
   }
