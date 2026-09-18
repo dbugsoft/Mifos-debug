@@ -1,4 +1,5 @@
 ﻿{
+  "error.msg.upload.file.too.big": "Atlasītais fails pārsniedz {{args.0.value}} MB ierobežojumu. Lūdzu, izvēlieties mazāku failu un mēģiniet vēlreiz.",
   "APP_NAME": "COIMS",
   "Logged in as": "ielogojies Kā",
   "Remember me": "Atceries mani",
@@ -420,6 +421,8 @@
     "error.server.internal.message": "Serverī radās neparedzēta kļūda. Lūdzu, mēģiniet vēlāk.",
     "error.unknown.type": "Nezināma kļūda",
     "error.unknown.message": "Radās neparedzēta kļūda.",
+    "error.file.too.large.type": "Fails ir pārāk liels",
+    "error.file.too.large.message": "Atlasītais fails ir pārāk liels. Lūdzu, izvēlieties mazāku failu un mēģiniet vēlreiz.",
     "validation.required": "Šis lauks ir obligāts",
     "validation.minLength": "Minimālais garums ir {{requiredLength}}",
     "validation.emailInvalid": "E-pasts nav derīgs",
@@ -3722,6 +3725,7 @@
       "Manage your Services": "Pārvaldiet savus pakalpojumus",
       "Mandatory": "Obligāts",
       "Manual journal entry transactions recorded in a journal": "Manuālā žurnāla ieraksta darījumi, kas ierakstīti žurnālā",
+      "Maximum file size": "Maksimālais faila izmērs: {{size}} MB",
       "Message Gateway": "Ziņojumu vārteja",
       "Mifos Initiative": "Mifos® iniciatīva",
       "Mifos X data-tables allow the user to add custom fields": "Mifos X datu tabulas ļauj lietotājam papildus iebūvētajiem laukiem pievienot pielāgotus laukus klienta profilam, aizdevuma/uzkrājuma kontam, grupai, centram vai birojam.",
@@ -4775,6 +4779,72 @@
       "takeSurvey": {
         "success": "Aptauja veiksmīgi iesniegta.",
         "failure": "Neizdevās iesniegt aptauju."
+      }
+    },
+    "memberAddress": {
+      "types": {
+        "PERMANENT": "permanent address",
+        "TEMPORARY": "temporary address"
+      },
+      "titles": {
+        "PERMANENT": "Permanent address",
+        "TEMPORARY": "Temporary address"
+      },
+      "dialog": {
+        "addTitle": "Add {{type}}",
+        "editTitle": "Edit {{type}}"
+      },
+      "fields": {
+        "province": "Province",
+        "district": "District",
+        "localLevel": "Municipality / Rural municipality",
+        "ward": "Ward no.",
+        "tole": "Tole / Street",
+        "houseNumber": "House no."
+      },
+      "labels": {
+        "required": "Required",
+        "optional": "Optional",
+        "sameAsPermanent": "Same as permanent address",
+        "notRecorded": "Not recorded yet",
+        "noLongerInUse": "no longer in use",
+        "loading": "Loading address data",
+        "houseNumberShort": "House no. {{number}}"
+      },
+      "temporaryChoices": {
+        "NONE": "No temporary address",
+        "SAME": "Same as permanent address",
+        "DIFFERENT": "A different address"
+      },
+      "hints": {
+        "optional": "Optional",
+        "chooseProvinceFirst": "Choose a province first",
+        "chooseDistrictFirst": "Choose a district first",
+        "chooseLocalLevelFirst": "Choose a municipality first",
+        "addPermanentFirst": "Add the permanent address first to use this option.",
+        "followsPermanent": "The temporary address will always match the permanent address, including any later changes.",
+        "permanentMissing": "This member has no permanent address yet. Add one to complete their record.",
+        "permanentInUse": "The temporary address follows this address. Change the temporary address first.",
+        "localLevelNoLongerInUse": "This municipality has since been merged or renamed. Choose its current name the next time you edit this address."
+      },
+      "errors": {
+        "provinceRequired": "Choose a province",
+        "districtRequired": "Choose a district",
+        "localLevelRequired": "Choose a municipality or rural municipality",
+        "wardRequired": "Choose a ward",
+        "tooLong": "Use at most {{max}} characters",
+        "locationsUnavailable": "The list of Nepal's provinces, districts and municipalities could not be loaded.",
+        "addressesUnavailable": "This member's addresses could not be loaded."
+      },
+      "actions": {
+        "retry": "Try again",
+        "save": "Save",
+        "saving": "Saving…"
+      },
+      "messages": {
+        "saved": "Address saved",
+        "removed": "Address removed",
+        "createdWithoutAddress": "The member was created, but the address could not be saved. Please add it here."
       }
     }
   },

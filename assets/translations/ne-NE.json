@@ -1,4 +1,5 @@
 ﻿{
+  "error.msg.upload.file.too.big": "चयन गरिएको फाइल {{args.0.value}} MB सीमाभन्दा ठूलो छ। कृपया सानो फाइल छान्नुहोस् र फेरि प्रयास गर्नुहोस्।",
   "APP_NAME": "COIMS",
   "Logged in as": "को रूपमा लग इन गरियो",
   "Remember me": "मलाई सम्झनुहोस्",
@@ -420,6 +421,8 @@
     "error.server.internal.message": "सर्भरमा अप्रत्याशित त्रुटि भयो। कृपया पछि पुन: प्रयास गर्नुहोस्।",
     "error.unknown.type": "अज्ञात त्रुटि",
     "error.unknown.message": "अप्रत्याशित त्रुटि भयो।",
+    "error.file.too.large.type": "फाइल धेरै ठूलो छ",
+    "error.file.too.large.message": "चयन गरिएको फाइल धेरै ठूलो छ। कृपया सानो फाइल छान्नुहोस् र फेरि प्रयास गर्नुहोस्।",
     "validation.required": "यो फिल्ड आवश्यक छ",
     "validation.minLength": "न्यूनतम लम्बाइ {{requiredLength}} हो",
     "validation.emailInvalid": "इमेल मान्य छैन",
@@ -3722,6 +3725,7 @@
       "Manage your Services": "आफ्नो सेवाहरू प्रबन्ध गर्नुहोस्",
       "Mandatory": "अनिवार्य",
       "Manual journal entry transactions recorded in a journal": "जर्नलमा रेकर्ड गरिएको म्यानुअल जर्नल प्रविष्टि लेनदेन",
+      "Maximum file size": "अधिकतम फाइल आकार: {{size}} MB",
       "Message Gateway": "सन्देश गेटवे",
       "Mifos Initiative": "Mifos® पहल",
       "Mifos X data-tables allow the user to add custom fields": "Mifos X डाटा-टेबलहरूले प्रयोगकर्तालाई ग्राहक प्रोफाइल, ऋण/बचत खाता, समूह, केन्द्र वा कार्यालयमा निर्मित क्षेत्रहरू बाहेक अनुकूलन क्षेत्रहरू थप्न अनुमति दिन्छ।",
@@ -4775,6 +4779,72 @@
       "takeSurvey": {
         "success": "सर्वेक्षण सफलतापूर्वक बुझाइयो।",
         "failure": "सर्वेक्षण बुझाउन असफल भयो।"
+      }
+    },
+    "memberAddress": {
+      "types": {
+        "PERMANENT": "स्थायी ठेगाना",
+        "TEMPORARY": "अस्थायी ठेगाना"
+      },
+      "titles": {
+        "PERMANENT": "स्थायी ठेगाना",
+        "TEMPORARY": "अस्थायी ठेगाना"
+      },
+      "dialog": {
+        "addTitle": "{{type}} थप्नुहोस्",
+        "editTitle": "{{type}} सम्पादन गर्नुहोस्"
+      },
+      "fields": {
+        "province": "प्रदेश",
+        "district": "जिल्ला",
+        "localLevel": "नगरपालिका / गाउँपालिका",
+        "ward": "वडा नं.",
+        "tole": "टोल / सडक",
+        "houseNumber": "घर नं."
+      },
+      "labels": {
+        "required": "अनिवार्य",
+        "optional": "ऐच्छिक",
+        "sameAsPermanent": "स्थायी ठेगाना जस्तै",
+        "notRecorded": "अहिलेसम्म राखिएको छैन",
+        "noLongerInUse": "अब प्रयोगमा छैन",
+        "loading": "ठेगाना विवरण लोड हुँदैछ",
+        "houseNumberShort": "घर नं. {{number}}"
+      },
+      "temporaryChoices": {
+        "NONE": "अस्थायी ठेगाना छैन",
+        "SAME": "स्थायी ठेगाना जस्तै",
+        "DIFFERENT": "फरक ठेगाना"
+      },
+      "hints": {
+        "optional": "ऐच्छिक",
+        "chooseProvinceFirst": "पहिले प्रदेश छान्नुहोस्",
+        "chooseDistrictFirst": "पहिले जिल्ला छान्नुहोस्",
+        "chooseLocalLevelFirst": "पहिले पालिका छान्नुहोस्",
+        "addPermanentFirst": "यो विकल्प प्रयोग गर्न पहिले स्थायी ठेगाना थप्नुहोस्।",
+        "followsPermanent": "अस्थायी ठेगाना सधैं स्थायी ठेगाना जस्तै रहनेछ, पछि गरिने परिवर्तन सहित।",
+        "permanentMissing": "यो सदस्यको स्थायी ठेगाना अझै राखिएको छैन। विवरण पूरा गर्न थप्नुहोस्।",
+        "permanentInUse": "अस्थायी ठेगाना यही ठेगाना अनुसार राखिएको छ। पहिले अस्थायी ठेगाना परिवर्तन गर्नुहोस्।",
+        "localLevelNoLongerInUse": "यो पालिका पछि गाभिएको वा नाम परिवर्तन भएको छ। अर्को पटक सम्पादन गर्दा हालको नाम छान्नुहोस्।"
+      },
+      "errors": {
+        "provinceRequired": "प्रदेश छान्नुहोस्",
+        "districtRequired": "जिल्ला छान्नुहोस्",
+        "localLevelRequired": "नगरपालिका वा गाउँपालिका छान्नुहोस्",
+        "wardRequired": "वडा छान्नुहोस्",
+        "tooLong": "बढीमा {{max}} अक्षर प्रयोग गर्नुहोस्",
+        "locationsUnavailable": "नेपालका प्रदेश, जिल्ला र पालिकाको सूची लोड गर्न सकिएन।",
+        "addressesUnavailable": "यो सदस्यको ठेगाना लोड गर्न सकिएन।"
+      },
+      "actions": {
+        "retry": "फेरि प्रयास गर्नुहोस्",
+        "save": "सुरक्षित गर्नुहोस्",
+        "saving": "सुरक्षित गर्दै…"
+      },
+      "messages": {
+        "saved": "ठेगाना सुरक्षित भयो",
+        "removed": "ठेगाना हटाइयो",
+        "createdWithoutAddress": "सदस्य बनाइयो, तर ठेगाना सुरक्षित गर्न सकिएन। कृपया यहाँ थप्नुहोस्।"
       }
     }
   },

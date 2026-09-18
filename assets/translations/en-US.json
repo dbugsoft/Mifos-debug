@@ -4,6 +4,7 @@
   "Remember me": "Remember me",
   "error.resource.notImplemented.type": "Not Implemented Error",
   "error.resource.notImplemented.message": "Not implemented functionality!",
+  "error.msg.upload.file.too.big": "The selected file is larger than the {{args.0.value}} MB limit. Please choose a smaller file and try again.",
   "errors": {
     "accountingRule": {
       "duplicateName": "Sorry, but an Accounting Rule with this Name exists already."
@@ -423,6 +424,8 @@
     "error.server.internal.message": "An unexpected error occurred on the server. Please try again later.",
     "error.unknown.type": "Unknown Error",
     "error.unknown.message": "An unexpected error occurred.",
+    "error.file.too.large.type": "File Too Large",
+    "error.file.too.large.message": "The selected file is too large. Please choose a smaller file and try again.",
     "validation.required": "This field is required",
     "validation.minLength": "Minimum length is {{requiredLength}}",
     "validation.emailInvalid": "Email not valid",
@@ -3817,6 +3820,7 @@
       "Manage your Services": "Manage your Services",
       "Mandatory": "Mandatory",
       "Manual journal entry transactions recorded in a journal": "Manual journal entry transactions recorded in a journal",
+      "Maximum file size": "Maximum file size: {{size}} MB",
       "Message Gateway": "Message Gateway",
       "Mifos Initiative": "Mifos® Initiative",
       "Mifos X data-tables allow the user to add custom fields": "Mifos X data-tables allow the user to add custom fields in addition to the built-in fields to a client profile, loan/saving account, group, center or an office.",
@@ -4889,6 +4893,72 @@
       "takeSurvey": {
         "success": "Survey submitted successfully.",
         "failure": "Failed to submit survey."
+      }
+    },
+    "memberAddress": {
+      "types": {
+        "PERMANENT": "permanent address",
+        "TEMPORARY": "temporary address"
+      },
+      "titles": {
+        "PERMANENT": "Permanent address",
+        "TEMPORARY": "Temporary address"
+      },
+      "dialog": {
+        "addTitle": "Add {{type}}",
+        "editTitle": "Edit {{type}}"
+      },
+      "fields": {
+        "province": "Province",
+        "district": "District",
+        "localLevel": "Municipality / Rural municipality",
+        "ward": "Ward no.",
+        "tole": "Tole / Street",
+        "houseNumber": "House no."
+      },
+      "labels": {
+        "required": "Required",
+        "optional": "Optional",
+        "sameAsPermanent": "Same as permanent address",
+        "notRecorded": "Not recorded yet",
+        "noLongerInUse": "no longer in use",
+        "loading": "Loading address data",
+        "houseNumberShort": "House no. {{number}}"
+      },
+      "temporaryChoices": {
+        "NONE": "No temporary address",
+        "SAME": "Same as permanent address",
+        "DIFFERENT": "A different address"
+      },
+      "hints": {
+        "optional": "Optional",
+        "chooseProvinceFirst": "Choose a province first",
+        "chooseDistrictFirst": "Choose a district first",
+        "chooseLocalLevelFirst": "Choose a municipality first",
+        "addPermanentFirst": "Add the permanent address first to use this option.",
+        "followsPermanent": "The temporary address will always match the permanent address, including any later changes.",
+        "permanentMissing": "This member has no permanent address yet. Add one to complete their record.",
+        "permanentInUse": "The temporary address follows this address. Change the temporary address first.",
+        "localLevelNoLongerInUse": "This municipality has since been merged or renamed. Choose its current name the next time you edit this address."
+      },
+      "errors": {
+        "provinceRequired": "Choose a province",
+        "districtRequired": "Choose a district",
+        "localLevelRequired": "Choose a municipality or rural municipality",
+        "wardRequired": "Choose a ward",
+        "tooLong": "Use at most {{max}} characters",
+        "locationsUnavailable": "The list of Nepal's provinces, districts and municipalities could not be loaded.",
+        "addressesUnavailable": "This member's addresses could not be loaded."
+      },
+      "actions": {
+        "retry": "Try again",
+        "save": "Save",
+        "saving": "Saving…"
+      },
+      "messages": {
+        "saved": "Address saved",
+        "removed": "Address removed",
+        "createdWithoutAddress": "The member was created, but the address could not be saved. Please add it here."
       }
     }
   }
