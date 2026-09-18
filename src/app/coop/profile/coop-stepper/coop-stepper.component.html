@@ -1,74 +1,89 @@
 <!--
-  Copyright since 2025 Mifos Initiative
+    Copyright since 2025 Mifos Initiative
 
-  This Source Code Form is subject to the terms of the Mozilla Public
-  License, v. 2.0. If a copy of the MPL was not distributed with this
-  file, You can obtain one at http://mozilla.org/MPL/2.0/.
--->
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
+  -->
 
 <div class="stepper-shell">
   <!-- =====================================================
-       SHARED NAVBAR
-       ===================================================== -->
+        SHARED NAVBAR
+        ===================================================== -->
 
-  <mifosx-coop-navbar [title]="currentStep.title" [subtitle]="currentStep.subtitle"> </mifosx-coop-navbar>
+  <mifosx-coop-navbar> </mifosx-coop-navbar>
 
-  <!-- =====================================================
-       CUSTOM STEP INDICATOR
-       ===================================================== -->
+  @if (showActivationWelcome) {
+    <!-- =====================================================
+          FULL-PAGE ACTIVATION WELCOME (ACTIVE ONLY)
+          ===================================================== -->
 
-  <div class="step-indicator-bar">
-    <span class="step-indicator-spacer"></span>
+    <mifosx-coop-system-status (next)="onActivationWelcomeNext()"> </mifosx-coop-system-status>
+  } @else if (showOnboardingWelcome) {
+    <!-- =====================================================
+          FULL-PAGE ONBOARDING WELCOME (NO_PROFILE, FIRST LOGIN)
+          ===================================================== -->
 
-    <div class="step-indicator-track">
-      <ng-container *ngFor="let step of steps; let i = index; let last = last">
-        <button
-          type="button"
-          class="step-indicator-item"
-          [class.is-active]="i === currentStepIndex"
-          [class.is-clickable]="i <= currentStepIndex"
-          [disabled]="i > currentStepIndex"
-          (click)="goToStep(i)"
-        >
-          <span class="step-indicator-circle">
-            {{ i + 1 }}
-          </span>
+    <mifosx-coop-system-status (next)="onOnboardingGetStarted()"> </mifosx-coop-system-status>
+  } @else {
+    <!-- =====================================================
+          CUSTOM STEP INDICATOR
+          ===================================================== -->
 
-          <span class="step-indicator-label">
-            {{ step.label }}
-          </span>
-        </button>
+    <div class="step-indicator-bar">
+      <span class="step-indicator-spacer"></span>
 
-        <span class="step-indicator-connector" *ngIf="!last"> </span>
-      </ng-container>
+      <div class="step-indicator-track">
+        <ng-container *ngFor="let step of steps; let i = index; let last = last">
+          <button
+            type="button"
+            class="step-indicator-item"
+            [class.is-active]="i === currentStepIndex"
+            [class.is-clickable]="i <= currentStepIndex"
+            [disabled]="i > currentStepIndex"
+            (click)="goToStep(i)"
+          >
+            <span class="step-indicator-circle">
+              {{ i + 1 }}
+            </span>
+
+            <span class="step-indicator-label">
+              {{ step.label }}
+            </span>
+          </button>
+
+          <span class="step-indicator-connector" *ngIf="!last"> </span>
+        </ng-container>
+      </div>
+
+      <!-- Profile status -->
+
+      <span class="status-badge" *ngIf="currentStepIndex === 0 && profileComponent?.profileStatus">
+        {{ profileComponent?.profileStatus }}
+      </span>
     </div>
 
-    <!-- Profile status -->
+    <!-- =====================================================
+          MATERIAL STEPPER
+          ===================================================== -->
 
-    <span class="status-badge" *ngIf="currentStepIndex === 0 && profileComponent?.profileStatus">
-      {{ profileComponent?.profileStatus }}
-    </span>
-  </div>
+    <mat-stepper #stepper class="coop-profile-stepper" [linear]="true" (selectionChange)="onSelectionChange($event)">
+      <!-- ===================================================
+            STEP 1 — GENERAL INFORMATION
+            =================================================== -->
 
-  <!-- =====================================================
-       MATERIAL STEPPER
-       ===================================================== -->
+      <mat-step label="General Information" [completed]="generalInfoCompleted">
+        <mifosx-coop-profile (nextStep)="onGeneralInfoNext()" (previousStep)="onGeneralInfoPrevious()">
+        </mifosx-coop-profile>
+      </mat-step>
 
-  <mat-stepper #stepper class="coop-profile-stepper" [linear]="true" (selectionChange)="onSelectionChange($event)">
-    <!-- ===================================================
-         STEP 1 — GENERAL INFORMATION
-         =================================================== -->
+      <!-- ===================================================
+            STEP 2 — DOCUMENTS
+            =================================================== -->
 
-    <mat-step label="General Information" [completed]="generalInfoCompleted">
-      <mifosx-coop-profile (nextStep)="onGeneralInfoNext()"> </mifosx-coop-profile>
-    </mat-step>
-
-    <!-- ===================================================
-         STEP 2 — DOCUMENTS
-         =================================================== -->
-
-    <mat-step label="Documents">
-      <mifosx-coop-documents (previousStep)="stepper.previous()"> </mifosx-coop-documents>
-    </mat-step>
-  </mat-stepper>
+      <mat-step label="Documents">
+        <mifosx-coop-documents (previousStep)="stepper.previous()"> </mifosx-coop-documents>
+      </mat-step>
+    </mat-stepper>
+  }
 </div>

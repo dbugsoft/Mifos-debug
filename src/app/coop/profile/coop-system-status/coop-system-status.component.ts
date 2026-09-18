@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { Component, OnDestroy, inject } from '@angular/core';
+import { Component, EventEmitter, OnDestroy, Output, inject } from '@angular/core';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { injectQuery } from '@tanstack/angular-query-experimental';
 
@@ -33,6 +33,14 @@ export class CoopSystemStatusComponent implements OnDestroy {
   private copiedTimer: ReturnType<typeof setTimeout> | null = null;
 
   copied = false;
+
+  /**
+   * Emitted by the "Next" button on the ACTIVE welcome page only -
+   * lets the profile stepper shell move on to the General Information
+   * step. PENDING/PROVISIONED/etc. render no such button.
+   */
+  @Output()
+  next = new EventEmitter<void>();
 
   get status(): CoopSystemStatus | null {
     return this.statusQuery.data() ?? null;

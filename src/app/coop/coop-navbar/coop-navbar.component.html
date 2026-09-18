@@ -9,7 +9,7 @@
 <div class="page-header">
   <!-- HEADER LEFT -->
 
-  <div class="header-left">
+  <a class="header-left" routerLink="/coop/profile" aria-label="Go to cooperative home">
     <div class="header-icon">🏢</div>
 
     <div>
@@ -19,14 +19,14 @@
         {{ subtitle }}
       </p>
     </div>
-  </div>
+  </a>
 
   <!-- NAVIGATION -->
 
   <nav class="navbar-links">
-    <a> Home </a>
+    <a routerLink="/coop/profile"> Home </a>
 
-    <a routerLink="/coop/profile" routerLinkActive="active"> Profile </a>
+    <a routerLink="/coop/profile" [queryParams]="{ view: 'general' }" routerLinkActive="active"> Profile </a>
 
     <a routerLink="/coop/me" routerLinkActive="active"> Me </a>
 

@@ -54,6 +54,14 @@ const coopConfigurations: Record<string, CoopConfig> = {
     tenantId: '2078sunr0003',
     coopName: 'Sunrise Community Savings and Credit Cooperative Ltd.'
   },
+  '2072nawa0022': {
+    tenantId: '2072nawa0022',
+    coopName: 'Nawa Aasha Multipurpose Cooperative Ltd.'
+  },
+  '2078navo0018': {
+    tenantId: '2078navo0018',
+    coopName: 'Navodaya Community Cooperative Ltd.'
+  },
   // Tenant-neutral entry for local development and any host that maps to no cooperative.
   // Without it an unrecognised host silently inherits a real cooperative's tenant.
   default: {

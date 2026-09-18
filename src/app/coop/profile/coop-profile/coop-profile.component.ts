@@ -120,6 +120,16 @@ export class CoopProfileComponent {
   @Output()
   nextStep = new EventEmitter<void>();
 
+  /**
+   * Emitted by the "Back" button, shown only when `profileStatus` is
+   * ACTIVE - lets the stepper shell return to the full-page activation
+   * welcome (Congratulations) screen. PENDING/PROVISIONED profiles have
+   * no such button, since their status is already shown inline above
+   * this form (see `mifosx-coop-system-status` in the template).
+   */
+  @Output()
+  previousStep = new EventEmitter<void>();
+
   // =====================================================
   // UI STATE
   // =====================================================
@@ -271,17 +281,26 @@ export class CoopProfileComponent {
     ],
     totalMaleMembers: [
       0,
-      Validators.min(0)
+      [
+        Validators.required,
+        Validators.min(0)
+      ]
     ],
 
     totalFemaleMembers: [
       0,
-      Validators.min(0)
+      [
+        Validators.required,
+        Validators.min(0)
+      ]
     ],
 
     totalOtherMembers: [
       0,
-      Validators.min(0)
+      [
+        Validators.required,
+        Validators.min(0)
+      ]
     ],
 
     webUrl: [
@@ -1227,5 +1246,9 @@ export class CoopProfileComponent {
    */
   onNextClick(): void {
     this.onSubmit(() => this.nextStep.emit());
+  }
+
+  goBack(): void {
+    this.previousStep.emit();
   }
 }

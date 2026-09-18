@@ -41,6 +41,20 @@
 }
 
 // =========================================================
+// FULL-PAGE ACTIVATION WELCOME
+// =========================================================
+
+// Fills the remaining height below the navbar, so the welcome page
+// isn't just a small card floating over empty grey space.
+
+.stepper-shell > mifosx-coop-system-status {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+// =========================================================
 // CUSTOM STEP INDICATOR
 // =========================================================
 

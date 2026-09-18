@@ -49,6 +49,9 @@ export function normalizeFrontendUrl(raw: string | null | undefined): FrontendUr
   if (candidate.includes('?') || candidate.includes('#')) {
     return fail('The address must not contain a query string (?) or fragment (#).');
   }
+  if (candidate === 'https://') {
+    return { value: 'https://', error: null };
+  }
 
   let url: URL;
 
