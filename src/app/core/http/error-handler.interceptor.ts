@@ -78,9 +78,12 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
       return throwError(() => response);
     }
 
-    // Translate top-level globalisation code if present
+    // Translate top-level globalisation code if present.
+    // Never fall back to response.message: for a non-Fineract body (proxy HTML, gateway timeout) it is the raw
+    // "Http failure response for <url>" transport string, which leaks the internal API URL. Branches below
+    // supply a translated generic message instead.
     const rawTopLevelMessage = errorBody?.defaultUserMessage || errorBody?.developerMessage;
-    let topLevelMessage = rawTopLevelMessage || response.message;
+    let topLevelMessage = rawTopLevelMessage || null;
     if (errorBody?.userMessageGlobalisationCode) {
       const topCode = errorBody.userMessageGlobalisationCode;
       const translated = this.translate.instant(topCode, errorBody || {});
@@ -90,11 +93,14 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
     }
 
     // Translate nested globalisation code if present
+    const firstError = errorBody?.errors?.[0];
     let nestedMessage: string | null = null;
-    if (errorBody?.errors?.[0]?.userMessageGlobalisationCode) {
-      const nestedCode = errorBody.errors[0].userMessageGlobalisationCode;
-      const translated = this.translate.instant(nestedCode, errorBody.errors[0] || {});
-      nestedMessage = translated !== nestedCode ? translated : errorBody.errors[0].defaultUserMessage || null;
+    let nestedTranslated: string | null = null;
+    if (firstError?.userMessageGlobalisationCode) {
+      const nestedCode = firstError.userMessageGlobalisationCode;
+      const translated = this.translate.instant(nestedCode, firstError);
+      nestedTranslated = translated !== nestedCode ? translated : null;
+      nestedMessage = nestedTranslated || firstError.defaultUserMessage || null;
     }
 
     // Combine both messages if both exist and are distinct.
@@ -107,21 +113,17 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
         : nestedMessage
       : topLevelMessage;
     let parameterName: string | null = null;
-    if (response.error.errors) {
-      if (response.error.errors[0]) {
-        if (
-          response.error.errors[0].userMessageGlobalisationCode &&
-          this.databaseErrorCodes.indexOf(response.error.errors[0].userMessageGlobalisationCode) > -1
-        ) {
-          errorMessage = this.translate.instant('errors.error.msg.data.integrity.issue');
-        } else {
-          errorMessage =
-            response.error.errors[0].defaultUserMessage.replace(/\\./g, ' ') ||
-            response.error.errors[0].developerMessage.replace(/\\./g, ' ');
-        }
+    if (firstError) {
+      if (this.databaseErrorCodes.includes(firstError.userMessageGlobalisationCode)) {
+        errorMessage = this.translate.instant('errors.error.msg.data.integrity.issue');
+      } else {
+        errorMessage =
+          nestedTranslated ||
+          (firstError.defaultUserMessage || firstError.developerMessage)?.replace(/\\./g, ' ') ||
+          errorMessage;
       }
-      if ('parameterName' in errorBody.errors[0]) {
-        parameterName = errorBody.errors[0].parameterName;
+      if ('parameterName' in firstError) {
+        parameterName = firstError.parameterName;
       }
     }
     const isClientImage404 = status === 404 && request.url.includes('/clients/') && request.url.includes('/images');
@@ -164,6 +166,22 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
           message: errorMessage || this.translate.instant('errors.error.resource.not.found.message')
         });
       }
+    } else if (status === 413) {
+      // Fineract's UploadSizeLimitFilter and the nginx proxy both answer 413 for an oversized upload.
+      this.alertService.alert({
+        type: this.translate.instant('errors.error.file.too.large.type'),
+        message: errorMessage || this.translate.instant('errors.error.file.too.large.message')
+      });
+    } else if (status === 0) {
+      this.alertService.alert({
+        type: this.translate.instant('errors.http.connection.title'),
+        message: this.translate.instant('errors.http.connection.message')
+      });
+    } else if (status >= 502 && status <= 504) {
+      this.alertService.alert({
+        type: this.translate.instant('errors.http.serviceUnavailable.title'),
+        message: errorMessage || this.translate.instant('errors.http.serviceUnavailable.message')
+      });
     } else if (status === 500) {
       this.alertService.alert({
         type: this.translate.instant('errors.error.server.internal.type'),

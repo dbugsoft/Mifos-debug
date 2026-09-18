@@ -1,4 +1,5 @@
 ﻿{
+  "error.msg.upload.file.too.big": "Faili uliyochagua ni kubwa kuliko kikomo cha MB {{args.0.value}}. Tafadhali chagua faili ndogo zaidi na ujaribu tena.",
   "APP_NAME": "COIMS",
   "Logged in as": "Imeingia kama",
   "Remember me": "Nikumbuke",
@@ -420,6 +421,8 @@
     "error.server.internal.message": "Hitilafu isiyotarajiwa ilitokea kwenye seva. Tafadhali jaribu tena baadaye.",
     "error.unknown.type": "Hitilafu isiyojulikana",
     "error.unknown.message": "Hitilafu isiyotarajiwa ilitokea.",
+    "error.file.too.large.type": "Faili ni kubwa mno",
+    "error.file.too.large.message": "Faili uliyochagua ni kubwa mno. Tafadhali chagua faili ndogo zaidi na ujaribu tena.",
     "validation.required": "Sehemu hii inahitajika",
     "validation.minLength": "Urefu wa chini ni {{requiredLength}}",
     "validation.emailInvalid": "Barua pepe si sahihi",
@@ -3719,6 +3722,7 @@
       "Manage your Services": "Dhibiti Huduma zako",
       "Mandatory": "Lazima",
       "Manual journal entry transactions recorded in a journal": "Uingizaji wa shughuli za jarida kwa mikono iliyorekodiwa kwenye jarida",
+      "Maximum file size": "Ukubwa wa juu wa faili: MB {{size}}",
       "Message Gateway": "Lango la Ujumbe",
       "Mifos Initiative": "Mpango wa Mifos®",
       "Mifos X data-tables allow the user to add custom fields": "Jedwali la data la Mifos X huruhusu mtumiaji kuongeza sehemu maalum pamoja na sehemu zilizojengewa ndani kwa wasifu wa mteja, akaunti ya mkopo/kuokoa, kikundi, kituo au ofisi.",

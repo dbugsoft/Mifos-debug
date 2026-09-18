@@ -1,4 +1,5 @@
 ﻿{
+  "error.msg.upload.file.too.big": "Pasirinktas failas viršija {{args.0.value}} MB ribą. Pasirinkite mažesnį failą ir bandykite dar kartą.",
   "APP_NAME": "COIMS",
   "Logged in as": "prisijungęs kaip",
   "Remember me": "Prisimink mane",
@@ -420,6 +421,8 @@
     "error.server.internal.message": "Serveryje įvyko netikėta klaida. Bandykite vėliau.",
     "error.unknown.type": "Nežinoma klaida",
     "error.unknown.message": "Įvyko netikėta klaida.",
+    "error.file.too.large.type": "Failas per didelis",
+    "error.file.too.large.message": "Pasirinktas failas per didelis. Pasirinkite mažesnį failą ir bandykite dar kartą.",
     "validation.required": "Šis laukas yra privalomas",
     "validation.minLength": "Minimali ilgis yra {{requiredLength}}",
     "validation.emailInvalid": "El. paštas neteisingas",
@@ -3722,6 +3725,7 @@
       "Manage your Services": "Tvarkykite savo paslaugas",
       "Mandatory": "Privaloma",
       "Manual journal entry transactions recorded in a journal": "Neautomatinio žurnalo įrašymo operacijos, įrašytos į žurnalą",
+      "Maximum file size": "Didžiausias failo dydis: {{size}} MB",
       "Message Gateway": "Pranešimų vartai",
       "Mifos Initiative": "Mifos® iniciatyva",
       "Mifos X data-tables allow the user to add custom fields": "„Mifos X“ duomenų lentelės leidžia vartotojui pridėti pasirinktinius laukus be įtaisytųjų laukų prie kliento profilio, paskolos / taupymo sąskaitos, grupės, centro ar biuro.",

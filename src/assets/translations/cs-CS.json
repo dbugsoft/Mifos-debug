@@ -4,6 +4,7 @@
   "Remember me": "Zapamatuj si mě",
   "error.resource.notImplemented.type": "Nenaimplementovaná chyba",
   "error.resource.notImplemented.message": "Funkce není implementována!",
+  "error.msg.upload.file.too.big": "Vybraný soubor je větší než limit {{args.0.value}} MB. Vyberte prosím menší soubor a zkuste to znovu.",
   "errors": {
     "accountingRule": {
       "duplicateName": "Omlouváme se, ale účetní pravidlo s tímto názvem již existuje."
@@ -422,6 +423,8 @@
     "error.server.internal.message": "Na serveru došlo k neočekávané chybě. Zkuste to prosím později.",
     "error.unknown.type": "Neznámá chyba",
     "error.unknown.message": "Došlo k neočekávané chybě.",
+    "error.file.too.large.type": "Soubor je příliš velký",
+    "error.file.too.large.message": "Vybraný soubor je příliš velký. Vyberte prosím menší soubor a zkuste to znovu.",
     "validation.required": "Toto pole je povinné",
     "validation.minLength": "Minimální délka je {{requiredLength}}",
     "validation.emailInvalid": "E-mail není platný",
@@ -3723,6 +3726,7 @@
       "Manage your Services": "Spravujte své služby",
       "Mandatory": "Povinné",
       "Manual journal entry transactions recorded in a journal": "Transakce ručního zápisu do deníku zaznamenané v deníku",
+      "Maximum file size": "Maximální velikost souboru: {{size}} MB",
       "Message Gateway": "Brána zpráv",
       "Mifos Initiative": "Iniciativa Mifos®",
       "Mifos X data-tables allow the user to add custom fields": "Tabulky dat Mifos X umožňují uživateli přidat vlastní pole kromě vestavěných polí do profilu klienta, úvěrového/spořicího účtu, skupiny, centra nebo kanceláře.",

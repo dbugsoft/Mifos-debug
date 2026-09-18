@@ -4,6 +4,7 @@
   "Remember me": "Erinnere dich an mich",
   "error.resource.notImplemented.type": "Nicht implementierter Fehler",
   "error.resource.notImplemented.message": "Nicht implementierte Funktion!",
+  "error.msg.upload.file.too.big": "Die ausgewählte Datei überschreitet das Limit von {{args.0.value}} MB. Bitte wählen Sie eine kleinere Datei und versuchen Sie es erneut.",
   "errors": {
     "accountingRule": {
       "duplicateName": "Entschuldigung, aber eine Buchungsregel mit diesem Namen existiert bereits."
@@ -422,6 +423,8 @@
     "error.server.internal.message": "Auf dem Server ist ein unerwarteter Fehler aufgetreten. Bitte versuchen Sie es später erneut.",
     "error.unknown.type": "Unbekannter Fehler",
     "error.unknown.message": "Ein unerwarteter Fehler ist aufgetreten.",
+    "error.file.too.large.type": "Datei zu groß",
+    "error.file.too.large.message": "Die ausgewählte Datei ist zu groß. Bitte wählen Sie eine kleinere Datei und versuchen Sie es erneut.",
     "validation.required": "Dieses Feld ist erforderlich",
     "validation.minLength": "Mindestlänge ist {{requiredLength}}",
     "validation.emailInvalid": "E-Mail ist ungültig",
@@ -3724,6 +3727,7 @@
       "Manage your Services": "Verwalten Sie Ihre Dienste",
       "Mandatory": "Obligatorisch",
       "Manual journal entry transactions recorded in a journal": "Manuelle Journalbuchungstransaktionen, die in einem Journal aufgezeichnet werden",
+      "Maximum file size": "Maximale Dateigröße: {{size}} MB",
       "Message Gateway": "Nachrichten-Gateway",
       "Mifos Initiative": "Mifos®-Initiative",
       "Mifos X data-tables allow the user to add custom fields": "Mifos",

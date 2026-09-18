@@ -8,13 +8,19 @@
 
 <h1 mat-dialog-title>{{ 'labels.heading.Upload Client Image' | translate }}</h1>
 
-<div>
+<mat-dialog-content>
   <mifosx-file-upload flex="60%" (change)="onFileSelect($event)" acceptFilter=".png,.jpeg,.jpg"></mifosx-file-upload>
+  @if (limits(); as limits) {
+    <p class="upload-hint">{{ 'labels.text.Maximum file size' | translate: { size: limits.imageMaxFileSizeMb } }}</p>
+  }
+  @if (sizeError()) {
+    <mat-error class="upload-error" role="alert">{{ sizeError() }}</mat-error>
+  }
+</mat-dialog-content>
 
-  <mat-dialog-actions align="end">
-    <button mat-raised-button mat-dialog-close>{{ 'labels.buttons.Cancel' | translate }}</button>
-    <button mat-raised-button color="primary" [disabled]="!image" [mat-dialog-close]="image">
-      {{ 'labels.buttons.Confirm' | translate }}
-    </button>
-  </mat-dialog-actions>
-</div>
+<mat-dialog-actions align="end">
+  <button mat-raised-button mat-dialog-close>{{ 'labels.buttons.Cancel' | translate }}</button>
+  <button mat-raised-button color="primary" [disabled]="!image" [mat-dialog-close]="image">
+    {{ 'labels.buttons.Confirm' | translate }}
+  </button>
+</mat-dialog-actions>
