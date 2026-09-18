@@ -9,9 +9,6 @@
 <div class="admin-detail-page">
   <!-- =====================================================
         FIXED NAVBAR
-        A direct flex child of .admin-detail-page (not inside
-        the scrollable content area below), so it never moves
-        while the page underneath is scrolled.
     ====================================================== -->
 
   <mifosx-coop-admin-navbar></mifosx-coop-admin-navbar>
@@ -138,6 +135,46 @@
             </section>
           </div>
 
+          <!-- MEMBER INFORMATION + ONLINE INFORMATION -->
+
+          <div class="section-pair">
+            <section class="information-section">
+              <div class="section-heading">
+                <div class="skeleton skeleton-section-icon"></div>
+
+                <div>
+                  <div class="skeleton skeleton-section-title"></div>
+                  <div class="skeleton skeleton-section-desc"></div>
+                </div>
+              </div>
+
+              <div class="detail-grid">
+                <div class="detail-field" *ngFor="let field of skeletonFields3">
+                  <div class="skeleton skeleton-label"></div>
+                  <div class="skeleton skeleton-value"></div>
+                </div>
+              </div>
+            </section>
+
+            <section class="information-section">
+              <div class="section-heading">
+                <div class="skeleton skeleton-section-icon"></div>
+
+                <div>
+                  <div class="skeleton skeleton-section-title"></div>
+                  <div class="skeleton skeleton-section-desc"></div>
+                </div>
+              </div>
+
+              <div class="detail-grid">
+                <div class="detail-field">
+                  <div class="skeleton skeleton-label"></div>
+                  <div class="skeleton skeleton-value"></div>
+                </div>
+              </div>
+            </section>
+          </div>
+
           <!-- REMARKS -->
 
           <section class="information-section">
@@ -159,6 +196,8 @@
           <!-- TENANT INFORMATION + SYSTEM INFORMATION -->
 
           <div class="section-pair wide-first">
+            <!-- TENANT INFORMATION SKELETON -->
+
             <section class="information-section">
               <div class="section-heading">
                 <div class="skeleton skeleton-section-icon"></div>
@@ -169,7 +208,7 @@
                 </div>
               </div>
 
-              <div class="detail-grid">
+              <div class="tenant-detail-grid">
                 <div class="detail-field" *ngFor="let field of skeletonFields4">
                   <div class="skeleton skeleton-label"></div>
                   <div class="skeleton skeleton-value"></div>
@@ -177,6 +216,8 @@
               </div>
             </section>
 
+            <!-- SYSTEM INFORMATION SKELETON -->
+
             <section class="information-section">
               <div class="section-heading">
                 <div class="skeleton skeleton-section-icon"></div>
@@ -187,7 +228,7 @@
                 </div>
               </div>
 
-              <div class="detail-grid">
+              <div class="system-detail-grid">
                 <div class="detail-field" *ngFor="let field of skeletonFields2">
                   <div class="skeleton skeleton-label"></div>
                   <div class="skeleton skeleton-value"></div>
@@ -275,9 +316,7 @@
           </div>
         </div>
 
-        <!-- =====================================================
-            SUCCESS MESSAGE
-        ====================================================== -->
+        <!-- SUCCESS MESSAGE -->
 
         <div class="alert success-alert" *ngIf="successMessage">
           <span class="alert-icon"> ✓ </span>
@@ -287,9 +326,7 @@
           </span>
         </div>
 
-        <!-- =====================================================
-            ERROR MESSAGE
-        ====================================================== -->
+        <!-- ERROR MESSAGE -->
 
         <div class="alert error-alert" *ngIf="errorMessage">
           <span class="alert-icon"> ! </span>
@@ -304,9 +341,7 @@
         ====================================================== -->
 
         <div class="information-paper">
-          <!-- ===================================================
-              BASIC INFORMATION
-          ==================================================== -->
+          <!-- BASIC INFORMATION -->
 
           <section class="information-section">
             <div class="section-heading">
@@ -314,65 +349,44 @@
 
               <div>
                 <h2>Basic Information</h2>
-
                 <p>Official cooperative registration information</p>
               </div>
             </div>
 
             <div class="detail-grid">
               <div class="detail-field">
-                <span class="detail-label"> ID </span>
-
-                <span class="detail-value">
-                  {{ cooperative.id }}
-                </span>
+                <span class="detail-label">ID</span>
+                <span class="detail-value">{{ cooperative.id }}</span>
               </div>
 
               <div class="detail-field">
-                <span class="detail-label"> App User ID </span>
-
-                <span class="detail-value">
-                  {{ cooperative.appUserId || '—' }}
-                </span>
+                <span class="detail-label">App User ID</span>
+                <span class="detail-value">{{ cooperative.appUserId || '—' }}</span>
               </div>
 
               <div class="detail-field">
-                <span class="detail-label"> Registration No. </span>
-
-                <span class="detail-value">
-                  {{ cooperative.coopRegdNo || '—' }}
-                </span>
+                <span class="detail-label">Registration No.</span>
+                <span class="detail-value">{{ cooperative.coopRegdNo || '—' }}</span>
               </div>
 
               <div class="detail-field">
-                <span class="detail-label"> Cooperative Code </span>
-
-                <span class="detail-value">
-                  {{ cooperative.cooperativeCode || '—' }}
-                </span>
+                <span class="detail-label">Cooperative Code</span>
+                <span class="detail-value">{{ cooperative.cooperativeCode || '—' }}</span>
               </div>
 
               <div class="detail-field">
-                <span class="detail-label"> Date of Registration </span>
-
-                <span class="detail-value">
-                  {{ cooperative.dateOfRegistered || '—' }}
-                </span>
+                <span class="detail-label">Date of Registration</span>
+                <span class="detail-value">{{ cooperative.dateOfRegistered || '—' }}</span>
               </div>
 
               <div class="detail-field">
-                <span class="detail-label"> PAN Number </span>
-
-                <span class="detail-value">
-                  {{ cooperative.panNo || '—' }}
-                </span>
+                <span class="detail-label">PAN Number</span>
+                <span class="detail-value">{{ cooperative.panNo || '—' }}</span>
               </div>
             </div>
           </section>
 
-          <!-- ===================================================
-              ADDRESS INFORMATION
-          ==================================================== -->
+          <!-- ADDRESS INFORMATION -->
 
           <section class="information-section">
             <div class="section-heading">
@@ -380,65 +394,44 @@
 
               <div>
                 <h2>Address Information</h2>
-
                 <p>Registered cooperative office address</p>
               </div>
             </div>
 
             <div class="detail-grid">
               <div class="detail-field">
-                <span class="detail-label"> Province Name </span>
-
-                <span class="detail-value">
-                  {{ provinceName || '—' }}
-                </span>
+                <span class="detail-label">Province Name</span>
+                <span class="detail-value">{{ provinceName || '—' }}</span>
               </div>
 
               <div class="detail-field">
-                <span class="detail-label"> District Name </span>
-
-                <span class="detail-value">
-                  {{ districtName || '—' }}
-                </span>
+                <span class="detail-label">District Name</span>
+                <span class="detail-value">{{ districtName || '—' }}</span>
               </div>
 
               <div class="detail-field field-lg">
-                <span class="detail-label"> Local Level Name </span>
-
-                <span class="detail-value">
-                  {{ localLevelName || '—' }}
-                </span>
+                <span class="detail-label">Local Level Name</span>
+                <span class="detail-value">{{ localLevelName || '—' }}</span>
               </div>
 
               <div class="detail-field field-xs">
-                <span class="detail-label"> Ward No. </span>
-
-                <span class="detail-value">
-                  {{ cooperative.wardNo || '—' }}
-                </span>
+                <span class="detail-label">Ward No.</span>
+                <span class="detail-value">{{ cooperative.wardNo || '—' }}</span>
               </div>
 
               <div class="detail-field">
-                <span class="detail-label"> Tole </span>
-
-                <span class="detail-value">
-                  {{ cooperative.tole || '—' }}
-                </span>
+                <span class="detail-label">Tole</span>
+                <span class="detail-value">{{ cooperative.tole || '—' }}</span>
               </div>
 
               <div class="detail-field field-xs">
-                <span class="detail-label"> House No. </span>
-
-                <span class="detail-value">
-                  {{ cooperative.houseNo || '—' }}
-                </span>
+                <span class="detail-label">House No.</span>
+                <span class="detail-value">{{ cooperative.houseNo || '—' }}</span>
               </div>
             </div>
           </section>
 
-          <!-- ===================================================
-              CONTACT INFORMATION + ABOUT
-          ==================================================== -->
+          <!-- CONTACT INFORMATION + ABOUT -->
 
           <div class="section-pair">
             <section class="information-section">
@@ -447,26 +440,19 @@
 
                 <div>
                   <h2>Contact Information</h2>
-
                   <p>Cooperative contact details</p>
                 </div>
               </div>
 
               <div class="detail-grid">
                 <div class="detail-field">
-                  <span class="detail-label"> Mobile Phone </span>
-
-                  <span class="detail-value">
-                    {{ cooperative.mobilePhone || '—' }}
-                  </span>
+                  <span class="detail-label">Mobile Phone</span>
+                  <span class="detail-value">{{ cooperative.mobilePhone || '—' }}</span>
                 </div>
 
                 <div class="detail-field">
-                  <span class="detail-label"> Office Phone </span>
-
-                  <span class="detail-value">
-                    {{ cooperative.officePhone || '—' }}
-                  </span>
+                  <span class="detail-label">Office Phone</span>
+                  <span class="detail-value">{{ cooperative.officePhone || '—' }}</span>
                 </div>
               </div>
             </section>
@@ -477,7 +463,6 @@
 
                 <div>
                   <h2>About Cooperative</h2>
-
                   <p>Additional information provided by the applicant</p>
                 </div>
               </div>
@@ -493,20 +478,16 @@
               </div>
             </section>
           </div>
-          <!-- ===================================================
-    MEMBER INFORMATION + ONLINE INFORMATION
-  ==================================================== -->
+
+          <!-- MEMBER INFORMATION + ONLINE INFORMATION -->
 
           <div class="section-pair">
-            <!-- MEMBER INFORMATION -->
-
             <section class="information-section">
               <div class="section-heading">
                 <div class="section-icon">♙</div>
 
                 <div>
                   <h2>Member Information</h2>
-
                   <p>Current member distribution</p>
                 </div>
               </div>
@@ -514,7 +495,6 @@
               <div class="detail-grid">
                 <div class="detail-field">
                   <span class="detail-label">Male Members</span>
-
                   <span class="detail-value">
                     {{ cooperative.totalMaleMembers ?? '—' }}
                   </span>
@@ -522,7 +502,6 @@
 
                 <div class="detail-field">
                   <span class="detail-label">Female Members</span>
-
                   <span class="detail-value">
                     {{ cooperative.totalFemaleMembers ?? '—' }}
                   </span>
@@ -530,7 +509,6 @@
 
                 <div class="detail-field">
                   <span class="detail-label">Other Members</span>
-
                   <span class="detail-value">
                     {{ cooperative.totalOtherMembers ?? '—' }}
                   </span>
@@ -538,15 +516,12 @@
               </div>
             </section>
 
-            <!-- ONLINE INFORMATION -->
-
             <section class="information-section">
               <div class="section-heading">
                 <div class="section-icon">◎</div>
 
                 <div>
                   <h2>Online Information</h2>
-
                   <p>Website and online presence</p>
                 </div>
               </div>
@@ -554,7 +529,6 @@
               <div class="detail-grid">
                 <div class="detail-field field-lg">
                   <span class="detail-label">Website URL</span>
-
                   <span class="detail-value">
                     {{ cooperative.webUrl || '—' }}
                   </span>
@@ -562,9 +536,8 @@
               </div>
             </section>
           </div>
-          <!-- ===================================================
-              REMARKS
-          ==================================================== -->
+
+          <!-- REMARKS -->
 
           <section class="information-section">
             <div class="section-heading">
@@ -572,14 +545,13 @@
 
               <div>
                 <h2>Remarks</h2>
-
                 <p>Applicant and administrator remarks</p>
               </div>
             </div>
 
             <div class="remarks-container">
               <div class="remark-box applicant-remark">
-                <span class="remark-label"> Applicant Remarks </span>
+                <span class="remark-label">Applicant Remarks</span>
 
                 <p *ngIf="cooperative.remarks">
                   {{ cooperative.remarks }}
@@ -589,7 +561,7 @@
               </div>
 
               <div class="remark-box admin-remark">
-                <span class="remark-label"> Admin Remarks </span>
+                <span class="remark-label">Admin Remarks</span>
 
                 <p *ngIf="cooperative.adminRemarks">
                   {{ cooperative.adminRemarks }}
@@ -600,57 +572,62 @@
             </div>
           </section>
 
-          <!-- ===================================================
+          <!-- =====================================================
               TENANT INFORMATION + SYSTEM INFORMATION
-          ==================================================== -->
+          ====================================================== -->
 
           <div class="section-pair wide-first">
+            <!-- TENANT INFORMATION -->
+
             <section class="information-section">
               <div class="section-heading">
                 <div class="section-icon">◉</div>
 
                 <div>
                   <h2>Tenant Information</h2>
-
                   <p>Fineract tenant provisioning information</p>
                 </div>
               </div>
 
-              <div class="detail-grid">
-                <div class="detail-field field-lg">
-                  <span class="detail-label"> Tenant Identifier </span>
+              <div class="tenant-detail-grid">
+                <!-- ROW 1 -->
+
+                <div class="detail-field">
+                  <span class="detail-label">Tenant Identifier</span>
 
                   <span class="detail-value tenant-value">
                     {{ cooperative.tenantIdentifier || '—' }}
                   </span>
                 </div>
 
-                <div class="detail-field field-lg">
-                  <span class="detail-label"> Administrator Username </span>
+                <div class="detail-field">
+                  <span class="detail-label">Administrator Username</span>
 
                   <span class="detail-value">
                     {{ cooperative.tenantAdminUsername || '—' }}
                   </span>
                 </div>
 
-                <div class="detail-field field-xs">
-                  <span class="detail-label"> Tenant Status </span>
+                <div class="detail-field">
+                  <span class="detail-label">Tenant Status</span>
 
                   <span class="detail-value">
                     {{ cooperative.status || '—' }}
                   </span>
                 </div>
 
-                <div class="detail-field field-xs">
-                  <span class="detail-label"> Provisioned At </span>
+                <!-- ROW 2 -->
+
+                <div class="detail-field">
+                  <span class="detail-label">Provisioned At</span>
 
                   <span class="detail-value">
                     {{ cooperative.provisionedAt ? (cooperative.provisionedAt | date: 'MMM dd, yyyy') : '—' }}
                   </span>
                 </div>
 
-                <div class="detail-field field-xs">
-                  <span class="detail-label"> Activated At </span>
+                <div class="detail-field">
+                  <span class="detail-label">Activated At</span>
 
                   <span class="detail-value">
                     {{ cooperative.activatedAt ? (cooperative.activatedAt | date: 'MMM dd, yyyy') : '—' }}
@@ -659,28 +636,29 @@
               </div>
             </section>
 
+            <!-- SYSTEM INFORMATION -->
+
             <section class="information-section">
               <div class="section-heading">
                 <div class="section-icon">⚙</div>
 
                 <div>
                   <h2>System Information</h2>
-
                   <p>Record creation and update information</p>
                 </div>
               </div>
 
-              <div class="detail-grid">
-                <div class="detail-field field-xs">
-                  <span class="detail-label"> Created At </span>
+              <div class="system-detail-grid">
+                <div class="detail-field">
+                  <span class="detail-label">Created At</span>
 
                   <span class="detail-value">
                     {{ cooperative.createdAt ? (cooperative.createdAt | date: 'MMM dd, yyyy') : '—' }}
                   </span>
                 </div>
 
-                <div class="detail-field field-xs">
-                  <span class="detail-label"> Updated At </span>
+                <div class="detail-field">
+                  <span class="detail-label">Updated At</span>
 
                   <span class="detail-value">
                     {{ cooperative.updatedAt ? (cooperative.updatedAt | date: 'MMM dd, yyyy') : '—' }}
@@ -690,6 +668,11 @@
             </section>
           </div>
         </div>
+
+        <!-- =====================================================
+            BACK / NEXT
+        ====================================================== -->
+
         <div class="navigation-container">
           <div class="nav-box nav-box-back">
             <button mat-flat-button type="button" class="nav-button back-button" (click)="goBack()">Back</button>

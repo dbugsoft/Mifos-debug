@@ -487,6 +487,45 @@
 }
 
 /* =========================================================
+   TENANT INFORMATION GRID
+========================================================= */
+
+.tenant-detail-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1.4fr 0.8fr;
+  gap: 10px;
+}
+
+.tenant-detail-grid .detail-field {
+  width: auto;
+  min-width: 0;
+  flex: none;
+}
+
+.tenant-detail-grid .detail-field:nth-child(4) {
+  grid-column: 1;
+}
+
+.tenant-detail-grid .detail-field:nth-child(5) {
+  grid-column: 2;
+}
+
+/* =========================================================
+   SYSTEM INFORMATION GRID
+========================================================= */
+
+.system-detail-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.system-detail-grid .detail-field {
+  width: 100%;
+  flex: none;
+}
+
+/* =========================================================
    WEBSITE
 ========================================================= */
 
@@ -1152,6 +1191,10 @@
   .navigation-container {
     padding-bottom: 20px;
   }
+
+  .tenant-detail-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 /* =========================================================
@@ -1266,6 +1309,16 @@
     padding: 12px 14px;
   }
 
+  .tenant-detail-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .system-detail-grid {
+    gap: 8px;
+  }
+
   .remarks-container {
     gap: 10px;
   }
@@ -1315,6 +1368,7 @@
   }
 
   /* Back / Next navigation on mobile */
+
   .navigation-container {
     justify-content: flex-end;
     margin-top: 16px;
