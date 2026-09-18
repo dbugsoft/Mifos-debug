@@ -6,9 +6,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, effect, inject } from '@angular/core';
+
+import { toSignal } from '@angular/core/rxjs-interop';
 
 import { CommonModule } from '@angular/common';
+
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { StepperSelectionEvent } from '@angular/cdk/stepper';
 
@@ -18,11 +22,19 @@ import { MatButtonModule } from '@angular/material/button';
 
 import { MatIconModule } from '@angular/material/icon';
 
+import { injectQuery } from '@tanstack/angular-query-experimental';
+
 import { CoopNavbarComponent } from '../../coop-navbar/coop-navbar.component';
 
 import { CoopProfileComponent } from '../coop-profile/coop-profile.component';
 
 import { CoopDocumentsComponent } from '../coop-profile/coop-documents/coop-documents.component';
+
+import { CoopSystemStatusComponent } from '../coop-system-status/coop-system-status.component';
+
+import { CoopProfileService } from '../../services/coop-profile.service';
+
+import { statusQueryOptions } from '../../queries/coop-profile.queries';
 
 interface CoopStepperStep {
   label: string;
@@ -44,7 +56,8 @@ interface CoopStepperStep {
     MatIconModule,
     CoopNavbarComponent,
     CoopProfileComponent,
-    CoopDocumentsComponent
+    CoopDocumentsComponent,
+    CoopSystemStatusComponent
   ],
 
   templateUrl: './coop-stepper.component.html',
@@ -68,6 +81,137 @@ export class CoopStepperComponent {
    */
   @ViewChild(CoopProfileComponent)
   profileComponent?: CoopProfileComponent;
+
+  // =====================================================
+  // ACTIVATION WELCOME (ACTIVE / PROVISIONED)
+  // =====================================================
+
+  private coopProfileService = inject(CoopProfileService);
+
+  private statusQuery = injectQuery(() => statusQueryOptions(this.coopProfileService));
+
+  private route = inject(ActivatedRoute);
+
+  private router = inject(Router);
+
+  /**
+   * `?view=general` on this same route is what the navbar's "Profile"
+   * link uses to land straight on the General Information step; its
+   * absence (the navbar's "Home" link, or the logo/title) means "show
+   * the welcome page when ACTIVE/PROVISIONED". Reading it as a signal -
+   * instead of a one-off snapshot - is what lets clicking those navbar
+   * links work even though they all resolve to this same
+   * route/component instance (Angular reuses it rather than
+   * re-creating it).
+   */
+  private queryParamMap = toSignal(this.route.queryParamMap);
+
+  /**
+   * Full-page welcome screen, shown in place of the stepper for
+   * ACTIVE (the "Congratulations" sign-in details) and PROVISIONED
+   * (the existing "your system is being prepared" message) - the
+   * cooperative's own home page while its system isn't something they
+   * can act on yet. PENDING keeps its existing status card embedded
+   * inline in CoopProfileComponent instead - this flag never applies
+   * to it. Derived entirely from `statusQuery` + the `view` query
+   * param so the navbar links and the welcome page's own Next/Back
+   * stay in sync with each other.
+   */
+  showActivationWelcome = false;
+
+  // =====================================================
+  // ONBOARDING WELCOME (NO_PROFILE ONLY, FIRST LOGIN)
+  // =====================================================
+
+  /**
+   * Persisted (not just in-memory) so the "Welcome to CoIMS" page never
+   * shows again once dismissed - a NO_PROFILE user who closes the tab
+   * mid-form and logs back in still has status NO_PROFILE from the
+   * server, so the query-param trick used for `showActivationWelcome`
+   * isn't enough here; only actually submitting the profile changes
+   * the server-side status away from NO_PROFILE.
+   */
+  private readonly onboardingDismissedKeyPrefix = 'coopOnboardingWelcomeDismissed:';
+
+  private isOnboardingDismissed(email: string): boolean {
+    return localStorage.getItem(this.onboardingDismissedKeyPrefix + email) === 'true';
+  }
+
+  private markOnboardingDismissed(email: string): void {
+    localStorage.setItem(this.onboardingDismissedKeyPrefix + email, 'true');
+  }
+
+  /**
+   * Full-page "Welcome to CoIMS" onboarding, shown in place of the
+   * stepper on a NO_PROFILE user's first login only - reuses
+   * `CoopSystemStatusComponent`'s existing NO_PROFILE case rather than
+   * a new component/step (see the template).
+   */
+  showOnboardingWelcome = false;
+
+  constructor() {
+    effect(() => {
+      const data = this.statusQuery.data();
+      const forcedToGeneral = this.queryParamMap()?.get('view') === 'general';
+
+      const isActiveOrProvisioned = data?.status === 'ACTIVE' || data?.status === 'PROVISIONED';
+
+      this.showActivationWelcome = isActiveOrProvisioned && !forcedToGeneral;
+
+      const isNoProfile = data?.status === 'NO_PROFILE';
+      const dismissed = !!data?.email && this.isOnboardingDismissed(data.email);
+
+      this.showOnboardingWelcome = isNoProfile && !dismissed && !forcedToGeneral;
+    });
+  }
+
+  /**
+   * "Get Started" on the onboarding welcome page moves into the
+   * profile stepper - and permanently dismisses the welcome page for
+   * this user (see `markOnboardingDismissed`), since a fresh
+   * NO_PROFILE profile is otherwise indistinguishable, server-side,
+   * from one whose onboarding was never started.
+   */
+  onOnboardingGetStarted(): void {
+    const email = this.statusQuery.data()?.email;
+
+    if (email) {
+      this.markOnboardingDismissed(email);
+    }
+
+    this.showOnboardingWelcome = false;
+  }
+
+  /**
+   * "Next" on the welcome screen (ACTIVE or PROVISIONED) moves into
+   * the profile stepper by setting `?view=general` on the current
+   * route (see `queryParamMap` above) rather than a plain field
+   * assignment, so a later click on the navbar's "Home" link - same
+   * route, no `view` param - reliably brings the welcome page back
+   * even though the URL path never changes.
+   */
+  onActivationWelcomeNext(): void {
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { view: 'general' },
+      queryParamsHandling: 'merge',
+      replaceUrl: true
+    });
+  }
+
+  /**
+   * "Back" from the General Information step - only reachable when
+   * ACTIVE (see CoopProfileComponent's Back button) - clears `view` so
+   * the welcome screen shows again instead of leaving the stepper.
+   */
+  onGeneralInfoPrevious(): void {
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { view: null },
+      queryParamsHandling: 'merge',
+      replaceUrl: true
+    });
+  }
 
   // =====================================================
   // STEPS

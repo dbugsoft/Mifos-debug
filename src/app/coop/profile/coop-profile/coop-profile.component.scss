@@ -248,6 +248,18 @@
 mat-form-field {
   width: 100%;
   min-width: 0;
+
+  /*
+   * Set the field font-size via Material's own typography token
+   * instead of overriding .mat-mdc-floating-label directly.
+   * The outline's notch gap is measured against this token at
+   * init time, so using the token keeps the notch width and the
+   * label width in sync — overriding the label class after the
+   * fact leaves a stray sliver of outline border behind (visible
+   * as a thin vertical line, especially once focus turns the
+   * outline blue).
+   */
+  --mat-form-field-container-text-size: 13px;
 }
 
 mat-form-field input,
@@ -260,6 +272,17 @@ mat-form-field textarea {
   min-height: 72px;
   line-height: 1.5;
   resize: vertical;
+}
+
+/* =========================================================
+   READ-ONLY DISPLAY FIELDS
+   Office Phone / Other Members / Website URL are readonly,
+   not caret-hidden — a real readonly input never generates
+   a caret, so no rendering artifact is left behind.
+========================================================= */
+
+mat-form-field [readonly] {
+  cursor: default;
 }
 
 /* =========================================================
@@ -323,16 +346,6 @@ mat-form-field textarea {
 
 ::ng-deep .mat-mdc-form-field-infix {
   min-height: 46px;
-}
-
-::ng-deep .mat-mdc-form-field .mat-mdc-floating-label {
-  font-size: 13px;
-}
-
-::ng-deep .mat-mdc-form-field.mat-focused .mdc-notched-outline__leading,
-::ng-deep .mat-mdc-form-field.mat-focused .mdc-notched-outline__notch,
-::ng-deep .mat-mdc-form-field.mat-focused .mdc-notched-outline__trailing {
-  border-color: #1074b9 !important;
 }
 
 ::ng-deep .mat-mdc-form-field-error {
@@ -399,6 +412,35 @@ mat-form-field textarea {
   align-items: center;
   width: 100%;
   padding: 2px 0 12px;
+}
+
+.back-button {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 112px;
+  height: 40px;
+  padding: 0 16px !important;
+  border: none !important;
+  border-radius: 8px !important;
+  font-size: 12.5px !important;
+  font-weight: 500 !important;
+  box-shadow: none !important;
+  background: #1074b9 !important;
+  color: #fff !important;
+  margin-right: auto;
+  transition:
+    background 0.18s ease,
+    transform 0.15s ease;
+}
+
+.back-button:hover {
+  background: #0c639e !important;
+}
+
+.back-button:active {
+  transform: translateY(1px);
 }
 
 .next-step-button {
@@ -587,11 +629,15 @@ mat-form-field textarea {
   }
 
   .form-actions {
+    flex-wrap: wrap;
+    gap: 10px;
     padding-bottom: 8px;
   }
 
+  .back-button,
   .next-step-button {
     width: 100%;
+    margin-right: 0;
   }
 }
 
