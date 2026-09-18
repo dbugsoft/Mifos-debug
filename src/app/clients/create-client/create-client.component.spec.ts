@@ -8,7 +8,7 @@
 
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
-import { of, BehaviorSubject } from 'rxjs';
+import { of, BehaviorSubject, throwError } from 'rxjs';
 import { CreateClientComponent } from './create-client.component';
 import { ClientsService } from '../clients.service';
 import { SettingsService } from '../../settings/settings.service';
@@ -19,6 +19,12 @@ import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
 import * as solidIcons from '@fortawesome/free-solid-svg-icons';
 import { describe, it, expect, jest, beforeEach } from '@jest/globals';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { MemberAddressDraft } from '../member-address/member-address.model';
+import { MemberAddressService } from '../member-address/member-address.service';
+import { NepalLocationService } from '../member-address/nepal-location.service';
+import { NepalLocationIndex } from '../member-address/nepal-location-index';
+import { MOCK_LOCATIONS } from '../member-address/testing/nepal-locations.mock';
+import { ClientActionNotifierService } from '../clients-view/client-actions/client-action-notifier.service';
 
 describe('CreateClientComponent - Integration Tests', () => {
   let component: CreateClientComponent;
@@ -27,6 +33,8 @@ describe('CreateClientComponent - Integration Tests', () => {
   let mockClientsService: jest.Mocked<ClientsService>;
   let mockSettingsService: jest.Mocked<SettingsService>;
   let routeDataSubject: BehaviorSubject<any>;
+  let mockMemberAddressService: { saveDraft: jest.Mock };
+  let mockNotifier: { notify: jest.Mock };
 
   const mockClientTemplate: any = {
     isAddressEnabled: true,
@@ -80,6 +88,9 @@ describe('CreateClientComponent - Integration Tests', () => {
       createClient: jest.fn(() => of({ resourceId: 123, clientId: 123 }))
     } as unknown as jest.Mocked<ClientsService>;
 
+    mockMemberAddressService = { saveDraft: jest.fn(() => of({ resourceId: 7 })) };
+    mockNotifier = { notify: jest.fn() };
+
     mockSettingsService = {
       language: { code: 'en' },
       dateFormat: 'dd MMMM yyyy'
@@ -101,6 +112,9 @@ describe('CreateClientComponent - Integration Tests', () => {
         },
         { provide: ClientsService, useValue: mockClientsService },
         { provide: SettingsService, useValue: mockSettingsService },
+        { provide: MemberAddressService, useValue: mockMemberAddressService },
+        { provide: NepalLocationService, useValue: { locations: () => of(new NepalLocationIndex(MOCK_LOCATIONS)) } },
+        { provide: ClientActionNotifierService, useValue: mockNotifier },
         DatePipe,
         DecimalPipe,
         provideNativeDateAdapter(),
@@ -495,6 +509,81 @@ describe('CreateClientComponent - Integration Tests', () => {
       });
 
       expect(component.clientTemplate.isAddressEnabled).toBe(false);
+    });
+  });
+
+  describe('Nepal member address (ADR-0014)', () => {
+    const draft: MemberAddressDraft = {
+      permanent: { sameAsPermanent: false, localLevelCode: '32701', wardNo: 16, tole: null, houseNumber: null },
+      temporary: { sameAsPermanent: true }
+    };
+
+    beforeEach(() => {
+      // Fineract's own address step is switched off in favour of the member address step.
+      routeDataSubject.next({
+        clientTemplate: { ...mockClientTemplate, isAddressEnabled: false, datatables: [] },
+        clientAddressFieldConfig: mockAddressConfig
+      });
+      fixture.detectChanges();
+      jest.spyOn(component.clientGeneralForm, 'valid', 'get').mockReturnValue(true);
+      Object.defineProperty(component.clientGeneralStep, 'clientGeneralDetails', {
+        get: () => ({ firstname: 'Sita', lastname: 'Sharma', officeId: 1 }),
+        configurable: true
+      });
+    });
+
+    it('always shows the member address step', () => {
+      expect(fixture.nativeElement.querySelector('mifosx-member-address-step')).not.toBeNull();
+      expect(fixture.nativeElement.querySelector('mifosx-client-address-step')).toBeNull();
+    });
+
+    it('does not submit until the permanent address is complete', () => {
+      jest.spyOn(component.memberAddressStep, 'valid').mockReturnValue(false);
+
+      component.submit();
+
+      expect(component.areFormvalids()).toBe(false);
+      expect(mockClientsService.createClient).not.toHaveBeenCalled();
+    });
+
+    it('saves the addresses once the member exists, then opens the member', () => {
+      jest.spyOn(component.memberAddressStep, 'valid').mockReturnValue(true);
+      jest.spyOn(component.memberAddressStep, 'draft').mockReturnValue(draft);
+
+      component.submit();
+
+      expect(mockClientsService.createClient).toHaveBeenCalledWith(
+        expect.not.objectContaining({ address: expect.anything() })
+      );
+      expect(mockMemberAddressService.saveDraft).toHaveBeenCalledWith(123, draft);
+      expect(mockRouter.navigate).toHaveBeenCalledWith(
+        [
+          '../',
+          123
+        ],
+        { relativeTo: TestBed.inject(ActivatedRoute) }
+      );
+      expect(mockNotifier.notify).not.toHaveBeenCalled();
+    });
+
+    it('keeps the new member and opens their Address tab when the address cannot be saved', () => {
+      jest.spyOn(component.memberAddressStep, 'valid').mockReturnValue(true);
+      jest.spyOn(component.memberAddressStep, 'draft').mockReturnValue(draft);
+      mockMemberAddressService.saveDraft.mockReturnValue(throwError(() => new Error('400')));
+
+      component.submit();
+
+      expect(mockNotifier.notify).toHaveBeenCalledWith('clients.memberAddress.messages.createdWithoutAddress');
+      expect(mockRouter.navigate).toHaveBeenCalledWith(
+        [
+          '../',
+          123,
+          'address'
+        ],
+        {
+          relativeTo: TestBed.inject(ActivatedRoute)
+        }
+      );
     });
   });
 

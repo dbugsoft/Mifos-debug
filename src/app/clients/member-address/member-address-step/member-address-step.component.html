@@ -1,0 +1,65 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="member-address-step">
+  @if (locations(); as index) {
+    <section aria-labelledby="permanent-address-heading">
+      <h3 id="permanent-address-heading" class="section-title">
+        {{ 'clients.memberAddress.titles.PERMANENT' | translate }}
+        <span class="badge">{{ 'clients.memberAddress.labels.required' | translate }}</span>
+      </h3>
+      <mifosx-member-address-fields [form]="permanentForm" [locations]="index"></mifosx-member-address-fields>
+    </section>
+
+    <section aria-labelledby="temporary-address-heading">
+      <h3 id="temporary-address-heading" class="section-title">
+        {{ 'clients.memberAddress.titles.TEMPORARY' | translate }}
+        <span class="badge">{{ 'clients.memberAddress.labels.optional' | translate }}</span>
+      </h3>
+      <mat-radio-group
+        class="choices"
+        [formControl]="temporaryChoice"
+        [attr.aria-label]="'clients.memberAddress.titles.TEMPORARY' | translate"
+        data-testid="temporary-choice"
+      >
+        @for (option of choices; track option) {
+          <mat-radio-button [value]="option">
+            {{ 'clients.memberAddress.temporaryChoices.' + option | translate }}
+          </mat-radio-button>
+        }
+      </mat-radio-group>
+
+      @if (choice() === 'DIFFERENT') {
+        <mifosx-member-address-fields [form]="temporaryForm" [locations]="index"></mifosx-member-address-fields>
+      } @else if (choice() === 'SAME') {
+        <p class="hint">{{ 'clients.memberAddress.hints.followsPermanent' | translate }}</p>
+      }
+    </section>
+  } @else if (loadFailed()) {
+    <div class="load-failed" role="alert">
+      <p>{{ 'clients.memberAddress.errors.locationsUnavailable' | translate }}</p>
+      <button mat-stroked-button type="button" (click)="loadLocations()">
+        {{ 'clients.memberAddress.actions.retry' | translate }}
+      </button>
+    </div>
+  } @else {
+    <mat-progress-bar mode="indeterminate" [attr.aria-label]="'clients.memberAddress.labels.loading' | translate">
+    </mat-progress-bar>
+  }
+
+  <div class="layout-row align-center gap-2percent margin-t responsive-column">
+    <button mat-raised-button type="button" matStepperPrevious>
+      <fa-icon icon="arrow-left" class="m-r-10"></fa-icon>
+      {{ 'labels.buttons.Previous' | translate }}
+    </button>
+    <button mat-raised-button type="button" matStepperNext (click)="markAllAsTouched()" data-testid="address-step-next">
+      {{ 'labels.buttons.Next' | translate }}
+      <fa-icon icon="arrow-right" class="m-l-10"></fa-icon>
+    </button>
+  </div>
+</div>

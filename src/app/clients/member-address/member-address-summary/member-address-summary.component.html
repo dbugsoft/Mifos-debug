@@ -1,0 +1,29 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<address class="member-address">
+  @if (street().tole || street().houseNumber) {
+    <span class="street">
+      @if (street().tole) {
+        <span>{{ street().tole }}</span>
+      }
+      @if (street().houseNumber) {
+        <span class="house">
+          {{ 'clients.memberAddress.labels.houseNumberShort' | translate: { number: street().houseNumber } }}
+        </span>
+      }
+    </span>
+  }
+  <span class="place">{{ primary() }}</span>
+  @if (secondary()) {
+    <span class="place-other" [attr.lang]="nepaliFirst() ? 'en' : 'ne'">{{ secondary() }}</span>
+  }
+  @if (!address().localLevelActive) {
+    <span class="notice">{{ 'clients.memberAddress.hints.localLevelNoLongerInUse' | translate }}</span>
+  }
+</address>
