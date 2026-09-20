@@ -8,8 +8,9 @@
 
 <div class="add-family-member-container">
   <form [formGroup]="editFamilyMemberForm" (ngSubmit)="submit()">
-    <div class="layout-row-wrap responsive-column align-start-center">
-      <mat-form-field class="flex-50-minus-25px">
+    <!-- ROW 1: First Name / Middle Name / Last Name -->
+    <div class="layout-row-wrap responsive-column align-start-center gap-25px">
+      <mat-form-field class="flex-33-minus-25px">
         <mat-label>{{ 'labels.inputs.First Name' | translate }}</mat-label>
         <input formControlName="firstName" required matInput />
         @if (editFamilyMemberForm.controls.firstName.hasError('required')) {
@@ -20,12 +21,12 @@
         }
       </mat-form-field>
 
-      <mat-form-field class="flex-50-minus-25px">
+      <mat-form-field class="flex-33-minus-25px">
         <mat-label>{{ 'labels.inputs.Middle Name' | translate }}</mat-label>
         <input formControlName="middleName" matInput />
       </mat-form-field>
 
-      <mat-form-field class="flex-50-minus-25px">
+      <mat-form-field class="flex-33-minus-25px">
         <mat-label>{{ 'labels.inputs.Last Name' | translate }}</mat-label>
         <input formControlName="lastName" required matInput />
         @if (editFamilyMemberForm.controls.lastName.hasError('required')) {
@@ -35,39 +36,29 @@
           </mat-error>
         }
       </mat-form-field>
+    </div>
 
-      <mat-form-field class="flex-50-minus-25px">
-        <mat-label>{{ 'labels.inputs.Qualification' | translate }}</mat-label>
-        <input formControlName="qualification" matInput />
+    <!-- ROW 2: Date of Birth / Age / Gender / Is Dependent -->
+    <div class="layout-row-wrap responsive-column align-start-center gap-25px">
+      <mat-form-field class="flex-25-minus-25px" (click)="dueDatePicker.open()">
+        <mat-label>{{ 'labels.inputs.Date Of Birth' | translate }}</mat-label>
+        <input
+          formControlName="dateOfBirth"
+          matInput
+          [max]="maxDate"
+          [matDatepicker]="dueDatePicker"
+          placeholder="{{ 'labels.text.Optional' | translate }}"
+        />
+        <mat-datepicker-toggle matSuffix [for]="dueDatePicker"></mat-datepicker-toggle>
+        <mat-datepicker #dueDatePicker></mat-datepicker>
       </mat-form-field>
 
-      <mat-form-field class="flex-50-minus-25px">
+      <mat-form-field class="flex-25-minus-25px">
         <mat-label>{{ 'labels.inputs.Age' | translate }}</mat-label>
         <input type="number" formControlName="age" matInput disabled />
       </mat-form-field>
 
-      <mat-checkbox formControlName="isDependent" labelPosition="before" class="flex-50-minus-25px">
-        {{ 'labels.inputs.Is Dependent' | translate }}
-      </mat-checkbox>
-
-      <mat-form-field class="flex-50-minus-25px">
-        <mat-label>{{ 'labels.inputs.Relationship' | translate }}</mat-label>
-        <mat-select formControlName="relationshipId" required>
-          @for (relation of addFamilyMemberTemplate.relationshipIdOptions; track relation) {
-            <mat-option [value]="relation.id">
-              {{ relation.name | translateKey: 'catalogs' }}
-            </mat-option>
-          }
-        </mat-select>
-        @if (editFamilyMemberForm.controls.relationshipId.hasError('required')) {
-          <mat-error>
-            {{ 'labels.inputs.Relationship' | translate }} {{ 'labels.commons.is' | translate }}
-            <strong>{{ 'labels.commons.required' | translate }}</strong>
-          </mat-error>
-        }
-      </mat-form-field>
-
-      <mat-form-field class="flex-50-minus-25px">
+      <mat-form-field class="flex-25-minus-25px">
         <mat-label>{{ 'labels.inputs.Gender' | translate }}</mat-label>
         <mat-select formControlName="genderId" required>
           @for (gender of addFamilyMemberTemplate.genderIdOptions; track gender) {
@@ -84,18 +75,35 @@
         }
       </mat-form-field>
 
-      <mat-form-field class="flex-50-minus-25px">
-        <mat-label>{{ 'labels.inputs.Profession' | translate }}</mat-label>
-        <mat-select formControlName="professionId">
-          @for (profession of addFamilyMemberTemplate.professionIdOptions; track profession) {
-            <mat-option [value]="profession.id">
-              {{ profession.name | translateKey: 'catalogs' }}
+      <mat-checkbox
+        formControlName="isDependent"
+        labelPosition="before"
+        class="flex-25-minus-25px is-dependent-checkbox"
+      >
+        {{ 'labels.inputs.Is Dependent' | translate }}
+      </mat-checkbox>
+    </div>
+
+    <!-- ROW 3: Relationship / Marital Status / Qualification / Profession -->
+    <div class="layout-row-wrap responsive-column align-start-center gap-25px">
+      <mat-form-field class="flex-25-minus-25px">
+        <mat-label>{{ 'labels.inputs.Relationship' | translate }}</mat-label>
+        <mat-select formControlName="relationshipId" required>
+          @for (relation of addFamilyMemberTemplate.relationshipIdOptions; track relation) {
+            <mat-option [value]="relation.id">
+              {{ relation.name | translateKey: 'catalogs' }}
             </mat-option>
           }
         </mat-select>
+        @if (editFamilyMemberForm.controls.relationshipId.hasError('required')) {
+          <mat-error>
+            {{ 'labels.inputs.Relationship' | translate }} {{ 'labels.commons.is' | translate }}
+            <strong>{{ 'labels.commons.required' | translate }}</strong>
+          </mat-error>
+        }
       </mat-form-field>
 
-      <mat-form-field class="flex-50-minus-25px">
+      <mat-form-field class="flex-25-minus-25px">
         <mat-label>{{ 'labels.inputs.Marital Status' | translate }}</mat-label>
         <mat-select formControlName="maritalStatusId">
           @for (maritalStatus of addFamilyMemberTemplate.maritalStatusIdOptions; track maritalStatus) {
@@ -106,17 +114,20 @@
         </mat-select>
       </mat-form-field>
 
-      <mat-form-field class="flex-fill" (click)="dueDatePicker.open()">
-        <mat-label>{{ 'labels.inputs.Date Of Birth' | translate }}</mat-label>
-        <input
-          formControlName="dateOfBirth"
-          matInput
-          [max]="maxDate"
-          [matDatepicker]="dueDatePicker"
-          placeholder="{{ 'labels.text.Optional' | translate }}"
-        />
-        <mat-datepicker-toggle matSuffix [for]="dueDatePicker"></mat-datepicker-toggle>
-        <mat-datepicker #dueDatePicker></mat-datepicker>
+      <mat-form-field class="flex-25-minus-25px">
+        <mat-label>{{ 'labels.inputs.Qualification' | translate }}</mat-label>
+        <input formControlName="qualification" matInput />
+      </mat-form-field>
+
+      <mat-form-field class="flex-25-minus-25px">
+        <mat-label>{{ 'labels.inputs.Profession' | translate }}</mat-label>
+        <mat-select formControlName="professionId">
+          @for (profession of addFamilyMemberTemplate.professionIdOptions; track profession) {
+            <mat-option [value]="profession.id">
+              {{ profession.name | translateKey: 'catalogs' }}
+            </mat-option>
+          }
+        </mat-select>
       </mat-form-field>
     </div>
 
