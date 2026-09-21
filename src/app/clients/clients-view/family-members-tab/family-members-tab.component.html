@@ -82,7 +82,7 @@
               <span>{{ 'labels.inputs.Profession' | translate }} : {{ member.profession }}<br /></span>
             }
             @if (member.dateOfBirth) {
-              <span>{{ 'labels.inputs.Date Of Birth' | translate }} : {{ member.dateOfBirth | dateFormat }}<br /></span>
+              <span>{{ 'labels.inputs.Date Of Birth' | translate }} : {{ member.dateOfBirth | adToBs }}<br /></span>
             }
           </p>
         </mat-expansion-panel>
