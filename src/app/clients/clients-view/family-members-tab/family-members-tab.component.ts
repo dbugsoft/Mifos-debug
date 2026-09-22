@@ -26,9 +26,9 @@ import {
   MatExpansionPanelDescription
 } from '@angular/material/expansion';
 import { MatDivider } from '@angular/material/divider';
-import { DateFormatPipe } from '../../../pipes/date-format.pipe';
 import { YesnoPipe } from '../../../pipes/yesno.pipe';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { AdToBsPipe } from 'app/pipes/ad-to-bs.pipe';
 
 /**
  * Client Family Members Tab
@@ -47,8 +47,8 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     MatExpansionPanelTitle,
     MatExpansionPanelDescription,
     MatDivider,
-    DateFormatPipe,
-    YesnoPipe
+    YesnoPipe,
+    AdToBsPipe
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
