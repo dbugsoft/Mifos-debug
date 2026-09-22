@@ -25,8 +25,8 @@ import {
 import { MatDivider } from '@angular/material/divider';
 import { MatStepperPrevious, MatStepperNext } from '@angular/material/stepper';
 import { FindPipe } from '../../../pipes/find.pipe';
-import { DateFormatPipe } from '../../../pipes/date-format.pipe';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { AdToBsPipe } from 'app/pipes/ad-to-bs.pipe';
 
 /**
  * Client Family Members Step
@@ -47,7 +47,7 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     MatStepperPrevious,
     MatStepperNext,
     FindPipe,
-    DateFormatPipe
+    AdToBsPipe
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })

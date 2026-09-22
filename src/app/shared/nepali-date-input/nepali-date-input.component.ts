@@ -11,8 +11,10 @@ import {
   ChangeDetectorRef,
   Component,
   ElementRef,
+  EventEmitter,
   HostListener,
   Input,
+  Output,
   ViewChild,
   inject
 } from '@angular/core';
@@ -67,6 +69,13 @@ function daysInBSMonth(year: number, monthIdx: number): number {
   return 30;
 }
 
+/** A BsDate as 'YYYY-MM-DD', the form the backend stores and validates. Month is 0-indexed here. */
+function formatBs(bs: BsDate | null): string | null {
+  if (!bs) return null;
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${bs.year}-${pad(bs.month + 1)}-${pad(bs.day)}`;
+}
+
 /** Compare two BsDate objects: -1 | 0 | 1 */
 function compareBs(a: BsDate, b: BsDate): number {
   if (a.year !== b.year) return a.year < b.year ? -1 : 1;
@@ -104,6 +113,17 @@ function compareBs(a: BsDate, b: BsDate): number {
 })
 export class NepaliDateInputComponent implements ControlValueAccessor {
   @Input() label = 'Date (BS)';
+
+  /**
+   * The selected BS date as 'YYYY-MM-DD', or null when cleared.
+   *
+   * The FormControl still carries an AD Date, because that is what the rest of the form and the
+   * age calculation expect. This emits the BS date alongside it so the form can post the date the
+   * user actually picked rather than a date the browser converted. The server converts it back and
+   * rejects the request if the two disagree, so the browser's calendar table can never quietly
+   * become the source of truth.
+   */
+  @Output() readonly bsDateChange = new EventEmitter<string | null>();
   @Input() minBsYear = MIN_BS_YEAR;
   @Input() maxBsYear = MAX_BS_YEAR;
 
@@ -402,6 +422,7 @@ export class NepaliDateInputComponent implements ControlValueAccessor {
     });
 
     this.onChange(adDate);
+    this.bsDateChange.emit(formatBs(this.selectedBs));
     this.closePanel();
   }
 
@@ -468,6 +489,7 @@ export class NepaliDateInputComponent implements ControlValueAccessor {
         year: 'numeric'
       });
       this.recomputeCalendar();
+      this.bsDateChange.emit(formatBs(this.selectedBs));
     } catch {
       // AD date outside NepaliDate supported range — leave display empty
     }
@@ -478,5 +500,6 @@ export class NepaliDateInputComponent implements ControlValueAccessor {
     this.adPreview = null;
     this.bsInputControl.setValue('', { emitEvent: false });
     if (emitChange) this.onChange(null);
+    this.bsDateChange.emit(null);
   }
 }
