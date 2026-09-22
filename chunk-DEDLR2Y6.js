@@ -1,0 +1,1 @@
+import{Y as i}from"./chunk-NJZ5X5EL.js";import{U as e,Y as r}from"./chunk-WESCSI6I.js";var m=(()=>{class t{constructor(){this.systemService=r(i)}resolve(){return this.systemService.getConfigurations()}static{this.\u0275fac=function(o){return new(o||t)}}static{this.\u0275prov=e({token:t,factory:t.\u0275fac,providedIn:"root"})}}return t})();export{m as a};
