@@ -87,11 +87,11 @@ export class UploadDocumentDialogComponent implements OnInit {
           Validators.required
         ],
         description: [''],
-        fileName: [
+        fileName: [''],
+        file: [
           '',
           Validators.required
-        ],
-        file: ['']
+        ]
       });
     } else {
       // Standard document upload form
@@ -114,7 +114,7 @@ export class UploadDocumentDialogComponent implements OnInit {
     if ($event.target.files.length > 0) {
       const file = $event.target.files[0];
       this.uploadDocumentForm.get('file').setValue(file);
-      if (!this.uploadDocumentForm.get('fileName').value) {
+      if (this.documentIdentifier || !this.uploadDocumentForm.get('fileName').value) {
         this.uploadDocumentForm.get('fileName').setValue(file.name);
       }
     }

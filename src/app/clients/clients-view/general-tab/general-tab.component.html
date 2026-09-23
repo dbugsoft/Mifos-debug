@@ -420,6 +420,8 @@
               color="primary"
               (click)="routeEdit($event)"
               [routerLink]="['../', 'savings-accounts', element.id, 'actions', 'Deposit']"
+              matTooltip="{{ 'tooltips.Deposit' | translate }}"
+              matTooltipPosition="above"
             >
               <i class="fa fa-arrow-up"></i>
             </button>
@@ -431,6 +433,8 @@
               color="primary"
               (click)="routeEdit($event)"
               [routerLink]="['../', 'savings-accounts', element.id, 'actions', 'Withdrawal']"
+              matTooltip="{{ 'tooltips.Withdraw' | translate }}"
+              matTooltipPosition="above"
             >
               <i class="fa fa-arrow-down"></i>
             </button>
@@ -442,6 +446,8 @@
               color="primary"
               (click)="routeEdit($event)"
               [routerLink]="['../', 'savings-accounts', element.id, 'actions', 'Approve']"
+              matTooltip="{{ 'tooltips.Approve' | translate }}"
+              matTooltipPosition="above"
             >
               <i class="fa fa-check"></i>
             </button>
@@ -452,6 +458,8 @@
               mat-raised-button
               color="primary"
               [routerLink]="['../', 'savings-accounts', element.id, 'actions', 'Undo Approval']"
+              matTooltip="{{ 'tooltips.Undo Approval' | translate }}"
+              matTooltipPosition="above"
             >
               <i class="fa fa-undo"></i>
             </button>
@@ -462,6 +470,8 @@
               mat-raised-button
               color="primary"
               [routerLink]="['../', 'savings-accounts', element.id, 'actions', 'Activate']"
+              matTooltip="{{ 'tooltips.Activate' | translate }}"
+              matTooltipPosition="above"
             >
               <i class="fa fa-check-circle"></i>
             </button>
@@ -585,6 +595,8 @@
               color="primary"
               (click)="routeEdit($event)"
               [routerLink]="['../', 'fixed-deposits-accounts', element.id, 'actions', 'Approve']"
+              matTooltip="{{ 'tooltips.Approve' | translate }}"
+              matTooltipPosition="above"
             >
               <i class="fa fa-check"></i>
             </button>
@@ -595,6 +607,8 @@
               mat-raised-button
               color="primary"
               [routerLink]="['../', 'fixed-deposits-accounts', element.id, 'actions', 'Undo Approval']"
+              matTooltip="{{ 'tooltips.Undo Approval' | translate }}"
+              matTooltipPosition="above"
             >
               <i class="fa fa-undo"></i>
             </button>
@@ -605,6 +619,8 @@
               mat-raised-button
               color="primary"
               [routerLink]="['../', 'fixed-deposits-accounts', element.id, 'actions', 'Activate']"
+              matTooltip="{{ 'tooltips.Activate' | translate }}"
+              matTooltipPosition="above"
             >
               <i class="fa fa-check-circle"></i>
             </button>
@@ -731,6 +747,8 @@
               *mifosxHasPermission="'APPROVE_SAVINGSACCOUNT'"
               [routerLink]="['../', 'recurring-deposits-accounts', element.id, 'actions', 'Approve']"
               color="primary"
+              matTooltip="{{ 'tooltips.Approve' | translate }}"
+              matTooltipPosition="above"
             >
               <i class="fa fa-check"></i>
             </button>
@@ -743,6 +761,8 @@
               (click)="routeEdit($event)"
               *mifosxHasPermission="'APPROVALUNDO_SAVINGSACCOUNT'"
               [routerLink]="['../', 'recurring-deposits-accounts', element.id, 'actions', 'Undo Approval']"
+              matTooltip="{{ 'tooltips.Undo Approval' | translate }}"
+              matTooltipPosition="above"
             >
               <i class="fa fa-undo"></i>
             </button>
@@ -753,6 +773,8 @@
               (click)="routeEdit($event)"
               *mifosxHasPermission="'ACTIVATE_SAVINGSACCOUNT'"
               [routerLink]="['../', 'recurring-deposits-accounts', element.id, 'actions', 'Activate']"
+              matTooltip="{{ 'tooltips.Activate' | translate }}"
+              matTooltipPosition="above"
             >
               <i class="fa fa-check-circle"></i>
             </button>
