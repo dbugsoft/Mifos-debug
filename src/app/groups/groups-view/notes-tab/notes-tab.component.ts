@@ -7,7 +7,7 @@
  */
 
 /** Angular Imports */
-import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 /** Custom Services */
@@ -35,6 +35,7 @@ export class NotesTabComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private authenticationService = inject(AuthenticationService);
   private groupsService = inject(GroupsService);
+  private changeDetectorRef = inject(ChangeDetectorRef);
 
   /** Group ID */
   entityId: string;
@@ -52,6 +53,8 @@ export class NotesTabComponent implements OnInit {
   constructor() {
     this.entityId = this.route.parent.snapshot.params['groupId'];
     this.addNote = this.addNote.bind(this);
+    this.editNote = this.editNote.bind(this);
+    this.deleteNote = this.deleteNote.bind(this);
   }
 
   ngOnInit() {
@@ -67,12 +70,16 @@ export class NotesTabComponent implements OnInit {
    */
   addNote(noteContent: any) {
     this.groupsService.createGroupNote(this.entityId, noteContent).subscribe((response: any) => {
-      this.entityNotes.push({
-        id: response.resourceId,
-        createdByUsername: this.username,
-        createdOn: new Date(),
-        note: noteContent.note
-      });
+      this.entityNotes = [
+        ...this.entityNotes,
+        {
+          id: response.resourceId,
+          createdByUsername: this.username,
+          createdOn: new Date(),
+          note: noteContent.note
+        }
+      ];
+      this.changeDetectorRef.markForCheck();
     });
   }
 
@@ -83,7 +90,10 @@ export class NotesTabComponent implements OnInit {
    */
   editNote(noteId: string, noteContent: any, index: number) {
     this.groupsService.editGroupNote(this.entityId, noteId, noteContent).subscribe(() => {
-      this.entityNotes[index].note = noteContent.note;
+      this.entityNotes = this.entityNotes.map((note: any, i: number) =>
+        i === index ? { ...note, note: noteContent.note } : note
+      );
+      this.changeDetectorRef.markForCheck();
     });
   }
 
@@ -93,7 +103,8 @@ export class NotesTabComponent implements OnInit {
    */
   deleteNote(noteId: string, index: number) {
     this.groupsService.deleteGroupNote(this.entityId, noteId).subscribe(() => {
-      this.entityNotes.splice(index, 1);
+      this.entityNotes = this.entityNotes.filter((note: any, i: number) => i !== index);
+      this.changeDetectorRef.markForCheck();
     });
   }
 }

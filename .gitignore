@@ -1,5 +1,8 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
+# Env files with real credentials (env.sample stays tracked as the template)
 .env
+.env.*
+*.env
 .angular/*
 
 # Compiled output

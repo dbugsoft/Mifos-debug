@@ -50,7 +50,6 @@ import { SearchToolComponent } from '../../../shared/search-tool/search-tool.com
 import { LanguageSelectorComponent } from '../../../shared/language-selector/language-selector.component';
 import { MatIcon } from '@angular/material/icon';
 import { NotificationsTrayComponent as NotificationsTrayComponent_1 } from '../../../shared/notifications-tray/notifications-tray.component';
-import { ThemeToggleComponent } from '../../../shared/theme-toggle/theme-toggle.component';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { DocumentationLinksService } from 'app/shared/services/documentation-links.service';
 
@@ -72,7 +71,6 @@ import { DocumentationLinksService } from 'app/shared/services/documentation-lin
     LanguageSelectorComponent,
     MatIcon,
     NotificationsTrayComponent_1,
-    ThemeToggleComponent,
     MatMenu,
     MatMenuItem
   ],
