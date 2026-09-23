@@ -8,6 +8,17 @@
 
 <nav class="breadcrumb-wrapper" aria-label="Page navigation">
   <div class="page-header">
+    @if (backUrl) {
+      <a
+        class="breadcrumb-back"
+        [routerLink]="backUrl"
+        matTooltip="{{ 'labels.buttons.Back' | translate }}"
+        [attr.aria-label]="'labels.buttons.Back' | translate"
+      >
+        <mat-icon>arrow_back</mat-icon>
+        <span>{{ getTranslate(backLabel) }}</span>
+      </a>
+    }
     <div class="title-row">
       <span #breadcrumb class="breadcrumb-title">
         {{ getTranslate(breadcrumbs[breadcrumbs?.length - 1].label) }}

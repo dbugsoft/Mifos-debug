@@ -58,7 +58,6 @@ import { ClientActionNotifierService } from '../clients-view/client-actions/clie
     MatStep,
     MatStepLabel,
     ClientGeneralStepComponent,
-    ClientFamilyMembersStepComponent,
     ClientAddressStepComponent,
     ClientDatatableStepComponent,
     ClientPreviewStepComponent,

@@ -33,8 +33,10 @@ import { PopoverService } from '../../../configuration-wizard/popover/popover.se
 import { ConfigurationWizardService } from '../../../configuration-wizard/configuration-wizard.service';
 import { TranslateService } from '@ngx-translate/core';
 import { MatIcon } from '@angular/material/icon';
+import { MatTooltip } from '@angular/material/tooltip';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { formatTabLabel } from 'app/shared/utils/format-tab-label.util';
+import { isSelfLink, normalizeBreadcrumbUrl } from 'app/shared/utils/breadcrumb-url.util';
 
 /**
  * Route data property to generate breadcrumb using a static string.
@@ -81,7 +83,8 @@ const routeHideBreadcrumbTrail = 'hideBreadcrumbTrail';
   styleUrls: ['./breadcrumb.component.scss'],
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
-    MatIcon
+    MatIcon,
+    MatTooltip
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -98,6 +101,10 @@ export class BreadcrumbComponent implements AfterViewInit {
   breadcrumbs: Breadcrumb[];
   /** Whether the breadcrumb trail (the `home › ...` line) should be hidden for the current route. */
   hideTrail = false;
+  /** Link of the nearest navigable parent breadcrumb, used by the back button. */
+  backUrl: string | null = null;
+  /** Label of that parent breadcrumb, e.g. the member's name. */
+  backLabel = '';
   /* Reference of breadcrumb */
   @ViewChild('breadcrumb') breadcrumb: ElementRef<any>;
   /* Template for popover on breadcrumb */
@@ -136,6 +143,7 @@ export class BreadcrumbComponent implements AfterViewInit {
           childrenRoutes.forEach((route) => {
             currentRoute = route;
             breadcrumbLabel = false;
+            let isClientCrumb = false;
 
             if (route.outlet !== 'primary') {
               return;
@@ -170,7 +178,7 @@ export class BreadcrumbComponent implements AfterViewInit {
                 const routeData: Data = route.snapshot.data;
                 if (routeData.breadcrumb === 'Clients') {
                   breadcrumbLabel = this.printableValue(routeData.clientViewData.displayName);
-                  currentUrl += `/general`;
+                  isClientCrumb = true;
                 } else if (routeData.breadcrumb === 'Groups') {
                   breadcrumbLabel = routeData.groupViewData.name;
                 } else if (routeData.breadcrumb === 'Centers') {
@@ -241,16 +249,8 @@ export class BreadcrumbComponent implements AfterViewInit {
                 }
               }
             }
-            if (url !== undefined) {
-              if (url.length > 8 && url.search(`/clients/`) > 0) {
-                const replaceGeneral = `/general/`;
-                let currentUrlTemp = url.replace(replaceGeneral, `/`);
-                currentUrlTemp = currentUrlTemp.replace(`//`, `/`);
-                currentUrlTemp += `/general`;
-                const replaceDoubleSlash = `/general/general`;
-                currentUrlTemp = currentUrlTemp.replace(replaceDoubleSlash, `/general`);
-                url = currentUrlTemp;
-              }
+            if (typeof url === 'string' && url) {
+              url = normalizeBreadcrumbUrl(url, isClientCrumb);
             }
 
             const breadcrumb: Breadcrumb = {
@@ -264,8 +264,22 @@ export class BreadcrumbComponent implements AfterViewInit {
           });
         }
         this.hideTrail = !!(currentRoute?.snapshot?.data && currentRoute.snapshot.data[routeHideBreadcrumbTrail]);
+        this.setBackLink();
         this.cdr.markForCheck();
       });
+  }
+
+  /**
+   * Link of the nearest parent breadcrumb that is navigable, or null on top level pages.
+   */
+  private setBackLink(): void {
+    const currentUrl = this.router.url.split('?')[0];
+    const parents = this.breadcrumbs
+      .slice(0, -1)
+      .filter((crumb) => typeof crumb.url === 'string' && crumb.url && !isSelfLink(crumb.url, currentUrl));
+    const parent = parents.length ? parents[parents.length - 1] : null;
+    this.backUrl = parent ? parent.url : null;
+    this.backLabel = parent ? parent.label : '';
   }
 
   printableValue(value: string): string {
