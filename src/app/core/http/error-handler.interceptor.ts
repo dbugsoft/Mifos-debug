@@ -78,6 +78,28 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
       return throwError(() => response);
     }
 
+    // A duplicate client identifier document key: the backend's defaultUserMessage names the
+    // other client (and their branch, and this same document key), which must never be shown -
+    // the Identities dialog already shows its own safe, generic message for this, so skip the
+    // generic global alert entirely rather than have it show the raw message here.
+    if (
+      status === 403 &&
+      errorBody?.errors?.[0]?.userMessageGlobalisationCode === 'error.msg.clientIdentifier.identityKey.duplicate'
+    ) {
+      return throwError(() => response);
+    }
+
+    // A duplicate client identifier document type: the Identities tab already shows its own
+    // banner for this (and highlights the existing row), so skip the generic global alert to
+    // avoid showing the same thing twice.
+    if (
+      status === 403 &&
+      errorBody?.errors?.[0]?.userMessageGlobalisationCode === 'error.msg.clientIdentifier.type.duplicate'
+    ) {
+      return throwError(() => response);
+    }
+
+    // Translate top-level globalisation code if present
     // Translate top-level globalisation code if present.
     // Never fall back to response.message: for a non-Fineract body (proxy HTML, gateway timeout) it is the raw
     // "Http failure response for <url>" transport string, which leaks the internal API URL. Branches below
