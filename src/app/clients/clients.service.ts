@@ -263,6 +263,10 @@ export class ClientsService {
     return this.http.post(`/clients/${clientId}/identifiers`, identifierData);
   }
 
+  editClientIdentifier(clientId: string, identifierId: string, identifierData: any) {
+    return this.http.put(`/clients/${clientId}/identifiers/${identifierId}`, identifierData);
+  }
+
   deleteClientIdentifier(clientId: string, identifierId: string) {
     return this.http.delete(`/clients/${clientId}/identifiers/${identifierId}`);
   }

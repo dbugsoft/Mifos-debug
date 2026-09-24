@@ -5,3 +5,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
+
+@use '../../../../../assets/styles/colours' as *;
+
+.server-error-banner {
+  margin: 8px 0 16px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid $msg-danger;
+  background: rgba($msg-danger, 0.08);
+  color: $msg-danger;
+  font-size: 0.875rem;
+}

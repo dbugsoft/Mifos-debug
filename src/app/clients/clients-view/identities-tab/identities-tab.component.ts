@@ -9,6 +9,7 @@
 /** Angular Imports */
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   DestroyRef,
   ElementRef,
@@ -17,7 +18,7 @@ import {
   ViewChild
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import {
   MatTable,
   MatColumnDef,
@@ -86,6 +87,7 @@ export class IdentitiesTabComponent implements OnDestroy {
   private clientService = inject(ClientsService);
   private translateService = inject(TranslateService);
   private documentPreviewService = inject(DocumentPreviewService);
+  private changeDetectorRef = inject(ChangeDetectorRef);
 
   private destroyRef = inject(DestroyRef);
 
@@ -113,6 +115,16 @@ export class IdentitiesTabComponent implements OnDestroy {
 
   /** Cached thumbnails for previewable docs */
   previewThumbnails: Record<string, string> = {};
+
+  /**
+   * Set when Add fails because this document type already exists on
+   * this client - `highlightedIdentityId` points at the existing row
+   * so the user is directed there instead of being left in the form.
+   */
+  duplicateTypeMessage: string | null = null;
+  highlightedIdentityId: any = null;
+  private highlightTimeout: ReturnType<typeof setTimeout> | null = null;
+
   private lightboxInstance: LightGallery | null = null;
   private readonly lightboxPlugins = [
     lgZoom,
@@ -139,6 +151,9 @@ export class IdentitiesTabComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
+    if (this.highlightTimeout) {
+      clearTimeout(this.highlightTimeout);
+    }
     this.destroyLightbox();
     if (Array.isArray(this.clientIdentities)) {
       this.clientIdentities.forEach((identity: any) => {
@@ -153,10 +168,10 @@ export class IdentitiesTabComponent implements OnDestroy {
   }
 
   /**
-   * Add Client Identifier with unified form (identifier + document upload)
+   * Builds the allowedDocumentTypes/statusOptions dialog data shared by
+   * the Add and Edit identifier flows.
    */
-  addIdentifier() {
-    // Translate document type names
+  private buildIdentifierDialogOptions(): { allowedDocumentTypes: any[]; statusOptions: any[] } {
     const translatedDocTypes = this.clientIdentifierTemplate.allowedDocumentTypes.map((docType: any) => ({
       ...docType,
       name: this.translateService.instant(`labels.catalogs.${docType.name}`)
@@ -167,20 +182,115 @@ export class IdentitiesTabComponent implements OnDestroy {
       { label: this.translateService.instant('labels.catalogs.Inactive'), value: 'Inactive' }
     ];
 
+    return { allowedDocumentTypes: translatedDocTypes, statusOptions };
+  }
+
+  /**
+   * Handles the one error Add needs special treatment for: the
+   * document type the user picked already exists on this client.
+   * Retrying with the same type can never succeed (it's a one-per-type
+   * rule, not a typo to fix), so instead of leaving the user in the
+   * form, this shows a message and points them at the existing row.
+   * Returns false for any other error, so the caller's normal
+   * (console.error) handling still runs for those.
+   */
+  private handleDuplicateDocumentType(
+    err: any,
+    documentTypeId: number,
+    dialogRef: MatDialogRef<UploadDocumentDialogComponent>
+  ): boolean {
+    const apiError = err?.error?.errors?.[0];
+    const isDuplicateType =
+      apiError?.userMessageGlobalisationCode === 'error.msg.clientIdentifier.type.duplicate' ||
+      (err?.status === 403 && apiError?.parameterName === 'documentTypeId');
+
+    if (!isDuplicateType) {
+      return false;
+    }
+
+    dialogRef.close();
+
+    const existing = Array.isArray(this.clientIdentities)
+      ? this.clientIdentities.find((identity: any) => identity.documentType?.id === documentTypeId)
+      : null;
+
+    const docType = this.clientIdentifierTemplate.allowedDocumentTypes.find((dt: any) => dt.id === documentTypeId);
+    this.duplicateTypeMessage = `${docType?.name ?? 'This document type'} already exists.`;
+    this.highlightedIdentityId = existing?.id ?? null;
+
+    if (this.highlightTimeout) {
+      clearTimeout(this.highlightTimeout);
+    }
+    this.highlightTimeout = setTimeout(() => {
+      this.duplicateTypeMessage = null;
+      this.highlightedIdentityId = null;
+      this.changeDetectorRef.detectChanges();
+    }, 5000);
+
+    if (existing) {
+      // Runs after this change detection pass so the row (and its
+      // highlight class) actually exist in the DOM to scroll to.
+      setTimeout(() => {
+        document.getElementById(`identity-row-${existing.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+    }
+
+    this.changeDetectorRef.detectChanges();
+
+    return true;
+  }
+
+  /**
+   * The other duplicate case: this document number already belongs to
+   * a different client. Unlike the type-duplicate case, this stays on
+   * the form (the dialog isn't closed) - the field itself needs to
+   * change, so applyServerError()'s existing parameterName -> control
+   * attachment is reused as-is rather than duplicating that logic here.
+   *
+   * The backend's own `defaultUserMessage` for this error names the
+   * other client (and their branch, and this same document key) - that
+   * must never be shown to the person creating this identifier, so a
+   * fixed, generic message is passed instead of the backend's text.
+   */
+  private handleDuplicateDocumentKey(err: any, dialogRef: MatDialogRef<UploadDocumentDialogComponent>): boolean {
+    const apiError = err?.error?.errors?.[0];
+    const isDuplicateKey =
+      apiError?.userMessageGlobalisationCode === 'error.msg.clientIdentifier.identityKey.duplicate' ||
+      (err?.status === 403 && apiError?.parameterName === 'documentKey');
+
+    if (!isDuplicateKey) {
+      return false;
+    }
+
+    dialogRef.componentInstance.applyServerError(err, 'This document key is already in use.');
+
+    return true;
+  }
+
+  /**
+   * Add Client Identifier with unified form (identifier + document upload)
+   */
+  addIdentifier() {
     const dialogRef = this.dialog.open(UploadDocumentDialogComponent, {
       data: {
         documentIdentifier: true,
-        allowedDocumentTypes: translatedDocTypes,
-        statusOptions: statusOptions
+        ...this.buildIdentifierDialogOptions()
       }
     });
 
-    dialogRef.afterClosed().subscribe((response: any) => {
+    dialogRef.componentInstance.submitted.subscribe((response: any) => {
+      // The dialog now closes once the identifier is actually created
+      // (see the `next` handler below), not upfront - a duplicate
+      // document key needs the dialog to still be open so the error
+      // can be shown on the form (see handleDuplicateDocumentKey).
+      // A duplicate document type still closes it (see
+      // handleDuplicateDocumentType), and any other error just logs,
+      // as before.
       if (response) {
         // Create identifier data
         const identifierData = {
           documentTypeId: response.documentTypeId,
-          status: response.status,
+          status: response.status.toUpperCase(),
           documentKey: response.documentKey,
           description: response.description
         };
@@ -188,6 +298,8 @@ export class IdentitiesTabComponent implements OnDestroy {
         // First create the identifier
         this.clientService.addClientIdentifier(this.clientId, identifierData).subscribe({
           next: (res: any) => {
+            dialogRef.close();
+
             const newIdentifierId = res.resourceId;
             const selectedDocType = this.clientIdentifierTemplate.allowedDocumentTypes.find(
               (doc: any) => doc.id === response.documentTypeId
@@ -240,6 +352,12 @@ export class IdentitiesTabComponent implements OnDestroy {
             }
           },
           error: (err: any) => {
+            if (this.handleDuplicateDocumentType(err, identifierData.documentTypeId, dialogRef)) {
+              return;
+            }
+            if (this.handleDuplicateDocumentKey(err, dialogRef)) {
+              return;
+            }
             console.error('Failed to create identifier', err);
           }
         });
@@ -247,6 +365,65 @@ export class IdentitiesTabComponent implements OnDestroy {
     });
   }
 
+  /**
+   * Edit Client Identifier with the same unified form used for Add, pre-filled
+   * with the existing identity's values. Document upload is left untouched -
+   * a new file is optional here and is not sent by this flow.
+   * @param {any} identity Identity being edited
+   */
+  editIdentifier(identity: any) {
+    const dialogRef = this.dialog.open(UploadDocumentDialogComponent, {
+      data: {
+        documentIdentifier: true,
+        identity,
+        ...this.buildIdentifierDialogOptions()
+      }
+    });
+
+    // Unlike Add, the dialog stays open on submit here - it only closes
+    // once the PUT actually succeeds, so a business/validation error
+    // from the API can be shown right on the form (field-level when the
+    // API names a parameterName, a general banner otherwise) instead of
+    // being lost after the dialog has already closed.
+    dialogRef.componentInstance.submitted.subscribe((response: any) => {
+      const identifierData = {
+        documentTypeId: response.documentTypeId,
+        status: response.status.toUpperCase(),
+        documentKey: response.documentKey,
+        description: response.description
+      };
+
+      this.clientService.editClientIdentifier(this.clientId, identity.id, identifierData).subscribe({
+        next: () => {
+          const selectedDocType = this.clientIdentifierTemplate.allowedDocumentTypes.find(
+            (doc: any) => doc.id === identifierData.documentTypeId
+          );
+
+          identity.documentType = selectedDocType;
+          identity.documentKey = identifierData.documentKey;
+          identity.description = identifierData.description;
+          identity.status =
+            identifierData.status === 'ACTIVE'
+              ? 'clientIdentifierStatusType.active'
+              : 'clientIdentifierStatusType.inactive';
+
+          this.identifiersTable.renderRows();
+          this.changeDetectorRef.detectChanges();
+
+          dialogRef.close();
+        },
+        error: (err: any) => {
+          if (this.handleDuplicateDocumentType(err, identifierData.documentTypeId, dialogRef)) {
+            return;
+          }
+          if (this.handleDuplicateDocumentKey(err, dialogRef)) {
+            return;
+          }
+          dialogRef.componentInstance.applyServerError(err);
+        }
+      });
+    });
+  }
   /**
    * Delete Client Identifier
    * @param {string} clientId Client Id
@@ -354,6 +531,11 @@ export class IdentitiesTabComponent implements OnDestroy {
       .then((preview) => {
         if (preview.type === 'image') {
           this.previewThumbnails[document.id] = preview.url;
+          // This resolves asynchronously, outside any template-bound
+          // event - on this OnPush component, the view otherwise never
+          // repaints to show it, leaving the placeholder showing even
+          // though the thumbnail already loaded.
+          this.changeDetectorRef.markForCheck();
         }
       })
       .catch((): void => undefined);
