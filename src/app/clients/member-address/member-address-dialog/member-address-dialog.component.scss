@@ -1,0 +1,37 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+// Material removes the top padding of dialog content that follows a title, which clips the floating label of the
+// first row of outlined fields. The doubled class outranks that rule.
+.dialog-content.dialog-content {
+  width: min(640px, calc(100vw - 48px));
+  padding-top: 16px;
+}
+
+.same-as-permanent {
+  margin-bottom: 16px;
+}
+
+.following {
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid rgb(127 127 127 / 32%);
+}
+
+.hint {
+  margin: 8px 0 0;
+  opacity: 0.72;
+  font-size: 0.875rem;
+}
+
+.load-failed {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}

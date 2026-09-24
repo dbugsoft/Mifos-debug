@@ -12,7 +12,7 @@ import { HttpClient, HttpParams, HttpBackend, HttpHeaders } from '@angular/commo
 
 /** rxjs Imports */
 import { Observable, of, throwError } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { map, catchError, tap } from 'rxjs/operators';
 
 import { environment } from 'environments/environment';
 
@@ -23,8 +23,14 @@ import { environment } from 'environments/environment';
   providedIn: 'root'
 })
 export class ClientsService {
+  /** Bounding box, in pixels, for the profile photo thumbnail. */
+  static readonly PROFILE_IMAGE_SIZE = 150;
+
   private http = inject(HttpClient);
   private httpBackend = inject(HttpBackend);
+
+  /** When this browser last changed each client's photo; lives as long as the app, like the browser cache. */
+  private profileImageVersions = new Map<string, number>();
 
   /** Separate HttpClient that bypasses interceptors (for external API calls) */
   private externalHttp = new HttpClient(this.httpBackend);
@@ -183,13 +189,35 @@ export class ClientsService {
     return this.http.get(`/runreports/ClientSummary`, { params: httpParams });
   }
 
-  getClientProfileImage(clientId: string) {
-    const httpParams = new HttpParams().set('maxHeight', '150');
+  /**
+   * Fetches the client's photo as a small binary thumbnail.
+   *
+   * Both `maxWidth` and `maxHeight` are sent: Fineract only resizes when it gets both (a height alone
+   * returned the full-size original, and upstream's rewritten resizer requires both outright), so the
+   * photo fits a 150 px box with its aspect ratio kept.
+   *
+   * `output=inline_octet` makes Fineract send the image bytes with their real content type instead of a
+   * base64 data URL, which was a third larger and could not be cached. The backend sends
+   * `Cache-Control: private` (varied by tenant and credentials) and an ETag, so the browser reuses or
+   * cheaply revalidates the photo. The request still goes through HttpClient so the auth and tenant
+   * headers are attached as usual; turn the Blob into a URL with `URL.createObjectURL`, and revoke it
+   * when done.
+   */
+  getClientProfileImage(clientId: string): Observable<Blob | null> {
+    let httpParams = new HttpParams()
+      .set('maxWidth', String(ClientsService.PROFILE_IMAGE_SIZE))
+      .set('maxHeight', String(ClientsService.PROFILE_IMAGE_SIZE))
+      .set('output', 'inline_octet');
+    const version = this.profileImageVersions.get(String(clientId));
+    if (version) {
+      // Changed from this browser: step past the browser's cached copy so the new photo shows at once.
+      httpParams = httpParams.set('v', String(version));
+    }
     // Keep it simple since our interceptor will handle the 404 errors
     return this.http
       .get(`/clients/${clientId}/images`, {
         params: httpParams,
-        responseType: 'text'
+        responseType: 'blob'
       })
       .pipe(
         // Handle the error here and return null when no image is found (404)
@@ -204,19 +232,35 @@ export class ClientsService {
       );
   }
 
+  /**
+   * Upload limits the server enforces. Compare files against the *Bytes fields and show the *Mb fields,
+   * so the displayed and enforced numbers never drift.
+   */
+  getUploadLimits(): Observable<{ imageMaxFileSizeBytes: number; imageMaxFileSizeMb: number }> {
+    return this.http.get<{ imageMaxFileSizeBytes: number; imageMaxFileSizeMb: number }>('/upload-limits');
+  }
+
   uploadClientProfileImage(clientId: string, image: File) {
     const formData = new FormData();
     formData.append('file', image);
     formData.append('filename', 'file');
-    return this.http.post(`/clients/${clientId}/images`, formData);
+    return this.http
+      .post(`/clients/${clientId}/images`, formData)
+      .pipe(tap(() => this.markProfileImageChanged(clientId)));
   }
 
   uploadCapturedClientProfileImage(clientId: string, imageURL: string) {
-    return this.http.post(`/clients/${clientId}/images`, imageURL);
+    return this.http
+      .post(`/clients/${clientId}/images`, imageURL)
+      .pipe(tap(() => this.markProfileImageChanged(clientId)));
   }
 
   deleteClientProfileImage(clientId: string) {
-    return this.http.delete(`/clients/${clientId}/images`);
+    return this.http.delete(`/clients/${clientId}/images`).pipe(tap(() => this.markProfileImageChanged(clientId)));
+  }
+
+  private markProfileImageChanged(clientId: string) {
+    this.profileImageVersions.set(String(clientId), Date.now());
   }
 
   uploadClientSignatureImage(clientId: string, signature: File) {

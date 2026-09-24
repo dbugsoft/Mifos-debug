@@ -23,7 +23,7 @@ import { IdentitiesTabComponent } from './clients-view/identities-tab/identities
 import { NotesTabComponent } from './clients-view/notes-tab/notes-tab.component';
 import { DocumentsTabComponent } from './clients-view/documents-tab/documents-tab.component';
 import { DatatableTabComponent } from './clients-view/datatable-tab/datatable-tab.component';
-import { AddressTabComponent } from './clients-view/address-tab/address-tab.component';
+import { MemberAddressTabComponent } from './member-address/member-address-tab/member-address-tab.component';
 import { PersonalDataTabComponent } from './clients-view/personal-data-tab/personal-data-tab.component';
 import { ClientActionsComponent } from './clients-view/client-actions/client-actions.component';
 import { ViewChargeComponent } from './clients-view/charges/view-charge/view-charge.component';
@@ -106,14 +106,10 @@ const routes: Routes = [
               data: { title: 'Personal Data', breadcrumb: 'Personal Data', routeParamBreadcrumb: false }
             },
             {
+              // Nepal member addresses replace Fineract's generic client address (Fineract ADR-0014).
               path: 'address',
-              component: AddressTabComponent,
-              data: { title: 'Address', breadcrumb: 'Address', routeParamBreadcrumb: false },
-              resolve: {
-                clientAddressFieldConfig: ClientAddressFieldConfigurationResolver,
-                clientAddressTemplateData: ClientAddressTemplateResolver,
-                clientAddressData: ClientAddressResolver
-              }
+              component: MemberAddressTabComponent,
+              data: { title: 'Address', breadcrumb: 'Address', routeParamBreadcrumb: false }
             },
             {
               path: 'family-members',

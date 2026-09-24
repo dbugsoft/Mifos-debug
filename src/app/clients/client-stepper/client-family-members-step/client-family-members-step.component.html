@@ -52,7 +52,7 @@
           {{ member.genderId | find: clientTemplate.familyMemberOptions.genderIdOptions : 'id' : 'name' }}<br />
           {{ 'labels.inputs.Profession' | translate }} :
           {{ member.professionId | find: clientTemplate.familyMemberOptions.professionIdOptions : 'id' : 'name' }}<br />
-          {{ 'labels.inputs.Date Of Birth' | translate }} : {{ member.dateOfBirth | dateFormat }}<br />
+          {{ 'labels.inputs.Date Of Birth' | translate }} : {{ member.dateOfBirth | adToBs }}<br />
         </p>
       </mat-expansion-panel>
     }

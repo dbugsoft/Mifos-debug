@@ -98,7 +98,7 @@
         <h3>
           {{ 'labels.buttons.Permissions' | translate }}: <strong>{{ formatName(previousGrouping) }}</strong>
           @if (isSearchActive) {
-            <span class="search-count">({{ groupingMatchCounts[previousGrouping] || 0 }})</span>
+            <span class="search-count">({{ filteredGroupPermissions.length }})</span>
           }
         </h3>
       </div>

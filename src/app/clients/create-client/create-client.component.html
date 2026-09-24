@@ -44,6 +44,11 @@
       ></mifosx-client-general-step>
     </mat-step>
 
+    <mat-step [completed]="memberAddress.valid()">
+      <ng-template matStepLabel>{{ 'labels.inputs.ADDRESS' | translate }}</ng-template>
+      <mifosx-member-address-step #memberAddress></mifosx-member-address-step>
+    </mat-step>
+
     <!-- <mat-step>
       <ng-template matStepLabel>{{ 'labels.inputs.FAMILY MEMBERS' | translate }}</ng-template>
 
@@ -74,6 +79,11 @@
 
     <mat-step [completed]="areFormvalids()">
       <ng-template matStepLabel>{{ 'labels.inputs.PREVIEW' | translate }}</ng-template>
+      <mifosx-member-address-preview
+        [permanent]="memberAddress.permanentPreview()"
+        [temporary]="memberAddress.temporaryPreview()"
+        [temporaryChoice]="memberAddress.choice()"
+      ></mifosx-member-address-preview>
       <mifosx-client-preview-step
         [clientTemplate]="clientTemplate"
         [clientAddressFieldConfig]="clientAddressFieldConfig"

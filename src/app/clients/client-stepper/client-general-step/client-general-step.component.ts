@@ -31,7 +31,7 @@ import { SettingsService } from 'app/settings/settings.service';
 import { MatDivider } from '@angular/material/divider';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 import { MatCheckbox } from '@angular/material/checkbox';
-import { MatStepperPrevious, MatStepperNext } from '@angular/material/stepper';
+import { MatStepperNext } from '@angular/material/stepper';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { NepaliDateInputComponent } from 'app/shared/nepali-date-input/nepali-date-input.component';
@@ -49,7 +49,6 @@ import { NepaliDateInputComponent } from 'app/shared/nepali-date-input/nepali-da
     MatDivider,
     CdkTextareaAutosize,
     MatCheckbox,
-    MatStepperPrevious,
     FaIconComponent,
     MatStepperNext,
     NepaliDateInputComponent

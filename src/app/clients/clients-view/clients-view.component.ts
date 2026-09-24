@@ -7,11 +7,10 @@
  */
 
 /** Angular Imports */
-import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { environment } from '../../../environments/environment';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { DomSanitizer } from '@angular/platform-browser';
 import { MatDialog } from '@angular/material/dialog';
 
 /** Custom Dialogs */
@@ -137,13 +136,17 @@ export class ClientsViewComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private clientsService = inject(ClientsService);
-  private _sanitizer = inject(DomSanitizer);
   dialog = inject(MatDialog);
   private destroyRef = inject(DestroyRef);
 
   clientViewData: any;
   clientDatatables: any;
-  clientImage: any;
+  /**
+   * blob: URL of the client's photo, or null when there is none.
+   * A signal, because this component is OnPush: a plain field set in the HTTP callback would not
+   * re-render the template, and the placeholder would stay until something else marked the view dirty.
+   */
+  readonly clientImage = signal<string | null>(null);
   clientTemplateData: any;
 
   constructor() {
@@ -172,21 +175,32 @@ export class ClientsViewComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.clientsService.getClientProfileImage(this.clientViewData.id).subscribe({
-      next: (base64Image: any) => {
-        // If base64Image is null, client has no profile image
-        if (base64Image) {
-          this.clientImage = this._sanitizer.bypassSecurityTrustResourceUrl(base64Image);
-        } else {
-          this.clientImage = null;
+    // A blob: URL points at memory held for this page; release it when the page goes away.
+    this.destroyRef.onDestroy(() => this.releaseClientImage());
+    this.clientsService
+      .getClientProfileImage(this.clientViewData.id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (image: Blob | null) => {
+          this.releaseClientImage();
+          // A null image means the client has no profile image. A blob: URL passes Angular's URL
+          // sanitizer as it is, so no bypassSecurityTrust call is needed.
+          this.clientImage.set(image ? URL.createObjectURL(image) : null);
+        },
+        error: (error: any) => {
+          // Handle any unexpected errors
+          console.error('Error loading client profile image:', error);
+          this.releaseClientImage();
         }
-      },
-      error: (error: any) => {
-        // Handle any unexpected errors
-        console.error('Error loading client profile image:', error);
-        this.clientImage = null;
-      }
-    });
+      });
+  }
+
+  private releaseClientImage() {
+    const url = this.clientImage();
+    if (url) {
+      URL.revokeObjectURL(url);
+      this.clientImage.set(null);
+    }
   }
 
   isActive(): boolean {

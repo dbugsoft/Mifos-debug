@@ -25,7 +25,6 @@ import {
   MatRowDef,
   MatRow
 } from '@angular/material/table';
-import { MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 
 /** rxjs Imports */
@@ -71,7 +70,6 @@ export const DEBOUNCE_MS = 500;
     MatRow,
     MatPaginator,
     StatusLookupPipe,
-    MatIconButton,
     MatIcon
   ],
   changeDetection: ChangeDetectionStrategy.OnPush

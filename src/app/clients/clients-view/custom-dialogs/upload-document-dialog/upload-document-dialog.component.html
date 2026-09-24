@@ -117,6 +117,10 @@
           <mat-error>
             {{ 'labels.inputs.File Name' | translate }}
             {{ 'labels.commons.is' | translate }}
+        <input formControlName="fileName" required matInput />
+        @if (uploadDocumentForm.controls.fileName.hasError('required')) {
+          <mat-error>
+            {{ 'labels.inputs.File Name' | translate }} {{ 'labels.commons.is' | translate }}
             <strong>{{ 'labels.commons.required' | translate }}</strong>
           </mat-error>
         }
