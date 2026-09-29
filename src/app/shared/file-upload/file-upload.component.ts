@@ -30,6 +30,8 @@ export class FileUploadComponent implements OnInit {
   /** Form field flex dimension */
   @Input() flex: any;
   @Input() acceptFilter: string;
+  /** Name of a file already attached elsewhere (e.g. editing an existing record), shown until the user picks a new one */
+  @Input() initialFileName: string;
 
   /** Selected file name */
   fileName: File;
@@ -39,6 +41,9 @@ export class FileUploadComponent implements OnInit {
   ngOnInit() {
     if (!this.acceptFilter) {
       this.acceptFilter = '.xls,.xlsx,.pdf,.doc,.docx,.png,.jpeg,.jpg';
+    }
+    if (this.initialFileName) {
+      this.fileName = this.initialFileName as any;
     }
   }
 

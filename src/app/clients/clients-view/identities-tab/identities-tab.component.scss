@@ -36,6 +36,31 @@
       margin: 4px;
       line-height: 25px;
     }
+
+    .highlighted-row {
+      animation: identity-row-highlight 5s ease-out;
+    }
+  }
+}
+
+.duplicate-type-banner {
+  margin: 8px 0;
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid $msg-danger;
+  background: rgba($msg-danger, 0.08);
+  color: $msg-danger;
+  font-size: 0.875rem;
+}
+
+@keyframes identity-row-highlight {
+  0%,
+  60% {
+    background-color: rgba($msg-warning, 0.25);
+  }
+
+  100% {
+    background-color: transparent;
   }
 }
 
