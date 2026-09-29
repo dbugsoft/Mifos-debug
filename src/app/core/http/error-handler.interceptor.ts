@@ -99,7 +99,6 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
       return throwError(() => response);
     }
 
-    // Translate top-level globalisation code if present
     // Translate top-level globalisation code if present.
     // Never fall back to response.message: for a non-Fineract body (proxy HTML, gateway timeout) it is the raw
     // "Http failure response for <url>" transport string, which leaks the internal API URL. Branches below

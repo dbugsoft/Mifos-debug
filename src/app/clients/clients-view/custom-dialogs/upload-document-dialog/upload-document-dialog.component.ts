@@ -149,12 +149,6 @@ export class UploadDocumentDialogComponent implements OnInit {
           identity ? [] : Validators.required
         ],
         file: ['']
-        description: [''],
-        fileName: [''],
-        file: [
-          '',
-          Validators.required
-        ]
       });
     } else {
       // Standard document upload form
