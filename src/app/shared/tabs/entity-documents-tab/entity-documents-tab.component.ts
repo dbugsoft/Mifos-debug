@@ -8,6 +8,7 @@
 
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   ElementRef,
   Input,
@@ -50,6 +51,7 @@ export class EntityDocumentsTabComponent implements OnInit, OnDestroy {
   private loansService = inject(LoansService);
   private clientsService = inject(ClientsService);
   private documentPreviewService = inject(DocumentPreviewService);
+  private changeDetectorRef = inject(ChangeDetectorRef);
 
   @ViewChild('lightboxRoot', { static: true }) lightboxRoot: ElementRef<HTMLElement>;
 
@@ -106,6 +108,7 @@ export class EntityDocumentsTabComponent implements OnInit, OnDestroy {
           };
           this.entityDocuments.push(newDocument);
           this.setThumbnail(newDocument);
+          this.changeDetectorRef.markForCheck();
         });
       }
     });
@@ -116,7 +119,7 @@ export class EntityDocumentsTabComponent implements OnInit, OnDestroy {
       data: { deleteContext: `Document: ${name}` }
     });
     deleteDocumentDialogRef.afterClosed().subscribe((response: any) => {
-      if (response.delete) {
+      if (response?.delete) {
         this.callbackDelete(documentId);
         const index = this.entityDocuments.findIndex((doc: any) => doc.id === documentId);
         if (index !== -1) {
@@ -124,6 +127,7 @@ export class EntityDocumentsTabComponent implements OnInit, OnDestroy {
         }
         this.documentPreviewService.release(documentId);
         delete this.previewThumbnails[documentId];
+        this.changeDetectorRef.markForCheck();
       }
     });
   }
@@ -224,6 +228,7 @@ export class EntityDocumentsTabComponent implements OnInit, OnDestroy {
       .then((preview) => {
         if (preview.type === 'image') {
           this.previewThumbnails[document.id] = preview.url;
+          this.changeDetectorRef.markForCheck();
         }
       })
       .catch((): void => undefined);

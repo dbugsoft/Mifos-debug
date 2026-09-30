@@ -140,7 +140,9 @@ export class IdentitiesTabComponent implements OnDestroy {
    * @param {DocumentPreviewService} documentPreviewService Preview helper
    */
   constructor() {
-    this.clientId = this.route.parent.snapshot.paramMap.get('clientId');
+    this.route.parent.paramMap
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((params) => (this.clientId = params.get('clientId')));
     this.route.data
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((data: { clientIdentities: any; clientIdentifierTemplate: any }) => {

@@ -541,6 +541,7 @@
       "Attendance": "Attendance",
       "Back": "Back",
       "Back to Account": "Back to Account",
+      "Back to Name": "Back to {{name}}",
       "Bar Chart": "Bar Chart",
       "Browse": "Browse",
       "Bulk JLG Loan Application": "Bulk JLG Loan Application",
