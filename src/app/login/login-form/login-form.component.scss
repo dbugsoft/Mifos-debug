@@ -353,6 +353,24 @@ $input-border: #e2e8f0;
       color: #e2e2e5;
     }
   }
+
+  .text-link {
+    color: #9ecaff;
+  }
+
+  .sign-in-notice {
+    border-color: #7f1d1d;
+    background: #2a1414;
+    color: #e2e2e5;
+
+    mifosx-m3-icon {
+      color: #ffb4ab;
+    }
+
+    p {
+      color: #c4c6d0;
+    }
+  }
 }
 
 // ===== Responsive =====
@@ -414,5 +432,60 @@ $input-border: #e2e8f0;
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+// ===== Forgot password link and locked-account notice (fineract-dbug ADR 0019) =====
+.forgot-password {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -0.5rem;
+}
+
+.text-link {
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: $brand-blue;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    text-decoration: underline;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+}
+
+.sign-in-notice {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  border-radius: 10px;
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  color: $text-dark;
+  animation: slide-in 0.3s ease-out;
+
+  mifosx-m3-icon {
+    color: #dc2626;
+  }
+
+  strong {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  p {
+    margin: 0.25rem 0 0.5rem;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    color: $text-muted;
   }
 }

@@ -60,4 +60,15 @@ describe('AuthenticationInterceptor', () => {
     expect(sent?.headers.get('Authorization')).toMatch(/^(Basic|Bearer) bWlmb3M6cGFzc3dvcmQ=$/);
     expect(sent?.headers.get('Fineract-Platform-TenantId')).toBe('default');
   });
+
+  it('keeps the credentials a Fineract call brings itself, instead of any session in memory', () => {
+    const request = new HttpRequest('POST', `${server}/fineract-provider/api/v1/nepal/staff-email/verification/send`, {
+      headers: undefined
+    }).clone({ setHeaders: { Authorization: 'Basic c2l0YTpzZWNyZXQ=' } });
+
+    interceptor.intercept(request, handler).subscribe();
+
+    expect(sent?.headers.get('Authorization')).toBe('Basic c2l0YTpzZWNyZXQ=');
+    expect(sent?.headers.get('Fineract-Platform-TenantId')).toBe('default');
+  });
 });

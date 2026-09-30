@@ -56,7 +56,13 @@ export class AuthenticationInterceptor implements HttpInterceptor {
     if (this.settingsService.tenantIdentifier) {
       httpOptions.headers['Fineract-Platform-TenantId'] = this.settingsService.tenantIdentifier;
     }
-    request = request.clone({ setHeaders: httpOptions.headers });
+    // A call that brings its own credentials (email verification before the first sign-in, fineract-dbug ADR 0019)
+    // keeps them, rather than having any session left in memory overwrite them.
+    const headers = { ...httpOptions.headers };
+    if (request.headers.has(authorizationHeader)) {
+      delete headers[authorizationHeader];
+    }
+    request = request.clone({ setHeaders: headers });
     return next.handle(request);
   }
 
