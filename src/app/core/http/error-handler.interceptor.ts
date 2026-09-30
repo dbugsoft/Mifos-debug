@@ -22,6 +22,7 @@ import { Logger } from '../logger/logger.service';
 import { AlertService } from '../alert/alert.service';
 import { TranslateService } from '@ngx-translate/core';
 import { PasswordRenewalService, isPasswordOutdatedError } from '../authentication/password-renewal.service';
+import { isHandledSignInRefusal, isStaffAccessUrl } from '../authentication/staff-access.service';
 
 /** Initialize Logger */
 const log = new Logger('ErrorHandlerInterceptor');
@@ -68,6 +69,12 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
     // A sign-in whose password must be changed first (FINERACT-2003) is not an error for the user:
     // AuthenticationService.login() turns it into the password renewal flow. No generic alert.
     if (status === 403 && errorBody?.shouldRenewPassword === true) {
+      return throwError(() => response);
+    }
+
+    // Email verification and password reset by code (fineract-dbug ADR 0019) explain their own errors on the sign-in
+    // card, and so does a sign-in refused because the account is locked or its email is not yet verified.
+    if (isStaffAccessUrl(request.url) || isHandledSignInRefusal(request.url, errorBody)) {
       return throwError(() => response);
     }
 

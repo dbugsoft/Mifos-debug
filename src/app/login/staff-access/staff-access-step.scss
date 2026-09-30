@@ -1,0 +1,277 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+// Shared look of the sign-in help steps (verify email, reset password). The values follow
+// login-form.component.scss so the steps read as part of the same sign-in card.
+
+$brand-blue: #1074b9;
+$text-dark: #1e293b;
+$text-muted: #64748b;
+$input-border: #e2e8f0;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  animation: step-in 0.3s ease-out;
+}
+
+.step-title {
+  margin: 0 0 0.25rem;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: $text-dark;
+}
+
+.step-lead {
+  margin: 0 0 1rem;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: $text-muted;
+
+  strong {
+    color: $text-dark;
+    font-weight: 600;
+  }
+}
+
+.step-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.step-field {
+  width: 100%;
+
+  ::ng-deep {
+    .mat-mdc-text-field-wrapper {
+      background: transparent !important;
+      border-radius: 10px !important;
+      border: 1px solid $input-border !important;
+      transition: border-color 0.2s ease;
+    }
+
+    &.mat-focused .mat-mdc-text-field-wrapper {
+      border-color: $brand-blue !important;
+    }
+
+    .mat-mdc-form-field-focus-overlay {
+      display: none !important;
+    }
+
+    .mdc-line-ripple::before,
+    .mdc-line-ripple::after {
+      border-bottom: none !important;
+    }
+
+    .mat-mdc-input-element {
+      font-size: 0.95rem;
+      color: $text-dark;
+    }
+
+    .mat-mdc-floating-label {
+      font-size: 0.95rem;
+      color: $text-muted;
+    }
+
+    .mat-mdc-form-field-icon-prefix {
+      padding: 0 0.75rem 0 0.5rem;
+      color: $text-muted;
+    }
+
+    .mat-mdc-form-field-icon-suffix button {
+      background: transparent;
+      border: none;
+      color: $text-muted;
+    }
+
+    &.mat-form-field-invalid .mat-mdc-text-field-wrapper {
+      border-color: #dc2626 !important;
+    }
+
+    .mat-mdc-form-field-error {
+      font-size: 0.75rem;
+      color: #dc2626;
+    }
+  }
+}
+
+.code-input {
+  letter-spacing: 0.35em;
+  font-variant-numeric: tabular-nums;
+}
+
+.step-submit {
+  min-height: 48px;
+  margin-top: 0.5rem;
+
+  ::ng-deep md-filled-button {
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+
+    --md-filled-button-container-color: #{$brand-blue};
+    --md-filled-button-label-text-color: #fff;
+
+    border-radius: 10px;
+  }
+
+  .button-spinner {
+    margin-left: 0.75rem;
+
+    ::ng-deep circle {
+      stroke: currentcolor;
+    }
+  }
+}
+
+.step-links {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.step-links-end {
+  display: flex;
+  gap: 1rem;
+}
+
+.text-link {
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: $brand-blue;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    text-decoration: underline;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+}
+
+.step-notice {
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  line-height: 1.4;
+
+  &.info {
+    border: 1px solid #bfdbfe;
+    background: #eff6ff;
+    color: #1e3a5f;
+  }
+
+  &.error {
+    border: 1px solid #fecaca;
+    background: #fef2f2;
+    color: #991b1b;
+  }
+}
+
+.password-rules {
+  margin: -0.25rem 0 0.25rem;
+  font-size: 0.8rem;
+  color: $text-muted;
+
+  .password-rules-title {
+    margin: 0 0 0.25rem;
+  }
+
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  li {
+    display: flex;
+    gap: 0.5rem;
+    line-height: 1.5;
+
+    &.met {
+      color: #15803d;
+    }
+  }
+
+  &.all-met {
+    margin: -0.25rem 0 0.25rem;
+    color: #15803d;
+  }
+}
+
+@keyframes step-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+:host-context(.dark-theme) {
+  .step-title,
+  .step-lead strong {
+    color: #e2e2e5;
+  }
+
+  .step-lead,
+  .password-rules {
+    color: #c4c6d0;
+  }
+
+  .password-rules li.met,
+  .password-rules.all-met {
+    color: #86efac;
+  }
+
+  .text-link {
+    color: #9ecaff;
+  }
+
+  .step-field ::ng-deep {
+    .mat-mdc-text-field-wrapper {
+      border-color: #444 !important;
+    }
+
+    .mat-mdc-input-element {
+      color: #e2e2e5;
+    }
+
+    .mat-mdc-floating-label,
+    .mat-mdc-form-field-icon-prefix {
+      color: #c4c6d0;
+    }
+  }
+
+  .step-notice.info {
+    border-color: #1e3a5f;
+    background: #0f1f33;
+    color: #cfe3ff;
+  }
+
+  .step-notice.error {
+    border-color: #7f1d1d;
+    background: #2a1414;
+    color: #ffb4ab;
+  }
+}

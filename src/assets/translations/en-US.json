@@ -4961,5 +4961,46 @@
         "createdWithoutAddress": "The member was created, but the address could not be saved. Please add it here."
       }
     }
+  },
+  "staffAccess": {
+    "signIn": {
+      "Forgot password?": "Forgot password?",
+      "This account is locked": "This account is locked",
+      "Locked explanation": "Too many wrong passwords were entered. Reset your password with a code sent to your email to unlock it, or ask your administrator.",
+      "Reset password to unlock": "Reset password to unlock"
+    },
+    "common": {
+      "Back to sign in": "Back to sign in",
+      "Send a new code": "Send a new code",
+      "6-digit code": "6-digit code",
+      "Enter the 6 digits": "Enter the 6 digits from the email",
+      "Code valid for": "The code works for {{minutes}} minutes"
+    },
+    "verify": {
+      "Verify your email": "Verify your email",
+      "Intro": "Before you can use the system, confirm that the email address on your account is yours. We'll send a 6-digit code to:",
+      "Enter the code sent to": "Enter the 6-digit code we sent to:",
+      "Send code": "Send code",
+      "Verify and sign in": "Verify and sign in",
+      "New code sent": "A new code is on its way. Only the newest code works."
+    },
+    "reset": {
+      "Reset your password": "Reset your password",
+      "Intro": "Enter your username. We'll email a code to the verified address on your account, and you can then choose a new password. This also unlocks a locked account.",
+      "Code requested": "If this account can reset its password, a code has been sent to its verified email address. Enter it below with your new password.",
+      "Email me a code": "Email me a code",
+      "New password": "New password",
+      "Password does not meet the rules": "Choose a password that meets every rule below",
+      "Meets every rule": "Meets every password rule",
+      "Set new password": "Set new password",
+      "Different username": "Different username",
+      "New code requested": "If the account can reset its password, a new code is on its way. Only the newest code works.",
+      "Password changed": "Password changed",
+      "Password changed message": "Your password has been changed. Sign in with your new password."
+    },
+    "errors": {
+      "Too soon": "A code was sent moments ago. Wait a minute before asking for another.",
+      "Something went wrong": "Something went wrong. Try again in a moment."
+    }
   }
 }
