@@ -4892,6 +4892,21 @@
     "errors": {
       "Too soon": "A code was sent moments ago. Wait a minute before asking for another.",
       "Something went wrong": "Something went wrong. Try again in a moment."
+    },
+    "users": {
+      "Locked": "Locked",
+      "Email not verified": "Email not verified",
+      "Verified": "Verified",
+      "Sign-in": "Sign-in",
+      "Locked after wrong passwords": "Locked after {{count}} wrong passwords",
+      "Can sign in": "Can sign in",
+      "Unlock account": "Unlock account",
+      "Unlock question": "Unlock the account of {{username}} so they can sign in again",
+      "Unlocked": "{{username}} can sign in again.",
+      "Send verification code": "Send verification code",
+      "Code sent": "A verification code was sent to {{email}}.",
+      "Email already used": "Another staff member already uses this email address",
+      "New email must be verified": "The user will have to verify the new address before signing in again"
     }
   }
 }

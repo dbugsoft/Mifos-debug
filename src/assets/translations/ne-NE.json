@@ -4895,6 +4895,21 @@
     "errors": {
       "Too soon": "भर्खरै कोड पठाइएको छ। अर्को माग्नुअघि एक मिनेट पर्खनुहोस्।",
       "Something went wrong": "केही गडबड भयो। केही बेरपछि फेरि प्रयास गर्नुहोस्।"
+    },
+    "users": {
+      "Locked": "लक भएको",
+      "Email not verified": "इमेल प्रमाणित भएको छैन",
+      "Verified": "प्रमाणित",
+      "Sign-in": "साइन इन",
+      "Locked after wrong passwords": "{{count}} पटक गलत पासवर्डपछि लक भएको",
+      "Can sign in": "साइन इन गर्न सक्छ",
+      "Unlock account": "खाता खोल्नुहोस्",
+      "Unlock question": "{{username}} को खाता खोलेर फेरि साइन इन गर्न दिने हो",
+      "Unlocked": "{{username}} अब फेरि साइन इन गर्न सक्छ।",
+      "Send verification code": "प्रमाणीकरण कोड पठाउनुहोस्",
+      "Code sent": "{{email}} मा प्रमाणीकरण कोड पठाइयो।",
+      "Email already used": "यो इमेल ठेगाना अर्को कर्मचारीले प्रयोग गरिसकेका छन्",
+      "New email must be verified": "प्रयोगकर्ताले फेरि साइन इन गर्नुअघि नयाँ ठेगाना प्रमाणित गर्नुपर्छ"
     }
   }
 }

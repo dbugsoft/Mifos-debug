@@ -25,6 +25,7 @@ import { MatDialog } from '@angular/material/dialog';
 
 /** Custom Services */
 import { UsersService } from '../users.service';
+import { StaffLoginService, emailAvailableValidator } from '../staff-login.service';
 import { PopoverService } from '../../configuration-wizard/popover/popover.service';
 
 /** Custom Dialog Component */
@@ -51,6 +52,7 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 export class CreateUserComponent implements OnInit, AfterViewInit {
   private formBuilder = inject(FormBuilder);
   private usersService = inject(UsersService);
+  private staffLogins = inject(StaffLoginService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private popoverService = inject(PopoverService);
@@ -94,6 +96,7 @@ export class CreateUserComponent implements OnInit, AfterViewInit {
    */
   ngOnInit() {
     this.createUserForm();
+    this.userForm.controls.email.addAsyncValidators(emailAvailableValidator(this.staffLogins, () => undefined));
     this.setStaffData();
     this.setConditionalControls();
   }

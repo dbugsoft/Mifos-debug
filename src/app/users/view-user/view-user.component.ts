@@ -7,17 +7,21 @@
  */
 
 /** Angular Imports */
-import { ChangeDetectionStrategy, Component, inject, DestroyRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, DestroyRef, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
+import { TranslateService } from '@ngx-translate/core';
 
 /** Custom Services */
 import { UsersService } from '../users.service';
+import { LoginStatus, StaffLoginService } from '../staff-login.service';
+import { AlertService } from 'app/core/alert/alert.service';
 
 /** Custom Components */
 import { DeleteDialogComponent } from 'app/shared/delete-dialog/delete-dialog.component';
 import { ChangePasswordDialogComponent } from 'app/shared/change-password-dialog/change-password-dialog.component';
+import { ConfirmationDialogComponent } from 'app/shared/confirmation-dialog/confirmation-dialog.component';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
@@ -41,9 +45,16 @@ export class ViewUserComponent {
   private router = inject(Router);
   private dialog = inject(MatDialog);
   private destroyRef = inject(DestroyRef);
+  private staffLogins = inject(StaffLoginService);
+  private alertService = inject(AlertService);
+  private translate = inject(TranslateService);
 
   /** User Data. */
   userData: any;
+  /** Sign-in state (fineract-dbug ADR 0019), for administrators allowed to see it. */
+  loginStatus = signal<LoginStatus | null>(null);
+  canUnlock = this.staffLogins.canUnlock();
+  canSendCode = this.staffLogins.canSendCode();
 
   /**
    * Retrieves the user data from `resolve`.
@@ -55,7 +66,52 @@ export class ViewUserComponent {
   constructor() {
     this.route.data.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((data: { user: any }) => {
       this.userData = data.user;
+      this.loadLoginStatus();
     });
+  }
+
+  /** Unlocks an account locked by too many wrong passwords, after a confirmation. */
+  unlock() {
+    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+      data: {
+        heading: this.translate.instant('staffAccess.users.Unlock account'),
+        dialogContext: this.translate.instant('staffAccess.users.Unlock question', {
+          username: this.userData.username
+        })
+      }
+    });
+    dialogRef.afterClosed().subscribe((response: any) => {
+      if (response?.confirm) {
+        this.staffLogins.unlock(this.userData.id).subscribe(() => {
+          this.alertService.alert({
+            type: this.translate.instant('staffAccess.users.Unlock account'),
+            message: this.translate.instant('staffAccess.users.Unlocked', { username: this.userData.username })
+          });
+          this.loadLoginStatus();
+        });
+      }
+    });
+  }
+
+  /** Emails a verification code to the address on the account, for a staff member who asks for help. */
+  sendVerificationCode() {
+    this.staffLogins.sendVerificationCode(this.userData.id).subscribe((sent) => {
+      this.alertService.alert({
+        type: this.translate.instant('staffAccess.users.Send verification code'),
+        message: this.translate.instant('staffAccess.users.Code sent', { email: sent.maskedEmail })
+      });
+    });
+  }
+
+  private loadLoginStatus() {
+    this.loginStatus.set(null);
+    if (!this.staffLogins.canRead()) {
+      return;
+    }
+    this.staffLogins
+      .status(this.userData.id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((status) => this.loginStatus.set(status));
   }
 
   /**

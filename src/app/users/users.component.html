@@ -32,7 +32,21 @@
 
       <ng-container matColumnDef="username">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'labels.inputs.Login Name' | translate }}</th>
-        <td mat-cell *matCellDef="let user">{{ user.username }}</td>
+        <td mat-cell *matCellDef="let user">
+          {{ user.username }}
+          @if (loginStatus().get(user.id); as status) {
+            @if (status.locked) {
+              <span class="login-badge status-deleted">
+                <fa-icon icon="lock"></fa-icon>{{ 'staffAccess.users.Locked' | translate }}
+              </span>
+            }
+            @if (status.emailVerificationRequired && !status.emailVerified) {
+              <span class="login-badge status-pending">
+                <fa-icon icon="envelope"></fa-icon>{{ 'staffAccess.users.Email not verified' | translate }}
+              </span>
+            }
+          }
+        </td>
       </ng-container>
 
       <ng-container matColumnDef="lastname">
