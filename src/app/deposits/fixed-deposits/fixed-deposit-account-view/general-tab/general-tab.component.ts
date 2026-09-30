@@ -39,7 +39,7 @@ export class GeneralTabComponent {
       this.fixedDepositsAccountData = data.fixedDepositsAccountData;
       this.currency = this.fixedDepositsAccountData.currency;
     });
-    if (this.router.url.includes('clients')) {
+    if (this.router.url.includes('members')) {
       this.entityType = 'Client';
     } else if (this.router.url.includes('groups')) {
       this.entityType = 'Group';

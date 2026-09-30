@@ -114,7 +114,7 @@ export class SavingsAccountViewComponent implements OnInit {
         this.currency = this.savingsAccountData.currency;
         this.savingsDatatables = data.savingsDatatables;
       });
-    if (this.router.url.includes('clients')) {
+    if (this.router.url.includes('members')) {
       this.entityType = 'Client';
     } else if (this.router.url.includes('groups')) {
       this.entityType = 'Group';
