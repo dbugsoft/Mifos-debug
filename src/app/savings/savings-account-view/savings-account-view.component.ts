@@ -114,11 +114,22 @@ export class SavingsAccountViewComponent implements OnInit {
         this.currency = this.savingsAccountData.currency;
         this.savingsDatatables = data.savingsDatatables;
       });
+    // Router.url reflects the router's current navigation state, which is not guaranteed to be
+    // settled to this component's own URL yet when the constructor runs - it can still be the
+    // previous page's URL, silently leaving entityType (and the "<Type> Name:" header) undefined.
+    // pathFromRoot reads this component's own already-resolved ActivatedRoute tree instead.
+    const fullPath = this.route.pathFromRoot
+      .map((activatedRoute) => activatedRoute.snapshot.url.map((segment) => segment.path).join('/'))
+      .join('/');
+    // The client section's URL is 'members' (see app-routing.module.ts's 'members' -> ClientsModule
+    // route), not 'clients' - 'clients' never appears in the actual URL, so that branch could never
+    // match.
+    if (fullPath.includes('members')) {
     if (this.router.url.includes('members')) {
       this.entityType = 'Client';
-    } else if (this.router.url.includes('groups')) {
+    } else if (fullPath.includes('groups')) {
       this.entityType = 'Group';
-    } else if (this.router.url.includes('centers')) {
+    } else if (fullPath.includes('centers')) {
       this.entityType = 'Center';
     }
   }
