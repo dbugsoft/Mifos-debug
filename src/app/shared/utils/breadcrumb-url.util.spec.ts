@@ -36,6 +36,15 @@ describe('isSelfLink', () => {
     expect(isSelfLink('/members/16/general', accountTab)).toBe(false);
   });
 
+  it('matches the member crumb on any of the member tabs', () => {
+    expect(isSelfLink('/members/16/general', '/members/16/documents')).toBe(true);
+    expect(isSelfLink('/members/16/general', '/members/16/family-members')).toBe(true);
+  });
+
+  it('keeps the member crumb below a member tab', () => {
+    expect(isSelfLink('/members/16/general', '/members/16/datatables/extra')).toBe(false);
+  });
+
   it('keeps the account crumb while a transaction is open', () => {
     expect(isSelfLink('/members/16/savings-accounts/5', '/members/16/savings-accounts/5/transactions/12/general')).toBe(
       false

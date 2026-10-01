@@ -36,6 +36,9 @@ import { SettingsService } from 'app/settings/settings.service';
 import { TenantSelectorComponent } from '../shared/tenant-selector/tenant-selector.component';
 import { LoginFormComponent } from './login-form/login-form.component';
 import { TwoFactorAuthenticationComponent } from './two-factor-authentication/two-factor-authentication.component';
+import { VerifyEmailComponent } from './staff-access/verify-email/verify-email.component';
+import { ForgotPasswordComponent } from './staff-access/forgot-password/forgot-password.component';
+import { StaffAccessService } from '../core/authentication/staff-access.service';
 import { LanguageSelectorComponent } from '../shared/language-selector/language-selector.component';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
@@ -53,6 +56,8 @@ import { VersionService } from '../system/version.service';
     TenantSelectorComponent,
     LoginFormComponent,
     TwoFactorAuthenticationComponent,
+    VerifyEmailComponent,
+    ForgotPasswordComponent,
     LanguageSelectorComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -72,6 +77,8 @@ export class LoginComponent implements OnInit {
   private versionService = inject(VersionService);
   private translateService = inject(TranslateService);
   private destroyRef = inject(DestroyRef);
+  /** Sign-in help steps (verify email, reset password) shown in place of the sign-in form. */
+  readonly staffAccess = inject(StaffAccessService);
 
   public environment = environment;
 
@@ -97,6 +104,7 @@ export class LoginComponent implements OnInit {
    * Subscribes to alert event of alert service and theme changes.
    */
   ngOnInit() {
+    this.staffAccess.backToSignIn();
     this.showTenantSelector = this.calculateTenantSelectorVisibility();
     this.updateLogo();
     this.themeDarkEnabled = this.settingsService.themeDarkEnabled;

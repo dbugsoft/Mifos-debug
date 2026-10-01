@@ -21,12 +21,14 @@ export function normalizeBreadcrumbUrl(url: string, isClientCrumb = false): stri
 /**
  * Whether a parent breadcrumb points at the page that is already open: either the same URL,
  * or the URL of the tab currently shown (e.g. the account crumb while its `general` tab is open).
+ * A crumb pointing at an entity's `general` tab counts for all of that entity's tabs, so from any
+ * member tab the back link leads to the member list rather than sideways to the General tab.
  * Such crumbs make for a back link that goes nowhere.
  */
 export function isSelfLink(parentUrl: string, currentUrl: string): boolean {
   if (parentUrl === currentUrl) {
     return true;
   }
-  const parent = parentUrl.replace(/\/$/, '');
+  const parent = parentUrl.replace(/\/$/, '').replace(/\/general$/, '');
   return currentUrl.startsWith(`${parent}/`) && !currentUrl.slice(parent.length + 1).includes('/');
 }

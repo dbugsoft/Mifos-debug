@@ -52,7 +52,9 @@ export class NotesTabComponent implements OnInit {
    * @param {AuthenticationService} authenticationService Authentication Service
    */
   constructor() {
-    this.entityId = this.route.parent.snapshot.params['clientId'];
+    this.route.parent.paramMap
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((params) => (this.entityId = params.get('clientId')));
     this.addNote = this.addNote.bind(this);
     this.editNote = this.editNote.bind(this);
     this.deleteNote = this.deleteNote.bind(this);

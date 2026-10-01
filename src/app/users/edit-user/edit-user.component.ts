@@ -7,13 +7,14 @@
  */
 
 /** Angular Imports */
-import { ChangeDetectionStrategy, Component, OnInit, inject, DestroyRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, DestroyRef, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormGroup, FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 
 /** Custom Services */
 import { UsersService } from '../users.service';
+import { StaffLoginService, emailAvailableValidator } from '../staff-login.service';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
@@ -33,6 +34,9 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 export class EditUserComponent implements OnInit {
   private formBuilder = inject(FormBuilder);
   private usersService = inject(UsersService);
+  private staffLogins = inject(StaffLoginService);
+  /** Whether this user must verify their email before signing in (fineract-dbug ADR 0019). */
+  private verificationRequired = signal(false);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
@@ -65,7 +69,23 @@ export class EditUserComponent implements OnInit {
 
   ngOnInit() {
     this.createEditUserForm();
+    this.editUserForm.controls.email.addAsyncValidators(
+      emailAvailableValidator(this.staffLogins, () => this.userData.id)
+    );
+    if (this.staffLogins.canRead()) {
+      this.staffLogins
+        .status(this.userData.id)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe((status) => this.verificationRequired.set(status.emailVerificationRequired));
+    }
     this.officeChanged(this.userData.officeId);
+  }
+
+  /** A changed email has to be verified again by its owner before they can sign in. */
+  get emailChangeNeedsVerification(): boolean {
+    const typed = (this.editUserForm.controls.email.value ?? '').trim().toLowerCase();
+    const saved = (this.userData.email ?? '').trim().toLowerCase();
+    return this.verificationRequired() && !!typed && typed !== saved;
   }
 
   /**

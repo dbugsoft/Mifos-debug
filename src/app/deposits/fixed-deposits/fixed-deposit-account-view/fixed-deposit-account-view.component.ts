@@ -109,7 +109,7 @@ export class FixedDepositAccountViewComponent implements OnInit {
       const status: any = data.fixedDepositsAccountData.status;
       this.showTransactions = status.id >= 300;
     });
-    if (this.router.url.includes('clients')) {
+    if (this.router.url.includes('members')) {
       this.entityType = 'Client';
     } else if (this.router.url.includes('groups')) {
       this.entityType = 'Group';

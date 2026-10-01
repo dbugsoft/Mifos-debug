@@ -75,6 +75,26 @@
         }
       </mat-form-field>
 
+      <div class="forgot-password">
+        <button type="button" class="text-link" (click)="forgotPassword()" [disabled]="loading">
+          {{ 'staffAccess.signIn.Forgot password?' | translate }}
+        </button>
+      </div>
+
+      <!-- A locked account (too many wrong passwords): resetting the password unlocks it -->
+      @if (lockedUsername(); as username) {
+        <div class="sign-in-notice" role="alert">
+          <mifosx-m3-icon name="lock_person"></mifosx-m3-icon>
+          <div>
+            <strong>{{ 'staffAccess.signIn.This account is locked' | translate }}</strong>
+            <p>{{ 'staffAccess.signIn.Locked explanation' | translate }}</p>
+            <button type="button" class="text-link" (click)="forgotPassword(username)">
+              {{ 'staffAccess.signIn.Reset password to unlock' | translate }}
+            </button>
+          </div>
+        </div>
+      }
+
       <!-- Loading Progress -->
       @if (loading) {
         <mat-progress-bar mode="indeterminate" class="login-progress"></mat-progress-bar>

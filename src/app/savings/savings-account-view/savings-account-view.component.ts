@@ -125,6 +125,7 @@ export class SavingsAccountViewComponent implements OnInit {
     // route), not 'clients' - 'clients' never appears in the actual URL, so that branch could never
     // match.
     if (fullPath.includes('members')) {
+    if (this.router.url.includes('members')) {
       this.entityType = 'Client';
     } else if (fullPath.includes('groups')) {
       this.entityType = 'Group';

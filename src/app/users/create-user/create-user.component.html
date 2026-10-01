@@ -37,6 +37,9 @@
                 <strong>{{ 'labels.commons.required' | translate }}</strong>
               </mat-error>
             }
+            @if (userForm.controls.email.hasError('emailTaken')) {
+              <mat-error>{{ 'staffAccess.users.Email already used' | translate }}</mat-error>
+            }
           </mat-form-field>
 
           <mat-form-field class="flex-48">
