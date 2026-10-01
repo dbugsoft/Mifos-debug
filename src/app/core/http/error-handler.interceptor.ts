@@ -22,6 +22,7 @@ import { Logger } from '../logger/logger.service';
 import { AlertService } from '../alert/alert.service';
 import { TranslateService } from '@ngx-translate/core';
 import { PasswordRenewalService, isPasswordOutdatedError } from '../authentication/password-renewal.service';
+import { isHandledSignInRefusal, isStaffAccessUrl } from '../authentication/staff-access.service';
 
 /** Initialize Logger */
 const log = new Logger('ErrorHandlerInterceptor');
@@ -71,10 +72,37 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
       return throwError(() => response);
     }
 
+    // Email verification and password reset by code (fineract-dbug ADR 0019) explain their own errors on the sign-in
+    // card, and so does a sign-in refused because the account is locked or its email is not yet verified.
+    if (isStaffAccessUrl(request.url) || isHandledSignInRefusal(request.url, errorBody)) {
+      return throwError(() => response);
+    }
+
     // A signed-in user whose password must now be changed (error.msg.password.outdated): open the blocking
     // "set a new password" dialog instead of showing a generic error for every refused call.
     if (isPasswordOutdatedError(errorBody)) {
       this.passwordRenewal.require();
+      return throwError(() => response);
+    }
+
+    // A duplicate client identifier document key: the backend's defaultUserMessage names the
+    // other client (and their branch, and this same document key), which must never be shown -
+    // the Identities dialog already shows its own safe, generic message for this, so skip the
+    // generic global alert entirely rather than have it show the raw message here.
+    if (
+      status === 403 &&
+      errorBody?.errors?.[0]?.userMessageGlobalisationCode === 'error.msg.clientIdentifier.identityKey.duplicate'
+    ) {
+      return throwError(() => response);
+    }
+
+    // A duplicate client identifier document type: the Identities tab already shows its own
+    // banner for this (and highlights the existing row), so skip the generic global alert to
+    // avoid showing the same thing twice.
+    if (
+      status === 403 &&
+      errorBody?.errors?.[0]?.userMessageGlobalisationCode === 'error.msg.clientIdentifier.type.duplicate'
+    ) {
       return throwError(() => response);
     }
 

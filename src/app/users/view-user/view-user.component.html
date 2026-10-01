@@ -6,7 +6,7 @@
   file, You can obtain one at http://mozilla.org/MPL/2.0/.
 -->
 
-<div class="container m-b-20 layout-row layout-lt-md-column align-end gap-2percent">
+<div class="container m-b-20 layout-row layout-lt-md-column align-end gap-2percent user-actions">
   <button mat-raised-button color="primary" [routerLink]="['edit']">
     <fa-icon icon="edit" class="m-r-10"></fa-icon>
     {{ 'labels.buttons.Edit' | translate }}
@@ -19,6 +19,18 @@
     <fa-icon icon="cog" class="m-r-10"></fa-icon>
     {{ 'labels.buttons.Change Password' | translate }}
   </button>
+  @if (loginStatus()?.locked && canUnlock) {
+    <button mat-raised-button color="primary" (click)="unlock()">
+      <fa-icon icon="lock-open" class="m-r-10"></fa-icon>
+      {{ 'staffAccess.users.Unlock account' | translate }}
+    </button>
+  }
+  @if (loginStatus()?.emailVerificationRequired && !loginStatus()?.emailVerified && canSendCode && userData.email) {
+    <button mat-raised-button color="primary" (click)="sendVerificationCode()">
+      <fa-icon icon="envelope" class="m-r-10"></fa-icon>
+      {{ 'staffAccess.users.Send verification code' | translate }}
+    </button>
+  }
 </div>
 
 <div class="container">
@@ -43,7 +55,40 @@
         @if (userData.email) {
           <div class="content-row">
             <div class="label">{{ 'labels.inputs.Email' | translate }}</div>
-            <div class="value">{{ userData.email }}</div>
+            <div class="value">
+              {{ userData.email }}
+              @if (loginStatus()?.emailVerificationRequired) {
+                @if (loginStatus()?.emailVerified) {
+                  <span class="login-state after-text status-active">
+                    <fa-icon icon="check"></fa-icon>{{ 'staffAccess.users.Verified' | translate }}
+                  </span>
+                } @else {
+                  <span class="login-state after-text status-pending">
+                    <fa-icon icon="envelope"></fa-icon>{{ 'staffAccess.users.Email not verified' | translate }}
+                  </span>
+                }
+              }
+            </div>
+          </div>
+        }
+
+        @if (loginStatus(); as status) {
+          <div class="content-row">
+            <div class="label">{{ 'staffAccess.users.Sign-in' | translate }}</div>
+            <div class="value">
+              @if (status.locked) {
+                <span class="login-state status-deleted">
+                  <fa-icon icon="lock"></fa-icon>
+                  {{
+                    'staffAccess.users.Locked after wrong passwords' | translate: { count: status.failedLoginAttempts }
+                  }}
+                </span>
+              } @else {
+                <span class="login-state status-active">
+                  <fa-icon icon="check"></fa-icon>{{ 'staffAccess.users.Can sign in' | translate }}
+                </span>
+              }
+            </div>
           </div>
         }
 

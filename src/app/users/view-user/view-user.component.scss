@@ -135,3 +135,30 @@
     }
   }
 }
+
+// Sign-in state (fineract-dbug ADR 0019)
+.login-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+
+  fa-icon {
+    font-size: 0.75rem;
+  }
+
+  &.after-text {
+    margin-left: 0.5rem;
+  }
+}
+
+// Up to five actions: wrap onto a second line rather than squeezing the labels
+.user-actions {
+  flex-wrap: wrap;
+  row-gap: 8px;
+
+  button {
+    white-space: nowrap;
+  }
+}

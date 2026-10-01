@@ -7,8 +7,9 @@
  */
 
 /** Angular Imports */
-import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { HttpErrorResponse } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 
 /** rxjs Imports */
@@ -16,6 +17,12 @@ import { finalize } from 'rxjs/operators';
 
 /** Custom Services */
 import { AuthenticationService } from '../../core/authentication/authentication.service';
+import {
+  ACCOUNT_LOCKED_CODE,
+  EMAIL_NOT_VERIFIED_CODE,
+  StaffAccessService,
+  fineractErrorCode
+} from '../../core/authentication/staff-access.service';
 import { MatPrefix } from '@angular/material/form-field';
 import { M3IconComponent } from '../../shared/m3-ui/m3-icon/m3-icon.component';
 import { M3ButtonComponent } from '../../shared/m3-ui/m3-button/m3-button.component';
@@ -46,6 +53,7 @@ export class LoginFormComponent implements OnInit {
   private formBuilder = inject(FormBuilder);
   private authenticationService = inject(AuthenticationService);
   private translateService = inject(TranslateService);
+  private staffAccess = inject(StaffAccessService);
   minPasswordLength = environment.minPasswordLength;
 
   /** Login form group. */
@@ -58,6 +66,8 @@ export class LoginFormComponent implements OnInit {
   oauthEnabled = environment.OIDC.oidcServerEnabled || environment.oauth.enabled;
   /** Whether remember me functionality is enabled */
   enableRememberMe = environment.enableRememberMe === true;
+  /** The username of an account the last sign-in found locked, to offer a reset that unlocks it. */
+  lockedUsername = signal<string | null>(null);
 
   /**
    * Creates login form.
@@ -66,6 +76,10 @@ export class LoginFormComponent implements OnInit {
    */
   ngOnInit() {
     this.createLoginForm();
+    if (this.staffAccess.signInAs()) {
+      this.loginForm.patchValue({ username: this.staffAccess.signInAs() });
+      this.staffAccess.signInAs.set('');
+    }
   }
 
   /**
@@ -76,6 +90,8 @@ export class LoginFormComponent implements OnInit {
     if (this.loginForm.invalid) {
       return;
     }
+    const { username, password } = this.loginForm.value;
+    this.lockedUsername.set(null);
     this.loading = true;
     this.loginForm.disable();
     this.authenticationService
@@ -89,7 +105,25 @@ export class LoginFormComponent implements OnInit {
           this.loading = false;
         })
       )
-      .subscribe();
+      .subscribe({ error: (error: HttpErrorResponse) => this.onSignInRefused(error, username, password) });
+  }
+
+  /** Opens "Forgot password?", carrying over the username typed so far. */
+  forgotPassword(username?: string) {
+    this.staffAccess.showResetPassword(username ?? this.loginForm.value.username ?? '');
+  }
+
+  /**
+   * A locked account gets a notice with a way out; an unverified email moves on to the verification step, which
+   * signs in again with the same credentials once the code is confirmed (fineract-dbug ADR 0019).
+   */
+  private onSignInRefused(error: HttpErrorResponse, username: string, password: string) {
+    const code = fineractErrorCode(error.error);
+    if (code === ACCOUNT_LOCKED_CODE) {
+      this.lockedUsername.set(username);
+    } else if (code === EMAIL_NOT_VERIFIED_CODE) {
+      this.staffAccess.showVerifyEmail(username, password, error.error?.maskedEmail ?? '');
+    }
   }
 
   /**

@@ -24,6 +24,10 @@
     </div>
   </div>
 
+  @if (duplicateTypeMessage) {
+    <div class="duplicate-type-banner">{{ duplicateTypeMessage }}</div>
+  }
+
   <div class="table-container">
     <table mat-table #identifiersTable [dataSource]="clientIdentities">
       <ng-container matColumnDef="id">
@@ -110,6 +114,17 @@
           <button
             class="identity-action-button"
             mat-raised-button
+            color="primary"
+            [title]="'labels.buttons.Edit' | translate"
+            [attr.aria-label]="'labels.buttons.Edit' | translate"
+            (click)="editIdentifier(identity)"
+            *mifosxHasPermission="'UPDATE_CLIENTIDENTIFIER'"
+          >
+            <fa-icon icon="edit"></fa-icon>
+          </button>
+          <button
+            class="identity-action-button"
+            mat-raised-button
             color="warn"
             [title]="'labels.buttons.Delete' | translate"
             [attr.aria-label]="'labels.buttons.Delete' | translate"
@@ -130,7 +145,12 @@
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="identitiesColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: identitiesColumns"></tr>
+      <tr
+        mat-row
+        *matRowDef="let row; columns: identitiesColumns"
+        [id]="'identity-row-' + row.id"
+        [class.highlighted-row]="row.id === highlightedIdentityId"
+      ></tr>
       @if (clientIdentities?.length === 0) {
         <tr mat-footer-row *matFooterRowDef="['no-data']"></tr>
       }

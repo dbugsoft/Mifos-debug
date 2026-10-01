@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
@@ -62,6 +62,7 @@ import { EnumOptionData, StringEnumOptionData } from 'app/shared/models/option-d
 export class EditBucketComponent extends DelinquencyBucketBaseComponent implements OnInit {
   private formBuilder = inject(UntypedFormBuilder);
   private productsService = inject(ProductsService);
+  private changeDetectorRef = inject(ChangeDetectorRef);
   private router = inject(Router);
   dialog = inject(MatDialog);
   private translateService = inject(TranslateService);
@@ -197,7 +198,7 @@ export class EditBucketComponent extends DelinquencyBucketBaseComponent implemen
     };
     const rangeDialogRef = this.dialog.open(FormDialogComponent, { data });
     rangeDialogRef.afterClosed().subscribe((response: any) => {
-      if (response.data) {
+      if (response?.data) {
         const itemSelected = response.data.value;
         const item = this.delinquencyRangesData.filter((range: any) => {
           return range.id === itemSelected.rangeId;
@@ -205,6 +206,7 @@ export class EditBucketComponent extends DelinquencyBucketBaseComponent implemen
         this.rangesDataSource = this.rangesDataSource.concat(item);
         this.delinquencyRangesIds.push(item.id);
         this.dataWasChanged = true;
+        this.changeDetectorRef.markForCheck();
       }
     });
   }
@@ -217,11 +219,12 @@ export class EditBucketComponent extends DelinquencyBucketBaseComponent implemen
       data: { deleteContext: this.translateService.instant('labels.text.this') }
     });
     dialogRef.afterClosed().subscribe((response: any) => {
-      if (response.delete) {
+      if (response?.delete) {
         this.delinquencyRangesIds.splice(index, 1);
         this.rangesDataSource.splice(index, 1);
         this.rangesDataSource = this.rangesDataSource.concat([]);
         this.dataWasChanged = true;
+        this.changeDetectorRef.markForCheck();
       }
     });
   }

@@ -69,7 +69,9 @@
             />
           }
         </div>
-        <p class="card-subtitle">Enter your credentials to access your account</p>
+        @if (!staffAccess.step()) {
+          <p class="card-subtitle">Enter your credentials to access your account</p>
+        }
 
         <!-- Tenant Selector -->
         @if (showTenantSelector) {
@@ -80,12 +82,25 @@
 
         <!-- Login Form -->
         <div class="form-section">
-          @if (!twoFactorAuthenticationRequired) {
-            <mifosx-login-form></mifosx-login-form>
-          }
+          <!-- Sign-in help from fineract-dbug ADR 0019: verify email before the first sign-in, or reset by code -->
+          @if (staffAccess.step(); as help) {
+            @if (help.kind === 'verifyEmail') {
+              <mifosx-verify-email
+                [username]="help.username"
+                [password]="help.password"
+                [maskedEmail]="help.maskedEmail"
+              ></mifosx-verify-email>
+            } @else {
+              <mifosx-forgot-password [username]="help.username"></mifosx-forgot-password>
+            }
+          } @else {
+            @if (!twoFactorAuthenticationRequired) {
+              <mifosx-login-form></mifosx-login-form>
+            }
 
-          @if (twoFactorAuthenticationRequired) {
-            <mifosx-two-factor-authentication></mifosx-two-factor-authentication>
+            @if (twoFactorAuthenticationRequired) {
+              <mifosx-two-factor-authentication></mifosx-two-factor-authentication>
+            }
           }
         </div>
 

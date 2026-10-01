@@ -37,6 +37,12 @@
                 <strong>{{ 'labels.commons.required' | translate }}</strong>
               </mat-error>
             }
+            @if (editUserForm.controls.email.hasError('emailTaken')) {
+              <mat-error>{{ 'staffAccess.users.Email already used' | translate }}</mat-error>
+            }
+            @if (emailChangeNeedsVerification) {
+              <mat-hint>{{ 'staffAccess.users.New email must be verified' | translate }}</mat-hint>
+            }
           </mat-form-field>
 
           <mat-form-field class="flex-48">
