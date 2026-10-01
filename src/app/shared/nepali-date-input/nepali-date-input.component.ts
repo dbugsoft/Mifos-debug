@@ -414,7 +414,7 @@ export class NepaliDateInputComponent implements ControlValueAccessor {
     const adDate = nd.toJsDate();
 
     this.selectedBs = { year: this.viewYear, month: this.viewMonth, day };
-    this.bsInputControl.setValue(nd.format('D MMMM YYYY'), { emitEvent: false });
+    this.bsInputControl.setValue(this.formatBsDisplay(this.selectedBs), { emitEvent: false });
     this.adPreview = adDate.toLocaleDateString('en-GB', {
       day: 'numeric',
       month: 'short',
@@ -457,6 +457,16 @@ export class NepaliDateInputComponent implements ControlValueAccessor {
 
   // ── Private helpers ────────────────────────────────────────────────────────
 
+  /**
+   * 'D MMMM YYYY' using NEPALI_MONTHS, not NepaliDate's own .format() - the
+   * library's built-in month names spell this month "Aswin", which read
+   * inconsistently next to NEPALI_MONTHS' "Ashwin" (used by ad-to-bs.pipe.ts
+   * elsewhere in the app for the same date).
+   */
+  private formatBsDisplay(bs: BsDate): string {
+    return `${bs.day} ${NEPALI_MONTHS[bs.month]} ${bs.year}`;
+  }
+
   private adToBs(date: Date): BsDate | null {
     try {
       const nd = new NepaliDate(date);
@@ -482,7 +492,7 @@ export class NepaliDateInputComponent implements ControlValueAccessor {
       this.selectedBs = { year: nd.getYear(), month: nd.getMonth(), day: nd.getDate() };
       this.viewYear = nd.getYear();
       this.viewMonth = nd.getMonth();
-      this.bsInputControl.setValue(nd.format('D MMMM YYYY'), { emitEvent: false });
+      this.bsInputControl.setValue(this.formatBsDisplay(this.selectedBs), { emitEvent: false });
       this.adPreview = jsDate.toLocaleDateString('en-GB', {
         day: 'numeric',
         month: 'short',
