@@ -7,23 +7,115 @@
 -->
 
 <div class="mfx-bs-picker" #wrapper>
-  <!-- ── Trigger form field ─────────────────────────────────────────────── -->
-  <mat-form-field class="flex-fill" (click)="openPanel()">
-    <mat-label>{{ label }}</mat-label>
-    <input
-      matInput
-      readonly
-      class="mfx-bs-picker__input"
-      [formControl]="bsInputControl"
-      [required]="isRequired"
-      placeholder="Select BS date"
-    />
-    <mat-icon matSuffix class="mfx-bs-picker__cal-icon">calendar_today</mat-icon>
+  <!-- ── Trigger form field: BS ─────────────────────────────────────────── -->
+  @if (mode === 'BS') {
+    <mat-form-field class="flex-fill" (click)="openPanel()">
+      <mat-label>{{ label }}</mat-label>
+      <input
+        matInput
+        readonly
+        class="mfx-bs-picker__input"
+        [formControl]="bsInputControl"
+        [required]="isRequired"
+        placeholder="Select BS date"
+      />
+      <!-- The BS | AD switch (fineract-dbug ADR 0020) -->
+      <span matSuffix class="mfx-cal-switch" role="group" [attr.aria-label]="label + ': calendar'">
+        <button
+          type="button"
+          [class.mfx-cal-switch--on]="mode === 'BS'"
+          [attr.aria-pressed]="mode === 'BS'"
+          [disabled]="isDisabled"
+          (click)="setMode('BS', $event)"
+        >
+          BS
+        </button>
+        <button
+          type="button"
+          [class.mfx-cal-switch--on]="mode === 'AD'"
+          [attr.aria-pressed]="mode === 'AD'"
+          [disabled]="isDisabled"
+          (click)="setMode('AD', $event)"
+        >
+          AD
+        </button>
+      </span>
+      <mat-icon matSuffix class="mfx-bs-picker__cal-icon">calendar_today</mat-icon>
+      <mat-hint>
+        {{ otherCalendarHint }}
+        @if (isProvisional) {
+          <span class="mfx-bs-picker__provisional">· provisional calendar</span>
+        }
+      </mat-hint>
 
-    @if (hasRequiredError) {
-      <mat-error>{{ label }} is <strong>required</strong></mat-error>
-    }
-  </mat-form-field>
+      @if (hasRequiredError) {
+        <mat-error>{{ label }} is <strong>required</strong></mat-error>
+      }
+    </mat-form-field>
+  } @else {
+    <!-- ── Trigger form field: AD (Material's own datepicker) ─────────────── -->
+    <mat-form-field class="flex-fill">
+      <mat-label>{{ label }}</mat-label>
+      <input
+        matInput
+        [matDatepicker]="adPicker"
+        [formControl]="adInputControl"
+        [required]="isRequired"
+        [min]="minDateAd"
+        [max]="maxDateAd"
+        (dateChange)="onAdChosen($event.value)"
+        (blur)="markTouched()"
+      />
+      <!-- The BS | AD switch (fineract-dbug ADR 0020) -->
+      <span matSuffix class="mfx-cal-switch" role="group" [attr.aria-label]="label + ': calendar'">
+        <button
+          type="button"
+          [class.mfx-cal-switch--on]="mode === 'BS'"
+          [attr.aria-pressed]="mode === 'BS'"
+          [disabled]="isDisabled"
+          (click)="setMode('BS', $event)"
+        >
+          BS
+        </button>
+        <button
+          type="button"
+          [class.mfx-cal-switch--on]="mode === 'AD'"
+          [attr.aria-pressed]="mode === 'AD'"
+          [disabled]="isDisabled"
+          (click)="setMode('AD', $event)"
+        >
+          AD
+        </button>
+      </span>
+      <mat-datepicker-toggle matSuffix [for]="adPicker"></mat-datepicker-toggle>
+      <mat-datepicker #adPicker></mat-datepicker>
+      @if (looksLikeBsYear) {
+        <mat-hint class="mfx-bs-picker__warning">
+          {{ selectedAd?.getFullYear() }} looks like a BS year.
+          <button type="button" class="mfx-bs-picker__link" (click)="setMode('BS', $event)">Switch to BS</button>
+        </mat-hint>
+      } @else if (isOutsideBsCalendar) {
+        <mat-hint>Outside the BS calendar ({{ minBsYear }}–{{ maxBsYear }} BS): kept in AD only</mat-hint>
+      } @else {
+        <mat-hint>
+          {{ otherCalendarHint }}
+          @if (isProvisional) {
+            <span class="mfx-bs-picker__provisional">· provisional calendar</span>
+          }
+        </mat-hint>
+      }
+
+      @if (hasRequiredError || adInputControl.hasError('required')) {
+        <mat-error>{{ label }} is <strong>required</strong></mat-error>
+      } @else if (adInputControl.hasError('matDatepickerMax')) {
+        <mat-error>{{ label }} can't be after {{ maxDateAd?.toLocaleDateString('en-GB') }}</mat-error>
+      } @else if (adInputControl.hasError('matDatepickerMin')) {
+        <mat-error>{{ label }} can't be before {{ minDateAd?.toLocaleDateString('en-GB') }}</mat-error>
+      } @else if (adInputControl.hasError('matDatepickerParse')) {
+        <mat-error>Type the date as day/month/year</mat-error>
+      }
+    </mat-form-field>
+  }
 
   <!-- ── Calendar panel ────────────────────────────────────────────────── -->
   @if (panelOpen) {
@@ -54,7 +146,7 @@
           <button
             type="button"
             class="mfx-bs-picker__header-btn"
-            (click)="setMode(pickerMode === 'months' ? 'days' : 'months')"
+            (click)="setPickerMode(pickerMode === 'months' ? 'days' : 'months')"
           >
             {{ nepaliMonths[viewMonth] }}
             <mat-icon class="mfx-bs-picker__header-chevron">{{
@@ -64,7 +156,7 @@
           <button
             type="button"
             class="mfx-bs-picker__header-btn"
-            (click)="setMode(pickerMode === 'years' ? 'days' : 'years')"
+            (click)="setPickerMode(pickerMode === 'years' ? 'days' : 'years')"
           >
             {{ viewYear }}
             <mat-icon class="mfx-bs-picker__header-chevron">{{
@@ -84,7 +176,12 @@
             <mat-icon>chevron_right</mat-icon>
           </button>
         } @else {
-          <button type="button" class="mfx-bs-picker__nav-btn" (click)="setMode('days')" aria-label="Close picker">
+          <button
+            type="button"
+            class="mfx-bs-picker__nav-btn"
+            (click)="setPickerMode('days')"
+            aria-label="Close picker"
+          >
             <mat-icon>close</mat-icon>
           </button>
         }

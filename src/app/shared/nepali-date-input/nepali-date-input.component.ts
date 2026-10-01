@@ -14,30 +14,19 @@ import {
   EventEmitter,
   HostListener,
   Input,
+  OnInit,
   Output,
   ViewChild,
+  effect,
   inject
 } from '@angular/core';
 import { ControlValueAccessor, NgControl, UntypedFormControl, Validators } from '@angular/forms';
-import NepaliDate from 'nepali-date-converter';
 import { MatIcon } from '@angular/material/icon';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { BS_MONTHS, BsCalendarService } from 'app/core/bs-calendar/bs-calendar.service';
+import { CalendarName, CalendarPreferenceService } from 'app/core/bs-calendar/calendar-preference.service';
 
 // Ported from Nepal-cms: packages/ui/src/components/BSDatePicker.tsx
-const NEPALI_MONTHS = [
-  'Baishakh',
-  'Jestha',
-  'Ashadh',
-  'Shrawan',
-  'Bhadra',
-  'Ashwin',
-  'Kartik',
-  'Mangsir',
-  'Poush',
-  'Magh',
-  'Falgun',
-  'Chaitra'
-];
 const WEEKDAYS = [
   'S',
   'M',
@@ -47,27 +36,9 @@ const WEEKDAYS = [
   'F',
   'S'
 ];
-const MIN_BS_YEAR = 2000;
-const MAX_BS_YEAR = 2089;
 
+/** A BS date inside this component. `month` is 0-indexed here (0 = Baishakh), unlike BsCalendarService. */
 type BsDate = { year: number; month: number; day: number };
-
-/**
- * How many days in a given BS (year, monthIdx)?
- * Probes 32→29 until NepaliDate round-trips cleanly.
- * Nepal months are irregular (29–32 days); nepali-date-converter holds the lookup table.
- */
-function daysInBSMonth(year: number, monthIdx: number): number {
-  for (let d = 32; d >= 29; d--) {
-    try {
-      const nd = new NepaliDate(year, monthIdx, d);
-      if (nd.getMonth() === monthIdx && nd.getDate() === d && nd.getYear() === year) return d;
-    } catch {
-      /* out-of-range — try shorter */
-    }
-  }
-  return 30;
-}
 
 /** A BsDate as 'YYYY-MM-DD', the form the backend stores and validates. Month is 0-indexed here. */
 function formatBs(bs: BsDate | null): string | null {
@@ -84,8 +55,11 @@ function compareBs(a: BsDate, b: BsDate): number {
   return 0;
 }
 
+const AD_FORMAT: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short', year: 'numeric' };
+
 /**
- * Nepali (BS) date picker — a ControlValueAccessor drop-in for mat-datepicker.
+ * Date field that takes a date in Bikram Sambat (BS) or AD (fineract-dbug ADR 0020): a ControlValueAccessor drop-in
+ * for mat-datepicker.
  *
  *   <mifosx-nepali-date-input
  *     class="flex-13"
@@ -94,11 +68,16 @@ function compareBs(a: BsDate, b: BsDate): number {
  *     [maxDate]="maxDate"
  *   />
  *
- * The parent FormControl receives a JS Date (same type as mat-datepicker),
- * so no backend or serialisation changes are needed.
+ * The parent FormControl always receives an AD JS Date (same type as mat-datepicker), whichever calendar was used.
+ * A small BS | AD switch in the field picks the calendar; it starts on the staff member's calendar setting, or on
+ * [calendar] when a form knows better (a passport is printed in AD). Below the field, the same date is shown in the
+ * other calendar, so it can be checked against the document.
  *
- * [minDate] and [maxDate] accept AD Date objects; they are converted to BS
- * internally and enforced on navigation, year select, and individual day buttons.
+ * Every conversion uses BsCalendarService, the server's own table, so nothing here can disagree with what the server
+ * stores. A date outside that table is kept in AD only, never guessed.
+ *
+ * [minDate] and [maxDate] accept AD Date objects; they are converted to BS internally and enforced on navigation,
+ * year select, and individual day buttons.
  */
 @Component({
   selector: 'mifosx-nepali-date-input',
@@ -111,35 +90,42 @@ function compareBs(a: BsDate, b: BsDate): number {
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class NepaliDateInputComponent implements ControlValueAccessor {
+export class NepaliDateInputComponent implements ControlValueAccessor, OnInit {
   @Input() label = 'Date (BS)';
 
   /**
-   * The selected BS date as 'YYYY-MM-DD', or null when cleared.
+   * The selected date in BS as 'YYYY-MM-DD', or null when cleared or outside the BS calendar.
    *
    * The FormControl still carries an AD Date, because that is what the rest of the form and the
-   * age calculation expect. This emits the BS date alongside it so the form can post the date the
-   * user actually picked rather than a date the browser converted. The server converts it back and
-   * rejects the request if the two disagree, so the browser's calendar table can never quietly
-   * become the source of truth.
+   * age calculation expect. This emits the BS date alongside it so the form can keep the date the
+   * user actually picked. The server converts it back and rejects it if the two disagree, so the
+   * browser can never quietly become the source of truth.
    */
   @Output() readonly bsDateChange = new EventEmitter<string | null>();
-  @Input() minBsYear = MIN_BS_YEAR;
-  @Input() maxBsYear = MAX_BS_YEAR;
+
+  /** Which calendar the date was entered in, each time one is chosen: keep a BS original only for 'BS'. */
+  @Output() readonly calendarUsed = new EventEmitter<CalendarName>();
+
+  /** Start in this calendar instead of the staff member's setting, for example 'AD' for a passport. */
+  @Input() calendar: CalendarName | null = null;
 
   // ── minDate / maxDate (AD) — converted to BS for internal use ─────────────
 
   private minBs: BsDate | null = null;
   private maxBs: BsDate | null = null;
+  minDateAd: Date | null = null;
+  maxDateAd: Date | null = null;
 
   @Input()
   set minDate(value: Date | null | undefined) {
+    this.minDateAd = value ?? null;
     this.minBs = value ? this.adToBs(value) : null;
     this.cdr.markForCheck();
   }
 
   @Input()
   set maxDate(value: Date | null | undefined) {
+    this.maxDateAd = value ?? null;
     this.maxBs = value ? this.adToBs(value) : null;
     this.cdr.markForCheck();
   }
@@ -149,9 +135,16 @@ export class NepaliDateInputComponent implements ControlValueAccessor {
 
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly el = inject(ElementRef);
+  private readonly bsCalendar = inject(BsCalendarService);
+  private readonly preference = inject(CalendarPreferenceService);
 
-  readonly nepaliMonths = NEPALI_MONTHS;
+  readonly nepaliMonths = BS_MONTHS;
   readonly weekdays = WEEKDAYS;
+
+  /** The calendar the field is showing. */
+  mode: CalendarName = 'BS';
+  /** Set once the staff member flips the switch, so a late-loading setting doesn't flip it back. */
+  private modeChosen = false;
 
   panelOpen = false;
   panelTop = 0;
@@ -163,17 +156,18 @@ export class NepaliDateInputComponent implements ControlValueAccessor {
   dayNumbers: number[] = [];
 
   selectedBs: BsDate | null = null;
-  adPreview: string | null = null;
+  selectedAd: Date | null = null;
 
-  /** Read-only display input; user interacts only via the calendar panel */
+  /** Read-only display input for BS; user interacts only via the calendar panel */
   readonly bsInputControl = new UntypedFormControl('');
+  /** Material datepicker input for AD */
+  readonly adInputControl = new UntypedFormControl(null);
 
   @ViewChild('wrapper') wrapperRef!: ElementRef<HTMLElement>;
   @ViewChild('yearList') yearListRef?: ElementRef<HTMLElement>;
 
   pickerMode: 'days' | 'months' | 'years' = 'days';
 
-  private readonly today = new NepaliDate();
   private onChange: (value: Date | null) => void = () => {};
   private onTouched: () => void = () => {};
 
@@ -181,13 +175,33 @@ export class NepaliDateInputComponent implements ControlValueAccessor {
     if (this.ngControl) {
       this.ngControl.valueAccessor = this;
     }
-    const now = new NepaliDate();
-    this.viewYear = now.getYear();
-    this.viewMonth = now.getMonth();
+    const today = this.todayBsInternal();
+    this.viewYear = today?.year ?? this.bsCalendar.maxYear;
+    this.viewMonth = today?.month ?? 0;
     this.recomputeCalendar();
+    // Follow the calendar setting (it loads after sign-in) until the staff member flips the switch themselves.
+    effect(() => {
+      const preferred = this.preference.calendar();
+      if (!this.modeChosen) {
+        this.mode = this.calendar ?? preferred;
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  ngOnInit(): void {
+    if (this.calendar) this.mode = this.calendar;
   }
 
   // ── Derived state ──────────────────────────────────────────────────────────
+
+  get minBsYear(): number {
+    return this.bsCalendar.minYear;
+  }
+
+  get maxBsYear(): number {
+    return this.bsCalendar.maxYear;
+  }
 
   get yearRange(): number[] {
     const lo = this.minBs?.year ?? this.minBsYear;
@@ -226,6 +240,36 @@ export class NepaliDateInputComponent implements ControlValueAccessor {
     return this.bsInputControl.disabled;
   }
 
+  /** The same date in the other calendar, shown under the field. */
+  get otherCalendarHint(): string {
+    if (!this.selectedAd) return '';
+    if (this.mode === 'BS') {
+      return `= ${this.selectedAd.toLocaleDateString('en-GB', AD_FORMAT)} AD`;
+    }
+    return this.selectedBs
+      ? `= ${this.selectedBs.day} ${BS_MONTHS[this.selectedBs.month]} ${this.selectedBs.year} BS`
+      : '';
+  }
+
+  /** The BS year's calendar is a projection that may still be corrected. */
+  get isProvisional(): boolean {
+    return !!this.selectedBs && this.bsCalendar.isProvisional(this.selectedBs.year);
+  }
+
+  /** An AD date the BS calendar doesn't cover: it is kept in AD only. */
+  get isOutsideBsCalendar(): boolean {
+    return !!this.selectedAd && !this.selectedBs;
+  }
+
+  /** A year like 2081 in AD mode is almost certainly a BS year typed into the wrong calendar. */
+  get looksLikeBsYear(): boolean {
+    return (
+      this.mode === 'AD' &&
+      !!this.selectedAd &&
+      this.selectedAd.getFullYear() >= this.bsCalendar.todayInNepal().getFullYear() + 40
+    );
+  }
+
   /** True when the calendar day should be greyed out and not selectable. */
   isDayDisabled(day: number): boolean {
     const candidate: BsDate = { year: this.viewYear, month: this.viewMonth, day };
@@ -236,14 +280,21 @@ export class NepaliDateInputComponent implements ControlValueAccessor {
 
   /** Today button is disabled when today falls outside the allowed range. */
   get isTodayDisabled(): boolean {
-    const todayBs: BsDate = {
-      year: this.today.getYear(),
-      month: this.today.getMonth(),
-      day: this.today.getDate()
-    };
+    const todayBs = this.todayBsInternal();
+    if (!todayBs) return true;
     if (this.minBs && compareBs(todayBs, this.minBs) < 0) return true;
     if (this.maxBs && compareBs(todayBs, this.maxBs) > 0) return true;
     return false;
+  }
+
+  // ── Calendar switch ────────────────────────────────────────────────────────
+
+  setMode(calendar: CalendarName, event?: Event): void {
+    event?.stopPropagation();
+    this.modeChosen = true;
+    this.mode = calendar;
+    this.panelOpen = false;
+    this.cdr.markForCheck();
   }
 
   // ── ControlValueAccessor ───────────────────────────────────────────────────
@@ -266,8 +317,36 @@ export class NepaliDateInputComponent implements ControlValueAccessor {
   }
 
   setDisabledState(isDisabled: boolean): void {
-    isDisabled ? this.bsInputControl.disable() : this.bsInputControl.enable();
+    if (isDisabled) {
+      this.bsInputControl.disable();
+      this.adInputControl.disable();
+    } else {
+      this.bsInputControl.enable();
+      this.adInputControl.enable();
+    }
     this.cdr.markForCheck();
+  }
+
+  // ── AD mode ────────────────────────────────────────────────────────────────
+
+  /** A date chosen or typed in the AD datepicker. */
+  onAdChosen(value: Date | null): void {
+    if (!value || isNaN(value.getTime())) {
+      this.clearState(true);
+      return;
+    }
+    const adDate = new Date(value.getFullYear(), value.getMonth(), value.getDate());
+    this.selectedAd = adDate;
+    this.selectedBs = this.adToBs(adDate);
+    this.bsInputControl.setValue(this.selectedBs ? this.formatBsDisplay(this.selectedBs) : '', { emitEvent: false });
+    this.onChange(adDate);
+    this.bsDateChange.emit(formatBs(this.selectedBs));
+    this.calendarUsed.emit('AD');
+    this.cdr.markForCheck();
+  }
+
+  markTouched(): void {
+    this.onTouched();
   }
 
   // ── Panel open/close ───────────────────────────────────────────────────────
@@ -364,7 +443,7 @@ export class NepaliDateInputComponent implements ControlValueAccessor {
 
   // ── Picker mode (month / year grid views) ──────────────────────────────────
 
-  setMode(mode: 'days' | 'months' | 'years'): void {
+  setPickerMode(mode: 'days' | 'months' | 'years'): void {
     this.pickerMode = mode;
     this.cdr.markForCheck();
     if (mode === 'years') {
@@ -410,19 +489,17 @@ export class NepaliDateInputComponent implements ControlValueAccessor {
 
   selectDay(day: number): void {
     if (this.isDayDisabled(day)) return; // guard against keyboard/programmatic calls
-    const nd = new NepaliDate(this.viewYear, this.viewMonth, day);
-    const adDate = nd.toJsDate();
+    const adDate = this.bsCalendar.toAd({ year: this.viewYear, month: this.viewMonth + 1, day });
+    if (!adDate) return;
 
     this.selectedBs = { year: this.viewYear, month: this.viewMonth, day };
+    this.selectedAd = adDate;
     this.bsInputControl.setValue(this.formatBsDisplay(this.selectedBs), { emitEvent: false });
-    this.adPreview = adDate.toLocaleDateString('en-GB', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric'
-    });
+    this.adInputControl.setValue(adDate, { emitEvent: false });
 
     this.onChange(adDate);
     this.bsDateChange.emit(formatBs(this.selectedBs));
+    this.calendarUsed.emit('BS');
     this.closePanel();
   }
 
@@ -433,11 +510,12 @@ export class NepaliDateInputComponent implements ControlValueAccessor {
 
   selectToday(): void {
     if (this.isTodayDisabled) return;
-    const now = new NepaliDate();
-    this.viewYear = now.getYear();
-    this.viewMonth = now.getMonth();
+    const today = this.todayBsInternal();
+    if (!today) return;
+    this.viewYear = today.year;
+    this.viewMonth = today.month;
     this.recomputeCalendar();
-    this.selectDay(now.getDate());
+    this.selectDay(today.day);
   }
 
   isSelected(day: number): boolean {
@@ -450,65 +528,58 @@ export class NepaliDateInputComponent implements ControlValueAccessor {
   }
 
   isToday(day: number): boolean {
-    return (
-      this.today.getYear() === this.viewYear && this.today.getMonth() === this.viewMonth && this.today.getDate() === day
-    );
+    const today = this.todayBsInternal();
+    return !!today && today.year === this.viewYear && today.month === this.viewMonth && today.day === day;
   }
 
   // ── Private helpers ────────────────────────────────────────────────────────
 
-  /**
-   * 'D MMMM YYYY' using NEPALI_MONTHS, not NepaliDate's own .format() - the
-   * library's built-in month names spell this month "Aswin", which read
-   * inconsistently next to NEPALI_MONTHS' "Ashwin" (used by ad-to-bs.pipe.ts
-   * elsewhere in the app for the same date).
-   */
+  /** 'D MMMM YYYY' with the app's month names ("Ashwin", as everywhere else in the app). */
   private formatBsDisplay(bs: BsDate): string {
-    return `${bs.day} ${NEPALI_MONTHS[bs.month]} ${bs.year}`;
+    return `${bs.day} ${BS_MONTHS[bs.month]} ${bs.year}`;
   }
 
-  private adToBs(date: Date): BsDate | null {
-    try {
-      const nd = new NepaliDate(date);
-      return { year: nd.getYear(), month: nd.getMonth(), day: nd.getDate() };
-    } catch {
-      return null;
-    }
+  /** The BS date (0-indexed month) for an AD date, or null when the BS calendar doesn't cover it. */
+  private adToBs(date: Date | string): BsDate | null {
+    const bs = this.bsCalendar.toBs(date);
+    return bs ? { year: bs.year, month: bs.month - 1, day: bs.day } : null;
+  }
+
+  private todayBsInternal(): BsDate | null {
+    const bs = this.bsCalendar.todayBs();
+    return bs ? { year: bs.year, month: bs.month - 1, day: bs.day } : null;
   }
 
   private recomputeCalendar(): void {
-    const days = daysInBSMonth(this.viewYear, this.viewMonth);
-    const firstWeekday = new NepaliDate(this.viewYear, this.viewMonth, 1).toJsDate().getDay();
-    this.emptySlots = Array(firstWeekday).fill(null);
+    const days = this.bsCalendar.daysInMonth(this.viewYear, this.viewMonth + 1) ?? 30;
+    const firstDay = this.bsCalendar.toAd({ year: this.viewYear, month: this.viewMonth + 1, day: 1 });
+    this.emptySlots = Array(firstDay ? firstDay.getDay() : 0).fill(null);
     this.dayNumbers = Array.from({ length: days }, (_, i) => i + 1);
   }
 
   private syncFromAd(adDate: Date | string): void {
-    try {
-      const jsDate = adDate instanceof Date ? adDate : new Date(adDate as string);
-      if (isNaN(jsDate.getTime())) return;
-      const nd = new NepaliDate(jsDate);
-
-      this.selectedBs = { year: nd.getYear(), month: nd.getMonth(), day: nd.getDate() };
-      this.viewYear = nd.getYear();
-      this.viewMonth = nd.getMonth();
+    const jsDate = adDate instanceof Date ? adDate : new Date(adDate as string);
+    if (isNaN(jsDate.getTime())) return;
+    this.selectedAd = new Date(jsDate.getFullYear(), jsDate.getMonth(), jsDate.getDate());
+    this.adInputControl.setValue(this.selectedAd, { emitEvent: false });
+    this.selectedBs = this.adToBs(this.selectedAd);
+    if (this.selectedBs) {
+      this.viewYear = this.selectedBs.year;
+      this.viewMonth = this.selectedBs.month;
       this.bsInputControl.setValue(this.formatBsDisplay(this.selectedBs), { emitEvent: false });
-      this.adPreview = jsDate.toLocaleDateString('en-GB', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric'
-      });
       this.recomputeCalendar();
-      this.bsDateChange.emit(formatBs(this.selectedBs));
-    } catch {
-      // AD date outside NepaliDate supported range — leave display empty
+    } else {
+      // Outside the BS calendar: shown in AD only, never guessed.
+      this.bsInputControl.setValue('', { emitEvent: false });
     }
+    this.bsDateChange.emit(formatBs(this.selectedBs));
   }
 
   private clearState(emitChange: boolean): void {
     this.selectedBs = null;
-    this.adPreview = null;
+    this.selectedAd = null;
     this.bsInputControl.setValue('', { emitEvent: false });
+    this.adInputControl.setValue(null, { emitEvent: false });
     if (emitChange) this.onChange(null);
     this.bsDateChange.emit(null);
   }

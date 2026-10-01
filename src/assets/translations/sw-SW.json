@@ -4909,5 +4909,16 @@
       "Email already used": "Another staff member already uses this email address",
       "New email must be verified": "The user will have to verify the new address before signing in again"
     }
+  },
+  "bsCalendar": {
+    "Calendar": "Calendar",
+    "Show and enter dates in": "Show and enter dates in",
+    "Cooperative default": "Cooperative default",
+    "Bikram Sambat (BS)": "Bikram Sambat (BS)",
+    "Gregorian (AD)": "Gregorian (AD)",
+    "Separate from the language": "Separate from the language: English with BS dates is fine",
+    "Default calendar for this cooperative": "Default calendar for this cooperative",
+    "Used by staff who have not chosen their own": "Used by staff who haven't chosen their own",
+    "Saved": "Calendar saved."
   }
 }
