@@ -5029,5 +5029,13 @@
     "Default calendar for this cooperative": "Default calendar for this cooperative",
     "Used by staff who have not chosen their own": "Used by staff who haven't chosen their own",
     "Saved": "Calendar saved."
+  },
+  "bsDates": {
+    "Issue Date": "Issue Date",
+    "Expiry Date": "Expiry Date",
+    "Issue date after expiry date": "The issue date can't be after the expiry date",
+    "Issued": "Issued",
+    "Expires": "Expires",
+    "Expired": "Expired"
   }
 }

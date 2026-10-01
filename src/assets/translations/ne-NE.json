@@ -4923,5 +4923,13 @@
     "Default calendar for this cooperative": "यस सहकारीको पूर्वनिर्धारित पात्रो",
     "Used by staff who have not chosen their own": "आफ्नै पात्रो नछानेका कर्मचारीले यही प्रयोग गर्छन्",
     "Saved": "पात्रो सुरक्षित भयो।"
+  },
+  "bsDates": {
+    "Issue Date": "जारी मिति",
+    "Expiry Date": "म्याद सकिने मिति",
+    "Issue date after expiry date": "जारी मिति म्याद सकिने मितिभन्दा पछि हुन सक्दैन",
+    "Issued": "जारी",
+    "Expires": "म्याद सकिने",
+    "Expired": "म्याद सकिएको"
   }
 }

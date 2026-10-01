@@ -136,6 +136,8 @@
       [label]="getDateLabel(createClientForm.value.legalFormId, ['Date of Birth', 'Incorporation Date'])"
       formControlName="dateOfBirth"
       [maxDate]="maxDate"
+      (bsDateChange)="dateOfBirthBsValue = $event"
+      (calendarUsed)="dateOfBirthCalendar = $event"
     />
 
     @if (createClientForm.get('clientNonPersonDetails')) {

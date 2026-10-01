@@ -56,6 +56,14 @@ import { NepaliDateInputComponent } from 'app/shared/nepali-date-input/nepali-da
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ClientGeneralStepComponent implements OnInit {
+  /** The date of birth in BS as typed (fineract-dbug ADR 0020), kept only when it was entered in BS. */
+  dateOfBirthBsValue: string | null = null;
+  dateOfBirthCalendar: 'BS' | 'AD' | null = null;
+
+  get dateOfBirthBs(): string | null {
+    return this.dateOfBirthCalendar === 'BS' ? this.dateOfBirthBsValue : null;
+  }
+
   private formBuilder = inject(FormBuilder);
   private dateUtils = inject(Dates);
   private settingsService = inject(SettingsService);

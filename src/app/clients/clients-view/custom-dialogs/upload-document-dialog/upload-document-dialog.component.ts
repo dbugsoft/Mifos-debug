@@ -23,17 +23,22 @@ import {
   MatDialogClose
 } from '@angular/material/dialog';
 import {
+  AbstractControl,
   FormControl,
   FormGroup,
   FormBuilder,
   FormGroupDirective,
   NgForm,
+  ValidationErrors,
+  ValidatorFn,
   Validators,
   ReactiveFormsModule
 } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material/core';
 import { FileUploadComponent } from '../../../../shared/file-upload/file-upload.component';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { NepaliDateInputComponent } from 'app/shared/nepali-date-input/nepali-date-input.component';
+import { CalendarName } from 'app/core/bs-calendar/calendar-preference.service';
 import { TranslateService } from '@ngx-translate/core';
 
 /**
@@ -52,6 +57,21 @@ class ServerErrorStateMatcher implements ErrorStateMatcher {
   }
 }
 
+/** The API's [year, month, day] (or an ISO string) as a local Date, for the date fields. */
+function toDate(value: number[] | string | null | undefined): Date | null {
+  if (!value) return null;
+  if (Array.isArray(value)) return new Date(value[0], value[1] - 1, value[2]);
+  const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(value);
+  return match ? new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3])) : null;
+}
+
+/** An issue date after the expiry date is refused on the form. */
+const issueNotAfterExpiry: ValidatorFn = (group: AbstractControl): ValidationErrors | null => {
+  const issued: Date | null = group.get('issuanceDate')?.value;
+  const expires: Date | null = group.get('expiryDate')?.value;
+  return issued && expires && issued.getTime() > expires.getTime() ? { issueAfterExpiry: true } : null;
+};
+
 @Component({
   selector: 'mifosx-upload-document-dialog',
   templateUrl: './upload-document-dialog.component.html',
@@ -61,11 +81,20 @@ class ServerErrorStateMatcher implements ErrorStateMatcher {
     MatDialogTitle,
     FileUploadComponent,
     MatDialogActions,
-    MatDialogClose
+    MatDialogClose,
+    NepaliDateInputComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class UploadDocumentDialogComponent implements OnInit {
+  /** Each date in BS and the calendar it was entered in (fineract-dbug ADR 0020). */
+  issuanceDateBs: string | null = null;
+  expiryDateBs: string | null = null;
+  issuanceCalendar: CalendarName | null = null;
+  expiryCalendar: CalendarName | null = null;
+  /** An issue date can't be in the future. */
+  readonly today = new Date();
+
   dialogRef = inject<MatDialogRef<UploadDocumentDialogComponent>>(MatDialogRef);
   private formBuilder = inject(FormBuilder);
   private translateService = inject(TranslateService);
@@ -130,36 +159,46 @@ export class UploadDocumentDialogComponent implements OnInit {
       // it and a new file is optional (document upload is unchanged
       // for now, so editing must not require re-selecting a file).
       const identity = this.identity;
-      this.uploadDocumentForm = this.formBuilder.group({
-        documentTypeId: [
-          identity ? identity.documentType?.id : '',
-          Validators.required
-        ],
-        status: [
-          identity ? (identity.status === 'clientIdentifierStatusType.active' ? 'Active' : 'Inactive') : 'Active',
-          Validators.required
-        ],
-        documentKey: [
-          identity ? identity.documentKey : '',
-          Validators.required
-        ],
-        description: [identity ? identity.description : ''],
-        fileName: [
-          identity ? identity.documents?.[0]?.name || identity.documents?.[0]?.fileName || '' : '',
-          identity ? [] : Validators.required
-        ],
-        file: ['']
-      });
+      this.uploadDocumentForm = this.formBuilder.group(
+        {
+          documentTypeId: [
+            identity ? identity.documentType?.id : '',
+            Validators.required
+          ],
+          status: [
+            identity ? (identity.status === 'clientIdentifierStatusType.active' ? 'Active' : 'Inactive') : 'Active',
+            Validators.required
+          ],
+          documentKey: [
+            identity ? identity.documentKey : '',
+            Validators.required
+          ],
+          description: [identity ? identity.description : ''],
+          issuanceDate: [toDate(identity?.issuanceDate)],
+          expiryDate: [toDate(identity?.expiryDate)],
+          fileName: [
+            identity ? identity.documents?.[0]?.name || identity.documents?.[0]?.fileName || '' : '',
+            identity ? [] : Validators.required
+          ],
+          file: ['']
+        },
+        { validators: issueNotAfterExpiry }
+      );
     } else {
       // Standard document upload form
-      this.uploadDocumentForm = this.formBuilder.group({
-        fileName: [
-          '',
-          Validators.required
-        ],
-        description: [''],
-        file: ['']
-      });
+      this.uploadDocumentForm = this.formBuilder.group(
+        {
+          fileName: [
+            '',
+            Validators.required
+          ],
+          description: [''],
+          issuanceDate: [null],
+          expiryDate: [null],
+          file: ['']
+        },
+        { validators: issueNotAfterExpiry }
+      );
     }
   }
 
@@ -186,7 +225,9 @@ export class UploadDocumentDialogComponent implements OnInit {
     'documentTypeId',
     'documentKey',
     'status',
-    'description'
+    'description',
+    'issuanceDate',
+    'expiryDate'
   ];
 
   /**
@@ -201,14 +242,26 @@ export class UploadDocumentDialogComponent implements OnInit {
    */
   onSubmitClick(): void {
     if (!this.documentIdentifier) {
-      this.dialogRef.close(this.uploadDocumentForm.value);
+      this.dialogRef.close(this.valueWithBsDates());
       return;
     }
 
     this.serverError = null;
     this.serverErrorFields.forEach((name) => this.uploadDocumentForm.get(name)?.updateValueAndValidity());
 
-    this.submitted.emit(this.uploadDocumentForm.value);
+    this.submitted.emit(this.valueWithBsDates());
+  }
+
+  /**
+   * The form value plus each date in BS (fineract-dbug ADR 0020): the BS date to keep, or null when it was typed in AD
+   * (an AD-typed date has no BS original) or is outside the BS calendar.
+   */
+  private valueWithBsDates(): any {
+    return {
+      ...this.uploadDocumentForm.value,
+      issuanceDateBs: this.issuanceCalendar === 'AD' ? null : this.issuanceDateBs,
+      expiryDateBs: this.expiryCalendar === 'AD' ? null : this.expiryDateBs
+    };
   }
 
   /**
