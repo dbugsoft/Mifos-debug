@@ -1,0 +1,192 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+:host {
+  display: block;
+}
+
+.actions,
+.action__items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.action {
+  border-bottom: 1px solid var(--viz-grid);
+
+  &:last-child {
+    border-bottom: 0;
+  }
+}
+
+.action__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 4px;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 8px;
+
+  &:hover:not(:disabled) {
+    background: var(--coop-hover);
+  }
+
+  &:disabled {
+    cursor: default;
+  }
+}
+
+.action--empty .action__head {
+  opacity: 0.55;
+}
+
+.action__icon {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.action__icon--urgent {
+  color: var(--coop-bad-ink);
+  background: var(--coop-bad-soft);
+}
+
+.action__icon--soon {
+  color: var(--coop-warn-ink);
+  background: var(--coop-warn-soft);
+}
+
+.action__icon--info {
+  color: var(--coop-accent);
+  background: var(--coop-accent-soft);
+}
+
+.action__text {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.action__title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--viz-ink);
+}
+
+.action__sub {
+  font-size: 12px;
+  color: var(--viz-muted);
+}
+
+.action__count {
+  min-width: 28px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.action__count--urgent {
+  color: var(--coop-bad-ink);
+  background: var(--coop-bad-soft);
+}
+
+.action__count--soon {
+  color: var(--coop-warn-ink);
+  background: var(--coop-warn-soft);
+}
+
+.action__count--info {
+  color: var(--coop-accent);
+  background: var(--coop-accent-soft);
+}
+
+.action__chevron {
+  font-size: 11px;
+  color: var(--viz-muted);
+  width: 12px;
+}
+
+.action__items {
+  padding: 0 0 8px 40px;
+}
+
+.item {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 8px;
+  border-radius: 8px;
+  color: inherit;
+  text-decoration: none;
+
+  &:hover {
+    background: var(--coop-hover);
+  }
+}
+
+.item__main,
+.item__side {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.item__side {
+  align-items: flex-end;
+  text-align: right;
+  flex: 0 0 auto;
+}
+
+.item__name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--coop-accent);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.item__detail,
+.item__date {
+  font-size: 12px;
+  color: var(--viz-muted);
+}
+
+.item__date--expired {
+  color: var(--coop-bad-ink);
+  font-weight: 600;
+}
+
+.item__amount {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--viz-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.action__more {
+  padding: 4px 8px;
+  font-size: 12px;
+  color: var(--viz-muted);
+}

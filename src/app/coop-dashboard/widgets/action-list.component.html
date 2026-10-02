@@ -1,0 +1,74 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<ul class="actions">
+  @for (g of ordered; track g.code) {
+    <li class="action" [class.action--open]="open() === g.code" [class.action--empty]="!g.count">
+      <button
+        type="button"
+        class="action__head"
+        (click)="toggle(g.code)"
+        [disabled]="!g.count"
+        [attr.aria-expanded]="open() === g.code"
+      >
+        <span class="action__icon action__icon--{{ g.tone }}"><fa-icon [icon]="g.icon"></fa-icon></span>
+        <span class="action__text">
+          <span class="action__title">{{ 'coopDashboard.actions.' + g.code | translate }}</span>
+          @if (g.amount) {
+            <span class="action__sub">NPR {{ short(g.amount) }}</span>
+          }
+        </span>
+        <span class="action__count action__count--{{ g.tone }}">{{ grouped(g.count) }}</span>
+        @if (g.count) {
+          <fa-icon class="action__chevron" [icon]="open() === g.code ? 'chevron-down' : 'chevron-right'"></fa-icon>
+        }
+      </button>
+      @if (open() === g.code && g.items.length) {
+        <ul class="action__items">
+          @for (item of g.items; track item.id) {
+            <li>
+              <a class="item" [routerLink]="link(item, g.code)">
+                <span class="item__main">
+                  <span class="item__name">{{ item.clientName }}</span>
+                  <span class="item__detail">
+                    @if (g.code === 'KYC_INCOMPLETE') {
+                      {{ 'coopDashboard.missing.' + item.detail | translate }}
+                    } @else {
+                      {{ item.detail }}
+                    }
+                    @if (item.accountNo && item.entity !== 'client') {
+                      · {{ item.accountNo }}
+                    }
+                  </span>
+                </span>
+                <span class="item__side">
+                  @if (hasAmount(item)) {
+                    <span class="item__amount">{{ short(item.amount) }}</span>
+                  }
+                  @if (item.date) {
+                    <span class="item__date" [class.item__date--expired]="expired(item, g.code)">
+                      @if (expired(item, g.code)) {
+                        {{ 'coopDashboard.Expired' | translate }} ·
+                      }
+                      <mifosx-dual-date [date]="item.date"></mifosx-dual-date>
+                    </span>
+                  }
+                </span>
+              </a>
+            </li>
+          }
+          @if (g.count > g.items.length) {
+            <li class="action__more">
+              {{ 'coopDashboard.and more' | translate: { count: grouped(g.count - g.items.length) } }}
+            </li>
+          }
+        </ul>
+      }
+    </li>
+  }
+</ul>
