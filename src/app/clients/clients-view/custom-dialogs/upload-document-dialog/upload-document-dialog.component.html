@@ -105,6 +105,28 @@
           </mat-error>
         }
       </mat-form-field>
+
+      <!-- Issue and expiry dates, BS or AD (fineract-dbug ADR 0020) -->
+      <div class="document-dates">
+        <mifosx-nepali-date-input
+          class="flex-fill"
+          [label]="'bsDates.Issue Date' | translate"
+          formControlName="issuanceDate"
+          [maxDate]="today"
+          (bsDateChange)="issuanceDateBs = $event"
+          (calendarUsed)="issuanceCalendar = $event"
+        />
+        <mifosx-nepali-date-input
+          class="flex-fill"
+          [label]="'bsDates.Expiry Date' | translate"
+          formControlName="expiryDate"
+          (bsDateChange)="expiryDateBs = $event"
+          (calendarUsed)="expiryCalendar = $event"
+        />
+      </div>
+      @if (uploadDocumentForm.hasError('issueAfterExpiry')) {
+        <mat-error class="document-dates__error">{{ 'bsDates.Issue date after expiry date' | translate }}</mat-error>
+      }
     }
 
     @if (!documentIdentifier) {
@@ -126,6 +148,28 @@
         <mat-label>{{ 'labels.inputs.Description' | translate }}</mat-label>
         <input formControlName="description" matInput />
       </mat-form-field>
+
+      <!-- Issue and expiry dates, BS or AD (fineract-dbug ADR 0020) -->
+      <div class="document-dates">
+        <mifosx-nepali-date-input
+          class="flex-fill"
+          [label]="'bsDates.Issue Date' | translate"
+          formControlName="issuanceDate"
+          [maxDate]="today"
+          (bsDateChange)="issuanceDateBs = $event"
+          (calendarUsed)="issuanceCalendar = $event"
+        />
+        <mifosx-nepali-date-input
+          class="flex-fill"
+          [label]="'bsDates.Expiry Date' | translate"
+          formControlName="expiryDate"
+          (bsDateChange)="expiryDateBs = $event"
+          (calendarUsed)="expiryCalendar = $event"
+        />
+      </div>
+      @if (uploadDocumentForm.hasError('issueAfterExpiry')) {
+        <mat-error class="document-dates__error">{{ 'bsDates.Issue date after expiry date' | translate }}</mat-error>
+      }
     }
 
     <mifosx-file-upload

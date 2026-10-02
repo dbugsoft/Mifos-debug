@@ -132,7 +132,7 @@ export class CoopDocumentsComponent implements OnInit, OnDestroy {
   // FILE SIZE
   // =====================================================
 
-  readonly maxFileSize = 10 * 1024 * 1024; // 10 MB
+  readonly maxFileSize = 5 * 1024 * 1024; // 5 MB
 
   // =====================================================
   // NAVIGATION
@@ -207,13 +207,15 @@ export class CoopDocumentsComponent implements OnInit, OnDestroy {
       },
 
       error: (error) => {
-        console.error('[Documents] Failed to load document types:', error);
+        this.isUploading = false;
+        console.error('[Documents] Upload failed:', error);
 
-        this.documentTypes = [];
-
-        this.hasLoadError = true;
-
-        this.documentsLoading = false;
+        if (error.status === 413) {
+          this.fileErrors['_general'] =
+            'The selected file is larger than the 5 MB limit. Please choose a smaller file and try again.';
+        } else {
+          this.fileErrors['_general'] = 'Failed to upload documents. Please try again.';
+        }
 
         this.changeDetectorRef.detectChanges();
       }
@@ -470,7 +472,7 @@ export class CoopDocumentsComponent implements OnInit, OnDestroy {
     // ===================================================
 
     if (file.size > this.maxFileSize) {
-      this.fileErrors[code] = 'File size must not exceed 10 MB.';
+      this.fileErrors[code] = 'File size must be below 5 MB.';
 
       this.selectedFiles[code] = null;
 

@@ -17,7 +17,7 @@ import { MatDialog } from '@angular/material/dialog';
 /** Custom Imports */
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { DateFormatPipe } from '../../../pipes/date-format.pipe';
-import { AdToBsPipe } from '../../../pipes/ad-to-bs.pipe';
+import { DualDateComponent } from '../../../shared/dual-date/dual-date.component';
 import { LegalFormId } from 'app/clients/models/legal-form.enum';
 import { ClientsService } from 'app/clients/clients.service';
 import { MatIcon } from '@angular/material/icon';
@@ -78,7 +78,7 @@ interface ClientViewData {
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
     DateFormatPipe,
-    AdToBsPipe,
+    DualDateComponent,
     MatIcon
   ],
   changeDetection: ChangeDetectionStrategy.OnPush

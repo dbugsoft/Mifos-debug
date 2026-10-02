@@ -17,3 +17,20 @@
   color: $msg-danger;
   font-size: 0.875rem;
 }
+
+// Issue and expiry dates side by side, stacked on a phone (fineract-dbug ADR 0020)
+.document-dates {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 16px;
+
+  mifosx-nepali-date-input {
+    flex: 1 1 220px;
+  }
+}
+
+.document-dates__error {
+  display: block;
+  margin: -8px 0 12px;
+  font-size: 0.75rem;
+}

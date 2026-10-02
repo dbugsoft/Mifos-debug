@@ -303,3 +303,50 @@
     }
   }
 }
+
+// ── BS | AD switch and hints (fineract-dbug ADR 0020) ─────────────────────
+.mfx-cal-switch {
+  display: inline-flex;
+  margin-right: 8px;
+  border: 1px solid var(--mat-sys-outline-variant, #bdbdbd);
+  border-radius: 12px;
+  overflow: hidden;
+  vertical-align: middle;
+
+  button {
+    padding: 2px 8px;
+    border: 0;
+    background: transparent;
+    color: var(--mat-sys-on-surface-variant, #616161);
+    font: 600 11px/1.4 inherit;
+    cursor: pointer;
+
+    &:disabled {
+      cursor: default;
+      opacity: 0.5;
+    }
+  }
+
+  .mfx-cal-switch--on {
+    background: var(--mat-sys-primary, #1074b9);
+    color: var(--mat-sys-on-primary, #fff);
+  }
+}
+
+.mfx-bs-picker__provisional {
+  font-style: italic;
+}
+
+.mfx-bs-picker__warning {
+  color: var(--mat-sys-error, #d32f2f);
+}
+
+.mfx-bs-picker__link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--mat-sys-primary, #1074b9);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}

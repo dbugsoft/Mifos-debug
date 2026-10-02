@@ -22,6 +22,10 @@ import { MatDivider } from '@angular/material/divider';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { NepaliDateInputComponent } from 'app/shared/nepali-date-input/nepali-date-input.component';
+import { MemberBsDatesService } from '../member-bs-dates.service';
+import { of } from 'rxjs';
+import { catchError, switchMap } from 'rxjs/operators';
 
 /**
  * Edit Client Component
@@ -35,7 +39,8 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     ...STANDALONE_SHARED_IMPORTS,
     MatDivider,
     CdkTextareaAutosize,
-    MatCheckbox
+    MatCheckbox,
+    NepaliDateInputComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -44,10 +49,15 @@ export class EditClientComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private clientsService = inject(ClientsService);
+  private memberBsDates = inject(MemberBsDatesService);
   private dateUtils = inject(Dates);
   private settingsService = inject(SettingsService);
   externalNationalIdService = inject(ExternalNationalIdService);
   private destroyRef = inject(DestroyRef);
+
+  /** The date of birth in BS as typed (fineract-dbug ADR 0020), kept only when it was entered in BS. */
+  dateOfBirthBsValue: string | null = null;
+  dateOfBirthCalendar: 'BS' | 'AD' | null = null;
 
   /** Minimum date allowed. */
   minDate = new Date(2000, 0, 1);
@@ -260,8 +270,20 @@ export class EditClientComponent implements OnInit {
     } else {
       clientData.clientNonPersonDetails = {};
     }
-    this.clientsService.updateClient(this.clientDataAndTemplate.id, clientData).subscribe(() => {
-      this.router.navigate(['../'], { relativeTo: this.route });
-    });
+    const clientId = this.clientDataAndTemplate.id;
+    const dateOfBirthBs = this.dateOfBirthCalendar === 'BS' ? this.dateOfBirthBsValue : null;
+    this.clientsService
+      .updateClient(clientId, clientData)
+      .pipe(
+        // Keep the date of birth as typed in BS; the AD date is already saved, so a failure here doesn't matter.
+        switchMap(() =>
+          dateOfBirthBs
+            ? this.memberBsDates.saveDateOfBirthBs(clientId, dateOfBirthBs).pipe(catchError(() => of(null)))
+            : of(null)
+        )
+      )
+      .subscribe(() => {
+        this.router.navigate(['../'], { relativeTo: this.route });
+      });
   }
 }

@@ -38,6 +38,8 @@ import { ThemeStorageService } from './shared/theme-picker/theme-storage.service
 import { AlertService } from './core/alert/alert.service';
 import { AuthenticationService } from './core/authentication/authentication.service';
 import { PasswordRenewalService } from './core/authentication/password-renewal.service';
+import { BsCalendarService } from './core/bs-calendar/bs-calendar.service';
+import { CalendarPreferenceService } from './core/bs-calendar/calendar-preference.service';
 import { ForcePasswordChangeDialogComponent } from './login/force-password-change-dialog/force-password-change-dialog.component';
 import { FORCE_PASSWORD_CHANGE_DIALOG_CONFIG } from './login/force-password-change-dialog/force-password-change-dialog.config';
 import { SettingsService } from './settings/settings.service';
@@ -117,6 +119,8 @@ export class WebAppComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   private passwordRenewal = inject(PasswordRenewalService);
+  private bsCalendar = inject(BsCalendarService);
+  private calendarPreference = inject(CalendarPreferenceService);
   private passwordRenewalDialog: MatDialogRef<ForcePasswordChangeDialogComponent> | null = null;
 
   /**
@@ -233,8 +237,17 @@ export class WebAppComponent implements OnInit, OnDestroy {
       localStorage.setItem('mifosXLocation', JSON.stringify(activities));
     });
 
+    // The BS calendar table and calendar setting (fineract-dbug ADR 0020): once for a session that's already open, and
+    // after every completed sign-in.
+    if (this.authenticationService.isAuthenticated()) {
+      this.loadCalendarSettings();
+    }
+
     // Setup alerts with hover behavior
     this.alertService.alertEvent.subscribe((alertEvent: Alert) => {
+      if (alertEvent.type === this.translateService.instant('errors.auth.success.type')) {
+        this.loadCalendarSettings();
+      }
       const snackBarRef = this.snackBar.open(
         `${alertEvent.message}`,
         this.translateService.instant('labels.buttons.Close'),
@@ -292,6 +305,11 @@ export class WebAppComponent implements OnInit, OnDestroy {
         }, 1000);
       });
     }
+  }
+
+  private loadCalendarSettings(): void {
+    this.bsCalendar.refreshFromServer();
+    this.calendarPreference.load();
   }
 
   /**

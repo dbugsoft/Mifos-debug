@@ -53,6 +53,9 @@ import { TranslateService } from '@ngx-translate/core';
 import { ClientsService } from '../../clients.service';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { DualDateComponent } from 'app/shared/dual-date/dual-date.component';
+import { BsCalendarService } from 'app/core/bs-calendar/bs-calendar.service';
+import { MemberBsDatesService } from '../../member-bs-dates.service';
 
 /**
  * Identities Tab Component
@@ -63,6 +66,7 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
   styleUrls: ['./identities-tab.component.scss'],
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
+    DualDateComponent,
     FaIconComponent,
     MatTable,
     MatColumnDef,
@@ -84,6 +88,8 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 export class IdentitiesTabComponent implements OnDestroy {
   private route = inject(ActivatedRoute);
   private dialog = inject(MatDialog);
+  private memberBsDates = inject(MemberBsDatesService);
+  private bsCalendar = inject(BsCalendarService);
   private clientService = inject(ClientsService);
   private translateService = inject(TranslateService);
   private documentPreviewService = inject(DocumentPreviewService);
@@ -103,6 +109,8 @@ export class IdentitiesTabComponent implements OnDestroy {
     'description',
     'type',
     'documentKey',
+    'issued',
+    'expires',
     'documents',
     'status',
     'actions'
@@ -290,12 +298,16 @@ export class IdentitiesTabComponent implements OnDestroy {
       // as before.
       if (response) {
         // Create identifier data
-        const identifierData = {
-          documentTypeId: response.documentTypeId,
-          status: response.status.toUpperCase(),
-          documentKey: response.documentKey,
-          description: response.description
-        };
+        const identifierData = this.withDates(
+          {
+            documentTypeId: response.documentTypeId,
+            status: response.status.toUpperCase(),
+            documentKey: response.documentKey,
+            description: response.description
+          },
+          response,
+          false
+        );
 
         // First create the identifier
         this.clientService.addClientIdentifier(this.clientId, identifierData).subscribe({
@@ -303,6 +315,7 @@ export class IdentitiesTabComponent implements OnDestroy {
             dialogRef.close();
 
             const newIdentifierId = res.resourceId;
+            this.saveBsDates(newIdentifierId, response, false);
             const selectedDocType = this.clientIdentifierTemplate.allowedDocumentTypes.find(
               (doc: any) => doc.id === response.documentTypeId
             );
@@ -313,6 +326,9 @@ export class IdentitiesTabComponent implements OnDestroy {
               description: response.description,
               documentType: selectedDocType,
               documentKey: response.documentKey,
+              // Kept as the yyyy-MM-dd strings the API returns, so Edit reads them like a loaded row.
+              issuanceDate: identifierData.issuanceDate ?? null,
+              expiryDate: identifierData.expiryDate ?? null,
               documents: [] as any[],
               clientId: this.clientId,
               status:
@@ -388,12 +404,16 @@ export class IdentitiesTabComponent implements OnDestroy {
     // API names a parameterName, a general banner otherwise) instead of
     // being lost after the dialog has already closed.
     dialogRef.componentInstance.submitted.subscribe((response: any) => {
-      const identifierData = {
-        documentTypeId: response.documentTypeId,
-        status: response.status.toUpperCase(),
-        documentKey: response.documentKey,
-        description: response.description
-      };
+      const identifierData = this.withDates(
+        {
+          documentTypeId: response.documentTypeId,
+          status: response.status.toUpperCase(),
+          documentKey: response.documentKey,
+          description: response.description
+        },
+        response,
+        true
+      );
 
       this.clientService.editClientIdentifier(this.clientId, identity.id, identifierData).subscribe({
         next: () => {
@@ -404,6 +424,9 @@ export class IdentitiesTabComponent implements OnDestroy {
           identity.documentType = selectedDocType;
           identity.documentKey = identifierData.documentKey;
           identity.description = identifierData.description;
+          identity.issuanceDate = identifierData.issuanceDate;
+          identity.expiryDate = identifierData.expiryDate;
+          this.saveBsDates(identity.id, response, true);
           identity.status =
             identifierData.status === 'ACTIVE'
               ? 'clientIdentifierStatusType.active'
@@ -426,6 +449,49 @@ export class IdentitiesTabComponent implements OnDestroy {
       });
     });
   }
+  /**
+   * Adds the issue and expiry dates to an identifier request (fineract-dbug ADR 0020), as plain yyyy-MM-dd. On edit
+   * both are always sent, so a cleared date is cleared on the server too.
+   */
+  private withDates(data: any, response: any, alwaysSend: boolean): any {
+    const iso = (date: Date | null | undefined) =>
+      date
+        ? `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+        : null;
+    const issuanceDate = iso(response.issuanceDate);
+    const expiryDate = iso(response.expiryDate);
+    if (!alwaysSend && !issuanceDate && !expiryDate) {
+      return data;
+    }
+    return { ...data, issuanceDate, expiryDate, dateFormat: 'yyyy-MM-dd', locale: 'en' };
+  }
+
+  /**
+   * Keeps the dates as typed in BS once the identifier is saved. The AD dates are already saved and are what counts,
+   * so a failure here is ignored.
+   */
+  private saveBsDates(identifierId: number | string, response: any, alwaysSend: boolean): void {
+    if (!alwaysSend && !response.issuanceDateBs && !response.expiryDateBs) {
+      return;
+    }
+    this.memberBsDates
+      .saveIdentifierBsDates(
+        this.clientId,
+        identifierId,
+        response.issuanceDateBs ?? null,
+        response.expiryDateBs ?? null
+      )
+      .subscribe({ error: () => {} });
+  }
+
+  /** True when the identity document's expiry date has passed (in Nepal's today). */
+  isExpired(identity: any): boolean {
+    const expiry = identity?.expiryDate;
+    if (!expiry) return false;
+    const date = Array.isArray(expiry) ? new Date(expiry[0], expiry[1] - 1, expiry[2]) : new Date(expiry);
+    return date.getTime() < this.bsCalendar.todayInNepal().getTime();
+  }
+
   /**
    * Delete Client Identifier
    * @param {string} clientId Client Id

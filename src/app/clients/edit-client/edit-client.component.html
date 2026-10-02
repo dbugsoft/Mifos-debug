@@ -152,25 +152,15 @@
 
         <!-- Date of Birth and Gender Row -->
         <div class="responsive-row">
-          <mat-form-field class="flex-48" (click)="dateOfBirthDatePicker.open()">
-            <mat-label>{{
-              'labels.inputs.' + getDateLabel(legalFormId, ['Date of Birth', 'Incorporation Date']) | translate
-            }}</mat-label>
-            <input
-              matInput
-              [max]="maxDate"
-              [matDatepicker]="dateOfBirthDatePicker"
-              formControlName="dateOfBirth"
-              [placeholder]="
-                'labels.inputs.' + getDateLabel(legalFormId, ['Date of Birth', 'Incorporation Date']) | translate
-              "
-              [title]="
-                'labels.inputs.' + getDateLabel(legalFormId, ['Date of Birth', 'Incorporation Date']) | translate
-              "
-            />
-            <mat-datepicker-toggle matSuffix [for]="dateOfBirthDatePicker"></mat-datepicker-toggle>
-            <mat-datepicker #dateOfBirthDatePicker></mat-datepicker>
-          </mat-form-field>
+          <!-- BS or AD, like Create Member (fineract-dbug ADR 0020) -->
+          <mifosx-nepali-date-input
+            class="flex-48"
+            [label]="'labels.inputs.' + getDateLabel(legalFormId, ['Date of Birth', 'Incorporation Date']) | translate"
+            formControlName="dateOfBirth"
+            [maxDate]="maxDate"
+            (bsDateChange)="dateOfBirthBsValue = $event"
+            (calendarUsed)="dateOfBirthCalendar = $event"
+          />
 
           @if (legalFormId === LegalFormId.PERSON) {
             <mat-form-field class="flex-48">
