@@ -59,6 +59,18 @@
               @if (document.description) {
                 <div class="description">{{ document.description }}</div>
               }
+              @if (document.issuanceDate) {
+                <div class="meta">
+                  {{ 'bsDates.Issued' | translate }}:
+                  <mifosx-dual-date [date]="document.issuanceDate"></mifosx-dual-date>
+                </div>
+              }
+              @if (document.expiryDate) {
+                <div class="meta">
+                  {{ 'bsDates.Expires' | translate }}:
+                  <mifosx-dual-date [date]="document.expiryDate"></mifosx-dual-date>
+                </div>
+              }
               <div class="actions">
                 <button
                   mat-icon-button

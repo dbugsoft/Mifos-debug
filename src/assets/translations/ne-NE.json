@@ -4912,5 +4912,24 @@
       "Email already used": "यो इमेल ठेगाना अर्को कर्मचारीले प्रयोग गरिसकेका छन्",
       "New email must be verified": "प्रयोगकर्ताले फेरि साइन इन गर्नुअघि नयाँ ठेगाना प्रमाणित गर्नुपर्छ"
     }
+  },
+  "bsCalendar": {
+    "Calendar": "पात्रो",
+    "Show and enter dates in": "मिति देखाउने र हाल्ने पात्रो",
+    "Cooperative default": "सहकारीको पूर्वनिर्धारित",
+    "Bikram Sambat (BS)": "विक्रम संवत् (BS)",
+    "Gregorian (AD)": "ईस्वी संवत् (AD)",
+    "Separate from the language": "भाषासँग छुट्टै: अंग्रेजी भाषामा पनि BS मिति प्रयोग गर्न सकिन्छ",
+    "Default calendar for this cooperative": "यस सहकारीको पूर्वनिर्धारित पात्रो",
+    "Used by staff who have not chosen their own": "आफ्नै पात्रो नछानेका कर्मचारीले यही प्रयोग गर्छन्",
+    "Saved": "पात्रो सुरक्षित भयो।"
+  },
+  "bsDates": {
+    "Issue Date": "जारी मिति",
+    "Expiry Date": "म्याद सकिने मिति",
+    "Issue date after expiry date": "जारी मिति म्याद सकिने मितिभन्दा पछि हुन सक्दैन",
+    "Issued": "जारी",
+    "Expires": "म्याद सकिने",
+    "Expired": "म्याद सकिएको"
   }
 }

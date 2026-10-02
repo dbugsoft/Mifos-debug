@@ -33,6 +33,13 @@ import { DocumentPreviewService } from 'app/shared/services/document-preview.ser
 import { Observable } from 'rxjs';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { DualDateComponent } from 'app/shared/dual-date/dual-date.component';
+
+/** A date as yyyy-MM-dd, or null. */
+function isoDate(date: Date | null | undefined): string | null {
+  if (!date) return null;
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
 
 @Component({
   selector: 'mifosx-entity-documents-tab',
@@ -41,7 +48,8 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
   standalone: true,
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
-    FaIconComponent
+    FaIconComponent,
+    DualDateComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -97,6 +105,12 @@ export class EntityDocumentsTabComponent implements OnInit, OnDestroy {
         formData.append('name', dialogResponse.fileName);
         formData.append('file', dialogResponse.file);
         formData.append('description', dialogResponse.description);
+        // Issue and expiry dates (fineract-dbug ADR 0020): strictly yyyy-MM-dd, and left out when blank, because the
+        // server can't read an empty date.
+        const issuanceDate = isoDate(dialogResponse.issuanceDate);
+        const expiryDate = isoDate(dialogResponse.expiryDate);
+        if (issuanceDate) formData.append('issuanceDate', issuanceDate);
+        if (expiryDate) formData.append('expiryDate', expiryDate);
         this.callbackUpload(formData).subscribe((res: any) => {
           const newDocument = {
             id: res.resourceId,
@@ -104,6 +118,8 @@ export class EntityDocumentsTabComponent implements OnInit, OnDestroy {
             parentEntityId: this.entityId,
             name: dialogResponse.fileName,
             description: dialogResponse.description,
+            issuanceDate: issuanceDate,
+            expiryDate: expiryDate,
             fileName: dialogResponse.file.name
           };
           this.entityDocuments.push(newDocument);

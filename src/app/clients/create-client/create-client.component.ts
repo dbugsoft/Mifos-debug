@@ -25,6 +25,7 @@ import { catchError, map, of, switchMap } from 'rxjs';
 
 /** Custom Services */
 import { ClientsService } from '../clients.service';
+import { MemberBsDatesService } from '../member-bs-dates.service';
 
 /** Custom Components */
 import { ClientGeneralStepComponent } from '../client-stepper/client-general-step/client-general-step.component';
@@ -70,6 +71,7 @@ export class CreateClientComponent implements AfterViewInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private clientsService = inject(ClientsService);
+  private memberBsDates = inject(MemberBsDatesService);
   private settingsService = inject(SettingsService);
   private destroyRef = inject(DestroyRef);
   private snackBar = inject(MatSnackBar);
@@ -228,6 +230,7 @@ export class CreateClientComponent implements AfterViewInit {
     }
 
     const addressDraft = this.memberAddressStep.draft();
+    const dateOfBirthBs = this.clientGeneralStep.dateOfBirthBs;
     this.clientsService
       .createClient(clientData)
       .pipe(
@@ -240,7 +243,17 @@ export class CreateClientComponent implements AfterViewInit {
             map(() => ({ clientId: response.resourceId, addressSaved: true })),
             catchError(() => of({ clientId: response.resourceId, addressSaved: false }))
           );
-        })
+        }),
+        // Keep the date of birth as typed in BS (fineract-dbug ADR 0020). The AD date is already saved and is what
+        // counts, so a failure here never loses the member.
+        switchMap((result) =>
+          dateOfBirthBs
+            ? this.memberBsDates.saveDateOfBirthBs(result.clientId, dateOfBirthBs).pipe(
+                map(() => result),
+                catchError(() => of(result))
+              )
+            : of(result)
+        )
       )
       .subscribe(({ clientId, addressSaved }) => {
         if (addressSaved) {
