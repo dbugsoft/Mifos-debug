@@ -4969,7 +4969,7 @@
     "Days overdue": "Days overdue",
     "Loans": "Loans",
     "Outstanding": "Outstanding",
-    "Share": "Share",
+    "Share": "Weight",
     "Provision rate": "Provision rate",
     "Provision": "Provision",
     "class": {
@@ -5143,9 +5143,270 @@
         "LOANS_AWAITING_DISBURSAL": "Approved loans not yet paid out.",
         "MEMBERS_AWAITING_ACTIVATION": "Membership applications waiting to be activated.",
         "CASH_WITH_CASHIERS": "Cash each cashier currently holds: allocated plus cash in, less settled and cash out."
+      },
+      "rateSpread": "Average lending rate (weighted by loan balances) minus average deposit rate (weighted by savings and fixed deposit balances), on today’s balances. Nepal caps a cooperative’s spread at 6 percentage points; the green part of the bar is the allowed range and the line marks the cap.",
+      "pearlsAbout": "PEARLS is the World Council of Credit Unions’ monitoring system: Protection, Effective financial structure, Asset quality, Rates of return and costs, Liquidity and Signs of growth. Each indicator has a goal. Rates are for the fiscal year so far, worked out per year; growth is against a year earlier. Indicators that need balance-sheet categories use the tag on each ledger account (Accounting › Chart of accounts).",
+      "pearls": {
+        "P1": "Loan loss allowance ÷ provision required for loans more than 12 months overdue. Goal: 100%.",
+        "P2": "Allowance left after covering loans over 12 months ÷ loans 1–12 months overdue. Goal: 35%.",
+        "P3": "Loans more than 12 months overdue still on the books. Goal: none; they should be written off.",
+        "P4": "Loans written off this year (per year) ÷ average loan portfolio. Lower is better.",
+        "P5": "All recoveries ÷ all write-offs ever made. Goal: 100%.",
+        "P6": "Solvency: what members’ savings and shares are worth after deducting loan losses and problem assets — (assets + allowance − loans over 12 months − 35% of loans 1–12 months − liabilities − problem assets + savings) ÷ (savings + shares). Goal: at least 111%.",
+        "E1": "Loans net of the loss allowance ÷ total assets. Goal: 70–80%.",
+        "E2": "Liquid investments (bank deposits) ÷ total assets. Goal: at most 16%.",
+        "E3": "Financial investments (shares, bonds) ÷ total assets. Goal: at most 2%.",
+        "E4": "Non-financial investments (property held to earn income) ÷ total assets. Goal: 0%.",
+        "E5": "Members’ savings deposits ÷ total assets. Goal: 70–80%.",
+        "E6": "External credit (borrowings) ÷ total assets. Goal: at most 5%.",
+        "E7": "Members’ share capital ÷ total assets. Goal: at most 20%.",
+        "E8": "Institutional capital (reserves and undistributed surplus) ÷ total assets. Goal: at least 10%.",
+        "E9": "Institutional capital after loan losses and problem assets ÷ total assets. Goal: at least 10%.",
+        "A1": "Loans more than 30 days overdue ÷ all loans outstanding. Goal: at most 5%.",
+        "A2": "Non-earning assets (cash, fixed assets, receivables) ÷ total assets. Goal: at most 5%.",
+        "A3": "Interest-free funds (net institutional capital, transitory capital and non-interest-bearing liabilities) ÷ non-earning assets. Goal: at least 200%.",
+        "R1": "Loan interest, fees and penalties (per year) ÷ average net loans. Should cover costs: an entrepreneurial rate.",
+        "R2": "Income from liquid investments (per year) ÷ average liquid investments. Should earn market rates.",
+        "R3": "Income from financial investments (per year) ÷ average financial investments. Should earn market rates.",
+        "R4": "Income from non-financial investments (per year) ÷ average non-financial investments. Should earn at least as much as loans.",
+        "R5": "Interest paid on savings (per year) ÷ average savings. Should be a market rate above inflation.",
+        "R6": "Interest paid on external credit (per year) ÷ average external credit. Goal: no more than the savings rate (R5).",
+        "R7": "Dividends on shares (per year) ÷ average share capital. Goal: at least the savings rate (R5).",
+        "R8": "Gross margin (income less interest and financing costs, per year) ÷ average assets. Should cover operating costs and provisions and still build capital.",
+        "R9": "Operating expenses (per year) ÷ average assets. Goal: at most 5%.",
+        "R10": "Loan loss provisions charged (per year) ÷ average assets. Enough to keep P1 and P2 on goal.",
+        "R11": "Non-recurring income less expense (per year) ÷ average assets. Should be small.",
+        "R12": "Net income (per year) ÷ average assets: return on assets. Goal: at least 1%.",
+        "R13": "Net income (per year) ÷ average institutional and transitory capital: return on capital. Should beat inflation.",
+        "L1": "(Liquid investments + cash + liquidity reserve − short-term payables) ÷ savings. Goal: 15–20%.",
+        "L2": "Liquidity reserve ÷ savings. Goal: at least 10%.",
+        "L3": "Cash and other non-earning liquid assets ÷ total assets. Goal: under 1%.",
+        "S1": "Growth in loans outstanding over the last 12 months.",
+        "S2": "Growth in liquid investments over the last 12 months.",
+        "S3": "Growth in financial investments over the last 12 months.",
+        "S4": "Growth in non-financial investments over the last 12 months.",
+        "S5": "Growth in savings deposits over the last 12 months.",
+        "S6": "Growth in external credit over the last 12 months.",
+        "S7": "Growth in member share capital over the last 12 months.",
+        "S8": "Growth in institutional capital over the last 12 months.",
+        "S9": "Growth in net institutional capital over the last 12 months.",
+        "S10": "Growth in membership over the last 12 months. Goal: at least 5%.",
+        "S11": "Growth in total assets over the last 12 months. Should be above inflation plus 10%."
       }
     },
     "Follow up with members": "Follow up with members",
-    "Waiting on the office": "Waiting on the office"
+    "Waiting on the office": "Waiting on the office",
+    "Back to dashboard": "Back to dashboard",
+    "records": "{{count}} records",
+    "Preparing": "Preparing…",
+    "Download CSV": "Download CSV",
+    "Task": "Task",
+    "Search": "Search",
+    "search hint": "Name, account number or details",
+    "No matches": "Nothing matches your search.",
+    "Nothing to do": "Nothing to follow up here.",
+    "View all": "View all {{count}}",
+    "Rate spread": "Interest rate spread",
+    "pts": "pts",
+    "lending minus deposits": "Lending {{lending}} − deposits {{deposit}}",
+    "within cap": "Within the {{cap}}% cap",
+    "over cap": "Above the {{cap}}% cap",
+    "Financial health section": "Financial health",
+    "PEARLS indicators": "PEARLS indicators",
+    "pearls hint": "WOCCU’s 45 measures of a savings and credit cooperative’s health, against their goals",
+    "pearlsMet": "{{count}} meet the goal",
+    "pearlsNotMet": "{{count}} below the goal",
+    "pearlsNoData": "{{count}} need account tags",
+    "metOf": "{{met}} of {{total}} on goal",
+    "needs tags": "Needs account tags",
+    "for reference": "For reference",
+    "Indicator": "Indicator",
+    "Value": "Value",
+    "Goal": "Goal",
+    "Status": "Status",
+    "tag accounts": "Tag accounts as: {{tags}}",
+    "counted as none": "No accounts tagged {{tags}}; counted as none",
+    "pearlsStatus": {
+      "MET": "Meets goal",
+      "NOT_MET": "Below goal",
+      "INFO": "For reference",
+      "NO_DATA": "Needs tags",
+      "NOT_APPLICABLE": "Not applicable"
+    },
+    "pearls": {
+      "group": {
+        "P": "Protection",
+        "E": "Effective structure",
+        "A": "Asset quality",
+        "R": "Returns and costs",
+        "L": "Liquidity",
+        "S": "Signs of growth"
+      },
+      "groupInfo": {
+        "P": "Is there enough set aside for loans that may not be repaid?",
+        "E": "Are the cooperative’s assets and funding in healthy proportions?",
+        "A": "How much of the loan book is late, and how much of the assets earn nothing?",
+        "R": "What do assets earn and what does funding cost, per year?",
+        "L": "Is enough cash available to pay members who withdraw?",
+        "S": "How fast is each part of the cooperative growing compared with a year ago?"
+      },
+      "P1": {
+        "name": "Allowance for loans over 12 months overdue"
+      },
+      "P2": {
+        "name": "Allowance for loans 1–12 months overdue"
+      },
+      "P3": {
+        "name": "Loans over 12 months overdue not written off"
+      },
+      "P4": {
+        "name": "Write-offs this year",
+        "goal": "Minimise"
+      },
+      "P5": {
+        "name": "Recoveries of written-off loans"
+      },
+      "P6": {
+        "name": "Solvency"
+      },
+      "E1": {
+        "name": "Net loans"
+      },
+      "E2": {
+        "name": "Liquid investments"
+      },
+      "E3": {
+        "name": "Financial investments"
+      },
+      "E4": {
+        "name": "Non-financial investments"
+      },
+      "E5": {
+        "name": "Savings deposits"
+      },
+      "E6": {
+        "name": "External credit"
+      },
+      "E7": {
+        "name": "Member share capital"
+      },
+      "E8": {
+        "name": "Institutional capital"
+      },
+      "E9": {
+        "name": "Net institutional capital"
+      },
+      "A1": {
+        "name": "Loan delinquency"
+      },
+      "A2": {
+        "name": "Non-earning assets"
+      },
+      "A3": {
+        "name": "Interest-free funds to non-earning assets"
+      },
+      "R1": {
+        "name": "Loan yield",
+        "goal": "Entrepreneurial rate"
+      },
+      "R2": {
+        "name": "Liquid investment yield",
+        "goal": "Market rate"
+      },
+      "R3": {
+        "name": "Financial investment yield",
+        "goal": "Market rate"
+      },
+      "R4": {
+        "name": "Non-financial investment yield",
+        "goal": "≥ R1"
+      },
+      "R5": {
+        "name": "Cost of savings",
+        "goal": "Market rate, above inflation"
+      },
+      "R6": {
+        "name": "Cost of external credit",
+        "goal": "≤ R5"
+      },
+      "R7": {
+        "name": "Dividends on shares",
+        "goal": "≥ R5"
+      },
+      "R8": {
+        "name": "Gross margin",
+        "goal": "Covers R9, R10 and capital"
+      },
+      "R9": {
+        "name": "Operating expenses"
+      },
+      "R10": {
+        "name": "Loan loss provisions",
+        "goal": "Keeps P1 and P2 on goal"
+      },
+      "R11": {
+        "name": "Non-recurring income or expense",
+        "goal": "Minimise"
+      },
+      "R12": {
+        "name": "Return on assets"
+      },
+      "R13": {
+        "name": "Return on capital",
+        "goal": "Above inflation"
+      },
+      "L1": {
+        "name": "Liquid assets to savings"
+      },
+      "L2": {
+        "name": "Liquidity reserve"
+      },
+      "L3": {
+        "name": "Non-earning liquid assets"
+      },
+      "S1": {
+        "name": "Growth in loans",
+        "goal": "In line with E1"
+      },
+      "S2": {
+        "name": "Growth in liquid investments",
+        "goal": "In line with E2"
+      },
+      "S3": {
+        "name": "Growth in financial investments",
+        "goal": "In line with E3"
+      },
+      "S4": {
+        "name": "Growth in non-financial investments",
+        "goal": "In line with E4"
+      },
+      "S5": {
+        "name": "Growth in savings",
+        "goal": "In line with E5"
+      },
+      "S6": {
+        "name": "Growth in external credit",
+        "goal": "In line with E6"
+      },
+      "S7": {
+        "name": "Growth in share capital",
+        "goal": "In line with E7"
+      },
+      "S8": {
+        "name": "Growth in institutional capital",
+        "goal": "In line with E8"
+      },
+      "S9": {
+        "name": "Growth in net institutional capital",
+        "goal": "In line with E9"
+      },
+      "S10": {
+        "name": "Growth in membership"
+      },
+      "S11": {
+        "name": "Growth in total assets",
+        "goal": "Inflation + 10%"
+      }
+    }
   }
 }

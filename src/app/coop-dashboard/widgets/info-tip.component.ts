@@ -52,7 +52,7 @@ import { TranslatePipe } from '@ngx-translate/core';
         background: none;
         color: var(--viz-muted);
         font-size: 13px;
-        cursor: help;
+        cursor: pointer;
       }
       .info:hover,
       .info:focus-visible {

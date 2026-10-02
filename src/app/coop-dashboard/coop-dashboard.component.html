@@ -13,6 +13,7 @@
 @let inc = s().income.data;
 @let cap = s().capital.data;
 @let act = s().actions.data;
+@let pearls = s().pearls.data;
 
 <!-- A card's loading placeholder, or its error with a retry; shared by every card. -->
 <ng-template #pending let-name="name" let-tall="tall">
@@ -164,7 +165,11 @@
       </div>
     </div>
     @if (act) {
-      <mifosx-coop-action-list [groups]="act.groups" [asOf]="act.asOf"></mifosx-coop-action-list>
+      <mifosx-coop-action-list
+        [groups]="act.groups"
+        [asOf]="act.asOf"
+        [officeId]="officeId()"
+      ></mifosx-coop-action-list>
     } @else {
       <ng-container *ngTemplateOutlet="pending; context: { name: 'actions' }"></ng-container>
     }
@@ -718,6 +723,40 @@
             </span>
           </div>
         </div>
+        @let rs = inc.rateSpread;
+        @let gauge = spreadGauge(rs.spread, rs.cap);
+        <div class="spread" [class.spread--over]="!rs.withinCap">
+          <div class="spread__head">
+            <span class="spread__label">
+              {{ 'coopDashboard.Rate spread' | translate }}
+              <mifosx-info-tip key="rateSpread"></mifosx-info-tip>
+            </span>
+            <span class="spread__value">
+              {{
+                rs.spread !== null && rs.spread !== undefined
+                  ? rs.spread + ' ' + ('coopDashboard.pts' | translate)
+                  : '–'
+              }}
+            </span>
+          </div>
+          <div class="spread__gauge" role="img" [attr.aria-label]="'coopDashboard.Rate spread' | translate">
+            <i class="spread__allowed" [style.width.%]="gauge.cap"></i>
+            <i class="spread__fill" [style.width.%]="gauge.value"></i>
+            <i class="spread__cap" [style.left.%]="gauge.cap"></i>
+          </div>
+          <div class="spread__foot">
+            <span>
+              {{
+                'coopDashboard.lending minus deposits'
+                  | translate: { lending: percent(rs.lendingRate, 2), deposit: percent(rs.depositRate, 2) }
+              }}
+            </span>
+            <span class="spread__status">
+              <fa-icon [icon]="rs.withinCap ? 'check-circle' : 'exclamation-circle'"></fa-icon>
+              {{ (rs.withinCap ? 'coopDashboard.within cap' : 'coopDashboard.over cap') | translate: { cap: rs.cap } }}
+            </span>
+          </div>
+        </div>
         <div class="lines">
           @for (type of ['INCOME', 'EXPENSE']; track type) {
             <h4>{{ (type === 'INCOME' ? 'coopDashboard.Income' : 'coopDashboard.Expenses') | translate }}</h4>
@@ -737,4 +776,26 @@
       }
     </mat-card>
   </div>
+
+  <!-- ── 7. Financial health ─────────────────────────────────────────── -->
+  <h3 class="section">
+    <fa-icon icon="tachometer-alt"></fa-icon>
+    {{ 'coopDashboard.Financial health section' | translate }}
+  </h3>
+  <mat-card class="card">
+    <div class="card__head">
+      <div>
+        <h3>
+          {{ 'coopDashboard.PEARLS indicators' | translate }}
+          <mifosx-info-tip key="pearlsAbout"></mifosx-info-tip>
+        </h3>
+        <p class="card__hint">{{ 'coopDashboard.pearls hint' | translate }}</p>
+      </div>
+    </div>
+    @if (pearls) {
+      <mifosx-coop-pearls-card [pearls]="pearls"></mifosx-coop-pearls-card>
+    } @else {
+      <ng-container *ngTemplateOutlet="pending; context: { name: 'pearls', tall: true }"></ng-container>
+    }
+  </mat-card>
 </div>

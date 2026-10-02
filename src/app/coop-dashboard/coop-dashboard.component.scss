@@ -570,6 +570,96 @@
   color: var(--viz-muted);
 }
 
+// Interest rate spread against the regulatory cap
+.spread {
+  margin-bottom: 14px;
+  padding: 12px;
+  border-radius: 10px;
+  background: var(--coop-hover);
+}
+
+.spread__head,
+.spread__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.spread__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--viz-ink);
+}
+
+.spread__value {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--viz-ink);
+}
+
+.spread__gauge {
+  position: relative;
+  height: 10px;
+  margin: 10px 0 8px;
+  border-radius: 5px;
+  background: var(--coop-bad-soft);
+
+  i {
+    position: absolute;
+    display: block;
+  }
+}
+
+.spread__allowed {
+  top: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: 5px 0 0 5px;
+  background: var(--coop-good-soft);
+}
+
+.spread__fill {
+  top: 2px;
+  bottom: 2px;
+  left: 0;
+  border-radius: 4px;
+  background: var(--viz-1);
+}
+
+.spread__cap {
+  top: -4px;
+  bottom: -4px;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--viz-ink);
+}
+
+.spread__foot {
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: var(--viz-muted);
+}
+
+.spread__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 600;
+  color: var(--coop-good-ink);
+}
+
+.spread--over .spread__status {
+  color: var(--coop-bad-ink);
+}
+
+.spread--over .spread__fill {
+  background: var(--coop-bad-ink);
+}
+
 .lines h4 {
   margin: 10px 0 4px;
   font-size: 12px;

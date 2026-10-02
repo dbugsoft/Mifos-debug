@@ -28,6 +28,7 @@ import {
   LoanClassCode,
   Loans,
   Membership,
+  Pearls,
   Savings,
   SectionName,
   SectionState,
@@ -38,6 +39,7 @@ import { change, grouped, percent, shortAmount } from './coop-format';
 import { ActionListComponent } from './widgets/action-list.component';
 import { AreaTableComponent } from './widgets/area-table.component';
 import { InfoTipComponent } from './widgets/info-tip.component';
+import { PearlsCardComponent } from './widgets/pearls-card.component';
 import { ChartSeries, CoopChartComponent } from './widgets/coop-chart.component';
 import { KpiTileComponent, TileChange } from './widgets/kpi-tile.component';
 
@@ -49,6 +51,7 @@ type Sections = {
   capital: SectionState<Capital>;
   income: SectionState<Income>;
   actions: SectionState<Actions>;
+  pearls: SectionState<Pearls>;
 };
 
 const SECTIONS: SectionName[] = [
@@ -58,7 +61,8 @@ const SECTIONS: SectionName[] = [
   'savings',
   'membership',
   'income',
-  'capital'
+  'capital',
+  'pearls'
 ];
 const AD_MONTH = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' });
 
@@ -84,6 +88,7 @@ const AD_MONTH = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'shor
     ActionListComponent,
     AreaTableComponent,
     InfoTipComponent,
+    PearlsCardComponent,
     NgTemplateOutlet
   ],
   templateUrl: './coop-dashboard.component.html',
@@ -300,6 +305,12 @@ export class CoopDashboardComponent implements OnInit {
     return i?.lines.filter((l) => l.type === type && Math.abs(l.amount) >= 1) ?? [];
   }
 
+  /** Where the spread and the cap sit on a gauge that runs a third past the cap. */
+  spreadGauge(spread: number | null, cap: number): { value: number; cap: number } {
+    const top = Math.max(cap * 1.34, (spread ?? 0) * 1.1, 1);
+    return { value: Math.max(0, Math.min(100, ((spread ?? 0) / top) * 100)), cap: (cap / top) * 100 };
+  }
+
   lineShare(amount: number, total: number): number {
     return total ? Math.max(2, (Math.abs(amount) / Math.abs(total)) * 100) : 0;
   }
@@ -317,7 +328,8 @@ export class CoopDashboardComponent implements OnInit {
       loans: { ...empty },
       capital: { ...empty },
       income: { ...empty },
-      actions: { ...empty }
+      actions: { ...empty },
+      pearls: { ...empty }
     };
   }
 
