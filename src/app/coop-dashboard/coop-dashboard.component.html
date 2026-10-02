@@ -1,0 +1,801 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+@let sum = s().summary.data;
+@let loans = s().loans.data;
+@let sav = s().savings.data;
+@let mem = s().membership.data;
+@let inc = s().income.data;
+@let cap = s().capital.data;
+@let act = s().actions.data;
+@let pearls = s().pearls.data;
+
+<!-- A card's loading placeholder, or its error with a retry; shared by every card. -->
+<ng-template #pending let-name="name" let-tall="tall">
+  @if (s()[$any(name)].error) {
+    <div class="card__error">
+      <fa-icon icon="exclamation-triangle"></fa-icon>
+      {{ 'coopDashboard.Could not load' | translate }}
+      <button mat-stroked-button type="button" (click)="loadSection(name)">
+        {{ 'coopDashboard.Retry' | translate }}
+      </button>
+    </div>
+  } @else {
+    <div class="shimmer" [class.shimmer--tall]="tall"></div>
+  }
+</ng-template>
+
+<div class="coop">
+  <!-- ── Header and filters ─────────────────────────────────────────── -->
+  <header class="coop__header">
+    <div class="coop__title">
+      <h2>{{ 'coopDashboard.Cooperative dashboard' | translate }}</h2>
+      @if (period(); as p) {
+        <p class="coop__subtitle">
+          {{ 'coopDashboard.Fiscal year' | translate }} {{ p.label }} ·
+          {{ (p.current ? 'coopDashboard.as of' : 'coopDashboard.year ended') | translate }}
+          <mifosx-dual-date [date]="p.asOf"></mifosx-dual-date>
+        </p>
+      }
+    </div>
+    <div class="coop__filters">
+      @if (filters(); as f) {
+        <mat-form-field class="coop__field" subscriptSizing="dynamic">
+          <mat-label>{{ 'coopDashboard.Office' | translate }}</mat-label>
+          <mat-select [ngModel]="officeId() ?? 0" (ngModelChange)="onOffice($event)">
+            <mat-option [value]="0">{{ 'coopDashboard.All offices' | translate }}</mat-option>
+            @for (o of f.offices; track o.id) {
+              @if (o.depth > 0) {
+                <mat-option [value]="o.id">
+                  <span [style.padding-left.px]="(o.depth - 1) * 12">{{ o.name }}</span>
+                </mat-option>
+              }
+            }
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field class="coop__field coop__field--year" subscriptSizing="dynamic">
+          <mat-label>{{ 'coopDashboard.Fiscal year' | translate }}</mat-label>
+          <mat-select [ngModel]="fiscalYear()" (ngModelChange)="onYear($event)">
+            @for (y of f.fiscalYears; track y.year) {
+              <mat-option [value]="y.year">{{ y.label }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      }
+      <button
+        mat-icon-button
+        type="button"
+        class="coop__refresh"
+        (click)="load()"
+        [matTooltip]="'coopDashboard.Refresh' | translate"
+        [attr.aria-label]="'coopDashboard.Refresh' | translate"
+      >
+        <fa-icon icon="sync"></fa-icon>
+      </button>
+    </div>
+  </header>
+
+  <!-- ── 1. How are we doing ─────────────────────────────────────────── -->
+  <section class="coop__kpis" [attr.aria-label]="'coopDashboard.Headline figures' | translate">
+    <mifosx-kpi-tile
+      label="coopDashboard.Members"
+      info="members"
+      icon="users"
+      [loading]="s().summary.loading"
+      [value]="grouped(sum?.members?.value)"
+      [change]="trendChange(sum?.members)"
+      [spark]="spark(sum?.members?.series, 'count')"
+    ></mifosx-kpi-tile>
+    <mifosx-kpi-tile
+      label="coopDashboard.Savings"
+      info="savings"
+      icon="piggy-bank"
+      unit="NPR"
+      [loading]="s().summary.loading"
+      [value]="short(sum?.savings?.value)"
+      [change]="trendChange(sum?.savings)"
+      [spark]="spark(sum?.savings?.series, 'amount')"
+    ></mifosx-kpi-tile>
+    <mifosx-kpi-tile
+      label="coopDashboard.Loans outstanding"
+      info="loansOutstanding"
+      icon="hand-holding-usd"
+      unit="NPR"
+      [loading]="s().summary.loading"
+      [value]="short(sum?.loansOutstanding?.value)"
+      [change]="trendChange(sum?.loansOutstanding)"
+      [spark]="spark(sum?.loansOutstanding?.series, 'amount')"
+    ></mifosx-kpi-tile>
+    <mifosx-kpi-tile
+      label="coopDashboard.Share capital"
+      info="shareCapital"
+      icon="coins"
+      unit="NPR"
+      [loading]="s().summary.loading"
+      [value]="short(sum?.shareCapital?.value)"
+      [change]="trendChange(sum?.shareCapital)"
+      [spark]="spark(sum?.shareCapital?.series, 'amount')"
+    ></mifosx-kpi-tile>
+    <mifosx-kpi-tile
+      label="coopDashboard.Portfolio at risk"
+      info="par30"
+      icon="shield-alt"
+      [loading]="s().summary.loading"
+      [value]="percent(sum?.par30, 1)"
+      [status]="parStatus(sum?.par30)"
+      [note]="'coopDashboard.over 30 days overdue' | translate"
+    ></mifosx-kpi-tile>
+    <mifosx-kpi-tile
+      label="coopDashboard.Savings to loans"
+      info="savingsToLoans"
+      icon="university"
+      [loading]="s().summary.loading"
+      [value]="(sum?.savingsToLoanRatio ?? null) !== null ? sum!.savingsToLoanRatio + '×' : '–'"
+      [note]="
+        (sum?.previousSavingsToLoanRatio ?? null) !== null
+          ? ('coopDashboard.last year' | translate) + ' ' + sum!.previousSavingsToLoanRatio + '×'
+          : ''
+      "
+    ></mifosx-kpi-tile>
+    <mifosx-kpi-tile
+      label="coopDashboard.Collected today"
+      info="collectedToday"
+      icon="money-bill-wave"
+      unit="NPR"
+      [loading]="s().summary.loading"
+      [value]="short(sum?.collectedToday)"
+      [note]="'coopDashboard.repayments' | translate: { count: grouped(sum?.repaymentsToday ?? 0) }"
+    ></mifosx-kpi-tile>
+  </section>
+
+  <!-- ── 2. What needs doing today ───────────────────────────────────── -->
+  <mat-card class="card card--attention">
+    <div class="card__head">
+      <div>
+        <h3>
+          {{ 'coopDashboard.Needs attention' | translate }}
+          <mifosx-info-tip key="needsAttention"></mifosx-info-tip>
+        </h3>
+        <p class="card__hint">{{ 'coopDashboard.actions hint' | translate }}</p>
+      </div>
+    </div>
+    @if (act) {
+      <mifosx-coop-action-list
+        [groups]="act.groups"
+        [asOf]="act.asOf"
+        [officeId]="officeId()"
+      ></mifosx-coop-action-list>
+    } @else {
+      <ng-container *ngTemplateOutlet="pending; context: { name: 'actions' }"></ng-container>
+    }
+  </mat-card>
+
+  <!-- ── 3. Loans ────────────────────────────────────────────────────── -->
+  <h3 class="section">
+    <fa-icon icon="hand-holding-usd"></fa-icon>
+    {{ 'coopDashboard.Loans section' | translate }}
+  </h3>
+  <div class="coop__grid">
+    <mat-card class="card span-8">
+      <div class="card__head">
+        <div>
+          <h3>
+            {{ 'coopDashboard.Loan quality' | translate }}
+            <mifosx-info-tip key="loanQuality"></mifosx-info-tip>
+          </h3>
+          <p class="card__hint">{{ 'coopDashboard.loan quality hint' | translate }}</p>
+        </div>
+        @if (loans) {
+          <div class="card__aside">
+            <span class="big">NPR {{ short(loans.outstanding) }}</span>
+            <span class="muted">{{ 'coopDashboard.loans' | translate: { count: grouped(loans.activeLoans) } }}</span>
+          </div>
+        }
+      </div>
+      @if (loans) {
+        <div class="quality-bar" role="img" [attr.aria-label]="'coopDashboard.Loan quality' | translate">
+          @for (c of loans.classification; track c.code) {
+            @if (c.outstanding > 0) {
+              <span
+                class="quality-bar__seg cls--{{ c.code }}"
+                [style.flex-grow]="c.outstanding"
+                [matTooltip]="
+                  ('coopDashboard.class.' + c.code | translate) +
+                  ': NPR ' +
+                  short(c.outstanding) +
+                  ' (' +
+                  percent(classShare(c.outstanding)) +
+                  ')'
+                "
+              ></span>
+            }
+          }
+        </div>
+        <div class="table-wrap">
+          <table class="quality">
+            <thead>
+              <tr>
+                <th>{{ 'coopDashboard.Class' | translate }}</th>
+                <th class="num hide-sm">{{ 'coopDashboard.Days overdue' | translate }}</th>
+                <th class="num">{{ 'coopDashboard.Loans' | translate }}</th>
+                <th class="num">{{ 'coopDashboard.Outstanding' | translate }}</th>
+                <th class="num hide-sm">{{ 'coopDashboard.Share' | translate }}</th>
+                <th class="num hide-sm">{{ 'coopDashboard.Provision rate' | translate }}</th>
+                <th class="num">
+                  {{ 'coopDashboard.Provision' | translate }}
+                  <mifosx-info-tip key="provision"></mifosx-info-tip>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (c of loans.classification; track c.code) {
+                <tr>
+                  <td>
+                    <span class="cls-label">
+                      <i class="cls-swatch cls--{{ c.code }}"></i>
+                      <fa-icon class="cls-icon" [icon]="classIcon[c.code]"></fa-icon>
+                      {{ 'coopDashboard.class.' + c.code | translate }}
+                      <mifosx-info-tip [key]="'class.' + c.code"></mifosx-info-tip>
+                    </span>
+                  </td>
+                  <td class="num hide-sm">{{ classDays(c.minDaysOverdue, c.maxDaysOverdue) }}</td>
+                  <td class="num">{{ grouped(c.loans) }}</td>
+                  <td class="num">{{ short(c.outstanding) }}</td>
+                  <td class="num hide-sm">{{ percent(classShare(c.outstanding)) }}</td>
+                  <td class="num hide-sm">{{ percent(c.provisionRate * 100, 0) }}</td>
+                  <td class="num strong">{{ short(c.provision) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <ng-container *ngTemplateOutlet="pending; context: { name: 'loans', tall: true }"></ng-container>
+      }
+    </mat-card>
+
+    <mat-card class="card span-4">
+      <div class="card__head">
+        <div>
+          <h3>
+            {{ 'coopDashboard.Collection and risk' | translate }}
+            <mifosx-info-tip key="collectionRisk"></mifosx-info-tip>
+          </h3>
+          <p class="card__hint">{{ 'coopDashboard.collection hint' | translate }}</p>
+        </div>
+      </div>
+      @if (loans) {
+        <div class="meters">
+          <div class="meter">
+            <span class="meter__label">
+              {{ 'coopDashboard.Collected this month' | translate }}
+              <mifosx-info-tip key="collectionMonth"></mifosx-info-tip>
+            </span>
+            <span class="meter__value">{{ percent(loans.collectionThisMonth.rate) }}</span>
+            <span class="meter__bar"><i [style.width.%]="loans.collectionThisMonth.rate"></i></span>
+            <span class="meter__sub">
+              NPR {{ short(loans.collectionThisMonth.collected) }} {{ 'coopDashboard.of' | translate }}
+              {{ short(loans.collectionThisMonth.due) }}
+            </span>
+          </div>
+          <div class="meter">
+            <span class="meter__label">{{ 'coopDashboard.Collected this year' | translate }}</span>
+            <span class="meter__value">{{ percent(loans.collectionThisYear.rate) }}</span>
+            <span class="meter__bar"><i [style.width.%]="loans.collectionThisYear.rate"></i></span>
+            <span class="meter__sub">
+              NPR {{ short(loans.collectionThisYear.collected) }} {{ 'coopDashboard.of' | translate }}
+              {{ short(loans.collectionThisYear.due) }}
+            </span>
+          </div>
+        </div>
+        <dl class="facts">
+          <div class="fact">
+            <dt>
+              {{ 'coopDashboard.Non-performing' | translate }}
+              <mifosx-info-tip key="nonPerforming"></mifosx-info-tip>
+            </dt>
+            <dd [class.bad]="loans.nonPerformingShare >= 5">{{ percent(loans.nonPerformingShare) }}</dd>
+          </div>
+          <div class="fact">
+            <dt>
+              {{ 'coopDashboard.Provision required' | translate }}
+              <mifosx-info-tip key="provision"></mifosx-info-tip>
+            </dt>
+            <dd>NPR {{ short(loans.provisionRequired) }}</dd>
+          </div>
+          <div class="fact">
+            <dt>
+              {{ 'coopDashboard.Overdue amount' | translate }}
+              <mifosx-info-tip key="overdue"></mifosx-info-tip>
+            </dt>
+            <dd>NPR {{ short(loans.overdue) }}</dd>
+          </div>
+          <div class="fact">
+            <dt>
+              {{ 'coopDashboard.Top 10 borrowers' | translate }}
+              <mifosx-info-tip key="topBorrowers"></mifosx-info-tip>
+            </dt>
+            <dd>{{ percent(loans.topTenBorrowersShare) }}</dd>
+          </div>
+        </dl>
+      } @else {
+        <ng-container *ngTemplateOutlet="pending; context: { name: 'loans', tall: true }"></ng-container>
+      }
+    </mat-card>
+
+    <mat-card class="card span-8">
+      <div class="card__head">
+        <div>
+          <h3>
+            {{ 'coopDashboard.Loan flows' | translate }}
+            <mifosx-info-tip key="loanFlows"></mifosx-info-tip>
+          </h3>
+          <p class="card__hint">{{ 'coopDashboard.by BS month' | translate }}</p>
+        </div>
+        @if (loans) {
+          <div class="card__aside">
+            <span class="big">NPR {{ short(loans.averageLoan) }}</span>
+            <span class="muted">{{ 'coopDashboard.average loan' | translate }}</span>
+          </div>
+        }
+      </div>
+      @if (loans) {
+        <mifosx-coop-chart
+          [labels]="monthLabels()"
+          [notes]="monthNotes()"
+          [series]="
+            monthly(
+              ['Disbursed', loans.disbursedByMonth],
+              ['Principal repaid', loans.principalRepaidByMonth],
+              ['Interest collected', loans.interestByMonth]
+            )
+          "
+          [height]="260"
+          [ariaLabel]="'coopDashboard.Loan flows' | translate"
+        ></mifosx-coop-chart>
+      } @else {
+        <ng-container *ngTemplateOutlet="pending; context: { name: 'loans' }"></ng-container>
+      }
+    </mat-card>
+
+    <mat-card class="card span-4">
+      <div class="card__head">
+        <div>
+          <h3>
+            {{ 'coopDashboard.Loans by purpose' | translate }}
+            <mifosx-info-tip key="loansByPurpose"></mifosx-info-tip>
+          </h3>
+          <p class="card__hint">{{ 'coopDashboard.outstanding' | translate }}</p>
+        </div>
+      </div>
+      @if (loans) {
+        <mifosx-coop-chart
+          kind="hbar"
+          [labels]="purposeLabels(loans)"
+          [series]="single('Outstanding', purposeValues(loans))"
+          [valueLabels]="true"
+          [height]="260"
+          [ariaLabel]="'coopDashboard.Loans by purpose' | translate"
+        ></mifosx-coop-chart>
+      } @else {
+        <ng-container *ngTemplateOutlet="pending; context: { name: 'loans' }"></ng-container>
+      }
+    </mat-card>
+  </div>
+
+  <!-- ── 4. Savings ──────────────────────────────────────────────────── -->
+  <h3 class="section">
+    <fa-icon icon="piggy-bank"></fa-icon>
+    {{ 'coopDashboard.Savings section' | translate }}
+  </h3>
+  <div class="coop__grid">
+    <mat-card class="card span-8">
+      <div class="card__head">
+        <div>
+          <h3>
+            {{ 'coopDashboard.Savings flows' | translate }}
+            <mifosx-info-tip key="savingsFlows"></mifosx-info-tip>
+          </h3>
+          <p class="card__hint">{{ 'coopDashboard.by BS month' | translate }}</p>
+        </div>
+        @if (sav) {
+          <div class="card__aside">
+            <span class="big">NPR {{ short(sav.totalBalance) }}</span>
+            <span class="muted">{{ 'coopDashboard.accounts' | translate: { count: grouped(sav.accounts) } }}</span>
+          </div>
+        }
+      </div>
+      @if (sav) {
+        <mifosx-coop-chart
+          [labels]="monthLabels()"
+          [notes]="monthNotes()"
+          [series]="monthly(['Deposits', sav.depositsByMonth], ['Withdrawals', sav.withdrawalsByMonth])"
+          [height]="260"
+          [ariaLabel]="'coopDashboard.Savings flows' | translate"
+        ></mifosx-coop-chart>
+      } @else {
+        <ng-container *ngTemplateOutlet="pending; context: { name: 'savings' }"></ng-container>
+      }
+    </mat-card>
+
+    <mat-card class="card span-4">
+      <div class="card__head">
+        <div>
+          <h3>
+            {{ 'coopDashboard.Savings by product' | translate }}
+            <mifosx-info-tip key="savingsByProduct"></mifosx-info-tip>
+          </h3>
+          <p class="card__hint">{{ 'coopDashboard.balance now' | translate }}</p>
+        </div>
+      </div>
+      @if (sav) {
+        <mifosx-coop-chart
+          kind="hbar"
+          [labels]="productLabels(sav)"
+          [series]="single('Balance', productValues(sav))"
+          [valueLabels]="true"
+          [height]="260"
+          [ariaLabel]="'coopDashboard.Savings by product' | translate"
+        ></mifosx-coop-chart>
+      } @else {
+        <ng-container *ngTemplateOutlet="pending; context: { name: 'savings' }"></ng-container>
+      }
+    </mat-card>
+
+    <mat-card class="card span-6">
+      <div class="card__head">
+        <div>
+          <h3>
+            {{ 'coopDashboard.Fixed deposits maturing' | translate }}
+            <mifosx-info-tip key="maturing"></mifosx-info-tip>
+          </h3>
+          <p class="card__hint">{{ 'coopDashboard.cash to have ready' | translate }}</p>
+        </div>
+      </div>
+      @if (sav) {
+        <div class="maturity">
+          @for (m of sav.fixedDepositsMaturing; track m.withinDays) {
+            <div class="maturity__col">
+              <span class="maturity__days">{{ 'coopDashboard.within days' | translate: { days: m.withinDays } }}</span>
+              <span class="maturity__amount">NPR {{ short(m.amount) }}</span>
+              <span class="maturity__count">{{
+                'coopDashboard.deposits' | translate: { count: grouped(m.count) }
+              }}</span>
+              <span class="maturity__bar">
+                <i [style.width.%]="(m.amount / (sav.fixedDepositsMaturing[2].amount || 1)) * 100"></i>
+              </span>
+            </div>
+          }
+        </div>
+      } @else {
+        <ng-container *ngTemplateOutlet="pending; context: { name: 'savings' }"></ng-container>
+      }
+    </mat-card>
+
+    <mat-card class="card span-6">
+      <div class="card__head">
+        <div>
+          <h3>
+            {{ 'coopDashboard.Deposit health' | translate }}
+            <mifosx-info-tip key="depositHealth"></mifosx-info-tip>
+          </h3>
+          <p class="card__hint">{{ 'coopDashboard.deposit health hint' | translate }}</p>
+        </div>
+      </div>
+      @if (sav) {
+        <dl class="facts facts--row">
+          <div class="fact">
+            <dt>{{ 'coopDashboard.average balance' | translate }}</dt>
+            <dd>NPR {{ short(sav.averageBalance) }}</dd>
+          </div>
+          <div class="fact">
+            <dt>
+              {{ 'coopDashboard.dormant accounts' | translate }}
+              <mifosx-info-tip key="dormantAccounts"></mifosx-info-tip>
+            </dt>
+            <dd>{{ grouped(sav.dormantAccounts) }}</dd>
+            <span class="fact__sub">NPR {{ short(sav.dormantBalance) }}</span>
+          </div>
+          <div class="fact">
+            <dt>
+              {{ 'coopDashboard.Top 10 depositors' | translate }}
+              <mifosx-info-tip key="topDepositors"></mifosx-info-tip>
+            </dt>
+            <dd>{{ percent(sav.topTenDepositorsShare) }}</dd>
+            <span class="meter__bar"><i [style.width.%]="sav.topTenDepositorsShare"></i></span>
+          </div>
+        </dl>
+      } @else {
+        <ng-container *ngTemplateOutlet="pending; context: { name: 'savings' }"></ng-container>
+      }
+    </mat-card>
+  </div>
+
+  <!-- ── 5. Members and ownership ────────────────────────────────────── -->
+  <h3 class="section">
+    <fa-icon icon="users"></fa-icon>
+    {{ 'coopDashboard.Members section' | translate }}
+  </h3>
+  <div class="coop__grid">
+    <mat-card class="card span-7">
+      <div class="card__head">
+        <div>
+          <h3>
+            {{ 'coopDashboard.Members by area' | translate }}
+            <mifosx-info-tip key="membersByArea"></mifosx-info-tip>
+          </h3>
+          <p class="card__hint">{{ 'coopDashboard.by permanent address' | translate }}</p>
+        </div>
+        @if (mem) {
+          <div class="card__aside">
+            <span class="big">{{ percent(mem.womenShare) }}</span>
+            <span class="muted">{{ 'coopDashboard.women' | translate }}</span>
+          </div>
+        }
+      </div>
+      @if (mem) {
+        <div class="chips">
+          <span class="chip">
+            <b>{{ grouped(mem.joinedThisYear) }}</b> {{ 'coopDashboard.joined this year' | translate }}
+          </span>
+          <span class="chip">
+            <b>{{ grouped(mem.pending) }}</b> {{ 'coopDashboard.awaiting activation' | translate }}
+          </span>
+          <span class="chip">
+            <b>{{ grouped(mem.dormant) }}</b> {{ 'coopDashboard.dormant' | translate }}
+            <mifosx-info-tip key="dormantMembers"></mifosx-info-tip>
+          </span>
+          <span class="chip">
+            <b>{{ grouped(mem.closedThisYear) }}</b> {{ 'coopDashboard.left this year' | translate }}
+          </span>
+        </div>
+        <mifosx-coop-area-table [areas]="mem.provinces" [notLocated]="mem.notLocated"></mifosx-coop-area-table>
+      } @else {
+        <ng-container *ngTemplateOutlet="pending; context: { name: 'membership', tall: true }"></ng-container>
+      }
+    </mat-card>
+
+    <mat-card class="card span-5">
+      <div class="card__head">
+        <div>
+          <h3>
+            {{ 'coopDashboard.New members' | translate }}
+            <mifosx-info-tip key="newMembers"></mifosx-info-tip>
+          </h3>
+          <p class="card__hint">{{ 'coopDashboard.by fiscal year' | translate }}</p>
+        </div>
+      </div>
+      @if (mem) {
+        <mifosx-coop-chart
+          [labels]="joinsLabels(mem)"
+          [series]="joinsSeries(mem)"
+          [stacked]="true"
+          format="count"
+          [height]="330"
+          [ariaLabel]="'coopDashboard.New members' | translate"
+        ></mifosx-coop-chart>
+      } @else {
+        <ng-container *ngTemplateOutlet="pending; context: { name: 'membership', tall: true }"></ng-container>
+      }
+    </mat-card>
+
+    <mat-card class="card span-6">
+      <div class="card__head">
+        <div>
+          <h3>
+            {{ 'coopDashboard.Members by age' | translate }}
+            <mifosx-info-tip key="membersByAge"></mifosx-info-tip>
+          </h3>
+          <p class="card__hint">{{ 'coopDashboard.active members' | translate }}</p>
+        </div>
+      </div>
+      @if (mem) {
+        <mifosx-coop-chart
+          kind="hbar"
+          [stacked]="true"
+          [labels]="ageLabels(mem)"
+          [series]="ageSeries(mem)"
+          format="count"
+          [height]="250"
+          [ariaLabel]="'coopDashboard.Members by age' | translate"
+        ></mifosx-coop-chart>
+      } @else {
+        <ng-container *ngTemplateOutlet="pending; context: { name: 'membership' }"></ng-container>
+      }
+    </mat-card>
+
+    <mat-card class="card span-6">
+      <div class="card__head">
+        <div>
+          <h3>
+            {{ 'coopDashboard.Share capital' | translate }}
+            <mifosx-info-tip key="capital"></mifosx-info-tip>
+          </h3>
+          <p class="card__hint">{{ 'coopDashboard.month end' | translate }}</p>
+        </div>
+      </div>
+      @if (cap) {
+        <dl class="facts facts--row">
+          <div class="fact">
+            <dt>{{ 'coopDashboard.capital' | translate }}</dt>
+            <dd>NPR {{ short(cap.shareCapital) }}</dd>
+          </div>
+          <div class="fact">
+            <dt>{{ 'coopDashboard.shareholders' | translate }}</dt>
+            <dd>{{ grouped(cap.shareholders) }}</dd>
+          </div>
+          <div class="fact">
+            <dt>
+              {{ 'coopDashboard.of members hold shares' | translate }}
+              <mifosx-info-tip key="coverage"></mifosx-info-tip>
+            </dt>
+            <dd>{{ percent(cap.memberCoverage) }}</dd>
+          </div>
+          <div class="fact">
+            <dt>{{ 'coopDashboard.average holding' | translate }}</dt>
+            <dd>NPR {{ short(cap.averageHolding) }}</dd>
+          </div>
+        </dl>
+        <mifosx-coop-chart
+          [labels]="monthLabels()"
+          [notes]="monthNotes()"
+          [series]="monthly(['Shares bought', cap.purchasedByMonth])"
+          [height]="150"
+          [ariaLabel]="'coopDashboard.Shares bought' | translate"
+        ></mifosx-coop-chart>
+      } @else {
+        <ng-container *ngTemplateOutlet="pending; context: { name: 'capital' }"></ng-container>
+      }
+    </mat-card>
+  </div>
+
+  <!-- ── 6. Income ───────────────────────────────────────────────────── -->
+  <h3 class="section">
+    <fa-icon icon="chart-line"></fa-icon>
+    {{ 'coopDashboard.Income section' | translate }}
+  </h3>
+  <div class="coop__grid">
+    <mat-card class="card span-8">
+      <div class="card__head">
+        <div>
+          <h3>
+            {{ 'coopDashboard.Income and expenses' | translate }}
+            <mifosx-info-tip key="incomeExpenses"></mifosx-info-tip>
+          </h3>
+          <p class="card__hint">{{ 'coopDashboard.from the accounts' | translate }}</p>
+        </div>
+        @if (inc) {
+          <div class="card__aside">
+            <span class="big" [class.bad]="inc.net < 0">NPR {{ short(inc.net) }}</span>
+            <span class="muted">{{ 'coopDashboard.net this year' | translate }}</span>
+          </div>
+        }
+      </div>
+      @if (inc) {
+        <mifosx-coop-chart
+          [labels]="monthLabels()"
+          [notes]="monthNotes()"
+          [series]="monthly(['Income', inc.incomeByMonth], ['Expenses', inc.expenseByMonth])"
+          [height]="280"
+          [ariaLabel]="'coopDashboard.Income and expenses' | translate"
+        ></mifosx-coop-chart>
+      } @else {
+        <ng-container *ngTemplateOutlet="pending; context: { name: 'income' }"></ng-container>
+      }
+    </mat-card>
+
+    <mat-card class="card span-4">
+      <div class="card__head">
+        <div>
+          <h3>
+            {{ 'coopDashboard.Margins' | translate }}
+            <mifosx-info-tip key="margins"></mifosx-info-tip>
+          </h3>
+          <p class="card__hint">{{ 'coopDashboard.yearly rates' | translate }}</p>
+        </div>
+      </div>
+      @if (inc) {
+        <div class="margins">
+          <div class="margin">
+            <span class="margin__value">{{ percent(inc.loanYield) }}</span>
+            <span class="margin__label">
+              {{ 'coopDashboard.Loan yield' | translate }}
+              <mifosx-info-tip key="loanYield"></mifosx-info-tip>
+            </span>
+          </div>
+          <div class="margin">
+            <span class="margin__value">{{ percent(inc.costOfDeposits) }}</span>
+            <span class="margin__label">
+              {{ 'coopDashboard.Cost of deposits' | translate }}
+              <mifosx-info-tip key="costOfDeposits"></mifosx-info-tip>
+            </span>
+          </div>
+          <div class="margin margin--accent">
+            <span class="margin__value">{{ percent(inc.spread) }}</span>
+            <span class="margin__label">
+              {{ 'coopDashboard.Spread' | translate }}
+              <mifosx-info-tip key="spread"></mifosx-info-tip>
+            </span>
+          </div>
+        </div>
+        @let rs = inc.rateSpread;
+        @let gauge = spreadGauge(rs.spread, rs.cap);
+        <div class="spread" [class.spread--over]="!rs.withinCap">
+          <div class="spread__head">
+            <span class="spread__label">
+              {{ 'coopDashboard.Rate spread' | translate }}
+              <mifosx-info-tip key="rateSpread"></mifosx-info-tip>
+            </span>
+            <span class="spread__value">
+              {{
+                rs.spread !== null && rs.spread !== undefined
+                  ? rs.spread + ' ' + ('coopDashboard.pts' | translate)
+                  : '–'
+              }}
+            </span>
+          </div>
+          <div class="spread__gauge" role="img" [attr.aria-label]="'coopDashboard.Rate spread' | translate">
+            <i class="spread__allowed" [style.width.%]="gauge.cap"></i>
+            <i class="spread__fill" [style.width.%]="gauge.value"></i>
+            <i class="spread__cap" [style.left.%]="gauge.cap"></i>
+          </div>
+          <div class="spread__foot">
+            <span>
+              {{
+                'coopDashboard.lending minus deposits'
+                  | translate: { lending: percent(rs.lendingRate, 2), deposit: percent(rs.depositRate, 2) }
+              }}
+            </span>
+            <span class="spread__status">
+              <fa-icon [icon]="rs.withinCap ? 'check-circle' : 'exclamation-circle'"></fa-icon>
+              {{ (rs.withinCap ? 'coopDashboard.within cap' : 'coopDashboard.over cap') | translate: { cap: rs.cap } }}
+            </span>
+          </div>
+        </div>
+        <div class="lines">
+          @for (type of ['INCOME', 'EXPENSE']; track type) {
+            <h4>{{ (type === 'INCOME' ? 'coopDashboard.Income' : 'coopDashboard.Expenses') | translate }}</h4>
+            @for (l of incomeLines(inc, $any(type)); track l.glCode) {
+              <div class="line">
+                <span class="line__name">{{ l.name }}</span>
+                <span class="line__amount">{{ short(l.amount) }}</span>
+                <span class="line__bar line__bar--{{ type }}">
+                  <i [style.width.%]="lineShare(l.amount, type === 'INCOME' ? inc.income : inc.expense)"></i>
+                </span>
+              </div>
+            }
+          }
+        </div>
+      } @else {
+        <ng-container *ngTemplateOutlet="pending; context: { name: 'income', tall: true }"></ng-container>
+      }
+    </mat-card>
+  </div>
+
+  <!-- ── 7. Financial health ─────────────────────────────────────────── -->
+  <h3 class="section">
+    <fa-icon icon="tachometer-alt"></fa-icon>
+    {{ 'coopDashboard.Financial health section' | translate }}
+  </h3>
+  <mat-card class="card">
+    <div class="card__head">
+      <div>
+        <h3>
+          {{ 'coopDashboard.PEARLS indicators' | translate }}
+          <mifosx-info-tip key="pearlsAbout"></mifosx-info-tip>
+        </h3>
+        <p class="card__hint">{{ 'coopDashboard.pearls hint' | translate }}</p>
+      </div>
+    </div>
+    @if (pearls) {
+      <mifosx-coop-pearls-card [pearls]="pearls"></mifosx-coop-pearls-card>
+    } @else {
+      <ng-container *ngTemplateOutlet="pending; context: { name: 'pearls', tall: true }"></ng-container>
+    }
+  </mat-card>
+</div>
