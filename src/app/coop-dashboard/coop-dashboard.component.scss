@@ -69,7 +69,7 @@
 .coop {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 18px;
 }
 
 // ── Header ──────────────────────────────────────────────────────────────
@@ -114,14 +114,13 @@
   color: var(--coop-accent);
 }
 
-// ── Headline tiles ──────────────────────────────────────────────────────
+// ── Headline tiles: four money figures, then three ratios ───────────────
 
 .coop__kpis {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
   gap: 14px;
 
-  // Four money tiles, then three ratio tiles, so both rows fill.
   mifosx-kpi-tile {
     grid-column: span 3;
   }
@@ -131,21 +130,53 @@
   }
 }
 
-// ── Cards ───────────────────────────────────────────────────────────────
+// ── Section headings ────────────────────────────────────────────────────
+
+.section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 14px 0 -4px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--viz-ink-2);
+
+  fa-icon {
+    color: var(--coop-accent);
+  }
+
+  &::after {
+    content: '';
+    flex: 1 1 auto;
+    height: 1px;
+    background: var(--viz-grid);
+  }
+}
+
+// ── Cards: rows of equal height ─────────────────────────────────────────
 
 .coop__grid {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
   gap: 16px;
-  align-items: start;
 }
 
 .span-4 {
   grid-column: span 4;
 }
 
+.span-5 {
+  grid-column: span 5;
+}
+
 .span-6 {
   grid-column: span 6;
+}
+
+.span-7 {
+  grid-column: span 7;
 }
 
 .span-8 {
@@ -153,27 +184,14 @@
 }
 
 .card {
+  display: flex;
+  flex-direction: column;
   padding: 18px 20px;
   border-radius: 12px;
   background: var(--coop-card);
   box-shadow: var(--coop-shadow);
   min-width: 0;
   box-sizing: border-box;
-}
-
-// The action list scrolls inside its card rather than stretching the loan-quality card beside it.
-.card--actions {
-  display: flex;
-  flex-direction: column;
-  max-height: 560px;
-
-  mifosx-coop-action-list {
-    flex: 1 1 auto;
-    min-height: 0;
-    overflow: auto;
-    margin-right: -8px;
-    padding-right: 8px;
-  }
 }
 
 .card__head {
@@ -184,6 +202,9 @@
   margin-bottom: 14px;
 
   h3 {
+    display: flex;
+    align-items: center;
+    gap: 4px;
     margin: 0;
     font-size: 16px;
     font-weight: 600;
@@ -211,13 +232,13 @@
   white-space: nowrap;
 }
 
-.big--bad {
-  color: var(--coop-bad-ink);
-}
-
 .muted {
   font-size: 12px;
   color: var(--viz-muted);
+}
+
+.bad {
+  color: var(--coop-bad-ink) !important;
 }
 
 .card__error {
@@ -228,6 +249,11 @@
   padding: 32px 16px;
   color: var(--viz-ink-2);
   font-size: 13px;
+
+  fa-icon {
+    color: var(--coop-bad-ink);
+    font-size: 18px;
+  }
 }
 
 .shimmer {
@@ -292,12 +318,8 @@
   overflow-x: auto;
 }
 
-.quality,
-.lines {
-  width: 100%;
-}
-
 .quality {
+  width: 100%;
   border-collapse: collapse;
   font-size: 13px;
 
@@ -308,6 +330,7 @@
     color: var(--viz-muted);
     padding: 6px 8px;
     border-bottom: 1px solid var(--viz-grid);
+    white-space: nowrap;
   }
 
   td {
@@ -336,6 +359,7 @@
   align-items: center;
   gap: 8px;
   font-weight: 500;
+  white-space: nowrap;
 }
 
 .cls-swatch {
@@ -350,56 +374,100 @@
   color: var(--viz-muted);
 }
 
-.facts {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 12px;
-  margin-top: 16px;
-  padding-top: 14px;
-  border-top: 1px solid var(--viz-grid);
-}
+// ── Meters and facts ────────────────────────────────────────────────────
 
-.fact {
+.meters {
   display: flex;
   flex-direction: column;
+  gap: 16px;
+}
+
+.meter {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px 12px;
+  align-items: center;
+}
+
+.meter__label {
+  display: inline-flex;
+  align-items: center;
   gap: 2px;
+  font-size: 13px;
+  color: var(--viz-ink-2);
 }
 
-.fact__label {
-  font-size: 12px;
-  color: var(--viz-muted);
-}
-
-.fact__value {
-  font-size: 16px;
+.meter__value {
+  font-size: 18px;
   font-weight: 700;
   color: var(--viz-ink);
 }
 
-.fact__value--bad {
-  color: var(--coop-bad-ink);
+.meter__sub {
+  grid-column: 1 / -1;
+  font-size: 12px;
+  color: var(--viz-muted);
 }
 
-.fact__bar,
+.meter__bar,
 .maturity__bar,
-.gauge__bar,
 .line__bar {
+  grid-column: 1 / -1;
   display: block;
-  height: 6px;
-  border-radius: 3px;
+  height: 8px;
+  border-radius: 4px;
   background: var(--viz-grid);
   overflow: hidden;
 
   i {
     display: block;
     height: 100%;
-    border-radius: 3px;
+    border-radius: 4px;
     background: var(--viz-1);
   }
 }
 
-.fact__bar {
-  margin-top: 4px;
+.facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 16px;
+  margin: 18px 0 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--viz-grid);
+}
+
+.facts--row {
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  margin: 0 0 14px;
+  padding: 0;
+  border: 0;
+}
+
+.fact {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+
+  dt {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    font-size: 12px;
+    color: var(--viz-muted);
+  }
+
+  dd {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--viz-ink);
+  }
+}
+
+.fact__sub {
+  font-size: 12px;
+  color: var(--viz-muted);
 }
 
 // ── Membership ──────────────────────────────────────────────────────────
@@ -412,7 +480,10 @@
 }
 
 .chip {
-  padding: 4px 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
   border-radius: 999px;
   font-size: 12px;
   color: var(--viz-ink-2);
@@ -421,6 +492,43 @@
   b {
     color: var(--viz-ink);
   }
+}
+
+// ── Fixed deposits maturing: three columns, nearest first ───────────────
+
+.maturity {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.maturity__col {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  border-radius: 10px;
+  background: var(--coop-hover);
+}
+
+.maturity__days {
+  font-size: 12px;
+  color: var(--viz-ink-2);
+}
+
+.maturity__amount {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--viz-ink);
+}
+
+.maturity__count {
+  font-size: 12px;
+  color: var(--viz-muted);
+}
+
+.maturity__bar {
+  margin-top: 6px;
 }
 
 // ── Income ──────────────────────────────────────────────────────────────
@@ -455,19 +563,20 @@
 }
 
 .margin__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
   font-size: 12px;
   color: var(--viz-muted);
 }
 
-.lines {
-  h4 {
-    margin: 10px 0 4px;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--viz-ink-2);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-  }
+.lines h4 {
+  margin: 10px 0 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--viz-ink-2);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .line {
@@ -492,7 +601,6 @@
 }
 
 .line__bar {
-  grid-column: 1 / -1;
   height: 4px;
 }
 
@@ -500,111 +608,24 @@
   background: var(--viz-2);
 }
 
-// ── Capital, maturities, concentration ──────────────────────────────────
-
-.stats {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-  margin-bottom: 12px;
-}
-
-.stats--two {
-  margin: 14px 0 0;
-  grid-template-columns: 1fr;
-}
-
-.stat {
-  display: flex;
-  flex-direction: column;
-}
-
-.stat__value {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--viz-ink);
-}
-
-.stat__label {
-  font-size: 12px;
-  color: var(--viz-muted);
-}
-
-.maturity {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.maturity__row {
-  display: grid;
-  grid-template-columns: 1fr auto auto;
-  gap: 4px 12px;
-  align-items: baseline;
-  font-size: 13px;
-}
-
-.maturity__days {
-  color: var(--viz-ink-2);
-}
-
-.maturity__count {
-  color: var(--viz-muted);
-  font-variant-numeric: tabular-nums;
-}
-
-.maturity__amount {
-  font-weight: 700;
-  color: var(--viz-ink);
-  font-variant-numeric: tabular-nums;
-}
-
-.maturity__bar {
-  grid-column: 1 / -1;
-}
-
-.gauges {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.gauge {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 6px 12px;
-  font-size: 13px;
-}
-
-.gauge__label {
-  color: var(--viz-ink-2);
-}
-
-.gauge__value {
-  font-weight: 700;
-  color: var(--viz-ink);
-}
-
-.gauge__bar {
-  grid-column: 1 / -1;
-  height: 8px;
-}
-
-.gauge__bar--risk i {
-  background: var(--cls-doubtful);
+// The info explanations open in an overlay outside this component.
+::ng-deep .coop-info-tooltip .mdc-tooltip__surface {
+  max-width: 320px !important;
+  padding: 8px 12px !important;
+  font-size: 12.5px !important;
+  line-height: 1.45 !important;
+  text-align: left !important;
 }
 
 // ── Smaller screens ─────────────────────────────────────────────────────
 
 @media screen and (width <= 1100px) {
   .span-4,
+  .span-5,
   .span-6,
+  .span-7,
   .span-8 {
     grid-column: span 12;
-  }
-
-  .facts {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
@@ -618,22 +639,23 @@
     grid-column: span 12;
   }
 
-  .card--actions {
-    max-height: none;
-  }
-
-  .coop__filters,
-  .coop__field,
-  .coop__field--year {
-    width: 100%;
-  }
-
   .coop__filters {
+    width: 100%;
     flex-wrap: nowrap;
   }
 
-  .facts {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .coop__field {
+    flex: 1 1 auto;
+    width: auto;
+    min-width: 0;
+  }
+
+  .coop__field--year {
+    flex: 0 0 120px;
+  }
+
+  .maturity {
+    grid-template-columns: 1fr;
   }
 
   .hide-sm {

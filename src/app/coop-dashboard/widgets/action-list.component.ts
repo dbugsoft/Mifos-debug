@@ -6,13 +6,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { ChangeDetectionStrategy, Component, Input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, computed, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { TranslatePipe } from '@ngx-translate/core';
 import { DualDateComponent } from 'app/shared/dual-date/dual-date.component';
 import { ActionCode, ActionGroup, ActionItem } from '../coop-dashboard.models';
 import { grouped, shortAmount } from '../coop-format';
+import { InfoTipComponent } from './info-tip.component';
 
 interface GroupLook {
   icon: string;
@@ -44,7 +45,15 @@ const ORDER: ActionCode[] = [
   'CASH_WITH_CASHIERS'
 ];
 
-/** What needs doing today, each group expandable to the records, each record linking to its screen. */
+const FOLLOW_UP: ActionCode[] = [
+  'LOANS_RECENTLY_OVERDUE',
+  'LOANS_DUE_THIS_WEEK',
+  'FIXED_DEPOSITS_MATURING',
+  'DOCUMENTS_EXPIRING',
+  'KYC_INCOMPLETE'
+];
+
+/** What needs doing today: a tile per kind of task, and the chosen one's records underneath, each linking to its screen. */
 @Component({
   selector: 'mifosx-coop-action-list',
   standalone: true,
@@ -52,29 +61,47 @@ const ORDER: ActionCode[] = [
     FaIconComponent,
     TranslatePipe,
     RouterLink,
-    DualDateComponent
+    DualDateComponent,
+    InfoTipComponent
   ],
   templateUrl: './action-list.component.html',
   styleUrl: './action-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ActionListComponent {
-  readonly open = signal<ActionCode | null>('LOANS_RECENTLY_OVERDUE');
-  ordered: (ActionGroup & GroupLook)[] = [];
+  private readonly chosen = signal<ActionCode | null>(null);
+  private readonly groupList = signal<(ActionGroup & GroupLook)[]>([]);
+  /** The chosen group, or the first one with anything in it. */
+  readonly selected = computed(() => {
+    const list = this.groupList();
+    return list.find((g) => g.code === this.chosen() && g.count) ?? list.find((g) => g.count) ?? null;
+  });
+
+  get ordered(): (ActionGroup & GroupLook)[] {
+    return this.groupList();
+  }
+
+  /** Tasks that mean contacting members, then work waiting on the office. */
+  readonly rows = computed(() => [
+    { key: 'Follow up with members', groups: this.groupList().filter((g) => FOLLOW_UP.includes(g.code)) },
+    { key: 'Waiting on the office', groups: this.groupList().filter((g) => !FOLLOW_UP.includes(g.code)) }
+  ]);
   today = '';
 
   @Input() set groups(groups: ActionGroup[] | null) {
-    this.ordered = ORDER.map((code) => groups?.find((g) => g.code === code))
-      .filter((g): g is ActionGroup => !!g)
-      .map((g) => ({ ...g, ...LOOK[g.code] }));
+    this.groupList.set(
+      ORDER.map((code) => groups?.find((g) => g.code === code))
+        .filter((g): g is ActionGroup => !!g)
+        .map((g) => ({ ...g, ...LOOK[g.code] }))
+    );
   }
 
   @Input() set asOf(value: string | null) {
     this.today = value ?? '';
   }
 
-  toggle(code: ActionCode): void {
-    this.open.set(this.open() === code ? null : code);
+  select(code: ActionCode): void {
+    this.chosen.set(code);
   }
 
   link(item: ActionItem, code: ActionCode): any[] | null {

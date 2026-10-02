@@ -9,6 +9,7 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { TranslatePipe } from '@ngx-translate/core';
+import { InfoTipComponent } from './info-tip.component';
 
 /** Up/down against a year earlier, and whether up is good news. */
 export interface TileChange {
@@ -22,13 +23,17 @@ export interface TileChange {
   standalone: true,
   imports: [
     FaIconComponent,
-    TranslatePipe
+    TranslatePipe,
+    InfoTipComponent
   ],
   template: `
     <div class="kpi" [class.kpi--loading]="loading">
       <div class="kpi__head">
         <span class="kpi__icon"><fa-icon [icon]="icon"></fa-icon></span>
         <span class="kpi__label">{{ label | translate }}</span>
+        @if (info) {
+          <mifosx-info-tip class="kpi__info" [key]="info"></mifosx-info-tip>
+        }
       </div>
       @if (loading) {
         <div class="kpi__shimmer"></div>
@@ -83,6 +88,8 @@ export interface TileChange {
 })
 export class KpiTileComponent {
   @Input() label = '';
+  /** Explanation key under coopDashboard.info. */
+  @Input() info = '';
   @Input() icon: any = 'chart-line';
   @Input() value = '';
   @Input() unit = '';

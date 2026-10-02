@@ -7,6 +7,7 @@
  */
 
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -36,6 +37,7 @@ import { CoopDashboardService } from './coop-dashboard.service';
 import { change, grouped, percent, shortAmount } from './coop-format';
 import { ActionListComponent } from './widgets/action-list.component';
 import { AreaTableComponent } from './widgets/area-table.component';
+import { InfoTipComponent } from './widgets/info-tip.component';
 import { ChartSeries, CoopChartComponent } from './widgets/coop-chart.component';
 import { KpiTileComponent, TileChange } from './widgets/kpi-tile.component';
 
@@ -80,7 +82,9 @@ const AD_MONTH = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'shor
     KpiTileComponent,
     CoopChartComponent,
     ActionListComponent,
-    AreaTableComponent
+    AreaTableComponent,
+    InfoTipComponent,
+    NgTemplateOutlet
   ],
   templateUrl: './coop-dashboard.component.html',
   styleUrl: './coop-dashboard.component.scss',

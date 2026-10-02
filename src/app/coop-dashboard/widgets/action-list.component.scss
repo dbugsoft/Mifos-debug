@@ -10,37 +10,58 @@
   display: block;
 }
 
-.actions,
-.action__items {
-  list-style: none;
-  margin: 0;
-  padding: 0;
+// ── Task tiles ──────────────────────────────────────────────────────────
+
+.tasks {
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 5), minmax(0, 1fr));
+  gap: 10px;
 }
 
-.action {
-  border-bottom: 1px solid var(--viz-grid);
+.tasks__caption {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--viz-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 
-  &:last-child {
-    border-bottom: 0;
+  .tasks + & {
+    margin-top: 16px;
   }
 }
 
-.action__head {
+@media screen and (width <= 1100px) {
+  .tasks {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  }
+}
+
+.task {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  padding: 10px 4px;
-  border: 0;
-  background: none;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  border: 1px solid var(--viz-grid);
+  border-radius: 10px;
+  background: var(--coop-card);
   color: inherit;
   font: inherit;
   text-align: left;
   cursor: pointer;
-  border-radius: 8px;
+  transition:
+    border-color 0.15s,
+    background 0.15s,
+    box-shadow 0.15s;
 
   &:hover:not(:disabled) {
+    border-color: var(--coop-accent);
     background: var(--coop-hover);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--coop-accent);
+    outline-offset: 2px;
   }
 
   &:disabled {
@@ -48,12 +69,23 @@
   }
 }
 
-.action--empty .action__head {
-  opacity: 0.55;
+.task--active {
+  border-color: var(--coop-accent);
+  background: var(--coop-accent-soft);
+  box-shadow: inset 0 -3px 0 var(--coop-accent);
 }
 
-.action__icon {
-  flex: 0 0 auto;
+.task--empty {
+  opacity: 0.5;
+}
+
+.task__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.task__icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -63,130 +95,165 @@
   font-size: 13px;
 }
 
-.action__icon--urgent {
+.task--urgent .task__icon {
   color: var(--coop-bad-ink);
   background: var(--coop-bad-soft);
 }
 
-.action__icon--soon {
+.task--soon .task__icon {
   color: var(--coop-warn-ink);
   background: var(--coop-warn-soft);
 }
 
-.action__icon--info {
+.task--info .task__icon {
   color: var(--coop-accent);
   background: var(--coop-accent-soft);
 }
 
-.action__text {
-  flex: 1 1 auto;
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.action__title {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--viz-ink);
-}
-
-.action__sub {
-  font-size: 12px;
-  color: var(--viz-muted);
-}
-
-.action__count {
-  min-width: 28px;
-  padding: 2px 8px;
-  border-radius: 999px;
-  font-size: 12px;
+.task__count {
+  font-size: 22px;
   font-weight: 700;
-  text-align: center;
+  color: var(--viz-ink);
   font-variant-numeric: tabular-nums;
 }
 
-.action__count--urgent {
+.task--urgent:not(.task--empty) .task__count {
   color: var(--coop-bad-ink);
-  background: var(--coop-bad-soft);
 }
 
-.action__count--soon {
-  color: var(--coop-warn-ink);
-  background: var(--coop-warn-soft);
+.task__label {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--viz-ink);
+  min-height: 2.6em;
 }
 
-.action__count--info {
-  color: var(--coop-accent);
-  background: var(--coop-accent-soft);
-}
-
-.action__chevron {
-  font-size: 11px;
+.task__amount {
+  font-size: 12px;
   color: var(--viz-muted);
-  width: 12px;
 }
 
-.action__items {
-  padding: 0 0 8px 40px;
+// ── Records of the chosen task ──────────────────────────────────────────
+
+.detail {
+  margin-top: 16px;
+  border-top: 1px solid var(--viz-grid);
+  padding-top: 12px;
 }
 
-.item {
+.detail__head {
   display: flex;
+  align-items: baseline;
   justify-content: space-between;
   gap: 12px;
-  padding: 7px 8px;
-  border-radius: 8px;
-  color: inherit;
-  text-decoration: none;
+  margin-bottom: 6px;
 
-  &:hover {
+  h4 {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--viz-ink);
+  }
+}
+
+.detail__count {
+  font-size: 12px;
+  color: var(--viz-muted);
+}
+
+.detail__scroll {
+  overflow-x: auto;
+}
+
+.detail__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+
+  th {
+    text-align: left;
+    font-weight: 500;
+    font-size: 12px;
+    color: var(--viz-muted);
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--viz-grid);
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--viz-grid);
+    color: var(--viz-ink);
+    white-space: nowrap;
+  }
+
+  tr:last-child td {
+    border-bottom: 0;
+  }
+}
+
+.row {
+  cursor: pointer;
+
+  &:hover td {
     background: var(--coop-hover);
   }
 }
 
-.item__main,
-.item__side {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.item__side {
-  align-items: flex-end;
-  text-align: right;
-  flex: 0 0 auto;
-}
-
-.item__name {
-  font-size: 13px;
-  font-weight: 500;
+.name a {
   color: var(--coop-accent);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-weight: 500;
+  text-decoration: none;
 }
 
-.item__detail,
-.item__date {
-  font-size: 12px;
-  color: var(--viz-muted);
-}
-
-.item__date--expired {
-  color: var(--coop-bad-ink);
-  font-weight: 600;
-}
-
-.item__amount {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--viz-ink);
+.num {
+  text-align: right !important;
   font-variant-numeric: tabular-nums;
 }
 
-.action__more {
-  padding: 4px 8px;
-  font-size: 12px;
+.strong {
+  font-weight: 600;
+}
+
+.muted {
+  color: var(--viz-muted) !important;
+}
+
+.badge {
+  display: inline-block;
+  margin-right: 6px;
+  padding: 0 6px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--coop-bad-ink);
+  background: var(--coop-bad-soft);
+}
+
+.go {
+  width: 20px;
   color: var(--viz-muted);
+  font-size: 11px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+@media screen and (width <= 760px) {
+  .tasks {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hide-sm {
+    display: none;
+  }
 }
