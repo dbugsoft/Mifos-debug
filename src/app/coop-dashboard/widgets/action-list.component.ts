@@ -96,6 +96,9 @@ export class ActionListComponent {
     );
   }
 
+  /** The office the dashboard shows, carried to the full list. */
+  @Input() officeId: number | null = null;
+
   @Input() set asOf(value: string | null) {
     this.today = value ?? '';
   }

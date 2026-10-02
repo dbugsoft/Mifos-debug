@@ -169,6 +169,16 @@ export interface Income {
   loanYield: number | null;
   costOfDeposits: number | null;
   spread: number | null;
+  rateSpread: RateSpread;
+}
+
+/** Interest rate spread as regulators measure it, on today's balances, against the cap. */
+export interface RateSpread {
+  lendingRate: number | null;
+  depositRate: number | null;
+  spread: number | null;
+  cap: number;
+  withinCap: boolean;
 }
 
 export type ActionCode =
@@ -205,7 +215,42 @@ export interface Actions {
   groups: ActionGroup[];
 }
 
-export type SectionName = 'summary' | 'membership' | 'savings' | 'loans' | 'capital' | 'income' | 'actions';
+/** One page of a task's records, for the full list. */
+export interface ActionPage {
+  code: ActionCode;
+  total: number;
+  amount: number;
+  offset: number;
+  limit: number;
+  items: ActionItem[];
+}
+
+export type PearlsGroup = 'P' | 'E' | 'A' | 'R' | 'L' | 'S';
+export type PearlsStatus = 'MET' | 'NOT_MET' | 'INFO' | 'NO_DATA' | 'NOT_APPLICABLE';
+
+/** One of WOCCU's 45 PEARLS indicators. */
+export interface PearlsIndicator {
+  code: string;
+  group: PearlsGroup;
+  value: number | null;
+  unit: 'PERCENT' | 'AMOUNT';
+  goalMin: number | null;
+  goalMax: number | null;
+  status: PearlsStatus;
+  missingTags: string[];
+  assumedNone: string[];
+}
+
+export interface Pearls {
+  period: DashPeriod;
+  indicators: PearlsIndicator[];
+  met: number;
+  notMet: number;
+  noData: number;
+  notApplicable: number;
+}
+
+export type SectionName = 'summary' | 'membership' | 'savings' | 'loans' | 'capital' | 'income' | 'actions' | 'pearls';
 
 /** A section on screen: loading, failed, or loaded. */
 export interface SectionState<T> {

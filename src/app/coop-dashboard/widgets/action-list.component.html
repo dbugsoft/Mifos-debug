@@ -47,6 +47,14 @@
       </h4>
       <span class="detail__count">
         {{ 'coopDashboard.showing' | translate: { shown: g.items.length, total: grouped(g.count) } }}
+        <a
+          class="detail__all"
+          [routerLink]="['/dashboard', 'tasks', g.code]"
+          [queryParams]="officeId ? { officeId: officeId } : {}"
+        >
+          {{ 'coopDashboard.View all' | translate: { count: grouped(g.count) } }}
+          <fa-icon icon="arrow-right"></fa-icon>
+        </a>
       </span>
     </div>
     <div class="detail__scroll">
