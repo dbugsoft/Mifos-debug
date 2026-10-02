@@ -25,6 +25,10 @@
       </mat-card-content>
     </mat-card>
 
-    <mifosx-analytics-dashboard [dashboard]="dashboardDefinition" [offices]="offices"></mifosx-analytics-dashboard>
+    @if (showCooperativeDashboard) {
+      <mifosx-coop-dashboard></mifosx-coop-dashboard>
+    } @else {
+      <mifosx-analytics-dashboard [dashboard]="dashboardDefinition" [offices]="offices"></mifosx-analytics-dashboard>
+    }
   </div>
 </div>

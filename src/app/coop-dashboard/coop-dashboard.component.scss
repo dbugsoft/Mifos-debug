@@ -1,0 +1,646 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+// Colour roles for the dashboard. Series colours are a validated categorical order starting with Mifos blue; dark
+// mode has its own steps rather than a flip. Status colours are reserved for good/warning/bad and always come with an
+// icon or label.
+:host {
+  display: block;
+  --viz-1: #1074b9;
+  --viz-2: #eb6834;
+  --viz-3: #1baf7a;
+  --viz-ink: #1f2124;
+  --viz-ink-2: #52545a;
+  --viz-muted: #7b7e86;
+  --viz-grid: #e6e7eb;
+  --viz-surface: #fff;
+  --viz-tooltip: #303135;
+  --coop-card: #fff;
+  --coop-shadow: 0 1px 2px rgb(16 24 40 / 6%), 0 1px 3px rgb(16 24 40 / 10%);
+  --coop-accent: #1074b9;
+  --coop-accent-soft: rgb(16 116 185 / 10%);
+  --coop-hover: rgb(16 116 185 / 6%);
+  --coop-good-ink: #1b7a1b;
+  --coop-good-soft: rgb(12 163 12 / 12%);
+  --coop-warn-ink: #9a6400;
+  --coop-warn-soft: rgb(250 178 25 / 18%);
+  --coop-bad-ink: #c62828;
+  --coop-bad-soft: rgb(208 59 59 / 11%);
+  --coop-shimmer-a: rgb(0 0 0 / 4%);
+  --coop-shimmer-b: rgb(0 0 0 / 9%);
+  --cls-pass: #0ca30c;
+  --cls-watchlist: #fab219;
+  --cls-substandard: #ec835a;
+  --cls-doubtful: #d03b3b;
+  --cls-loss: #8e1d1d;
+}
+
+:host-context(.dark-theme) {
+  --viz-1: #3987e5;
+  --viz-2: #d95926;
+  --viz-3: #199e70;
+  --viz-ink: #f1f1f3;
+  --viz-ink-2: #c4c6d0;
+  --viz-muted: #9a9ca4;
+  --viz-grid: #55575d;
+  --viz-surface: #424242;
+  --viz-tooltip: #1a1a19;
+  --coop-card: #424242;
+  --coop-shadow: 0 1px 3px rgb(0 0 0 / 40%);
+  --coop-accent: #5ba2ec;
+  --coop-accent-soft: rgb(91 162 236 / 16%);
+  --coop-hover: rgb(255 255 255 / 6%);
+  --coop-good-ink: #5fd35f;
+  --coop-good-soft: rgb(12 163 12 / 20%);
+  --coop-warn-ink: #fcc75a;
+  --coop-warn-soft: rgb(250 178 25 / 18%);
+  --coop-bad-ink: #ff8a80;
+  --coop-bad-soft: rgb(208 59 59 / 22%);
+  --coop-shimmer-a: rgb(255 255 255 / 5%);
+  --coop-shimmer-b: rgb(255 255 255 / 11%);
+  --cls-loss: #b23a3a;
+}
+
+.coop {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+// ── Header ──────────────────────────────────────────────────────────────
+
+.coop__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px 24px;
+}
+
+.coop__title h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--viz-ink);
+}
+
+.coop__subtitle {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--viz-ink-2);
+}
+
+.coop__filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.coop__field {
+  width: 240px;
+}
+
+.coop__field--year {
+  width: 150px;
+}
+
+.coop__refresh {
+  color: var(--coop-accent);
+}
+
+// ── Headline tiles ──────────────────────────────────────────────────────
+
+.coop__kpis {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 14px;
+
+  // Four money tiles, then three ratio tiles, so both rows fill.
+  mifosx-kpi-tile {
+    grid-column: span 3;
+  }
+
+  mifosx-kpi-tile:nth-child(n + 5) {
+    grid-column: span 4;
+  }
+}
+
+// ── Cards ───────────────────────────────────────────────────────────────
+
+.coop__grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+.span-4 {
+  grid-column: span 4;
+}
+
+.span-6 {
+  grid-column: span 6;
+}
+
+.span-8 {
+  grid-column: span 8;
+}
+
+.card {
+  padding: 18px 20px;
+  border-radius: 12px;
+  background: var(--coop-card);
+  box-shadow: var(--coop-shadow);
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+// The action list scrolls inside its card rather than stretching the loan-quality card beside it.
+.card--actions {
+  display: flex;
+  flex-direction: column;
+  max-height: 560px;
+
+  mifosx-coop-action-list {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: auto;
+    margin-right: -8px;
+    padding-right: 8px;
+  }
+}
+
+.card__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 14px;
+
+  h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--viz-ink);
+  }
+}
+
+.card__hint {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--viz-muted);
+}
+
+.card__aside {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+}
+
+.big {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--viz-ink);
+  white-space: nowrap;
+}
+
+.big--bad {
+  color: var(--coop-bad-ink);
+}
+
+.muted {
+  font-size: 12px;
+  color: var(--viz-muted);
+}
+
+.card__error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 32px 16px;
+  color: var(--viz-ink-2);
+  font-size: 13px;
+}
+
+.shimmer {
+  height: 240px;
+  border-radius: 10px;
+  background: linear-gradient(90deg, var(--coop-shimmer-a) 25%, var(--coop-shimmer-b) 37%, var(--coop-shimmer-a) 63%);
+  background-size: 400% 100%;
+  animation: coop-shimmer 1.2s ease-in-out infinite;
+}
+
+.shimmer--tall {
+  height: 320px;
+}
+
+@keyframes coop-shimmer {
+  0% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0 50%;
+  }
+}
+
+// ── Loan quality ────────────────────────────────────────────────────────
+
+.quality-bar {
+  display: flex;
+  gap: 2px;
+  height: 14px;
+  margin-bottom: 14px;
+}
+
+.quality-bar__seg {
+  display: block;
+  flex-basis: 0;
+  min-width: 4px;
+  border-radius: 4px;
+}
+
+.cls--PASS {
+  background: var(--cls-pass);
+}
+
+.cls--WATCHLIST {
+  background: var(--cls-watchlist);
+}
+
+.cls--SUBSTANDARD {
+  background: var(--cls-substandard);
+}
+
+.cls--DOUBTFUL {
+  background: var(--cls-doubtful);
+}
+
+.cls--LOSS {
+  background: var(--cls-loss);
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.quality,
+.lines {
+  width: 100%;
+}
+
+.quality {
+  border-collapse: collapse;
+  font-size: 13px;
+
+  th {
+    text-align: left;
+    font-weight: 500;
+    font-size: 12px;
+    color: var(--viz-muted);
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--viz-grid);
+  }
+
+  td {
+    padding: 7px 8px;
+    border-bottom: 1px solid var(--viz-grid);
+    color: var(--viz-ink);
+  }
+
+  tr:last-child td {
+    border-bottom: 0;
+  }
+}
+
+.num {
+  text-align: right !important;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.strong {
+  font-weight: 600;
+}
+
+.cls-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+}
+
+.cls-swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+
+.cls-icon {
+  font-size: 12px;
+  color: var(--viz-muted);
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--viz-grid);
+}
+
+.fact {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.fact__label {
+  font-size: 12px;
+  color: var(--viz-muted);
+}
+
+.fact__value {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--viz-ink);
+}
+
+.fact__value--bad {
+  color: var(--coop-bad-ink);
+}
+
+.fact__bar,
+.maturity__bar,
+.gauge__bar,
+.line__bar {
+  display: block;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--viz-grid);
+  overflow: hidden;
+
+  i {
+    display: block;
+    height: 100%;
+    border-radius: 3px;
+    background: var(--viz-1);
+  }
+}
+
+.fact__bar {
+  margin-top: 4px;
+}
+
+// ── Membership ──────────────────────────────────────────────────────────
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.chip {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  color: var(--viz-ink-2);
+  background: var(--coop-hover);
+
+  b {
+    color: var(--viz-ink);
+  }
+}
+
+// ── Income ──────────────────────────────────────────────────────────────
+
+.margins {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.margin {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--coop-hover);
+}
+
+.margin--accent {
+  background: var(--coop-accent-soft);
+
+  .margin__value {
+    color: var(--coop-accent);
+  }
+}
+
+.margin__value {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--viz-ink);
+}
+
+.margin__label {
+  font-size: 12px;
+  color: var(--viz-muted);
+}
+
+.lines {
+  h4 {
+    margin: 10px 0 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--viz-ink-2);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+}
+
+.line {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2px 8px;
+  padding: 4px 0;
+  font-size: 13px;
+}
+
+.line__name {
+  color: var(--viz-ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.line__amount {
+  font-weight: 600;
+  color: var(--viz-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.line__bar {
+  grid-column: 1 / -1;
+  height: 4px;
+}
+
+.line__bar--EXPENSE i {
+  background: var(--viz-2);
+}
+
+// ── Capital, maturities, concentration ──────────────────────────────────
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.stats--two {
+  margin: 14px 0 0;
+  grid-template-columns: 1fr;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat__value {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--viz-ink);
+}
+
+.stat__label {
+  font-size: 12px;
+  color: var(--viz-muted);
+}
+
+.maturity {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.maturity__row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 4px 12px;
+  align-items: baseline;
+  font-size: 13px;
+}
+
+.maturity__days {
+  color: var(--viz-ink-2);
+}
+
+.maturity__count {
+  color: var(--viz-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.maturity__amount {
+  font-weight: 700;
+  color: var(--viz-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.maturity__bar {
+  grid-column: 1 / -1;
+}
+
+.gauges {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.gauge {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px 12px;
+  font-size: 13px;
+}
+
+.gauge__label {
+  color: var(--viz-ink-2);
+}
+
+.gauge__value {
+  font-weight: 700;
+  color: var(--viz-ink);
+}
+
+.gauge__bar {
+  grid-column: 1 / -1;
+  height: 8px;
+}
+
+.gauge__bar--risk i {
+  background: var(--cls-doubtful);
+}
+
+// ── Smaller screens ─────────────────────────────────────────────────────
+
+@media screen and (width <= 1100px) {
+  .span-4,
+  .span-6,
+  .span-8 {
+    grid-column: span 12;
+  }
+
+  .facts {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media screen and (width <= 760px) {
+  .coop__kpis mifosx-kpi-tile,
+  .coop__kpis mifosx-kpi-tile:nth-child(n + 5) {
+    grid-column: span 6;
+  }
+
+  .coop__kpis mifosx-kpi-tile:last-child {
+    grid-column: span 12;
+  }
+
+  .card--actions {
+    max-height: none;
+  }
+
+  .coop__filters,
+  .coop__field,
+  .coop__field--year {
+    width: 100%;
+  }
+
+  .coop__filters {
+    flex-wrap: nowrap;
+  }
+
+  .facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hide-sm {
+    display: none;
+  }
+
+  .card {
+    padding: 14px;
+  }
+}
