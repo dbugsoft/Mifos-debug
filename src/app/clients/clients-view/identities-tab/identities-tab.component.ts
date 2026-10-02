@@ -326,8 +326,9 @@ export class IdentitiesTabComponent implements OnDestroy {
               description: response.description,
               documentType: selectedDocType,
               documentKey: response.documentKey,
-              issuanceDate: response.issuanceDate,
-              expiryDate: response.expiryDate,
+              // Kept as the yyyy-MM-dd strings the API returns, so Edit reads them like a loaded row.
+              issuanceDate: identifierData.issuanceDate ?? null,
+              expiryDate: identifierData.expiryDate ?? null,
               documents: [] as any[],
               clientId: this.clientId,
               status:
@@ -423,8 +424,8 @@ export class IdentitiesTabComponent implements OnDestroy {
           identity.documentType = selectedDocType;
           identity.documentKey = identifierData.documentKey;
           identity.description = identifierData.description;
-          identity.issuanceDate = response.issuanceDate;
-          identity.expiryDate = response.expiryDate;
+          identity.issuanceDate = identifierData.issuanceDate;
+          identity.expiryDate = identifierData.expiryDate;
           this.saveBsDates(identity.id, response, true);
           identity.status =
             identifierData.status === 'ACTIVE'

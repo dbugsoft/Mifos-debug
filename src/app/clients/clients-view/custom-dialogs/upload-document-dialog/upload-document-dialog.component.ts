@@ -58,8 +58,9 @@ class ServerErrorStateMatcher implements ErrorStateMatcher {
 }
 
 /** The API's [year, month, day] (or an ISO string) as a local Date, for the date fields. */
-function toDate(value: number[] | string | null | undefined): Date | null {
+function toDate(value: number[] | string | Date | null | undefined): Date | null {
   if (!value) return null;
+  if (value instanceof Date) return isNaN(value.getTime()) ? null : value;
   if (Array.isArray(value)) return new Date(value[0], value[1] - 1, value[2]);
   const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(value);
   return match ? new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3])) : null;
