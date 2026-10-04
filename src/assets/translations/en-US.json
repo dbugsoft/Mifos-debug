@@ -4007,6 +4007,8 @@
       "System Information": "System Information",
       "Table": "Table",
       "Tax Components": "Tax Components",
+      "Teller open date range": "Teller is open {{start}} – {{end}}",
+      "Teller open from date": "Teller is open from {{start}}",
       "Tellers": "Tellers",
       "Template I am trying to use": "This is the template I am trying to use. Is that fine.",
       "Templates": "Templates",
