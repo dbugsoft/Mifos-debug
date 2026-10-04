@@ -13,6 +13,7 @@ import { take } from 'rxjs';
 import { FormGroup, FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Dates } from 'app/core/utils/dates';
+import { TranslateService } from '@ngx-translate/core';
 
 /** Custom Services. */
 import { OrganizationService } from 'app/organization/organization.service';
@@ -41,6 +42,7 @@ export class EditCashierComponent implements OnInit {
   private organizationService = inject(OrganizationService);
   private settingsService = inject(SettingsService);
   private destroyRef = inject(DestroyRef);
+  private translateService = inject(TranslateService);
 
   /** Cashier Data. */
   cashierData: any = new Object();
@@ -52,6 +54,10 @@ export class EditCashierComponent implements OnInit {
   minDate = new Date(2000, 0, 1);
   /** Maximum Date allowed. */
   maxDate = new Date();
+  /** Parent Teller's start date - constrains the cashier's From/To date pickers. */
+  tellerStartDate: Date | null = null;
+  /** Parent Teller's end date, if any - constrains the cashier's From/To date pickers. */
+  tellerEndDate: Date | null = null;
   /** Hours options for time selection (00-23). */
   hours: string[] = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0'));
   /** Minutes options for time selection (00-59). */
@@ -76,6 +82,19 @@ export class EditCashierComponent implements OnInit {
           (element: any) => element.id === this.cashierData.data.staffId
         );
       });
+    // Route is tellers/:id/cashiers/:id/edit - one level deeper than create-cashier's route, so
+    // reaching the teller's :id segment takes a third .parent hop (cashier :id -> cashiers -> teller :id).
+    // See create-cashier.component.ts for the two-hop version and the fuller explanation.
+    const tellerId = this.route.snapshot.parent?.parent?.parent?.paramMap.get('id');
+    if (tellerId) {
+      this.organizationService
+        .getTeller(tellerId)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe((teller: any) => {
+          this.tellerStartDate = teller.startDate ? new Date(teller.startDate) : null;
+          this.tellerEndDate = teller.endDate ? new Date(teller.endDate) : null;
+        });
+    }
   }
 
   ngOnInit() {
@@ -124,6 +143,31 @@ export class EditCashierComponent implements OnInit {
       hourEndTime: [hourEnd.padStart(2, '0')],
       minEndTime: [minEnd.padStart(2, '0')]
     });
+  }
+
+  /**
+   * To Date picker's minimum - the later of the teller's start date and the chosen From date,
+   * falling back to the teller's start date (or the generic minDate) while From is still unset.
+   */
+  get toDateMin(): Date {
+    const fromDate = this.editCashierForm?.value?.startDate;
+    if (this.tellerStartDate && fromDate instanceof Date) {
+      return fromDate > this.tellerStartDate ? fromDate : this.tellerStartDate;
+    }
+    return fromDate instanceof Date ? fromDate : (this.tellerStartDate ?? this.minDate);
+  }
+
+  /** Hint shown under the date fields describing the teller's own open date range, if known. */
+  get tellerDateRangeHint(): string | null {
+    if (!this.tellerStartDate) {
+      return null;
+    }
+    const start = this.dateUtils.formatDate(this.tellerStartDate, this.settingsService.dateFormat);
+    if (this.tellerEndDate) {
+      const end = this.dateUtils.formatDate(this.tellerEndDate, this.settingsService.dateFormat);
+      return this.translateService.instant('labels.text.Teller open date range', { start, end });
+    }
+    return this.translateService.instant('labels.text.Teller open from date', { start });
   }
 
   /**

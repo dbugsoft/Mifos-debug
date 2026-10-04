@@ -13,6 +13,7 @@ import { take } from 'rxjs';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Dates } from 'app/core/utils/dates';
+import { TranslateService } from '@ngx-translate/core';
 
 /** Custom Services. */
 import { OrganizationService } from 'app/organization/organization.service';
@@ -41,6 +42,7 @@ export class CreateCashierComponent implements OnInit {
   private organizationService = inject(OrganizationService);
   private settingsService = inject(SettingsService);
   private destroyRef = inject(DestroyRef);
+  private translateService = inject(TranslateService);
 
   /** Minimum Date allowed. */
   minDate = new Date(2000, 0, 1);
@@ -48,6 +50,10 @@ export class CreateCashierComponent implements OnInit {
   maxDate = new Date();
   /** Cashier Template. */
   cashierTemplate: any;
+  /** Parent Teller's start date - constrains the cashier's From/To date pickers. */
+  tellerStartDate: Date | null = null;
+  /** Parent Teller's end date, if any - constrains the cashier's From/To date pickers. */
+  tellerEndDate: Date | null = null;
   /** Create cashier form. */
   createCashierForm: FormGroup;
   /** Hours options for time selection (00-23). */
@@ -68,6 +74,21 @@ export class CreateCashierComponent implements OnInit {
     this.route.data.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((data: { cashierTemplate: any }) => {
       this.cashierTemplate = data.cashierTemplate;
     });
+    // Route is tellers/:id/cashiers/create - the cashier template (resolved above) doesn't carry
+    // the teller's own dates, so they're fetched separately via the same getTeller() the Teller
+    // screens already use. Two .parent hops from this route reach the teller's :id segment
+    // (cashiers has no param of its own); edit-cashier.component.ts needs a third hop since it's
+    // nested one level deeper under its own cashier :id segment.
+    const tellerId = this.route.snapshot.parent?.parent?.paramMap.get('id');
+    if (tellerId) {
+      this.organizationService
+        .getTeller(tellerId)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe((teller: any) => {
+          this.tellerStartDate = teller.startDate ? new Date(teller.startDate) : null;
+          this.tellerEndDate = teller.endDate ? new Date(teller.endDate) : null;
+        });
+    }
   }
 
   ngOnInit() {
@@ -99,6 +120,31 @@ export class CreateCashierComponent implements OnInit {
       hourEndTime: ['00'],
       minEndTime: ['00']
     });
+  }
+
+  /**
+   * To Date picker's minimum - the later of the teller's start date and the chosen From date,
+   * falling back to the teller's start date (or the generic minDate) while From is still unset.
+   */
+  get toDateMin(): Date {
+    const fromDate = this.createCashierForm?.value?.startDate;
+    if (this.tellerStartDate && fromDate instanceof Date) {
+      return fromDate > this.tellerStartDate ? fromDate : this.tellerStartDate;
+    }
+    return fromDate instanceof Date ? fromDate : (this.tellerStartDate ?? this.minDate);
+  }
+
+  /** Hint shown under the date fields describing the teller's own open date range, if known. */
+  get tellerDateRangeHint(): string | null {
+    if (!this.tellerStartDate) {
+      return null;
+    }
+    const start = this.dateUtils.formatDate(this.tellerStartDate, this.settingsService.dateFormat);
+    if (this.tellerEndDate) {
+      const end = this.dateUtils.formatDate(this.tellerEndDate, this.settingsService.dateFormat);
+      return this.translateService.instant('labels.text.Teller open date range', { start, end });
+    }
+    return this.translateService.instant('labels.text.Teller open from date', { start });
   }
 
   /**
