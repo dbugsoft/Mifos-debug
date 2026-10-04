@@ -19,6 +19,8 @@ import { AsyncPipe } from '@angular/common';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { DashboardEngineComponent } from 'app/analytics/dashboard-engine/dashboard-engine.component';
 import { GLOBAL_ANALYTICS_DASHBOARD } from 'app/analytics/global-dashboard.config';
+import { AnalyticsVisibilityService } from 'app/analytics/services/analytics-visibility.service';
+import { CoopDashboardComponent } from 'app/coop-dashboard/coop-dashboard.component';
 
 /**
  * Dashboard component.
@@ -33,6 +35,7 @@ import { GLOBAL_ANALYTICS_DASHBOARD } from 'app/analytics/global-dashboard.confi
     MatAutocompleteTrigger,
     MatAutocomplete,
     DashboardEngineComponent,
+    CoopDashboardComponent,
     AsyncPipe
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -51,6 +54,8 @@ export class DashboardComponent implements OnInit {
   dashboardDefinition = GLOBAL_ANALYTICS_DASHBOARD;
   /** Office options from resolver */
   offices: any[] = [];
+  /** The cooperative dashboard (fineract-dbug ADR 0021) for those allowed to see it; the generic widgets otherwise. */
+  showCooperativeDashboard = inject(AnalyticsVisibilityService).canView({ permissionsAny: ['READ_NEPALDASHBOARD'] });
 
   constructor() {
     this.route.data.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((data: { offices: any[] }) => {

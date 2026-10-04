@@ -1,0 +1,183 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+:host {
+  display: block;
+  --viz-ink: #1f2124;
+  --viz-ink-2: #52545a;
+  --viz-muted: #7b7e86;
+  --viz-grid: #e6e7eb;
+  --coop-accent: #1074b9;
+  --coop-accent-soft: rgb(16 116 185 / 10%);
+  --coop-hover: rgb(16 116 185 / 6%);
+  --coop-bad-ink: #c62828;
+  --coop-bad-soft: rgb(208 59 59 / 11%);
+}
+
+:host-context(.dark-theme) {
+  --viz-ink: #f1f1f3;
+  --viz-ink-2: #c4c6d0;
+  --viz-muted: #9a9ca4;
+  --viz-grid: #55575d;
+  --coop-accent: #5ba2ec;
+  --coop-accent-soft: rgb(91 162 236 / 16%);
+  --coop-hover: rgb(255 255 255 / 6%);
+  --coop-bad-ink: #ff8a80;
+  --coop-bad-soft: rgb(208 59 59 / 22%);
+}
+
+.tasklist {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  color: var(--coop-accent);
+  font-size: 13px;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.tasklist__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin: 0;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--viz-ink);
+  }
+
+  button fa-icon {
+    margin-right: 6px;
+  }
+}
+
+.tasklist__summary {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--viz-ink-2);
+}
+
+.tasklist__card {
+  padding: 16px;
+  border-radius: 12px;
+}
+
+.tasklist__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.f-task {
+  flex: 1 1 280px;
+}
+
+.f-office {
+  flex: 0 1 220px;
+}
+
+.f-search {
+  flex: 1 1 260px;
+}
+
+.search-icon {
+  color: var(--viz-muted);
+  margin-right: 8px;
+}
+
+.tasklist__table {
+  overflow-x: auto;
+  transition: opacity 0.15s;
+
+  &.is-loading {
+    opacity: 0.55;
+  }
+
+  table {
+    width: 100%;
+  }
+}
+
+.row {
+  cursor: pointer;
+
+  &:hover {
+    background: var(--coop-hover);
+  }
+}
+
+.name {
+  color: var(--coop-accent);
+  font-weight: 500;
+}
+
+.num {
+  text-align: right !important;
+  font-variant-numeric: tabular-nums;
+}
+
+.strong {
+  font-weight: 600;
+}
+
+.muted {
+  color: var(--viz-muted);
+}
+
+.go {
+  width: 28px;
+  color: var(--viz-muted);
+  font-size: 11px;
+}
+
+.badge {
+  display: inline-block;
+  margin-right: 6px;
+  padding: 0 6px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--coop-bad-ink);
+  background: var(--coop-bad-soft);
+}
+
+.tasklist__empty {
+  padding: 32px 16px;
+  text-align: center;
+  color: var(--viz-muted);
+}
+
+@media screen and (width <= 760px) {
+  .hide-sm {
+    display: none;
+  }
+
+  .f-office,
+  .f-task,
+  .f-search {
+    flex: 1 1 100%;
+  }
+}
