@@ -388,7 +388,29 @@
     </mat-card>
   </div>
 
-  <!-- ── 4. Savings ──────────────────────────────────────────────────── -->
+  <!-- ── 4. Financial health ─────────────────────────────────────────── -->
+  <h3 class="section">
+    <fa-icon icon="tachometer-alt"></fa-icon>
+    {{ 'coopDashboard.Financial health section' | translate }}
+  </h3>
+  <mat-card class="card">
+    <div class="card__head">
+      <div>
+        <h3>
+          {{ 'coopDashboard.PEARLS indicators' | translate }}
+          <mifosx-info-tip key="pearlsAbout"></mifosx-info-tip>
+        </h3>
+        <p class="card__hint">{{ 'coopDashboard.pearls hint' | translate }}</p>
+      </div>
+    </div>
+    @if (pearls) {
+      <mifosx-coop-pearls-card [pearls]="pearls"></mifosx-coop-pearls-card>
+    } @else {
+      <ng-container *ngTemplateOutlet="pending; context: { name: 'pearls', tall: true }"></ng-container>
+    }
+  </mat-card>
+
+  <!-- ── 5. Savings ──────────────────────────────────────────────────── -->
   <h3 class="section">
     <fa-icon icon="piggy-bank"></fa-icon>
     {{ 'coopDashboard.Savings section' | translate }}
@@ -516,7 +538,7 @@
     </mat-card>
   </div>
 
-  <!-- ── 5. Members and ownership ────────────────────────────────────── -->
+  <!-- ── 6. Members and ownership ────────────────────────────────────── -->
   <h3 class="section">
     <fa-icon icon="users"></fa-icon>
     {{ 'coopDashboard.Members section' | translate }}
@@ -654,7 +676,7 @@
     </mat-card>
   </div>
 
-  <!-- ── 6. Income ───────────────────────────────────────────────────── -->
+  <!-- ── 7. Income ───────────────────────────────────────────────────── -->
   <h3 class="section">
     <fa-icon icon="chart-line"></fa-icon>
     {{ 'coopDashboard.Income section' | translate }}
@@ -776,26 +798,4 @@
       }
     </mat-card>
   </div>
-
-  <!-- ── 7. Financial health ─────────────────────────────────────────── -->
-  <h3 class="section">
-    <fa-icon icon="tachometer-alt"></fa-icon>
-    {{ 'coopDashboard.Financial health section' | translate }}
-  </h3>
-  <mat-card class="card">
-    <div class="card__head">
-      <div>
-        <h3>
-          {{ 'coopDashboard.PEARLS indicators' | translate }}
-          <mifosx-info-tip key="pearlsAbout"></mifosx-info-tip>
-        </h3>
-        <p class="card__hint">{{ 'coopDashboard.pearls hint' | translate }}</p>
-      </div>
-    </div>
-    @if (pearls) {
-      <mifosx-coop-pearls-card [pearls]="pearls"></mifosx-coop-pearls-card>
-    } @else {
-      <ng-container *ngTemplateOutlet="pending; context: { name: 'pearls', tall: true }"></ng-container>
-    }
-  </mat-card>
 </div>
