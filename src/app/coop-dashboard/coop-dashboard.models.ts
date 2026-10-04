@@ -105,7 +105,8 @@ export interface Savings {
   averageBalance: number;
 }
 
-export type LoanClassCode = 'PASS' | 'WATCHLIST' | 'SUBSTANDARD' | 'DOUBTFUL' | 'LOSS';
+/** NCRA Regulatory Standards 2082: four classes (fineract-dbug ADR 0029). */
+export type LoanClassCode = 'PASS' | 'SUBSTANDARD' | 'DOUBTFUL' | 'LOSS';
 
 export interface ClassRow {
   code: LoanClassCode;
@@ -116,6 +117,14 @@ export interface ClassRow {
   loans: number;
   outstanding: number;
   provision: number;
+}
+
+/** Pass loans overdue long enough to follow up: an early warning inside Pass, not a class. */
+export interface Watch {
+  minDaysOverdue: number;
+  maxDaysOverdue: number;
+  loans: number;
+  outstanding: number;
 }
 
 export interface Collection {
@@ -134,6 +143,7 @@ export interface Loans {
   nonPerformingShare: number;
   provisionRequired: number;
   classification: ClassRow[];
+  passWatch?: Watch;
   byProduct: Labelled[];
   byPurpose: Labelled[];
   collectionThisMonth: Collection;
