@@ -16,6 +16,7 @@ import { Route } from '../core/route/route.service';
 /** Custom Components */
 import { HomeComponent } from './home.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
+import { TaskListComponent } from 'app/coop-dashboard/task-list/task-list.component';
 import { CardMenuComponent, MenuCard } from './card-menu/card-menu.component';
 
 /** Cards for the Member Management landing page. */
@@ -112,11 +113,22 @@ const routes: Routes = [
     },
     {
       path: 'dashboard',
-      component: DashboardComponent,
       data: { title: 'Dashboard', breadcrumb: 'Dashboard' },
-      resolve: {
-        offices: OfficesResolver
-      }
+      children: [
+        {
+          path: '',
+          component: DashboardComponent,
+          resolve: {
+            offices: OfficesResolver
+          }
+        },
+        {
+          // Every record of one "needs attention" task (fineract-dbug ADR 0021)
+          path: 'tasks/:code',
+          component: TaskListComponent,
+          data: { title: 'Needs attention', breadcrumb: 'Needs attention' }
+        }
+      ]
     }
   ])
 ];
