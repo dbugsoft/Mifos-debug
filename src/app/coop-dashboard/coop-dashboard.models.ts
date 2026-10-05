@@ -105,7 +105,7 @@ export interface Savings {
   averageBalance: number;
 }
 
-/** NCRA Regulatory Standards 2082: four classes (fineract-dbug ADR 0029). */
+/** The four loan classes savings and credit cooperatives use (fineract-dbug ADR 0029). */
 export type LoanClassCode = 'PASS' | 'SUBSTANDARD' | 'DOUBTFUL' | 'LOSS';
 
 export interface ClassRow {
