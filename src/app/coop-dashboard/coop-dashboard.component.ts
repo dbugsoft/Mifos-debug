@@ -67,7 +67,7 @@ const SECTIONS: SectionName[] = [
 const AD_MONTH = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' });
 
 /**
- * The cooperative dashboard (fineract-dbug ADR 0021): headline figures, loan quality in NRB classes, what needs doing,
+ * The cooperative dashboard (fineract-dbug ADR 0021): headline figures, loan quality in NCRA classes, what needs doing,
  * savings and loan flows by BS month, membership, income and capital, for an office and a BS fiscal year.
  */
 @Component({
@@ -197,7 +197,6 @@ export class CoopDashboardComponent implements OnInit {
 
   readonly classIcon: Record<LoanClassCode, string> = {
     PASS: 'check-circle',
-    WATCHLIST: 'exclamation-triangle',
     SUBSTANDARD: 'exclamation-circle',
     DOUBTFUL: 'exclamation-circle',
     LOSS: 'times-circle'
