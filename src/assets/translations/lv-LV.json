@@ -4957,7 +4957,7 @@
       "critical": "High"
     },
     "Loan quality": "Loan quality",
-    "loan quality hint": "Outstanding loans by NRB class, by days the oldest instalment is overdue",
+    "loan quality hint": "Outstanding loans by NCRA class (Standards 2082), by how long the oldest instalment is overdue",
     "loans": "{{count}} loans",
     "Could not load": "This section could not be loaded.",
     "Retry": "Retry",
@@ -4970,7 +4970,6 @@
     "Provision": "Provision",
     "class": {
       "PASS": "Pass",
-      "WATCHLIST": "Watchlist",
       "SUBSTANDARD": "Substandard",
       "DOUBTFUL": "Doubtful",
       "LOSS": "Loss"
@@ -5096,11 +5095,10 @@
       "savingsToLoans": "Savings divided by loans outstanding. Above 1 means members’ savings fund all the loans, with money left to invest; well above 1 means savings are sitting idle.",
       "collectedToday": "Loan repayments received today, and how many.",
       "needsAttention": "Things to follow up today. Choose a tile to see the records; each one opens the loan, deposit or member.",
-      "loanQuality": "Every active loan is placed in a Nepal Rastra Bank class by how many days its oldest unpaid instalment is overdue. The bar shows each class’s share of the money outstanding.",
-      "provision": "Money set aside for loans that may not be repaid: each class’s outstanding balance times its provision rate (Pass 1%, Watchlist 5%, Substandard 25%, Doubtful 50%, Loss 100%). Guidance only; booking it is done in the accounts.",
+      "loanQuality": "Every active loan is placed in a class under NCRA’s Regulatory Standards 2082 for savings and credit cooperatives, by how many days its oldest unpaid instalment is overdue. The bar shows each class’s share of the money outstanding.",
+      "provision": "Money set aside for loans that may not be repaid: each class’s outstanding balance times its provision rate (Pass 1%, Substandard 25%, Doubtful 50%, Loss 100%). Guidance only; booking it is done in the accounts.",
       "class": {
-        "PASS": "Not overdue, or up to 30 days overdue. 1% provision.",
-        "WATCHLIST": "31 to 90 days overdue. Still performing, but follow up. 5% provision.",
+        "PASS": "Not overdue, or up to 90 days (3 months) overdue. 1% provision. Pass loans 31 to 90 days overdue are also shown on the watch line below.",
         "SUBSTANDARD": "91 to 180 days overdue. Non-performing. 25% provision.",
         "DOUBTFUL": "181 days to one year overdue. Non-performing. 50% provision.",
         "LOSS": "More than a year overdue. Non-performing. 100% provision."
@@ -5188,7 +5186,8 @@
         "S9": "Growth in net institutional capital over the last 12 months.",
         "S10": "Growth in membership over the last 12 months. Goal: at least 5%.",
         "S11": "Growth in total assets over the last 12 months. Should be above inflation plus 10%."
-      }
+      },
+      "watch": "Pass loans 31 to 90 days overdue. Still Pass under NCRA’s standards (1% provision), but follow them up now, before they become Substandard at 91 days."
     },
     "Follow up with members": "Follow up with members",
     "Waiting on the office": "Waiting on the office",
@@ -5403,6 +5402,7 @@
         "name": "Growth in total assets",
         "goal": "Inflation + 10%"
       }
-    }
+    },
+    "Watch": "Of which on watch"
   }
 }

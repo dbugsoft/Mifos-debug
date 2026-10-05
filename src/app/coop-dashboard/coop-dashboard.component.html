@@ -250,6 +250,26 @@
                   <td class="num hide-sm">{{ percent(c.provisionRate * 100, 0) }}</td>
                   <td class="num strong">{{ short(c.provision) }}</td>
                 </tr>
+                @if (c.code === 'PASS' && loans.passWatch?.loans) {
+                  <tr class="watch-row">
+                    <td>
+                      <span class="cls-label watch-label">
+                        <i class="cls-swatch cls--WATCH"></i>
+                        <fa-icon class="cls-icon" icon="exclamation-triangle"></fa-icon>
+                        {{ 'coopDashboard.Watch' | translate }}
+                        <mifosx-info-tip key="watch"></mifosx-info-tip>
+                      </span>
+                    </td>
+                    <td class="num hide-sm">
+                      {{ classDays(loans.passWatch.minDaysOverdue, loans.passWatch.maxDaysOverdue) }}
+                    </td>
+                    <td class="num">{{ grouped(loans.passWatch.loans) }}</td>
+                    <td class="num">{{ short(loans.passWatch.outstanding) }}</td>
+                    <td class="num hide-sm">{{ percent(classShare(loans.passWatch.outstanding)) }}</td>
+                    <td class="hide-sm"></td>
+                    <td></td>
+                  </tr>
+                }
               }
             </tbody>
           </table>

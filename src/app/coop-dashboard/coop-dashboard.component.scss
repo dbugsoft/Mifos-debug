@@ -34,7 +34,7 @@
   --coop-shimmer-a: rgb(0 0 0 / 4%);
   --coop-shimmer-b: rgb(0 0 0 / 9%);
   --cls-pass: #0ca30c;
-  --cls-watchlist: #fab219;
+  --cls-watch: #fab219;
   --cls-substandard: #ec835a;
   --cls-doubtful: #d03b3b;
   --cls-loss: #8e1d1d;
@@ -298,8 +298,8 @@
   background: var(--cls-pass);
 }
 
-.cls--WATCHLIST {
-  background: var(--cls-watchlist);
+.cls--WATCH {
+  background: var(--cls-watch);
 }
 
 .cls--SUBSTANDARD {
@@ -372,6 +372,17 @@
 .cls-icon {
   font-size: 12px;
   color: var(--viz-muted);
+}
+
+// The watch line sits inside Pass: indented and quieter, so it reads as "of which", not as a fifth class.
+.watch-row td {
+  color: var(--viz-muted);
+  font-size: 12px;
+}
+
+.watch-label {
+  padding-left: 18px;
+  font-weight: 400;
 }
 
 // ── Meters and facts ────────────────────────────────────────────────────
