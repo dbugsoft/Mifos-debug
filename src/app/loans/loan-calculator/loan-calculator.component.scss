@@ -1,0 +1,191 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+@use '../../shared/styles/compact-stepper' as *;
+
+.calculator {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 0 auto;
+  max-width: 84rem;
+  width: 90%;
+  padding-bottom: 32px;
+}
+
+// Same field sizing as the loan product forms: each field as wide as what it holds.
+@include compact-stepper('.calculator-form');
+
+// Row 1: member, product, principal, rate. Row 2: repayments, every + frequency, date.
+// Each field is as wide as what it holds; only member and product names vary, so only they grow.
+// Laptop and up only: on a phone the shared rule puts every field at full width.
+@media (width > 768px) {
+  .calculator-form .layout-row-wrap > mat-form-field:has([formcontrolname='member']) {
+    flex: 1 1 200px;
+  }
+
+  // Product names run longer than member names, so the product field takes more of the spare room.
+  .calculator-form .layout-row-wrap > mat-form-field:has([formcontrolname='productId']) {
+    flex: 2 1 240px;
+  }
+
+  .calculator-form .layout-row-wrap > mat-form-field:has([formcontrolname='principal']) {
+    flex: 0 1 200px;
+  }
+
+  .calculator-form .layout-row-wrap > mat-form-field:has([formcontrolname='interestRatePerPeriod']) {
+    flex: 0 1 240px;
+  }
+
+  .calculator-form .layout-row-wrap > mat-form-field:has([formcontrolname='numberOfRepayments']) {
+    flex: 0 1 168px;
+  }
+
+  .calculator-form .layout-row-wrap > mat-form-field:has([formcontrolname='repaymentEvery']) {
+    flex: 0 1 112px;
+  }
+
+  .calculator-form .layout-row-wrap > mat-form-field:has([formcontrolname='repaymentFrequencyType']) {
+    flex: 0 1 136px;
+  }
+
+  // Calendar icon, BS date, the BS | AD switch and the other calendar's date, on one line.
+  .calculator-form .layout-row-wrap > mifosx-nepali-date-input {
+    flex: 0 0 416px;
+    max-width: 100%;
+  }
+}
+
+.calculator-form .layout-row-wrap {
+  .row-break {
+    flex-basis: 100%;
+    height: 0;
+  }
+
+  // Calculate ends row 2, centred on the 48px fields.
+  .actions {
+    display: flex;
+    align-items: center;
+    height: 48px;
+    margin-left: auto;
+  }
+}
+
+button fa-icon {
+  margin-right: 8px;
+}
+
+.totals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+
+  mat-card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .label,
+  .hint {
+    color: var(--mat-sys-on-surface-variant);
+    font-size: 0.875rem;
+  }
+
+  .value {
+    font-size: 1.25rem;
+    font-weight: 500;
+  }
+}
+
+.chart-container {
+  position: relative;
+  height: 320px;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+.schedule-table {
+  width: 100%;
+
+  .num {
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .mat-mdc-footer-cell {
+    font-weight: 500;
+  }
+
+  // Blue header with white partitions, as on the member and loan product lists.
+  .mat-mdc-header-row {
+    background: var(--md-sys-color-primary, #1074b9);
+  }
+
+  th.mat-mdc-header-cell {
+    color: #fff;
+    font-weight: 600;
+    border-bottom: none;
+  }
+
+  th.mat-mdc-header-cell + th.mat-mdc-header-cell {
+    border-left: 1px solid rgb(255 255 255 / 35%);
+  }
+}
+
+.print-only {
+  display: none;
+}
+
+@media (width <= 768px) {
+  // 16px side gutter on phones, as on the page title.
+  .calculator {
+    width: auto;
+    margin: 0 16px;
+  }
+
+  .calculator-form .layout-row-wrap > mifosx-nepali-date-input {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+}
+
+@media (width <= 600px) {
+  .chart-container {
+    height: 240px;
+  }
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block;
+  }
+
+  .calculator {
+    max-width: none;
+  }
+
+  mat-card {
+    box-shadow: none !important;
+    break-inside: avoid;
+  }
+
+  .table-scroll {
+    overflow: visible;
+  }
+
+  .schedule-table tr {
+    break-inside: avoid;
+  }
+}

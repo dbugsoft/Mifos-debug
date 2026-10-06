@@ -1,6 +1,7 @@
 ﻿{
   "error.msg.upload.file.too.big": "Pasirinktas failas viršija {{args.0.value}} MB ribą. Pasirinkite mažesnį failą ir bandykite dar kartą.",
-  "APP_NAME": "COIMS",
+  "APP_NAME": "COFMIS",
+  "APP_FULL_NAME": "Cooperative Financial Management & Information System",
   "Logged in as": "prisijungęs kaip",
   "Remember me": "Prisimink mane",
   "errors": {
@@ -496,6 +497,8 @@
       "Home": "Namai"
     },
     "buttons": {
+      "Photo": "Photo",
+      "Open Module": "Open Module",
       "Accept Transfer": "Priimti perkėlimą",
       "Actions": "Veiksmai",
       "Activate": "Suaktyvinti",
@@ -622,6 +625,8 @@
       "Enable": "Įgalinti",
       "Expand All": "Išplėsti viską",
       "Export": "Eksportuoti",
+      "Export as JSON": "Export as JSON",
+      "Export as PDF": "Export as PDF",
       "Export to File": "Eksportuoti į failą",
       "Export CSV": "Eksportuoti CSV",
       "Export XLS": "Eksportuoti XLS",
@@ -769,7 +774,9 @@
       "DONE": "Atlikta",
       "Submitting": "Pateikiama",
       "OK": "Gerai",
-      "undo_account_transfer": "Atšaukti sąskaitos pervedimą"
+      "undo_account_transfer": "Atšaukti sąskaitos pervedimą",
+      "Calculate": "Calculate",
+      "Share": "Share"
     },
     "catalogs": {
       "Interest payment waiver": "Palūkanų mokėjimo atsisakymas",
@@ -1565,7 +1572,8 @@
       "identifier id": "identifikatoriaus id",
       "savings-transaction-datatable-tab works": "taupymo-operacijų-duomenų lentelės-skirtukas veikia",
       "successfully select option": "sėkmingai. Jei norite tęsti, pasirinkite iš toliau pateiktų parinkčių.",
-      "undo_account_transfer": "Atšaukti sąskaitos pervedimą"
+      "undo_account_transfer": "Atšaukti sąskaitos pervedimą",
+      "Loan Calculator": "Loan Calculator"
     },
     "inputs": {
       "# Remittance": "# Pervedimas",
@@ -3096,7 +3104,11 @@
       "s3_secret_key": "s3_slaptas_raktas",
       "task-management component": "užduočių valdymo komponentas",
       "to": "į",
-      "valid": "galioja"
+      "valid": "galioja",
+      "Member": "Member",
+      "Total Interest": "Total Interest",
+      "Total Repayment": "Total Repayment",
+      "First Repayment": "First Repayment"
     },
     "links": {
       "Community": "bendruomenė",
@@ -3114,6 +3126,17 @@
       "Working with Code": "Darbas su kodu"
     },
     "menus": {
+      "Member Management": "Member Management",
+      "Administration": "Administration",
+      "Collapse Sidebar": "Collapse sidebar",
+      "Collections": "Collections",
+      "Expand Sidebar": "Expand sidebar",
+      "Finance": "Finance",
+      "Home": "Home",
+      "Members": "Members",
+      "Open Menu": "Open menu",
+      "Operations": "Operations",
+      "Overview": "Overview",
       "Unassign Staff": "Atšaukti personalo priskyrimą",
       "Accounting": "Apskaita",
       "Account Overview": "Sąskaitos apžvalga",
@@ -3241,7 +3264,8 @@
       "Tasks": "Užduotys",
       "Remittances": "Pervedimai",
       "Process Remittance": "Apdoroti pervedimą",
-      "Undo Write-off": "Atšaukti nurašymą"
+      "Undo Write-off": "Atšaukti nurašymą",
+      "Loan Calculator": "Loan Calculator"
     },
     "placeholders": {
       "Add new server": "Pridėti naują serverį",
@@ -3254,7 +3278,8 @@
       "Enter last name": "Įveskite pavardę",
       "Enter remittance reference number": "Įveskite pervedimo nuorodos numerį",
       "Sender name": "Siuntėjo vardas",
-      "Loading vendors...": "Kraunami tiekėjai..."
+      "Loading vendors...": "Kraunami tiekėjai...",
+      "Search active member": "Search an active member by name or account number"
     },
     "status": {
       "Active": "Aktyvus",
@@ -3303,6 +3328,19 @@
       "undo_account_transfer": "Ar tikrai norite atšaukti šį sąskaitos pervedimą?"
     },
     "text": {
+      "Welcome back": "Welcome back, {{name}}!",
+      "Home subtitle": "Manage and monitor your cooperative efficiently with {{app}}.",
+      "Total Members": "Total Members",
+      "Total Savings": "Total Savings",
+      "Loans Outstanding": "Loans Outstanding",
+      "Quick Menu": "Quick Menu",
+      "Home Members Description": "Register members and manage their groups and centers.",
+      "Home Dashboard Description": "Key figures, trends and the work that needs attention.",
+      "Home Collection Sheet Description": "Record a meeting's collections for a group or center.",
+      "Home Accounting Description": "Journal entries, chart of accounts and period closing.",
+      "Home Reports Description": "Run member, loan, savings and accounting reports.",
+      "Home Admin Description": "Users, offices, products and system settings.",
+      "Home Quick Menu Tour": "Shortcuts to the main modules you can use.",
       "A": "A",
       "Ability to manage holidays for individual offices": "Galimybė tvarkyti atskirų biurų atostogas yra labai naudingas įrankis organizacijai, kuri veikia keliose vietose. Naudokite šią parinktį, kad tinkintumėte atostogas kiekvienam savo organizacijos biurui.",
       "About Us": "Apie Mus",
@@ -4052,7 +4090,9 @@
       "username": "Vartotojo vardas",
       "withhold tax for this account": "išskaičiuoti mokesčius už šią sąskaitą",
       "withoutCategory": "Bez kategorijos",
-      "“Maker-Checker” principle requires every tasks": "„Maker-Checker“ principas reikalauja, kad kiekvieną užduotį atliktų du žmonės, kad būtų sumažinta klaidų ir netinkamo naudojimo galimybė. Vienas asmuo pradeda procesą, o antrasis jį užbaigia."
+      "“Maker-Checker” principle requires every tasks": "„Maker-Checker“ principas reikalauja, kad kiekvieną užduotį atliktų du žmonės, kad būtų sumažinta klaidų ir netinkamo naudojimo galimybė. Vienas asmuo pradeda procesą, o antrasis jį užbaigia.",
+      "Pick a member from the search results": "Pick a member from the search results",
+      "Copied to clipboard": "Copied to clipboard"
     },
     "permissions": {
       "actions": {
@@ -4609,7 +4649,8 @@
     "PENDING": "LAUKIAMA",
     "INACTIVE": "NEAKTYVUS",
     "Process Remittance": "Apdoroti pervedimą",
-    "Allow full term length for each tranche disbursement": "Kai įjungta, kiekvienas tranšės išmokėjimas bus vykdomas pagal visą paskolos termino grafiką, o ne likusio termino ribose. Pasiekiama tik PROGRESYVIOJO paskolos grafiko tipui."
+    "Allow full term length for each tranche disbursement": "Kai įjungta, kiekvienas tranšės išmokėjimas bus vykdomas pagal visą paskolos termino grafiką, o ne likusio termino ribose. Pasiekiama tik PROGRESYVIOJO paskolos grafiko tipui.",
+    "Loan Calculator": "Loan repayment calculator"
   },
   "countries": {
     "AF": "Afganistanas",

@@ -7,3 +7,36 @@
  */
 
 @use '../shared/styles/list-layout' as *;
+
+// Same frameless look as the loan products list.
+.container {
+  padding: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.list-toolbar {
+  margin-bottom: 16px;
+
+  // Filter and buttons share one 36px control height.
+  .search-field {
+    --mat-form-field-container-height: 36px;
+    --mat-form-field-container-vertical-padding: 6px;
+  }
+}
+
+.members-table {
+  th.mat-mdc-header-cell,
+  td.mat-mdc-cell {
+    padding: 8px 16px;
+  }
+
+  // White partition between header columns.
+  th.mat-mdc-header-cell + th.mat-mdc-header-cell {
+    border-left: 1px solid rgb(255 255 255 / 35%);
+  }
+}
+
+.status-badge {
+  background: color-mix(in srgb, currentcolor 12%, transparent);
+}

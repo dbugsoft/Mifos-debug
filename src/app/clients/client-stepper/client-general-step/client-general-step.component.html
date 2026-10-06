@@ -132,7 +132,8 @@
     }
 
     <mifosx-nepali-date-input
-      class="flex-13"
+      class="bs-date"
+      [inline]="true"
       [label]="getDateLabel(createClientForm.value.legalFormId, ['Date of Birth', 'Incorporation Date'])"
       formControlName="dateOfBirth"
       [maxDate]="maxDate"
@@ -163,7 +164,8 @@
           </mat-select>
         </mat-form-field>
         <mifosx-nepali-date-input
-          class="flex-14"
+          class="bs-date"
+          [inline]="true"
           label="Incorporation Validity Till Date"
           formControlName="incorpValidityTillDate"
         />
@@ -253,7 +255,8 @@
 
     <!-- Row 4: Submitted On, Active?, Activation Date, Open Savings Account?, Savings Product -->
     <mifosx-nepali-date-input
-      class="flex-13"
+      class="bs-date"
+      [inline]="true"
       label="Submitted On"
       formControlName="submittedOnDate"
       [minDate]="minDate"
@@ -267,7 +270,8 @@
 
       @if (createClientForm.contains('activationDate')) {
         <mifosx-nepali-date-input
-          class="flex-13 activation-date"
+          class="bs-date"
+          [inline]="true"
           label="Activation Date"
           formControlName="activationDate"
           [minDate]="createClientForm.value.submittedOnDate"

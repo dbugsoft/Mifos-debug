@@ -92,6 +92,12 @@ const AD_FORMAT: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short', 
 })
 export class NepaliDateInputComponent implements ControlValueAccessor, OnInit {
   @Input() label = 'Date (BS)';
+  /**
+   * Inline layout: `18 Ashwin 2083 [cal] ... [BS|AD] 4 Oct 2026 AD`. The calendar icon sits right after the date,
+   * the active calendar leads the switch, and the other calendar's date follows it inside the field instead of as a
+   * hint underneath, so the field stays one line high next to other fields.
+   */
+  @Input() inline = false;
 
   /**
    * The selected date in BS as 'YYYY-MM-DD', or null when cleared or outside the BS calendar.
@@ -252,6 +258,11 @@ export class NepaliDateInputComponent implements ControlValueAccessor, OnInit {
   }
 
   /** The BS year's calendar is a projection that may still be corrected. */
+  /** The other calendar's date without the hint's leading "= ", for the inline layout. */
+  get otherCalendarDate(): string {
+    return this.otherCalendarHint.replace(/^= /, '');
+  }
+
   get isProvisional(): boolean {
     return !!this.selectedBs && this.bsCalendar.isProvisional(this.selectedBs.year);
   }

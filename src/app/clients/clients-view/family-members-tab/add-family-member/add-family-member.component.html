@@ -7,10 +7,10 @@
 -->
 
 <div class="add-family-member-container">
-  <form [formGroup]="addFamilyMemberForm" (ngSubmit)="submit()">
+  <form class="family-member-form" [formGroup]="addFamilyMemberForm" (ngSubmit)="submit()">
     <!-- ROW 1: First Name / Middle Name / Last Name -->
-    <div class="layout-row-wrap responsive-column align-start-center gap-25px">
-      <mat-form-field class="flex-33-minus-25px">
+    <div class="layout-row-wrap">
+      <mat-form-field>
         <mat-label>{{ 'labels.inputs.First Name' | translate }}</mat-label>
         <input
           formControlName="firstName"
@@ -28,7 +28,7 @@
         }
       </mat-form-field>
 
-      <mat-form-field class="flex-33-minus-25px">
+      <mat-form-field>
         <mat-label>{{ 'labels.inputs.Middle Name' | translate }}</mat-label>
         <input
           formControlName="middleName"
@@ -39,7 +39,7 @@
         />
       </mat-form-field>
 
-      <mat-form-field class="flex-33-minus-25px">
+      <mat-form-field>
         <mat-label>{{ 'labels.inputs.Last Name' | translate }}</mat-label>
         <input
           formControlName="lastName"
@@ -59,16 +59,16 @@
     </div>
 
     <!-- ROW 2: Date of Birth / Age / Gender / Is Dependent -->
-    <div class="layout-row-wrap responsive-column align-start-center gap-25px">
+    <div class="layout-row-wrap">
       <mifosx-nepali-date-input
-        class="flex-25-minus-25px"
+        [inline]="true"
         [label]="'labels.inputs.Date Of Birth' | translate"
         formControlName="dateOfBirth"
         [maxDate]="maxDate"
         (bsDateChange)="dateOfBirthBs = $event"
       />
 
-      <mat-form-field class="flex-25-minus-25px">
+      <mat-form-field>
         <mat-label>{{ 'labels.inputs.Age' | translate }}</mat-label>
         <input
           type="number"
@@ -82,7 +82,7 @@
         />
       </mat-form-field>
 
-      <mat-form-field class="flex-25-minus-25px">
+      <mat-form-field>
         <mat-label>{{ 'labels.inputs.Gender' | translate }}</mat-label>
         <mat-select formControlName="genderId" required>
           @for (gender of addFamilyMemberTemplate.genderIdOptions; track gender) {
@@ -99,18 +99,14 @@
         }
       </mat-form-field>
 
-      <mat-checkbox
-        formControlName="isDependent"
-        labelPosition="before"
-        class="flex-25-minus-25px is-dependent-checkbox"
-      >
+      <mat-checkbox formControlName="isDependent" labelPosition="before" class="is-dependent-checkbox">
         {{ 'labels.inputs.Is Dependent' | translate }}?
       </mat-checkbox>
     </div>
 
     <!-- ROW 3: Relationship / Marital Status / Qualification / Profession -->
-    <div class="layout-row-wrap responsive-column align-start-center gap-25px">
-      <mat-form-field class="flex-25-minus-25px">
+    <div class="layout-row-wrap">
+      <mat-form-field>
         <mat-label>{{ 'labels.inputs.Relationship' | translate }}</mat-label>
         <mat-select formControlName="relationshipId" required>
           @for (relation of addFamilyMemberTemplate.relationshipIdOptions; track relation) {
@@ -127,7 +123,7 @@
         }
       </mat-form-field>
 
-      <mat-form-field class="flex-25-minus-25px">
+      <mat-form-field>
         <mat-label>{{ 'labels.inputs.Marital Status' | translate }}</mat-label>
         <mat-select formControlName="maritalStatusId">
           @for (maritalStatus of addFamilyMemberTemplate.maritalStatusIdOptions; track maritalStatus) {
@@ -138,7 +134,7 @@
         </mat-select>
       </mat-form-field>
 
-      <mat-form-field class="flex-25-minus-25px">
+      <mat-form-field>
         <mat-label>{{ 'labels.inputs.Qualification' | translate }}</mat-label>
         <input
           formControlName="qualification"
@@ -149,7 +145,7 @@
         />
       </mat-form-field>
 
-      <mat-form-field class="flex-25-minus-25px">
+      <mat-form-field>
         <mat-label>{{ 'labels.inputs.Profession' | translate }}</mat-label>
         <mat-select formControlName="professionId">
           @for (profession of addFamilyMemberTemplate.professionIdOptions; track profession) {
@@ -161,7 +157,7 @@
       </mat-form-field>
     </div>
 
-    <div class="layout-row gap-32px layout-align-center">
+    <div class="form-actions">
       <button type="button" mat-raised-button [routerLink]="['../']">{{ 'labels.buttons.Cancel' | translate }}</button>
       <button type="submit" mat-raised-button color="primary" [disabled]="!addFamilyMemberForm.valid">
         {{ 'labels.buttons.Submit' | translate }}

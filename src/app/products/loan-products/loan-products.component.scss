@@ -6,16 +6,107 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-table {
-  width: 100%;
+@use '../../shared/styles/list-layout' as *;
 
-  .select-row:hover {
-    cursor: pointer;
+.container {
+  padding: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.list-toolbar {
+  margin-bottom: 16px;
+
+  // Filter, toggle and buttons share one 36px control height.
+  .search-field {
+    --mat-form-field-container-height: 36px;
+    --mat-form-field-container-vertical-padding: 6px;
   }
 }
 
-.form-container {
-  display: flex;
-  flex-direction: row;
-  gap: 2%;
+.members-table {
+  th.mat-mdc-header-cell,
+  td.mat-mdc-cell {
+    padding: 8px 16px;
+  }
+
+  // White partition between header columns.
+  th.mat-mdc-header-cell + th.mat-mdc-header-cell {
+    border-left: 1px solid rgb(255 255 255 / 35%);
+  }
+}
+
+.caret {
+  margin-left: 8px;
+}
+
+// Create menu renders in an overlay outside this component, hence ::ng-deep on its panel class.
+::ng-deep .create-menu {
+  --mat-menu-container-shape: 12px;
+  --mat-menu-item-label-text-weight: 500;
+  --mat-menu-item-hover-state-layer-color: color-mix(in srgb, var(--md-sys-color-primary, #1074b9) 8%, transparent);
+
+  min-width: 280px !important;
+
+  // Material caps menus at 280px; let the longest label stay on one line.
+  max-width: none !important;
+
+  .mat-mdc-menu-content {
+    padding: 8px;
+  }
+
+  .mat-mdc-menu-item {
+    min-height: 48px;
+    border-radius: 8px;
+  }
+
+  .mat-mdc-menu-item-text {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+  }
+
+  .menu-tile {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    margin-right: 16px;
+    border-radius: 8px;
+    color: var(--md-sys-color-primary, #1074b9);
+    background: color-mix(in srgb, var(--md-sys-color-primary, #1074b9) 10%, transparent);
+  }
+}
+
+// Two product families only, so a segmented toggle beats a dropdown: both are visible at once.
+.product-type-toggle {
+  flex-shrink: 0;
+
+  --mat-button-toggle-height: 36px;
+  --mat-button-toggle-shape: 8px;
+  --mat-button-toggle-selected-state-background-color: var(--md-sys-color-primary, #1074b9);
+  --mat-button-toggle-selected-state-text-color: var(--md-sys-color-on-primary, #fff);
+}
+
+// Short name is the product's code: set it like a ledger code, not prose.
+.product-code {
+  display: inline-block;
+  padding: 0 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 24px;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  color: var(--md-sys-color-primary, #1074b9);
+  background: color-mix(in srgb, var(--md-sys-color-primary, #1074b9) 10%, transparent);
+}
+
+.muted {
+  color: var(--md-sys-color-on-surface-variant, #64748b);
+}
+
+.status-badge {
+  background: color-mix(in srgb, currentcolor 12%, transparent);
 }

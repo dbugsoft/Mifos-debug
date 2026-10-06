@@ -5,3 +5,44 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
+
+@use '../member-tab' as *;
+
+// The shared notes component (also used by loans and savings) in the member page's look, here only.
+:host ::ng-deep {
+  @include member-tab;
+  @include framed-section($dark: false, $box: '.tab-container', $title: '> h3');
+
+  .tab-container {
+    .note-card {
+      margin-bottom: 12px;
+      padding: 16px;
+      border: 1px solid rgb(127 127 127 / 20%);
+      border-left: 3px solid var(--md-sys-color-primary, #1074b9);
+      border-radius: 8px;
+    }
+
+    .note-footer {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .note-meta {
+      font-size: 0.8rem;
+      opacity: 0.7;
+    }
+
+    .note-actions {
+      display: flex;
+      gap: 8px;
+    }
+  }
+}
+
+:host-context(.dark-theme) ::ng-deep .tab-container {
+  --legend-bg: #424242;
+}

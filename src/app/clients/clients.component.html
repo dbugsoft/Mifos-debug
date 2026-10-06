@@ -6,7 +6,7 @@
   file, You can obtain one at http://mozilla.org/MPL/2.0/.
 -->
 
-<mat-card class="container">
+<div class="container">
   <!-- Toolbar -->
   <div class="list-toolbar">
     <div class="toolbar-left">
@@ -74,7 +74,7 @@
       <!-- Name Column -->
       <ng-container matColumnDef="displayName">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'labels.inputs.name' | translate }}</th>
-        <td mat-cell *matCellDef="let row" [routerLink]="[row.id, 'general']" class="name-cell">
+        <td mat-cell *matCellDef="let row" class="name-cell">
           {{ hideClientData ? maskName(row.displayName) : row.displayName }}
         </td>
       </ng-container>
@@ -100,7 +100,7 @@
         <th mat-header-cell *matHeaderCellDef>{{ 'labels.inputs.Status' | translate }}</th>
         <td mat-cell *matCellDef="let row">
           <span class="status-badge" [ngClass]="row.status.code | statusLookup">
-            <fa-icon icon="stop"></fa-icon>
+            <fa-icon icon="circle"></fa-icon>
             {{ row.status.value | translate }}
           </span>
         </td>
@@ -113,7 +113,12 @@
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns" class="select-row"></tr>
+      <tr
+        mat-row
+        *matRowDef="let row; columns: displayedColumns"
+        [routerLink]="[row.id, 'general']"
+        class="select-row"
+      ></tr>
     </table>
 
     <mat-paginator
@@ -132,4 +137,4 @@
       <p>{{ 'labels.text.No client was found' | translate }}</p>
     </div>
   }
-</mat-card>
+</div>

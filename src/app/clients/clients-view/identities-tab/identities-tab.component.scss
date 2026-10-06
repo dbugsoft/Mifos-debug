@@ -6,6 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+@use '../member-tab' as *;
 @use '../../../../assets/styles/colours' as *;
 
 .tab-container {
@@ -188,4 +189,89 @@
   color: #e65100;
   font-size: 11px;
   font-weight: 600;
+}
+
+// Shared member tab look (padding, heading row, blue-header table), after the rules above.
+@include member-tab;
+
+// HEMIS layout: the tab an outlined box titled on its border.
+@include framed-section('.tab-container', '> .layout-row.align-start h3');
+
+// The title sits on the border; keep the button below it, inside the box, with space under it.
+.tab-container > .layout-row.align-start {
+  align-items: flex-start;
+  margin-bottom: 16px;
+
+  button {
+    margin-top: 12px;
+  }
+}
+
+@include label-value-grid('.identity-details', '.identity-details > div', 'dt', 'dd');
+
+// Same table pattern as Family Members: one line per row, click a row to open its details.
+.tab-container table.mat-mdc-table {
+  margin-bottom: 0;
+
+  th.mat-mdc-header-cell,
+  td.mat-mdc-cell {
+    white-space: nowrap;
+  }
+
+  .identity-row {
+    cursor: pointer;
+
+    &.open {
+      background: color-mix(in srgb, var(--md-sys-color-primary, #1074b9) 6%, transparent);
+
+      td {
+        border-bottom-color: transparent;
+      }
+    }
+  }
+
+  .details-row {
+    height: 0;
+
+    td {
+      padding: 0 16px;
+      border-bottom-width: 0;
+      white-space: normal;
+    }
+
+    &.open td {
+      padding: 4px 16px 16px;
+      border-bottom-width: 1px;
+      background: color-mix(in srgb, var(--md-sys-color-primary, #1074b9) 6%, transparent);
+    }
+  }
+
+  // S.No. with the open / close arrow before it.
+  .mat-column-sno {
+    width: 72px;
+  }
+
+  .expand-icon {
+    width: 14px;
+    margin-right: 8px;
+    color: var(--md-sys-color-primary, #1074b9);
+    font-size: 0.75rem;
+  }
+
+  // Delete in red, beside Edit in blue.
+  .account-action-button.delete-button {
+    --mat-button-protected-container-color: rgb(211 47 47 / 10%);
+    --mat-button-protected-label-text-color: #d32f2f;
+  }
+}
+
+.identity-documents {
+  margin-top: 12px;
+
+  .documents-label {
+    display: block;
+    margin-bottom: 8px;
+    color: rgb(127 127 127);
+    font-size: 0.875rem;
+  }
 }

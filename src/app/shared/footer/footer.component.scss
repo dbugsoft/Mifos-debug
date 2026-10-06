@@ -55,9 +55,10 @@
   }
 }
 
-// Dark theme support for compact mode
-.dark-theme .footer-compact {
-  color: var(--md-sys-color-on-surface-variant, #c4c6d0);
+// Dark theme support for compact mode. :host-context, since a plain .dark-theme ancestor
+// selector never matches from this component's scoped styles.
+:host-context(.dark-theme) .footer-compact {
+  color: #c4c6d0;
 }
 
 // ===== Default Mode (Shell) =====
@@ -86,8 +87,8 @@
   }
 }
 
-.dark-theme .footer-shell {
-  color: var(--md-sys-color-on-surface-variant, #c4c6d0);
+:host-context(.dark-theme) .footer-shell {
+  color: #c4c6d0;
 }
 
 // ===== Responsive for Compact Mode =====

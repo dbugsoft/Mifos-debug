@@ -1,0 +1,227 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+// The member page's tabs share one look: 24px padding, section headings with their button on the
+// right, blue-header tables, compact empty states and light row buttons.
+@mixin member-tab {
+  .tab-container {
+    padding: 24px;
+
+    h3 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    > h3 {
+      margin-bottom: 12px;
+    }
+
+    // Title left, its button right (the identities and family tabs' header row).
+    > .layout-row.align-start {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 12px;
+
+      > div {
+        margin: 0;
+      }
+
+      .action-button {
+        margin-left: auto;
+      }
+    }
+
+    // Blue header and compact rows, as on the member and loan product lists.
+    table.mat-mdc-table {
+      width: 100%;
+      margin-bottom: 24px;
+      border: 1px solid rgb(127 127 127 / 20%);
+      border-radius: 8px;
+      overflow: hidden;
+
+      .mat-mdc-header-row {
+        background: var(--md-sys-color-primary, #1074b9);
+      }
+
+      th.mat-mdc-header-cell {
+        color: #fff;
+        font-weight: 600;
+        border-bottom: none;
+      }
+
+      th.mat-mdc-header-cell + th.mat-mdc-header-cell {
+        border-left: 1px solid rgb(255 255 255 / 35%);
+      }
+
+      th.mat-mdc-header-cell,
+      td.mat-mdc-cell {
+        padding: 8px 16px;
+        // Every column starts on the left, header and values alike (the markup right-aligns amounts and
+        // centres actions with .r-amount / .center).
+        text-align: left !important;
+      }
+
+      th.mat-mdc-header-cell ::ng-deep .mat-sort-header-container {
+        justify-content: flex-start;
+      }
+
+      .mat-mdc-row:hover {
+        background: rgb(127 127 127 / 6%);
+        cursor: pointer;
+      }
+
+      // Row actions: light tinted squares, so the table's blue header stays the strongest blue.
+      .account-action-button,
+      .identity-action-button {
+        --mat-button-protected-container-color: color-mix(
+          in srgb,
+          var(--md-sys-color-primary, #1074b9) 12%,
+          transparent
+        );
+        --mat-button-protected-label-text-color: var(--md-sys-color-primary, #1074b9);
+        --mat-button-protected-container-elevation-shadow: none;
+        --mat-button-protected-hover-container-elevation-shadow: none;
+
+        min-width: 0;
+        height: 32px;
+        padding: 0 10px;
+        margin: 2px;
+        line-height: 32px;
+        font-size: 0.8rem;
+        white-space: nowrap;
+
+        .action-label {
+          margin-left: 6px;
+        }
+      }
+
+      // Account status as a word, not only a colour.
+      .status-chip {
+        display: inline-block;
+        margin-right: 8px;
+        padding: 0 8px;
+        border-radius: 10px;
+        background: color-mix(in srgb, currentcolor 12%, transparent);
+        font-size: 0.75rem;
+        font-weight: 600;
+        line-height: 20px;
+        white-space: nowrap;
+      }
+
+      // The "nothing found" footer row is still drawn, empty, when there is data: hide it.
+      tr.mat-mdc-footer-row:empty {
+        display: none;
+      }
+
+      td.mat-mdc-footer-cell {
+        border-bottom: none;
+      }
+    }
+
+    // An empty section: one muted line, no header row.
+    table.mat-mdc-table:has(.table-empty-state) {
+      .mat-mdc-header-row {
+        display: none;
+      }
+    }
+
+    .table-empty-state {
+      padding: 4px 0;
+      text-align: left;
+      opacity: 0.7;
+
+      p {
+        margin: 0;
+        font-size: 0.875rem;
+      }
+    }
+  }
+}
+
+// HEMIS-style framed section (as on HEMIS's pending student review): an outlined box whose title
+// sits in a small pill on the top border, like a fieldset legend. $box is the framed element and
+// $title its title (relative to the box).
+@mixin framed-section($box: '.tab-container', $title: '> h3', $dark: true) {
+  #{$box} {
+    --legend-bg: #fff;
+
+    position: relative;
+    margin: 28px 24px 24px;
+    padding: 0 24px 16px;
+    border: 1px solid rgb(127 127 127 / 45%);
+    border-radius: 10px;
+
+    #{$title} {
+      position: relative;
+      top: -12px;
+      display: inline-block;
+      margin: 0 0 -4px;
+      padding: 0 10px;
+      border: 1px solid rgb(127 127 127 / 35%);
+      border-radius: 10px;
+      background: var(--legend-bg);
+      font-size: 0.875rem;
+      font-weight: 600;
+      line-height: 22px;
+    }
+  }
+
+  // Off when included inside :host ::ng-deep; the caller then sets --legend-bg for dark mode itself.
+  @if $dark {
+    :host-context(.dark-theme) #{$box} {
+      --legend-bg: #424242;
+    }
+  }
+}
+
+// Label: value pairs in three columns, label muted, value in the app's blue (HEMIS detail grid).
+@mixin label-value-grid($grid, $pair, $label, $value) {
+  #{$grid} {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px 24px;
+    margin: 0;
+
+    @media (width <= 960px) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @media (width <= 600px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  #{$pair} {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    align-items: baseline;
+    min-width: 0;
+  }
+
+  #{$label} {
+    margin: 0;
+    color: rgb(127 127 127);
+    font-size: 0.875rem;
+
+    &::after {
+      content: ':';
+    }
+  }
+
+  #{$value} {
+    margin: 0;
+    color: var(--md-sys-color-primary, #1074b9);
+    font-size: 0.875rem;
+    font-weight: 500;
+    overflow-wrap: anywhere;
+  }
+}
