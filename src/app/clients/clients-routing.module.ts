@@ -26,6 +26,9 @@ import { DatatableTabComponent } from './clients-view/datatable-tab/datatable-ta
 import { MemberAddressTabComponent } from './member-address/member-address-tab/member-address-tab.component';
 import { PersonalDataTabComponent } from './clients-view/personal-data-tab/personal-data-tab.component';
 import { ClientActionsComponent } from './clients-view/client-actions/client-actions.component';
+import { ClientMembershipResolver, MembershipTemplateResolver } from './membership/membership.resolvers';
+import { MembershipTabComponent } from './membership/membership-tab/membership-tab.component';
+import { MembershipApplicationsComponent } from './membership/membership-applications/membership-applications.component';
 import { ViewChargeComponent } from './clients-view/charges/view-charge/view-charge.component';
 import { ClientPayChargesComponent } from './clients-view/charges/client-pay-charges/client-pay-charges.component';
 import { EditClientComponent } from './edit-client/edit-client.component';
@@ -72,7 +75,20 @@ const routes: Routes = [
           component: CreateClientComponent,
           resolve: {
             clientAddressFieldConfig: ClientAddressFieldConfigurationResolver,
-            clientTemplate: ClientTemplateResolver
+            clientTemplate: ClientTemplateResolver,
+            membershipTemplate: MembershipTemplateResolver
+          }
+        },
+        {
+          path: 'applications',
+          data: {
+            title: 'Membership Applications',
+            breadcrumb: 'Membership Applications',
+            routeParamBreadcrumb: false
+          },
+          component: MembershipApplicationsComponent,
+          resolve: {
+            membershipTemplate: MembershipTemplateResolver
           }
         },
         {
@@ -82,7 +98,8 @@ const routes: Routes = [
           resolve: {
             clientViewData: ClientViewResolver,
             clientTemplateData: ClientTemplateResolver,
-            clientDatatables: ClientDatatablesResolver
+            clientDatatables: ClientDatatablesResolver,
+            membershipApplication: ClientMembershipResolver
           },
           children: [
             {
@@ -98,6 +115,14 @@ const routes: Routes = [
                 clientAccountsData: ClientAccountsResolver,
                 clientChargesData: ClientChargesResolver,
                 clientCollateralData: ClientCollateralResolver
+              }
+            },
+            {
+              path: 'membership',
+              component: MembershipTabComponent,
+              data: { title: 'Membership', breadcrumb: 'Membership', routeParamBreadcrumb: false },
+              resolve: {
+                clientAccountsData: ClientAccountsResolver
               }
             },
             {
@@ -314,7 +339,9 @@ const routes: Routes = [
     ClientChargeViewResolver,
     ClientTransactionPayResolver,
     ClientDataAndTemplateResolver,
-    ClientCollateralResolver
+    ClientCollateralResolver,
+    MembershipTemplateResolver,
+    ClientMembershipResolver
   ]
 })
 export class ClientsRoutingModule {}

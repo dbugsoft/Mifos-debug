@@ -40,9 +40,18 @@
         <fa-icon icon="download" class="btn-icon"></fa-icon>
         {{ 'labels.buttons.Import Client' | translate }}
       </button>
+      <button
+        mat-stroked-button
+        color="primary"
+        [routerLink]="['applications']"
+        *mifosxHasPermission="'READ_MEMBERSHIP'"
+      >
+        <fa-icon icon="user-check" class="btn-icon"></fa-icon>
+        {{ 'membership.Applications' | translate }}
+      </button>
       <button mat-raised-button color="primary" [routerLink]="['create']" *mifosxHasPermission="'CREATE_CLIENT'">
         <fa-icon icon="plus" class="btn-icon"></fa-icon>
-        {{ 'labels.buttons.Create Client' | translate }}
+        {{ (shareFirstRule() ? 'membership.New Member Application' : 'labels.buttons.Create Client') | translate }}
       </button>
     </div>
   </div>

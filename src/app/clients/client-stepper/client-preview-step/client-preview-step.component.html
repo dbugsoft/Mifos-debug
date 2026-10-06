@@ -98,10 +98,12 @@
         </div>
       }
 
-      <div class="preview-item">
-        <span class="label">{{ 'labels.inputs.Active' | translate }}?</span>
-        <span class="value">{{ client.active | yesNo }}</span>
-      </div>
+      @if (!membershipMode) {
+        <div class="preview-item">
+          <span class="label">{{ 'labels.inputs.Active' | translate }}?</span>
+          <span class="value">{{ client.active | yesNo }}</span>
+        </div>
+      }
 
       @if (client.activationDate) {
         <div class="preview-item">

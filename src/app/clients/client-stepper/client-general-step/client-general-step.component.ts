@@ -84,6 +84,11 @@ export class ClientGeneralStepComponent implements OnInit {
 
   /** Client Template */
   @Input() clientTemplate: any;
+  /**
+   * With the share-first rule on (fineract-dbug ADR 0023) the member starts pending and becomes active, with the member
+   * savings account, when the board approves; so Active, Activation Date and Open Savings Account are not asked.
+   */
+  @Input() membershipMode = false;
   /** Create Client Form */
   createClientForm: FormGroup;
 
@@ -278,6 +283,9 @@ export class ClientGeneralStepComponent implements OnInit {
     const locale = this.settingsService.language.code;
     for (const key in generalDetails) {
       if (generalDetails[key] === '' || key === 'addSavings') {
+        delete generalDetails[key];
+      }
+      if (this.membershipMode && (key === 'active' || key === 'activationDate' || key === 'savingsProductId')) {
         delete generalDetails[key];
       }
     }

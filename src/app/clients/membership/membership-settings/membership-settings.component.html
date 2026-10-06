@@ -1,0 +1,95 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="membership-settings">
+  <form [formGroup]="form" (ngSubmit)="save()">
+    <div class="grid">
+      <mat-form-field>
+        <mat-label>{{ 'membership.Share-first rule' | translate }}</mat-label>
+        <mat-select formControlName="shareFirstEnabled">
+          <mat-option [value]="true">{{ 'membership.ruleOnOption' | translate }}</mat-option>
+          <mat-option [value]="false">{{ 'membership.ruleOffOption' | translate }}</mat-option>
+        </mat-select>
+        <mat-hint>{{ 'membership.ruleHint' | translate }}</mat-hint>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>{{ 'membership.Board decides within (days)' | translate }}</mat-label>
+        <input matInput type="number" min="1" max="365" formControlName="decisionDays" required />
+        <mat-hint>{{ 'membership.decisionDaysHint' | translate }}</mat-hint>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>{{ 'membership.Member savings product' | translate }}</mat-label>
+        <mat-select formControlName="savingsProductId">
+          @for (p of template()?.savingsProducts ?? []; track p.id) {
+            <mat-option [value]="p.id">{{ p.name }}</mat-option>
+          }
+        </mat-select>
+        <mat-hint>{{ 'membership.savingsProductHint' | translate }}</mat-hint>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>{{ 'membership.Share product' | translate }}</mat-label>
+        <mat-select formControlName="shareProductId">
+          @for (p of template()?.shareProducts ?? []; track p.id) {
+            <mat-option [value]="p.id">{{ p.name }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    @if (canUpdate) {
+      <div class="actions">
+        <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid || saving()">
+          {{ 'labels.buttons.Submit' | translate }}
+        </button>
+      </div>
+    }
+  </form>
+
+  <section class="cleanup">
+    <div class="head">
+      <h3>{{ 'membership.Active members who hold no shares' | translate }}</h3>
+      @if (withoutShares(); as w) {
+        <span class="count" [class.none]="w.count === 0">{{
+          'membership.toResolve' | translate: { count: w.count }
+        }}</span>
+      }
+    </div>
+    <p class="hint">{{ 'membership.cleanupHint' | translate }}</p>
+    <div class="table-wrap">
+      <table class="list">
+        <thead>
+          <tr>
+            <th>{{ 'membership.Member' | translate }}</th>
+            <th>{{ 'labels.inputs.Account No' | translate }}</th>
+            <th>{{ 'labels.inputs.Office' | translate }}</th>
+            <th>{{ 'membership.Active since' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (m of withoutShares()?.members ?? []; track m.clientId) {
+            <tr>
+              <td>
+                <a [routerLink]="['/members', m.clientId, 'general']">{{ m.name }}</a>
+              </td>
+              <td>{{ m.accountNo }}</td>
+              <td>{{ m.officeName }}</td>
+              <td>{{ m.activatedOn | dateFormat }}</td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="4" class="empty">{{ 'membership.None' | translate }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
