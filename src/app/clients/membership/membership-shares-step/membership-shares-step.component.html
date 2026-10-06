@@ -7,6 +7,20 @@
 -->
 
 <form [formGroup]="form" class="shares-step">
+  @if (mode === 'existing') {
+    <p class="existing">
+      <fa-icon icon="info-circle" class="m-r-10"></fa-icon>{{ 'membership.existingExplanation' | translate }}
+    </p>
+    <div class="layout-row-wrap gap-2percent responsive-column">
+      <mifosx-nepali-date-input
+        class="flex-48"
+        [label]="'membership.Application date' | translate"
+        formControlName="submittedOn"
+        [maxDate]="today"
+      />
+    </div>
+  }
+
   <div class="layout-row-wrap gap-2percent responsive-column">
     <mat-form-field class="flex-48">
       <mat-label>{{ 'membership.Share product' | translate }}</mat-label>
@@ -53,6 +67,28 @@
       }
     </mat-form-field>
 
+    @if (!hasCitizenship) {
+      <mat-form-field class="flex-48">
+        <mat-label>{{ 'membership.Citizenship number' | translate }}</mat-label>
+        <input matInput formControlName="citizenshipNumber" maxlength="50" required />
+        @if (form.controls.citizenshipNumber.hasError('required')) {
+          <mat-error>{{ 'membership.errors.citizenshipRequired' | translate }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field class="flex-48">
+        <mat-label>{{ 'membership.Issuing district' | translate }}</mat-label>
+        <mat-select formControlName="citizenshipDistrictCode" required>
+          @for (d of districts(); track d.code) {
+            <mat-option [value]="d.code">{{ districtName(d) }}</mat-option>
+          }
+        </mat-select>
+        @if (form.controls.citizenshipDistrictCode.hasError('required')) {
+          <mat-error>{{ 'membership.errors.districtRequired' | translate }}</mat-error>
+        }
+      </mat-form-field>
+    }
+
     <mat-form-field class="flex-48">
       <mat-label>{{ 'membership.Note' | translate }}</mat-label>
       <input
@@ -79,7 +115,7 @@
           </div>
         }
         <div class="row sum">
-          <span>{{ 'membership.To pay at approval' | translate }}</span>
+          <span>{{ (c.paidNow ? 'membership.To pay now' : 'membership.To pay at approval') | translate }}</span>
           <span>{{ 'membership.Rs' | translate }} {{ c.total | formatNumber }}</span>
         </div>
       } @else {
@@ -88,18 +124,74 @@
     </div>
   </div>
 
-  <p class="info">
-    <fa-icon icon="info-circle" class="m-r-10"></fa-icon>{{ 'membership.pendingExplanation' | translate }}
-  </p>
+  @if (paidNow) {
+    <h4 class="section">{{ 'membership.Payment' | translate }}</h4>
+    <div class="layout-row-wrap gap-2percent responsive-column">
+      <mat-form-field class="flex-48">
+        <mat-label>{{ 'membership.Amount received (cash)' | translate }}</mat-label>
+        <input matInput type="number" min="0" step="0.01" formControlName="amountReceived" required />
+        @if (form.controls.amountReceived.hasError('required')) {
+          <mat-error>{{ 'membership.errors.amountRequired' | translate }}</mat-error>
+        }
+        @if (form.controls.amountReceived.hasError('notTotal')) {
+          <mat-error>{{
+            'membership.errors.amountNotTotal'
+              | translate: { total: (form.controls.amountReceived.errors?.['notTotal'].total | formatNumber) }
+          }}</mat-error>
+        }
+      </mat-form-field>
+      <mat-form-field class="flex-48">
+        <mat-label>{{ 'membership.Receipt number' | translate }}</mat-label>
+        <input matInput formControlName="receiptNumber" maxlength="50" />
+        <mat-hint>{{ 'membership.receiptHint' | translate }}</mat-hint>
+      </mat-form-field>
+    </div>
+  }
 
-  <div class="layout-row align-center gap-2percent margin-t responsive-column">
-    <button mat-raised-button matStepperPrevious type="button">
-      <fa-icon icon="arrow-left" class="m-r-10"></fa-icon>
-      {{ 'labels.buttons.Previous' | translate }}
-    </button>
-    <button mat-raised-button color="primary" matStepperNext type="button" [disabled]="!valid()">
-      {{ 'labels.buttons.Next' | translate }}
-      <fa-icon icon="arrow-right" class="m-l-10"></fa-icon>
-    </button>
+  <h4 class="section">
+    {{ 'membership.Nominee' | translate }}
+    @if (!nomineeRequired) {
+      <span class="optional">({{ 'membership.optional' | translate }})</span>
+    }
+  </h4>
+  @if (hasNominee) {
+    <p class="muted">{{ 'membership.nomineeOnRecord' | translate }}</p>
+  }
+  <div class="layout-row-wrap gap-2percent responsive-column">
+    <mat-form-field class="flex-31">
+      <mat-label>{{ 'membership.Nominee name' | translate }}</mat-label>
+      <input matInput formControlName="nomineeName" maxlength="200" [required]="nomineeRequired" />
+      @if (form.controls.nomineeName.hasError('required')) {
+        <mat-error>{{ 'membership.errors.nomineeRequired' | translate }}</mat-error>
+      }
+    </mat-form-field>
+    <mat-form-field class="flex-31">
+      <mat-label>{{ 'membership.Relationship' | translate }}</mat-label>
+      <input matInput formControlName="nomineeRelationship" maxlength="100" [required]="nomineeRequired" />
+      @if (form.controls.nomineeRelationship.hasError('required')) {
+        <mat-error>{{ 'membership.errors.relationshipRequired' | translate }}</mat-error>
+      }
+    </mat-form-field>
+    <mat-form-field class="flex-31">
+      <mat-label>{{ 'membership.Nominee phone' | translate }}</mat-label>
+      <input matInput formControlName="nomineeMobileNo" maxlength="50" />
+    </mat-form-field>
   </div>
+
+  @if (!embedded) {
+    <p class="info">
+      <fa-icon icon="info-circle" class="m-r-10"></fa-icon>{{ 'membership.pendingExplanation' | translate }}
+    </p>
+
+    <div class="layout-row align-center gap-2percent margin-t responsive-column">
+      <button mat-raised-button matStepperPrevious type="button">
+        <fa-icon icon="arrow-left" class="m-r-10"></fa-icon>
+        {{ 'labels.buttons.Previous' | translate }}
+      </button>
+      <button mat-raised-button color="primary" matStepperNext type="button" [disabled]="!valid()">
+        {{ 'labels.buttons.Next' | translate }}
+        <fa-icon icon="arrow-right" class="m-l-10"></fa-icon>
+      </button>
+    </div>
+  }
 </form>

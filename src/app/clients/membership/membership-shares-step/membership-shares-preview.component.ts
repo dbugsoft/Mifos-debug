@@ -27,7 +27,9 @@ import { SharesChoice } from './membership-shares-step.component';
             <span class="label">{{ charge.name }}</span>
             <span>{{ 'membership.Rs' | translate }} {{ charge.amount | formatNumber }}</span>
           }
-          <span class="label">{{ 'membership.To pay at approval' | translate }}</span>
+          <span class="label">{{
+            (choice.paidNow ? 'membership.Paid with the application' : 'membership.To pay at approval') | translate
+          }}</span>
           <span
             ><b>{{ 'membership.Rs' | translate }} {{ choice.total | formatNumber }}</b></span
           >

@@ -14,6 +14,8 @@ import {
   MembersWithoutShares,
   MembershipApplication,
   MembershipApplyRequest,
+  MembershipApproveRequest,
+  MembershipRejectRequest,
   MembershipSettings,
   MembershipSettingsView,
   MembershipStatus,
@@ -21,7 +23,7 @@ import {
 } from './membership.models';
 
 /**
- * Membership applications (fineract-dbug ADR 0023): a person becomes a member by buying shares. Applying creates a
+ * Membership applications (fineract-dbug ADR 0023; the settings, ADR 0035): a person becomes a member by buying shares. Applying creates a
  * pending client; approving activates the member, opens the member savings account and buys the shares in one step.
  */
 @Injectable({ providedIn: 'root' })
@@ -64,36 +66,55 @@ export class MembershipService {
     });
   }
 
-  /** The member's application whatever its status, or null when there is none (or the user may not read it). */
+  /** The member's latest application whatever its status, or null when there is none (or the user may not read it). */
   forClient(clientId: number | string): Observable<MembershipApplication | null> {
+    return this.history(clientId).pipe(map((applications) => applications[0] ?? null));
+  }
+
+  /** Every application of the member, newest first; empty when there is none (or the user may not read them). */
+  history(clientId: number | string): Observable<MembershipApplication[]> {
     if (!this.canRead()) {
-      return of(null);
+      return of([]);
     }
     return this.http
-      .get<
-        MembershipApplication[]
-      >('/nepal/memberships', { params: new HttpParams().set('clientId', String(clientId)) })
-      .pipe(
-        map((applications) => applications[0] ?? null),
-        catchError(() => of(null))
-      );
+      .get<MembershipApplication[]>('/nepal/memberships', {
+        params: new HttpParams().set('clientId', String(clientId))
+      })
+      .pipe(catchError(() => of([])));
   }
 
   get(id: number): Observable<MembershipApplication> {
     return this.http.get<MembershipApplication>(`/nepal/memberships/${id}`);
   }
 
-  /** {@code date} is yyyy-MM-dd; today when left out. */
-  approve(id: number, date?: string): Observable<MembershipApplication> {
-    return this.http.post<MembershipApplication>(`/nepal/memberships/${id}`, date ? { date } : {}, {
+  approve(id: number, request: MembershipApproveRequest): Observable<MembershipApplication> {
+    return this.http.post<MembershipApplication>(`/nepal/memberships/${id}`, request, {
       params: new HttpParams().set('command', 'approve')
     });
   }
 
-  reject(id: number, reason: string, date?: string): Observable<MembershipApplication> {
-    return this.http.post<MembershipApplication>(`/nepal/memberships/${id}`, date ? { reason, date } : { reason }, {
+  reject(id: number, request: MembershipRejectRequest): Observable<MembershipApplication> {
+    return this.http.post<MembershipApplication>(`/nepal/memberships/${id}`, request, {
       params: new HttpParams().set('command', 'reject')
     });
+  }
+
+  /** Whether the signed-in user holds one of these permissions, or all functions. */
+  can(...permissions: string[]): boolean {
+    const held: string[] = this.authenticationService.getCredentials()?.permissions ?? [];
+    return [
+      'ALL_FUNCTIONS',
+      ...permissions
+    ].some((p) => held.includes(p));
+  }
+
+  /**
+   * Whether the signed-in user may decide this application: with "a different person must approve" on, not the
+   * person who entered it (the server refuses that too).
+   */
+  mayDecide(application: MembershipApplication, settings: MembershipSettings | null | undefined): boolean {
+    const me = this.authenticationService.getCredentials()?.userId;
+    return !settings?.separateApprover || application.submittedById == null || application.submittedById !== me;
   }
 
   membersWithoutShares(): Observable<MembersWithoutShares> {

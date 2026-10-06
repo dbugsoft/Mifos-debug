@@ -81,7 +81,11 @@
     @if (membershipMode) {
       <mat-step [completed]="sharesStep.valid()">
         <ng-template matStepLabel>{{ 'membership.SHARES' | translate }}</ng-template>
-        <mifosx-membership-shares-step #sharesStep [template]="membershipTemplate"></mifosx-membership-shares-step>
+        <mifosx-membership-shares-step
+          #sharesStep
+          [template]="membershipTemplate"
+          [mode]="existingApplication ? 'existing' : 'new'"
+        ></mifosx-membership-shares-step>
       </mat-step>
     }
 

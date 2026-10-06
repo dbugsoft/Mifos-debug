@@ -23,11 +23,44 @@
         <li>{{ 'membership.stepSavings' | translate }}</li>
         <li>
           {{
-            'membership.stepShares'
+            'membership.stepBuyShares'
               | translate: { kitta: application.kitta, amount: (application.shareAmount | formatNumber) }
           }}
         </li>
+        @for (charge of application.charges; track charge.id) {
+          <li>
+            {{ 'membership.stepCharge' | translate: { name: charge.name, amount: (charge.amount | formatNumber) } }}
+          </li>
+        }
       </ol>
+
+      @if (takesMoney) {
+        <mat-checkbox formControlName="moneyReceived" class="received">
+          {{ 'membership.moneyReceived' | translate: { amount: (application.amountDue | formatNumber) } }}
+        </mat-checkbox>
+        @if (form.controls.moneyReceived.touched && form.controls.moneyReceived.invalid) {
+          <p class="error">{{ 'membership.errors.confirmMoney' | translate }}</p>
+        }
+        <mat-form-field class="full">
+          <mat-label>{{ 'membership.Receipt number' | translate }}</mat-label>
+          <input matInput formControlName="receiptNumber" maxlength="50" />
+          <mat-hint>{{ 'membership.receiptHint' | translate }}</mat-hint>
+        </mat-form-field>
+      } @else {
+        <p class="paid">
+          {{
+            'membership.alreadyPaid'
+              | translate
+                : { amount: (application.amountReceived | formatNumber), date: (application.paidOn | dateFormat) }
+          }}
+        </p>
+      }
+
+      <mat-form-field class="full">
+        <mat-label>{{ 'membership.Approval note' | translate }}</mat-label>
+        <textarea matInput formControlName="approvalNote" rows="2" maxlength="1000"></textarea>
+        <mat-hint>{{ 'membership.optional' | translate }}</mat-hint>
+      </mat-form-field>
     } @else {
       <p class="lead">{{ 'membership.rejectLead' | translate }}</p>
       <mat-form-field class="full">
@@ -37,6 +70,34 @@
           <mat-error>{{ 'membership.errors.reasonRequired' | translate }}</mat-error>
         }
       </mat-form-field>
+
+      @if (refunds) {
+        <p class="paid">
+          {{
+            'membership.refundLead'
+              | translate
+                : { amount: (application.amountReceived | formatNumber), date: (application.paidOn | dateFormat) }
+          }}
+        </p>
+        <div class="pair">
+          <mat-form-field>
+            <mat-label>{{ 'membership.Amount refunded' | translate }}</mat-label>
+            <input matInput type="number" min="0" step="0.01" formControlName="refundAmount" required />
+            @if (form.controls.refundAmount.hasError('required')) {
+              <mat-error>{{ 'membership.errors.refundRequired' | translate }}</mat-error>
+            }
+            @if (form.controls.refundAmount.hasError('max') || form.controls.refundAmount.hasError('min')) {
+              <mat-error>{{
+                'membership.errors.refundRange' | translate: { amount: (application.amountReceived | formatNumber) }
+              }}</mat-error>
+            }
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>{{ 'membership.Refund receipt number' | translate }}</mat-label>
+            <input matInput formControlName="refundReceiptNumber" maxlength="50" />
+          </mat-form-field>
+        </div>
+      }
     }
 
     <mifosx-nepali-date-input

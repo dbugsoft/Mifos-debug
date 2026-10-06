@@ -213,7 +213,10 @@
     <!-- Row 3: Mobile No, Email Address, Member Type, Member Classification -->
     <mat-form-field class="flex-11">
       <mat-label>{{ 'labels.inputs.Mobile No' | translate }}</mat-label>
-      <input matInput type="text" formControlName="mobileNo" />
+      <input matInput type="text" formControlName="mobileNo" required />
+      @if (createClientForm.controls.mobileNo.hasError('required')) {
+        <mat-error>{{ 'membership.errors.phoneRequired' | translate }}</mat-error>
+      }
       @if (createClientForm.controls.mobileNo.hasError('pattern')) {
         <mat-error>Mobile number must be exactly 10 digits</mat-error>
       }

@@ -65,3 +65,39 @@
     flex: 1 1 100%;
   }
 }
+
+.flex-31 {
+  flex: 0 0 31%;
+  min-width: 0;
+}
+
+.section {
+  margin: 20px 0 8px;
+  font-weight: 600;
+
+  .optional {
+    font-weight: 400;
+    opacity: 0.6;
+  }
+}
+
+.existing {
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  background: #e8f1fb;
+}
+
+:host-context(.dark-theme) .existing {
+  background: rgb(16 116 185 / 18%);
+}
+
+.muted {
+  opacity: 0.7;
+}
+
+@media (width <= 768px) {
+  .flex-31 {
+    flex: 1 1 100%;
+  }
+}

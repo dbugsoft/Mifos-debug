@@ -126,6 +126,13 @@ export class CreateClientComponent implements AfterViewInit {
   /** Shares step, present while the share-first rule is on */
   @ViewChild(MembershipSharesStepComponent) sharesStep: MembershipSharesStepComponent;
 
+  /**
+   * An administrator entering an existing application (on paper) with its original date: `?existing=true`
+   * (fineract-dbug ADR 0035).
+   */
+  readonly existingApplication =
+    this.route.snapshot?.queryParamMap?.get('existing') === 'true' && this.membershipService.can('ENTER_MEMBERSHIP');
+
   /** With the share-first rule on, a new member is a membership application: a pending client buying shares. */
   get membershipMode(): boolean {
     return !!this.membershipTemplate?.settings.shareFirstEnabled && this.membershipTemplate.shareProducts.length > 0;

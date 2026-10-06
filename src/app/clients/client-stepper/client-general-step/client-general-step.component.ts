@@ -153,7 +153,10 @@ export class ClientGeneralStepComponent implements OnInit {
       genderId: [''],
       mobileNo: [
         '',
-        Validators.pattern(/^\d{10}$/)
+        [
+          Validators.required,
+          Validators.pattern(/^\d{10}$/)
+        ]
       ],
       emailAddress: [
         '',

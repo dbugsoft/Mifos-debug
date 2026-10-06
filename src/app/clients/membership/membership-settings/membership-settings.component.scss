@@ -22,6 +22,33 @@
   margin-top: 20px;
 }
 
+.rules-title {
+  margin: 28px 0 12px;
+}
+
+.deadline {
+  display: flex;
+  gap: 12px;
+
+  mat-form-field {
+    flex: 1;
+  }
+
+  .days {
+    flex: 0 0 110px;
+  }
+}
+
+.warning {
+  display: flex;
+  align-items: center;
+  margin: 16px 0 0;
+  padding: 10px 14px;
+  border-radius: 6px;
+  background: #fff1dc;
+  color: #7a4500;
+}
+
 .cleanup {
   margin-top: 32px;
 
