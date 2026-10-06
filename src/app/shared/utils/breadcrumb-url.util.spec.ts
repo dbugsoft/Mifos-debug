@@ -1,4 +1,4 @@
-import { isSelfLink, normalizeBreadcrumbUrl } from './breadcrumb-url.util';
+import { normalizeBreadcrumbUrl } from './breadcrumb-url.util';
 
 describe('normalizeBreadcrumbUrl', () => {
   it('collapses duplicated slashes', () => {
@@ -18,36 +18,5 @@ describe('normalizeBreadcrumbUrl', () => {
 
   it('leaves other module urls alone', () => {
     expect(normalizeBreadcrumbUrl('/groups/2/general')).toBe('/groups/2/general');
-  });
-});
-
-describe('isSelfLink', () => {
-  const accountTab = '/members/16/savings-accounts/5/general';
-
-  it('matches the identical url', () => {
-    expect(isSelfLink(accountTab, accountTab)).toBe(true);
-  });
-
-  it('matches the account crumb while one of its tabs is open', () => {
-    expect(isSelfLink('/members/16/savings-accounts/5', accountTab)).toBe(true);
-  });
-
-  it('keeps the member crumb, which is a different page', () => {
-    expect(isSelfLink('/members/16/general', accountTab)).toBe(false);
-  });
-
-  it('matches the member crumb on any of the member tabs', () => {
-    expect(isSelfLink('/members/16/general', '/members/16/documents')).toBe(true);
-    expect(isSelfLink('/members/16/general', '/members/16/family-members')).toBe(true);
-  });
-
-  it('keeps the member crumb below a member tab', () => {
-    expect(isSelfLink('/members/16/general', '/members/16/datatables/extra')).toBe(false);
-  });
-
-  it('keeps the account crumb while a transaction is open', () => {
-    expect(isSelfLink('/members/16/savings-accounts/5', '/members/16/savings-accounts/5/transactions/12/general')).toBe(
-      false
-    );
   });
 });

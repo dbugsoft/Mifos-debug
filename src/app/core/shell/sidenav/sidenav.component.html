@@ -145,6 +145,19 @@
           <a matLine>{{ 'labels.menus.Remittances' | translate }}</a>
         </mat-list-item>
         <mat-list-item
+          [routerLink]="['/loan-calculator']"
+          [matTooltipPosition]="tooltipPosition"
+          matTooltip="{{ 'tooltips.Loan Calculator' | translate }}"
+          routerLinkActive="active-menu"
+          [routerLinkActiveOptions]="{ exact: false }"
+          *mifosxHasPermission="'READ_LOAN'"
+        >
+          <mat-icon matListIcon>
+            <fa-icon icon="calculator" size="sm"></fa-icon>
+          </mat-icon>
+          <a matLine>{{ 'labels.menus.Loan Calculator' | translate }}</a>
+        </mat-list-item>
+        <mat-list-item
           [routerLink]="['/notifications']"
           [matTooltipPosition]="tooltipPosition"
           matTooltip="{{ 'tooltips.Notifications' | translate }}"

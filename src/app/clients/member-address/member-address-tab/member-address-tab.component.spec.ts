@@ -22,7 +22,7 @@ import {
   faTrash
 } from '@fortawesome/free-solid-svg-icons';
 import { TranslateModule } from '@ngx-translate/core';
-import { of, throwError } from 'rxjs';
+import { BehaviorSubject, of, throwError } from 'rxjs';
 
 import { AuthenticationService } from 'app/core/authentication/authentication.service';
 import { ClientActionNotifierService } from 'app/clients/clients-view/client-actions/client-action-notifier.service';
@@ -39,6 +39,7 @@ describe('MemberAddressTabComponent', () => {
   let dialog: { open: jest.Mock };
   let notifier: { notify: jest.Mock };
   let dialogResult: unknown;
+  let parentParams: BehaviorSubject<ReturnType<typeof convertToParamMap>>;
 
   const create = async (addresses: MemberAddress[] | Error) => {
     addressService = {
@@ -48,6 +49,7 @@ describe('MemberAddressTabComponent', () => {
     dialogResult = undefined;
     dialog = { open: jest.fn(() => ({ afterClosed: () => of(dialogResult) })) };
     notifier = { notify: jest.fn() };
+    parentParams = new BehaviorSubject(convertToParamMap({ clientId: '16' }));
 
     await TestBed.configureTestingModule({
       imports: [
@@ -58,7 +60,7 @@ describe('MemberAddressTabComponent', () => {
         provideNoopAnimations(),
         {
           provide: ActivatedRoute,
-          useValue: { parent: { snapshot: { paramMap: convertToParamMap({ clientId: '16' }) } } }
+          useValue: { parent: { paramMap: parentParams } }
         },
         { provide: MemberAddressService, useValue: addressService },
         { provide: ClientActionNotifierService, useValue: notifier },
@@ -141,6 +143,18 @@ describe('MemberAddressTabComponent', () => {
     expect(addressService.delete).toHaveBeenCalledWith('16', 'PERMANENT');
     expect(notifier.notify).toHaveBeenCalledWith('clients.memberAddress.messages.removed');
     expect(addressService.getAddresses).toHaveBeenCalledTimes(2);
+  });
+
+  it('loads and saves for the member in the address after Back/Forward reuses the tab', async () => {
+    await create([mockAddress()]);
+    dialogResult = { delete: true };
+
+    parentParams.next(convertToParamMap({ clientId: '17' }));
+    fixture.detectChanges();
+    element('remove-PERMANENT')!.click();
+
+    expect(addressService.getAddresses).toHaveBeenLastCalledWith('17');
+    expect(addressService.delete).toHaveBeenCalledWith('17', 'PERMANENT');
   });
 
   it('offers a retry when the addresses cannot be loaded', async () => {

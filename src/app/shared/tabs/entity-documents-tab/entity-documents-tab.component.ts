@@ -97,7 +97,8 @@ export class EntityDocumentsTabComponent implements OnInit, OnDestroy {
   uploadDocument(): void {
     const uploadDocumentDialogRef = this.dialog.open(UploadDocumentDialogComponent, {
       data: { documentIdentifier: false, entityType: '' },
-      width: '33rem'
+      width: '56rem',
+      maxWidth: '95vw'
     });
     uploadDocumentDialogRef.afterClosed().subscribe((dialogResponse: any) => {
       if (dialogResponse) {

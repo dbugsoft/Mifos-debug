@@ -85,13 +85,15 @@ export class AddressTabComponent {
    * @param {TranslateService} translateService Translate Service.
    */
   constructor() {
+    this.route.parent.paramMap
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((params) => (this.clientId = params.get('clientId')));
     this.route.data
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((data: { clientAddressData: any; clientAddressFieldConfig: any; clientAddressTemplateData: any }) => {
         this.clientAddressData = data.clientAddressData;
         this.clientAddressFieldConfig = data.clientAddressFieldConfig;
         this.clientAddressTemplate = data.clientAddressTemplateData;
-        this.clientId = this.route.parent.snapshot.paramMap.get('clientId');
       });
   }
 

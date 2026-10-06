@@ -7,7 +7,16 @@
  */
 
 /** Angular Imports */
-import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  OnInit,
+  inject,
+  signal,
+  TemplateRef,
+  ViewChild
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { environment } from '../../../environments/environment';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
@@ -38,15 +47,14 @@ import {
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatTooltip } from '@angular/material/tooltip';
 import { NgClass } from '@angular/common';
-import { EntityNameComponent } from '../../shared/entity-name/entity-name.component';
 import { MatMenuTrigger, MatMenu, MatMenuItem } from '@angular/material/menu';
 import { MatIcon } from '@angular/material/icon';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
-import { AccountNumberComponent } from '../../shared/account-number/account-number.component';
-import { ExternalIdentifierComponent } from '../../shared/external-identifier/external-identifier.component';
 import { MatTabNav, MatTabLink, MatTabNavPanel } from '@angular/material/tabs';
 import { StatusLookupPipe } from '../../pipes/status-lookup.pipe';
 import { DateFormatPipe } from '../../pipes/date-format.pipe';
+import { AdToBsPipe } from '../../pipes/ad-to-bs.pipe';
+import { MatDivider } from '@angular/material/divider';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { formatTabLabel } from 'app/shared/utils/format-tab-label.util';
 
@@ -72,14 +80,11 @@ import { ClientActionNotifierService } from './client-actions/client-action-noti
     MatTooltip,
     MatCardTitle,
     NgClass,
-    EntityNameComponent,
     MatIconButton,
     MatMenuTrigger,
     MatIcon,
     FaIconComponent,
     MatCardSubtitle,
-    AccountNumberComponent,
-    ExternalIdentifierComponent,
     MatMenu,
     MatMenuItem,
     MatTabNav,
@@ -89,7 +94,9 @@ import { ClientActionNotifierService } from './client-actions/client-action-noti
     RouterOutlet,
     StatusLookupPipe,
     DateFormatPipe,
-    MembershipDeadlineComponent
+    MembershipDeadlineComponent,
+    AdToBsPipe,
+    MatDivider
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -98,6 +105,11 @@ export class ClientsViewComponent implements OnInit {
   /**
    * Mask a string, keeping first and last letter, masking the rest with *
    */
+  /** Opens the member's photo at full size. */
+  openPhoto() {
+    this.dialog.open(this.photoPreview, { maxWidth: '90vw', panelClass: 'photo-preview-dialog' });
+  }
+
   maskName(name: string): string {
     if (!name) return '';
     return name
@@ -164,6 +176,8 @@ export class ClientsViewComponent implements OnInit {
    * re-render the template, and the placeholder would stay until something else marked the view dirty.
    */
   readonly clientImage = signal<string | null>(null);
+  /** Full-size view of the member's photo. */
+  @ViewChild('photoPreview') photoPreview: TemplateRef<unknown>;
   clientTemplateData: any;
 
   constructor() {

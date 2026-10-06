@@ -130,8 +130,10 @@ mat-checkbox {
   }
 }
 
-.activation-date {
-  min-width: 180px;
+// BS date, calendar icon, the BS | AD switch and the other calendar's date on one line, as on Edit Member.
+.bs-date {
+  flex: 0 1 416px;
+  max-width: 100%;
 }
 
 @media (width <= 768px) {

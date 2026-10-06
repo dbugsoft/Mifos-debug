@@ -1,6 +1,7 @@
 ﻿{
   "error.msg.upload.file.too.big": "El archivo seleccionado supera el límite de {{args.0.value}} MB. Elija un archivo más pequeño e inténtelo de nuevo.",
-  "APP_NAME": "COIMS",
+  "APP_NAME": "COFMIS",
+  "APP_FULL_NAME": "Cooperative Financial Management & Information System",
   "Logged in as": "Conectado como",
   "Remember me": "Recordar me",
   "errors": {
@@ -496,6 +497,8 @@
       "Home": "Inicio"
     },
     "buttons": {
+      "Photo": "Photo",
+      "Open Module": "Open Module",
       "Accept Transfer": "Aceptar transferencia",
       "Actions": "Acciones",
       "Activate": "Activar",
@@ -622,6 +625,8 @@
       "Enable": "Permitir",
       "Expand All": "Expandir Todo",
       "Export": "Exportar",
+      "Export as JSON": "Export as JSON",
+      "Export as PDF": "Export as PDF",
       "Export to File": "Exportar Archivo",
       "Export CSV": "Exportar CSV",
       "Export XLS": "Exportar XLS",
@@ -769,7 +774,9 @@
       "DONE": "Hecho",
       "Submitting": "Enviando",
       "OK": "OK",
-      "undo_account_transfer": "Revertir transferencia de cuenta"
+      "undo_account_transfer": "Revertir transferencia de cuenta",
+      "Calculate": "Calculate",
+      "Share": "Share"
     },
     "catalogs": {
       "Interest payment waiver": "Exención de pago de intereses",
@@ -1566,7 +1573,8 @@
       "identifier id": "identificación del identificador",
       "savings-transaction-datatable-tab works": "La pestaña de tabla de datos de transacciones de ahorro funciona",
       "successfully select option": "exitosamente. Seleccione una de las opciones siguientes para continuar.",
-      "undo_account_transfer": "Revertir transferencia de cuenta"
+      "undo_account_transfer": "Revertir transferencia de cuenta",
+      "Loan Calculator": "Loan Calculator"
     },
     "inputs": {
       "# Remittance": "# Remesa",
@@ -3098,7 +3106,11 @@
       "s3_secret_key": "s3_clave_secreta",
       "task-management component": "componente de gestión de tareas",
       "to": "a",
-      "valid": "válido"
+      "valid": "válido",
+      "Member": "Member",
+      "Total Interest": "Total Interest",
+      "Total Repayment": "Total Repayment",
+      "First Repayment": "First Repayment"
     },
     "links": {
       "Community": "Comunidad",
@@ -3116,6 +3128,17 @@
       "Working with Code": "Trabajar con código"
     },
     "menus": {
+      "Member Management": "Member Management",
+      "Administration": "Administration",
+      "Collapse Sidebar": "Collapse sidebar",
+      "Collections": "Collections",
+      "Expand Sidebar": "Expand sidebar",
+      "Finance": "Finance",
+      "Home": "Home",
+      "Members": "Members",
+      "Open Menu": "Open menu",
+      "Operations": "Operations",
+      "Overview": "Overview",
       "Unassign Staff": "Desasignar Asesor",
       "Accounting": "Contabilidad",
       "Account Overview": "Descripción de cuenta",
@@ -3243,7 +3266,8 @@
       "Tasks": "Tareas",
       "Remittances": "Remesas",
       "Process Remittance": "Procesar Remesa",
-      "Undo Write-off": "Deshacer castigo contable"
+      "Undo Write-off": "Deshacer castigo contable",
+      "Loan Calculator": "Loan Calculator"
     },
     "placeholders": {
       "Add new server": "Agregar nuevo servidor",
@@ -3256,7 +3280,8 @@
       "Enter last name": "Ingrese apellido",
       "Enter remittance reference number": "Ingrese número de referencia de remesa",
       "Sender name": "Nombre del remitente",
-      "Loading vendors...": "Cargando proveedores..."
+      "Loading vendors...": "Cargando proveedores...",
+      "Search active member": "Search an active member by name or account number"
     },
     "status": {
       "Active": "Activo",
@@ -3305,6 +3330,19 @@
       "undo_account_transfer": "¿Está seguro de que desea revertir esta transferencia de cuenta?"
     },
     "text": {
+      "Welcome back": "Welcome back, {{name}}!",
+      "Home subtitle": "Manage and monitor your cooperative efficiently with {{app}}.",
+      "Total Members": "Total Members",
+      "Total Savings": "Total Savings",
+      "Loans Outstanding": "Loans Outstanding",
+      "Quick Menu": "Quick Menu",
+      "Home Members Description": "Register members and manage their groups and centers.",
+      "Home Dashboard Description": "Key figures, trends and the work that needs attention.",
+      "Home Collection Sheet Description": "Record a meeting's collections for a group or center.",
+      "Home Accounting Description": "Journal entries, chart of accounts and period closing.",
+      "Home Reports Description": "Run member, loan, savings and accounting reports.",
+      "Home Admin Description": "Users, offices, products and system settings.",
+      "Home Quick Menu Tour": "Shortcuts to the main modules you can use.",
       "A": "Una",
       "Ability to manage holidays for individual offices": "La capacidad de gestionar días festivos para oficinas individuales es una herramienta muy útil para una organización que abarca varias ubicaciones. Utilice esta opción para personalizar los días festivos para cada oficina de su organización.",
       "About Us": "Sobre Nosotros",
@@ -4053,7 +4091,9 @@
       "username": "nombre de usuario",
       "withhold tax for this account": "retener impuestos para esta cuenta",
       "withoutCategory": "Sin categoría",
-      "“Maker-Checker” principle requires every tasks": "El principio \"Maker-Checker\" requiere que dos personas completen cada tarea para reducir la posibilidad de errores y uso indebido. Una persona inicia el proceso y la segunda lo completa."
+      "“Maker-Checker” principle requires every tasks": "El principio \"Maker-Checker\" requiere que dos personas completen cada tarea para reducir la posibilidad de errores y uso indebido. Una persona inicia el proceso y la segunda lo completa.",
+      "Pick a member from the search results": "Pick a member from the search results",
+      "Copied to clipboard": "Copied to clipboard"
     },
     "permissions": {
       "actions": {
@@ -4610,7 +4650,8 @@
     "PENDING": "PENDIENTE",
     "INACTIVE": "INACTIVO",
     "Process Remittance": "Procesar Remesa",
-    "Allow full term length for each tranche disbursement": "Cuando está habilitado, cada desembolso de tramo seguirá el cronograma completo del préstamo en lugar de ajustarse al plazo restante. Solo disponible para el tipo de cronograma PROGRESIVO."
+    "Allow full term length for each tranche disbursement": "Cuando está habilitado, cada desembolso de tramo seguirá el cronograma completo del préstamo en lugar de ajustarse al plazo restante. Solo disponible para el tipo de cronograma PROGRESIVO.",
+    "Loan Calculator": "Loan repayment calculator"
   },
   "countries": {
     "AF": "Afganistán",

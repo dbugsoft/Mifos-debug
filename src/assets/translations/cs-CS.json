@@ -1,5 +1,6 @@
 ﻿{
-  "APP_NAME": "COIMS",
+  "APP_NAME": "COFMIS",
+  "APP_FULL_NAME": "Cooperative Financial Management & Information System",
   "Logged in as": "Přihlášen jako",
   "Remember me": "Zapamatuj si mě",
   "error.resource.notImplemented.type": "Nenaimplementovaná chyba",
@@ -497,6 +498,8 @@
       "Home": "Domov"
     },
     "buttons": {
+      "Photo": "Photo",
+      "Open Module": "Open Module",
       "Accept Transfer": "Přijmout převod",
       "Actions": "Akce",
       "Activate": "aktivovat",
@@ -623,6 +626,8 @@
       "Enable": "Umožnit",
       "Expand All": "Rozšířit vše",
       "Export": "Vývozní",
+      "Export as JSON": "Export as JSON",
+      "Export as PDF": "Export as PDF",
       "Export to File": "Export do FILE",
       "Export CSV": "Vývozní CSV",
       "Export XLS": "Vývozní XLS",
@@ -770,7 +775,9 @@
       "DONE": "Hotovo",
       "Submitting": "Odesílání",
       "OK": "OK",
-      "undo_account_transfer": "Vrátit převod účtu"
+      "undo_account_transfer": "Vrátit převod účtu",
+      "Calculate": "Calculate",
+      "Share": "Share"
     },
     "catalogs": {
       "Interest payment waiver": "Prominutí platby úroků",
@@ -1566,7 +1573,8 @@
       "identifier id": "identifikátor id",
       "savings-transaction-datatable-tab works": "spořicí-transakční-datatable-tab funguje",
       "successfully select option": "úspěšně. Chcete-li pokračovat dále, vyberte si z níže uvedených možností.",
-      "undo_account_transfer": "Vrátit převod účtu"
+      "undo_account_transfer": "Vrátit převod účtu",
+      "Loan Calculator": "Loan Calculator"
     },
     "inputs": {
       "# Remittance": "# Remitence",
@@ -3097,7 +3105,11 @@
       "s3_secret_key": "s3_secret_key",
       "task-management component": "komponenta řízení úkolů",
       "to": "na",
-      "valid": "platný"
+      "valid": "platný",
+      "Member": "Member",
+      "Total Interest": "Total Interest",
+      "Total Repayment": "Total Repayment",
+      "First Repayment": "First Repayment"
     },
     "links": {
       "Community": "Společenství",
@@ -3115,6 +3127,17 @@
       "Working with Code": "Práce s kódem"
     },
     "menus": {
+      "Member Management": "Member Management",
+      "Administration": "Administration",
+      "Collapse Sidebar": "Collapse sidebar",
+      "Collections": "Collections",
+      "Expand Sidebar": "Expand sidebar",
+      "Finance": "Finance",
+      "Home": "Home",
+      "Members": "Members",
+      "Open Menu": "Open menu",
+      "Operations": "Operations",
+      "Overview": "Overview",
       "Unassign Staff": "Zrušit přidělení personálu",
       "Accounting": "Účetnictví",
       "Account Overview": "Přehled účtu",
@@ -3242,7 +3265,8 @@
       "Tasks": "Úkoly",
       "Remittances": "Remitence",
       "Process Remittance": "Zpracovat remitenci",
-      "Undo Write-off": "Zrušit odpis"
+      "Undo Write-off": "Zrušit odpis",
+      "Loan Calculator": "Loan Calculator"
     },
     "placeholders": {
       "Add new server": "Přidat nový server",
@@ -3255,7 +3279,8 @@
       "Enter last name": "Zadejte příjmení",
       "Enter remittance reference number": "Zadejte referenční číslo remitence",
       "Sender name": "Jméno odesílatele",
-      "Loading vendors...": "Načítání dodavatelů..."
+      "Loading vendors...": "Načítání dodavatelů...",
+      "Search active member": "Search an active member by name or account number"
     },
     "status": {
       "Active": "Aktivní",
@@ -3304,6 +3329,19 @@
       "undo_account_transfer": "Opravdu chcete vrátit tento převod účtu?"
     },
     "text": {
+      "Welcome back": "Welcome back, {{name}}!",
+      "Home subtitle": "Manage and monitor your cooperative efficiently with {{app}}.",
+      "Total Members": "Total Members",
+      "Total Savings": "Total Savings",
+      "Loans Outstanding": "Loans Outstanding",
+      "Quick Menu": "Quick Menu",
+      "Home Members Description": "Register members and manage their groups and centers.",
+      "Home Dashboard Description": "Key figures, trends and the work that needs attention.",
+      "Home Collection Sheet Description": "Record a meeting's collections for a group or center.",
+      "Home Accounting Description": "Journal entries, chart of accounts and period closing.",
+      "Home Reports Description": "Run member, loan, savings and accounting reports.",
+      "Home Admin Description": "Users, offices, products and system settings.",
+      "Home Quick Menu Tour": "Shortcuts to the main modules you can use.",
       "A": "A",
       "Ability to manage holidays for individual offices": "Schopnost spravovat svátky pro jednotlivé kanceláře je velmi užitečným nástrojem pro organizaci zahrnující více míst. Tuto možnost použijte k přizpůsobení svátků pro každou kancelář vaší organizace.",
       "About Us": "O Nás",
@@ -4052,7 +4090,9 @@
       "username": "uživatelské jméno",
       "withhold tax for this account": "srazit daň pro tento účet",
       "withoutCategory": "Bez kategorie",
-      "“Maker-Checker” principle requires every tasks": "Princip „Maker-Checker“ vyžaduje, aby každý úkol prováděli dva lidé, aby se snížila pravděpodobnost chyb a zneužití. Jedna osoba proces iniciuje a druhá jej dokončí."
+      "“Maker-Checker” principle requires every tasks": "Princip „Maker-Checker“ vyžaduje, aby každý úkol prováděli dva lidé, aby se snížila pravděpodobnost chyb a zneužití. Jedna osoba proces iniciuje a druhá jej dokončí.",
+      "Pick a member from the search results": "Pick a member from the search results",
+      "Copied to clipboard": "Copied to clipboard"
     },
     "permissions": {
       "actions": {
@@ -4898,7 +4938,8 @@
     "PENDING": "ČEKÁ NA VYŘÍZENÍ",
     "INACTIVE": "NEAKTIVNÍ",
     "Process Remittance": "Zpracovat remitenci",
-    "Allow full term length for each tranche disbursement": "Pokud je povoleno, každá tranšová platba bude sledovat plný harmonogram splatnosti úvěru namísto přizpůsobení se zbývající době. K dispozici pouze pro PROGRESIVNÍ typ splátkového kalendáře."
+    "Allow full term length for each tranche disbursement": "Pokud je povoleno, každá tranšová platba bude sledovat plný harmonogram splatnosti úvěru namísto přizpůsobení se zbývající době. K dispozici pouze pro PROGRESIVNÍ typ splátkového kalendáře.",
+    "Loan Calculator": "Loan repayment calculator"
   },
   "countries": {
     "AF": "Afghánistán",

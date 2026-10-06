@@ -69,7 +69,7 @@ export class ClientFamilyMembersStepComponent {
         context: this.translateService.instant('labels.buttons.Add'),
         options: this.clientTemplate.familyMemberOptions
       },
-      width: '44rem'
+      width: '52rem'
     });
     addFamilyMemberDialogRef.afterClosed().subscribe((response: any) => {
       if (response.member) {
@@ -90,7 +90,7 @@ export class ClientFamilyMembersStepComponent {
         member: member,
         options: this.clientTemplate.familyMemberOptions
       },
-      width: '42rem'
+      width: '52rem'
     });
     addFamilyMemberDialogRef.afterClosed().subscribe((response: any) => {
       if (response.member) {

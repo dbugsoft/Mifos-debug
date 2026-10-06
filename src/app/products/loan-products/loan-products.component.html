@@ -6,96 +6,114 @@
   file, You can obtain one at http://mozilla.org/MPL/2.0/.
 -->
 
-<div class="container m-b-20 layout-row align-end gap-20px">
-  <div #buttonCreateLoanProduct class="in-block">
-    <button
-      mat-raised-button
-      color="primary"
-      [matMenuTriggerFor]="createMenu"
-      *mifosxHasPermission="'CREATE_LOANPRODUCT'"
-    >
-      {{ 'labels.buttons.Create' | translate }}
-      <fa-icon icon="caret-down" class="m-l-10"></fa-icon>
-    </button>
-    <mat-menu #createMenu="matMenu">
-      <button
-        mat-menu-item
-        [routerLink]="['create']"
-        [queryParams]="{ productType: 'loan' }"
-        *mifosxHasPermission="'CREATE_LOANPRODUCT'"
-      >
-        <fa-icon icon="calendar-alt" class="m-r-10"></fa-icon>
-        {{ 'labels.buttons.Create Loan Product' | translate }}
-      </button>
-      <button
-        mat-menu-item
-        [routerLink]="['create']"
-        [queryParams]="{ productType: 'working-capital' }"
-        *mifosxHasPermission="'CREATE_LOANPRODUCT'"
-      >
-        <fa-icon icon="money-bill-alt" class="m-r-10"></fa-icon>
-        {{ 'labels.buttons.Create Working Capital Product' | translate }}
-      </button>
-    </mat-menu>
-  </div>
-  <div class="in-block">
-    <button mat-raised-button color="primary" (click)="openImportDialog()" *mifosxHasPermission="'CREATE_LOANPRODUCT'">
-      <fa-icon icon="upload" class="m-r-10"></fa-icon>
-      {{ 'labels.buttons.Import' | translate }}
-    </button>
-  </div>
-</div>
-
 <div class="container">
-  <div #filter class="layout-row flex-fill form-container">
-    <mat-form-field class="flex-70">
-      <mat-label>{{ 'labels.inputs.Filter' | translate }}</mat-label>
-      <input matInput (keyup)="applyFilter($event.target.value)" />
-    </mat-form-field>
-    <mat-form-field class="flex-28">
-      <mat-label>{{ 'labels.inputs.Product' | translate }}</mat-label>
-      <mat-select (selectionChange)="fetchProducts()" [formControl]="loanProductSelector">
+  <div class="list-toolbar">
+    <div #filter class="toolbar-left">
+      <mat-form-field class="search-field" appearance="outline" subscriptSizing="dynamic">
+        <mat-icon matPrefix>search</mat-icon>
+        <input matInput [placeholder]="'labels.inputs.Filter' | translate" (keyup)="applyFilter($event.target.value)" />
+      </mat-form-field>
+
+      <mat-button-toggle-group
+        class="product-type-toggle"
+        hideSingleSelectionIndicator
+        [formControl]="loanProductSelector"
+        (change)="fetchProducts()"
+        [attr.aria-label]="'labels.inputs.Product' | translate"
+      >
         @for (loanProduct of loanProductOptions; track loanProduct.type) {
-          <mat-option [value]="loanProduct.type">
+          <mat-button-toggle [value]="loanProduct.type">
             {{ loanProduct.label | translateKey: 'catalogs' }}
-          </mat-option>
+          </mat-button-toggle>
         }
-      </mat-select>
-    </mat-form-field>
+      </mat-button-toggle-group>
+    </div>
+
+    <div class="toolbar-right">
+      <button
+        mat-stroked-button
+        color="primary"
+        (click)="openImportDialog()"
+        *mifosxHasPermission="'CREATE_LOANPRODUCT'"
+      >
+        <fa-icon icon="upload" class="btn-icon"></fa-icon>
+        {{ 'labels.buttons.Import' | translate }}
+      </button>
+      <div #buttonCreateLoanProduct class="in-block">
+        <button
+          mat-raised-button
+          color="primary"
+          [matMenuTriggerFor]="createMenu"
+          *mifosxHasPermission="'CREATE_LOANPRODUCT'"
+        >
+          <fa-icon icon="plus" class="btn-icon"></fa-icon>
+          {{ 'labels.buttons.Create' | translate }}
+          <fa-icon icon="caret-down" class="caret"></fa-icon>
+        </button>
+        <mat-menu #createMenu="matMenu" xPosition="before" class="create-menu">
+          <button
+            mat-menu-item
+            [routerLink]="['create']"
+            [queryParams]="{ productType: 'loan' }"
+            *mifosxHasPermission="'CREATE_LOANPRODUCT'"
+          >
+            <span class="menu-tile"><fa-icon icon="calendar-alt"></fa-icon></span>
+            {{ 'labels.buttons.Create Loan Product' | translate }}
+          </button>
+          <button
+            mat-menu-item
+            [routerLink]="['create']"
+            [queryParams]="{ productType: 'working-capital' }"
+            *mifosxHasPermission="'CREATE_LOANPRODUCT'"
+          >
+            <span class="menu-tile"><fa-icon icon="money-bill-alt"></fa-icon></span>
+            {{ 'labels.buttons.Create Working Capital Product' | translate }}
+          </button>
+        </mat-menu>
+      </div>
+    </div>
   </div>
 
-  <div #loanProductsTable class="mat-elevation-z8">
-    <table mat-table [dataSource]="dataSource" matSort>
+  <div #loanProductsTable [hidden]="!isLoading && !dataSource.filteredData.length">
+    @if (isLoading) {
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }
+
+    <table mat-table [dataSource]="dataSource" matSort class="members-table">
       <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'labels.inputs.Name' | translate }}</th>
-        <td mat-cell *matCellDef="let loanProduct">{{ loanProduct.name }}</td>
+        <td mat-cell *matCellDef="let loanProduct" class="name-cell">{{ loanProduct.name }}</td>
       </ng-container>
 
       <ng-container matColumnDef="shortName">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'labels.inputs.Short Name' | translate }}</th>
-        <td mat-cell *matCellDef="let loanProduct">{{ loanProduct.shortName }}</td>
+        <td mat-cell *matCellDef="let loanProduct">
+          <span class="product-code">{{ loanProduct.shortName }}</span>
+        </td>
       </ng-container>
 
       <ng-container matColumnDef="closeDate">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'labels.inputs.Expiry Date' | translate }}</th>
-        <td mat-cell *matCellDef="let loanProduct">{{ loanProduct.closeDate | dateFormat }}</td>
+        <td mat-cell *matCellDef="let loanProduct">
+          @if (loanProduct.closeDate) {
+            {{ loanProduct.closeDate | dateFormat }}
+          } @else {
+            <span class="muted">&mdash;</span>
+          }
+        </td>
       </ng-container>
 
       <ng-container matColumnDef="status">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'labels.inputs.Status' | translate }}</th>
         <td mat-cell *matCellDef="let loanProduct">
-          <div [className]="loanProduct.status | statusLookup">
-            <fa-icon
-              matTooltip="{{
-                loanProduct.status === 'loanProduct.active'
-                  ? ('labels.inputs.Active' | translate)
-                  : ('labels.catalogs.Inactive' | translate)
-              }}"
-              matTooltipPosition="right"
-              icon="circle"
-              size="lg"
-            ></fa-icon>
-          </div>
+          <span class="status-badge" [ngClass]="loanProduct.status | statusLookup">
+            <fa-icon icon="circle"></fa-icon>
+            {{
+              loanProduct.status === 'loanProduct.active'
+                ? ('labels.inputs.Active' | translate)
+                : ('labels.catalogs.Inactive' | translate)
+            }}
+          </span>
         </td>
       </ng-container>
 
@@ -111,6 +129,13 @@
 
     <mat-paginator [pageSizeOptions]="[10, 25, 50, 100]" showFirstLastButtons></mat-paginator>
   </div>
+
+  @if (!isLoading && !dataSource.filteredData.length) {
+    <div class="empty-state">
+      <fa-icon icon="money-bill-alt" size="2x" class="empty-icon"></fa-icon>
+      <p>{{ 'labels.text.No Loan Product was found' | translate }}</p>
+    </div>
+  }
 </div>
 
 <ng-template #templateButtonCreateLoanProduct let-popover="popover">

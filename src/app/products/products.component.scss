@@ -6,6 +6,5 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-mat-list-item {
-  height: 50px;
-}
+// Same cards as the Member Management and Admin landing pages.
+@use '../home/card-menu/card-menu.component';

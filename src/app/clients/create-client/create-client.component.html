@@ -10,7 +10,6 @@
   <mat-stepper
     orientation="vertical"
     [linear]="true"
-    class="mat-elevation-z8"
     labelPosition="bottom"
     #clientStepper
     (selectionChange)="onStepChange($event)"
@@ -36,7 +35,9 @@
     </ng-template>
 
     <mat-step [completed]="clientGeneralForm.valid">
-      <ng-template matStepLabel>{{ 'labels.inputs.GENERAL' | translate }}</ng-template>
+      <ng-template matStepLabel
+        ><strong>{{ 'labels.inputs.GENERAL' | translate }}</strong></ng-template
+      >
 
       <mifosx-client-general-step
         [clientTemplate]="clientTemplate"
@@ -46,12 +47,14 @@
     </mat-step>
 
     <mat-step [completed]="memberAddress.valid()">
-      <ng-template matStepLabel>{{ 'labels.inputs.ADDRESS' | translate }}</ng-template>
+      <ng-template matStepLabel
+        ><strong>{{ 'labels.inputs.ADDRESS' | translate }}</strong></ng-template
+      >
       <mifosx-member-address-step #memberAddress></mifosx-member-address-step>
     </mat-step>
 
     <!-- <mat-step>
-      <ng-template matStepLabel>{{ 'labels.inputs.FAMILY MEMBERS' | translate }}</ng-template>
+      <ng-template matStepLabel><strong>{{ 'labels.inputs.FAMILY MEMBERS' | translate }}</strong></ng-template>
 
       <mifosx-client-family-members-step
         #clientFamily
@@ -61,7 +64,9 @@
 
     @if (clientTemplate.isAddressEnabled) {
       <mat-step [optional]="true">
-        <ng-template matStepLabel>{{ 'labels.inputs.ADDRESS' | translate }}</ng-template>
+        <ng-template matStepLabel
+          ><strong>{{ 'labels.inputs.ADDRESS' | translate }}</strong></ng-template
+        >
         <mifosx-client-address-step
           #clientAddress
           [clientTemplate]="clientTemplate"
@@ -73,7 +78,9 @@
 
     @for (datatable of datatables; track datatable) {
       <mat-step [optional]="true">
-        <ng-template matStepLabel>{{ datatable.registeredTableName }}</ng-template>
+        <ng-template matStepLabel
+          ><strong>{{ datatable.registeredTableName }}</strong></ng-template
+        >
         <mifosx-client-datatable-step [datatableData]="datatable" #dtclient></mifosx-client-datatable-step>
       </mat-step>
     }
@@ -86,7 +93,9 @@
     }
 
     <mat-step [completed]="areFormvalids()">
-      <ng-template matStepLabel>{{ 'labels.inputs.PREVIEW' | translate }}</ng-template>
+      <ng-template matStepLabel
+        ><strong>{{ 'labels.inputs.PREVIEW' | translate }}</strong></ng-template
+      >
       @if (membershipMode) {
         <mifosx-membership-shares-preview [choice]="sharesStep?.choice() ?? null"></mifosx-membership-shares-preview>
       }

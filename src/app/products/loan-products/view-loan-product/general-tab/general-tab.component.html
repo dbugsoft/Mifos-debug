@@ -6,10 +6,21 @@
   file, You can obtain one at http://mozilla.org/MPL/2.0/.
 -->
 
-<div class="layout-row align-end gap-2px responsive-column container m-b-20 m-t-10">
-  <button mat-raised-button color="primary" *mifosxHasPermission="'READ_LOANPRODUCT'" (click)="exportDefinition()">
-    <fa-icon icon="download" class="m-r-10"></fa-icon>{{ 'labels.buttons.Export' | translate }}
+<div class="product-actions">
+  <button mat-stroked-button color="primary" [matMenuTriggerFor]="exportMenu" *mifosxHasPermission="'READ_LOANPRODUCT'">
+    <fa-icon icon="download" class="btn-icon"></fa-icon>{{ 'labels.buttons.Export' | translate }}
+    <fa-icon icon="caret-down" class="caret"></fa-icon>
   </button>
+  <mat-menu #exportMenu="matMenu" xPosition="before">
+    <button mat-menu-item (click)="exportPdf()">
+      <fa-icon icon="file-pdf" class="menu-icon"></fa-icon>
+      {{ 'labels.buttons.Export as PDF' | translate }}
+    </button>
+    <button mat-menu-item (click)="exportDefinition()">
+      <fa-icon icon="code" class="menu-icon"></fa-icon>
+      {{ 'labels.buttons.Export as JSON' | translate }}
+    </button>
+  </mat-menu>
   <button
     mat-raised-button
     color="primary"
@@ -17,11 +28,12 @@
     [queryParams]="{ productType: loanProductService.productType.value }"
     *mifosxHasPermission="'UPDATE_LOANPRODUCT'"
   >
-    <fa-icon icon="edit" class="m-r-10"></fa-icon>{{ 'labels.buttons.Edit' | translate }}
+    <fa-icon icon="edit" class="btn-icon"></fa-icon>{{ 'labels.buttons.Edit' | translate }}
   </button>
 </div>
 
 <mifosx-loan-product-summary
+  #summary
   [action]="'view'"
   [loanProduct]="loanProduct"
   [useDueForRepaymentsConfigurations]="useDueForRepaymentsConfigurations"

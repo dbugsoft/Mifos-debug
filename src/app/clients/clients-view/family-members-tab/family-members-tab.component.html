@@ -13,80 +13,127 @@
         <h3>{{ 'labels.heading.Family Members' | translate }}</h3>
       </div>
       <div class="action-button m-b-10 gap-25px">
-        <button mat-raised-button color="primary" [routerLink]="['./add']">
+        <button mat-stroked-button color="primary" (click)="addFamilyMember()">
           <fa-icon icon="plus" class="m-r-10" aria-hidden="true"></fa-icon>{{ 'labels.buttons.Add' | translate }}
         </button>
       </div>
     </div>
 
-    <mat-accordion>
-      @for (member of clientFamilyMembers; track member.id; let i = $index) {
-        <mat-expansion-panel class="family-member">
-          <mat-expansion-panel-header>
-            <mat-panel-title>
-              {{ displayName(member) }}
-            </mat-panel-title>
-            <mat-panel-description>
-              {{ member.relationship }}
-            </mat-panel-description>
-          </mat-expansion-panel-header>
-          <mat-divider [inset]="true"></mat-divider>
-          <div class="family-member-actions layout-row align-end">
+    <!-- One row per family member with the main details; click a row to see the rest -->
+    <div class="table-scroll">
+      <table mat-table [dataSource]="clientFamilyMembers" multiTemplateDataRows>
+        <ng-container matColumnDef="sno">
+          <th mat-header-cell *matHeaderCellDef>S.No.</th>
+          <td mat-cell *matCellDef="let member; let i = dataIndex">
+            <!-- Arrow shows the row opens for more details -->
+            <i
+              class="fa expand-icon"
+              [class.fa-chevron-up]="expandedMember === member"
+              [class.fa-chevron-down]="expandedMember !== member"
+            ></i>
+            {{ i + 1 }}
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef>{{ 'labels.inputs.Name' | translate }}</th>
+          <td mat-cell *matCellDef="let member; let i = dataIndex">{{ displayName(member) }}</td>
+        </ng-container>
+        <ng-container matColumnDef="relationship">
+          <th mat-header-cell *matHeaderCellDef>{{ 'labels.inputs.Relationship' | translate }}</th>
+          <td mat-cell *matCellDef="let member; let i = dataIndex">{{ member.relationship || '—' }}</td>
+        </ng-container>
+        <ng-container matColumnDef="gender">
+          <th mat-header-cell *matHeaderCellDef>{{ 'labels.inputs.Gender' | translate }}</th>
+          <td mat-cell *matCellDef="let member; let i = dataIndex">{{ member.gender || '—' }}</td>
+        </ng-container>
+        <ng-container matColumnDef="dateOfBirth">
+          <th mat-header-cell *matHeaderCellDef>{{ 'labels.inputs.Date Of Birth' | translate }}</th>
+          <td mat-cell *matCellDef="let member; let i = dataIndex">
+            {{ member.dateOfBirth ? (member.dateOfBirth | adToBs) : '—' }}
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="age">
+          <th mat-header-cell *matHeaderCellDef>{{ 'labels.inputs.Age' | translate }}</th>
+          <td mat-cell *matCellDef="let member; let i = dataIndex">{{ ageOf(member) ?? '—' }}</td>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>{{ 'labels.inputs.Actions' | translate }}</th>
+          <td mat-cell *matCellDef="let member; let i = dataIndex">
             <button
+              class="account-action-button"
               mat-raised-button
-              color="primary"
-              [routerLink]="[member.id, 'edit']"
-              [title]="'labels.buttons.Edit' | translate"
+              (click)="$event.stopPropagation(); editFamilyMember(member)"
             >
-              <fa-icon icon="edit" class="m-r-10" aria-hidden="true"></fa-icon>{{ 'labels.buttons.Edit' | translate }}
+              <i class="fa fa-edit"></i><span class="action-label">{{ 'labels.buttons.Edit' | translate }}</span>
             </button>
             <button
+              class="account-action-button delete-button"
               mat-raised-button
-              color="warn"
-              (click)="deleteFamilyMember(member.clientId, member.id, member.firstName, i)"
-              [title]="'labels.buttons.Delete' | translate"
+              (click)="$event.stopPropagation(); deleteFamilyMember(member.clientId, member.id, member.firstName, i)"
             >
-              <fa-icon icon="trash" class="m-r-10" aria-hidden="true"></fa-icon
-              >{{ 'labels.buttons.Delete' | translate }}
+              <i class="fa fa-trash"></i><span class="action-label">{{ 'labels.buttons.Delete' | translate }}</span>
             </button>
-          </div>
-          <p>
-            @if (member.firstName) {
-              <span>{{ 'labels.inputs.First Name' | translate }} : {{ member.firstName }}<br /></span>
+          </td>
+        </ng-container>
+
+        <!-- The rest of the member's details, shown when the row is open -->
+        <!-- Empty cell under S.No., so the details start in line with Name -->
+        <ng-container matColumnDef="detailsSpacer">
+          <td mat-cell *matCellDef="let member"></td>
+        </ng-container>
+        <ng-container matColumnDef="details">
+          <td mat-cell *matCellDef="let member" [attr.colspan]="familyMemberColumns.length - 1">
+            @if (expandedMember === member) {
+              <dl class="member-details">
+                <div>
+                  <dt>{{ 'labels.inputs.Mobile Number' | translate }}</dt>
+                  <dd>{{ member.mobileNumber || '—' }}</dd>
+                </div>
+                <div>
+                  <dt>{{ 'labels.inputs.Marital Status' | translate }}</dt>
+                  <dd>{{ member.maritalStatus || '—' }}</dd>
+                </div>
+                <div>
+                  <dt>{{ 'labels.inputs.Profession' | translate }}</dt>
+                  <dd>{{ member.profession || '—' }}</dd>
+                </div>
+                <div>
+                  <dt>{{ 'labels.inputs.Qualification' | translate }}</dt>
+                  <dd>{{ member.qualification || '—' }}</dd>
+                </div>
+                <div>
+                  <dt>{{ 'labels.inputs.Is Dependent' | translate }}</dt>
+                  <dd>{{ member.isDependent | yesNo }}</dd>
+                </div>
+              </dl>
             }
-            @if (member.middleName) {
-              <span>{{ 'labels.inputs.Middle Name' | translate }} : {{ member.middleName }}<br /></span>
-            }
-            @if (member.lastName) {
-              <span>{{ 'labels.inputs.Last Name' | translate }} : {{ member.lastName }}<br /></span>
-            }
-            @if (member.qualification) {
-              <span>{{ 'labels.inputs.Qualification' | translate }} : {{ member.qualification }}<br /></span>
-            }
-            @if (member.mobileNumber) {
-              <span>{{ 'labels.inputs.Mobile Number' | translate }} : {{ member.mobileNumber }}<br /></span>
-            }
-            @if (member.age) {
-              <span>{{ 'labels.inputs.Age' | translate }} : {{ member.age }}<br /></span>
-            }
-            @if (member.isDependent) {
-              <span>{{ 'labels.inputs.Is Dependent' | translate }} : {{ member.isDependent | yesNo }}<br /></span>
-            }
-            @if (member.maritalStatus) {
-              <span>{{ 'labels.inputs.Marital Status' | translate }} : {{ member.maritalStatus }}<br /></span>
-            }
-            @if (member.gender) {
-              <span>{{ 'labels.inputs.Gender' | translate }} : {{ member.gender }}<br /></span>
-            }
-            @if (member.profession) {
-              <span>{{ 'labels.inputs.Profession' | translate }} : {{ member.profession }}<br /></span>
-            }
-            @if (member.dateOfBirth) {
-              <span>{{ 'labels.inputs.Date Of Birth' | translate }} : {{ member.dateOfBirth | adToBs }}<br /></span>
-            }
-          </p>
-        </mat-expansion-panel>
-      }
-    </mat-accordion>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="no-data">
+          <td mat-footer-cell *matFooterCellDef [attr.colspan]="familyMemberColumns.length">
+            <div class="table-empty-state">
+              <p>{{ 'labels.text.No data found' | translate }}</p>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="familyMemberColumns"></tr>
+        <tr
+          mat-row
+          *matRowDef="let member; columns: familyMemberColumns"
+          class="member-row"
+          [class.open]="expandedMember === member"
+          (click)="toggleMember(member)"
+        ></tr>
+        <tr
+          mat-row
+          *matRowDef="let member; columns: ['detailsSpacer', 'details']"
+          class="details-row"
+          [class.open]="expandedMember === member"
+        ></tr>
+        <tr mat-footer-row *matFooterRowDef="clientFamilyMembers?.length ? [] : ['no-data']"></tr>
+      </table>
+    </div>
   </router-outlet>
 </div>
