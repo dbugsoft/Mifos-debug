@@ -80,6 +80,8 @@
   }
 }
 
+// The classes are the application's status as the server sends it (PENDING, APPROVED, REJECTED).
+/* stylelint-disable selector-class-pattern */
 .status {
   font-weight: 600;
 
@@ -95,6 +97,7 @@
     color: #c62828;
   }
 }
+/* stylelint-enable selector-class-pattern */
 
 .actions {
   display: flex;
@@ -158,11 +161,11 @@ h3 {
 
   td {
     padding: 10px 12px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    border-bottom: 1px solid rgb(0 0 0 / 12%);
   }
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .steps {
     grid-template-columns: minmax(0, 1fr);
   }

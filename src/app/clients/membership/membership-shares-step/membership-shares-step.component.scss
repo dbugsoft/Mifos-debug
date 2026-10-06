@@ -38,29 +38,29 @@
   }
 
   .muted {
-    color: rgba(0, 0, 0, 0.6);
+    color: rgb(0 0 0 / 60%);
   }
 }
 
 :host-context(.dark-theme) .total {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.12);
+  background: rgb(255 255 255 / 4%);
+  border-color: rgb(255 255 255 / 12%);
 
   .muted {
-    color: rgba(255, 255, 255, 0.6);
+    color: rgb(255 255 255 / 60%);
   }
 }
 
 .info {
-  color: rgba(0, 0, 0, 0.6);
+  color: rgb(0 0 0 / 60%);
   margin: 16px 0 0;
 }
 
 :host-context(.dark-theme) .info {
-  color: rgba(255, 255, 255, 0.6);
+  color: rgb(255 255 255 / 60%);
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .flex-48 {
     flex: 1 1 100%;
   }

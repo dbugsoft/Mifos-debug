@@ -101,7 +101,7 @@
 
   td {
     padding: 10px 16px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    border-bottom: 1px solid rgb(0 0 0 / 12%);
   }
 
   .empty {
@@ -109,7 +109,7 @@
   }
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .grid {
     grid-template-columns: minmax(0, 1fr);
   }
