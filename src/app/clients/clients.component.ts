@@ -7,7 +7,16 @@
  */
 
 /** Angular Imports. */
-import { ChangeDetectionStrategy, Component, DestroyRef, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+  inject,
+  signal
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
@@ -41,6 +50,7 @@ import { AccountNumberComponent } from '../shared/account-number/account-number.
 import { ExternalIdentifierComponent } from '../shared/external-identifier/external-identifier.component';
 import { StatusLookupPipe } from '../pipes/status-lookup.pipe';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { MembershipService } from './membership/membership.service';
 
 export const DEBOUNCE_MS = 500;
 
@@ -77,6 +87,9 @@ export const DEBOUNCE_MS = 500;
 export class ClientsComponent implements OnInit, OnDestroy {
   private clientService = inject(ClientsService);
   private destroyRef = inject(DestroyRef);
+  private membershipService = inject(MembershipService);
+  /** With the share-first rule on, a new member is a membership application (fineract-dbug ADR 0023) */
+  readonly shareFirstRule = signal(false);
 
   private searchInput$ = new Subject<string>();
   private clientsRequestSub: Subscription | null = null;
@@ -125,6 +138,10 @@ export class ClientsComponent implements OnInit, OnDestroy {
   @ViewChild(MatSort) sort: MatSort;
 
   ngOnInit() {
+    this.membershipService
+      .templateOrNull()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((template) => this.shareFirstRule.set(!!template?.settings.shareFirstEnabled));
     this.searchInput$
       .pipe(debounceTime(DEBOUNCE_MS), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
       .subscribe((value) => {

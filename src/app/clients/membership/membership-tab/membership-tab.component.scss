@@ -1,0 +1,138 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+.membership-tab {
+  padding: 16px 8px;
+}
+
+.steps {
+  list-style: none;
+  margin: 0 0 20px;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+
+  li {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    min-width: 0;
+  }
+
+  .n {
+    flex: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 13px;
+    background: #e0e0e0;
+    color: #555;
+  }
+
+  .done .n {
+    background: #2e7d32;
+    color: #fff;
+  }
+
+  .now .n {
+    background: #1074b9;
+    color: #fff;
+  }
+
+  .refused .n {
+    background: #c62828;
+    color: #fff;
+  }
+
+  b,
+  .sub {
+    display: block;
+  }
+
+  .sub {
+    opacity: 0.7;
+    font-size: 13px;
+  }
+}
+
+.details {
+  border-collapse: collapse;
+  margin-bottom: 8px;
+
+  td {
+    padding: 6px 24px 6px 0;
+    vertical-align: top;
+  }
+
+  td:first-child {
+    opacity: 0.7;
+    white-space: nowrap;
+  }
+}
+
+.status {
+  font-weight: 600;
+
+  &.PENDING {
+    color: #f29400;
+  }
+
+  &.APPROVED {
+    color: #2e7d32;
+  }
+
+  &.REJECTED {
+    color: #c62828;
+  }
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+h3 {
+  margin: 24px 0 8px;
+}
+
+.accounts {
+  width: 100%;
+  border-collapse: collapse;
+
+  th {
+    background: #1074b9;
+    color: #fff;
+    text-align: left;
+    padding: 10px 12px;
+    font-weight: 600;
+  }
+
+  td {
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  }
+}
+
+@media (max-width: 768px) {
+  .steps {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .accounts {
+    display: block;
+    overflow-x: auto;
+  }
+}

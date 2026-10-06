@@ -40,6 +40,7 @@
 
       <mifosx-client-general-step
         [clientTemplate]="clientTemplate"
+        [membershipMode]="membershipMode"
         (legalFormChangeEvent)="legalFormChange($event)"
       ></mifosx-client-general-step>
     </mat-step>
@@ -77,8 +78,18 @@
       </mat-step>
     }
 
+    @if (membershipMode) {
+      <mat-step [completed]="sharesStep.valid()">
+        <ng-template matStepLabel>{{ 'membership.SHARES' | translate }}</ng-template>
+        <mifosx-membership-shares-step #sharesStep [template]="membershipTemplate"></mifosx-membership-shares-step>
+      </mat-step>
+    }
+
     <mat-step [completed]="areFormvalids()">
       <ng-template matStepLabel>{{ 'labels.inputs.PREVIEW' | translate }}</ng-template>
+      @if (membershipMode) {
+        <mifosx-membership-shares-preview [choice]="sharesStep?.choice() ?? null"></mifosx-membership-shares-preview>
+      }
       <mifosx-member-address-preview
         [permanent]="memberAddress.permanentPreview()"
         [temporary]="memberAddress.temporaryPreview()"
@@ -88,6 +99,7 @@
         [clientTemplate]="clientTemplate"
         [clientAddressFieldConfig]="clientAddressFieldConfig"
         [client]="client"
+        [membershipMode]="membershipMode"
         (submitEvent)="submit()"
       >
       </mifosx-client-preview-step>

@@ -1,0 +1,89 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+.membership-settings {
+  padding: 16px 8px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 24px;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.cleanup {
+  margin-top: 32px;
+
+  .head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  h3 {
+    margin: 0;
+  }
+
+  .count {
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 12.5px;
+    font-weight: 600;
+    background: #fff1dc;
+    color: #a15c00;
+
+    &.none {
+      background: #e7f5e8;
+      color: #2e7d32;
+    }
+  }
+
+  .hint {
+    opacity: 0.7;
+    margin: 6px 0 12px;
+  }
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.list {
+  width: 100%;
+  border-collapse: collapse;
+
+  th {
+    background: #1074b9;
+    color: #fff;
+    text-align: left;
+    padding: 12px 16px;
+    font-weight: 600;
+  }
+
+  td {
+    padding: 10px 16px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  }
+
+  .empty {
+    opacity: 0.7;
+  }
+}
+
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

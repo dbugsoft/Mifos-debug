@@ -50,6 +50,16 @@ import { DateFormatPipe } from '../../pipes/date-format.pipe';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { formatTabLabel } from 'app/shared/utils/format-tab-label.util';
 
+import { MembershipApplication } from '../membership/membership.models';
+import { MembershipService } from '../membership/membership.service';
+import { MembershipDeadlineComponent } from '../membership/membership-deadline/membership-deadline.component';
+import {
+  MembershipDecisionData,
+  MembershipDecisionDialogComponent
+} from '../membership/membership-decision-dialog/membership-decision-dialog.component';
+import { reloadMemberPage } from '../membership/membership-tab/membership-tab.component';
+import { ClientActionNotifierService } from './client-actions/client-action-notifier.service';
+
 @Component({
   selector: 'mifosx-clients-view',
   templateUrl: './clients-view.component.html',
@@ -78,7 +88,8 @@ import { formatTabLabel } from 'app/shared/utils/format-tab-label.util';
     MatTabNavPanel,
     RouterOutlet,
     StatusLookupPipe,
-    DateFormatPipe
+    DateFormatPipe,
+    MembershipDeadlineComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -141,6 +152,12 @@ export class ClientsViewComponent implements OnInit {
 
   clientViewData: any;
   clientDatatables: any;
+  /** The member's membership application, if any (fineract-dbug ADR 0023) */
+  readonly membershipApplication = signal<MembershipApplication | null>(null);
+  /** Whether the share-first rule is on; only looked up for a pending client */
+  readonly shareFirstRule = signal(false);
+  private membershipService = inject(MembershipService);
+  private notifier = inject(ClientActionNotifierService);
   /**
    * blob: URL of the client's photo, or null when there is none.
    * A signal, because this component is OnPush: a plain field set in the HTTP callback would not
@@ -152,13 +169,53 @@ export class ClientsViewComponent implements OnInit {
   constructor() {
     this.route.data
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((data: { clientViewData: any; clientTemplateData: any; clientDatatables: any }) => {
-        this.clientViewData = data.clientViewData;
-        this.clientDatatables = this.filterDatatablesByClientSubtype(
-          data.clientDatatables,
-          data.clientViewData?.legalForm?.id
-        );
-        this.clientTemplateData = data.clientTemplateData;
+      .subscribe(
+        (data: {
+          clientViewData: any;
+          clientTemplateData: any;
+          clientDatatables: any;
+          membershipApplication: MembershipApplication | null;
+        }) => {
+          this.clientViewData = data.clientViewData;
+          this.membershipApplication.set(data.membershipApplication ?? null);
+          if (data.clientViewData?.status?.value === 'Pending' && !data.membershipApplication) {
+            this.membershipService
+              .templateOrNull()
+              .subscribe((template) => this.shareFirstRule.set(!!template?.settings.shareFirstEnabled));
+          }
+          this.clientDatatables = this.filterDatatablesByClientSubtype(
+            data.clientDatatables,
+            data.clientViewData?.legalForm?.id
+          );
+          this.clientTemplateData = data.clientTemplateData;
+        }
+      );
+  }
+
+  /** A pending applicant: the board decides through the application, not through Fineract's own actions. */
+  get applicationPending(): boolean {
+    return this.membershipApplication()?.status === 'PENDING';
+  }
+
+  decideMembership(decision: 'approve' | 'reject'): void {
+    const application = this.membershipApplication();
+    if (!application) {
+      return;
+    }
+    this.dialog
+      .open<MembershipDecisionDialogComponent, MembershipDecisionData>(MembershipDecisionDialogComponent, {
+        data: { application, decision },
+        width: '560px',
+        maxWidth: 'calc(100vw - 32px)'
+      })
+      .afterClosed()
+      .subscribe((decided?: MembershipApplication) => {
+        if (decided) {
+          this.notifier.notify(
+            decision === 'approve' ? 'membership.messages.approved' : 'membership.messages.rejected'
+          );
+          reloadMemberPage(this.router, decided.clientId);
+        }
       });
   }
 
