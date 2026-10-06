@@ -23,7 +23,16 @@ import { CardMenuComponent, MenuCard } from './card-menu/card-menu.component';
 const memberManagementCards: MenuCard[] = [
   { label: 'labels.menus.Clients', icon: 'users', path: ['/members'], permission: 'READ_CLIENT' },
   { label: 'labels.menus.Groups', icon: 'sitemap', path: ['/groups'], permission: 'READ_GROUP' },
-  { label: 'labels.menus.Centers', icon: 'building', path: ['/centers'], permission: 'READ_CENTER' }
+  { label: 'labels.menus.Centers', icon: 'building', path: ['/centers'], permission: 'READ_CENTER' },
+  {
+    label: 'membership.Membership Applications',
+    icon: 'user-check',
+    path: [
+      '/members',
+      'applications'
+    ],
+    permission: 'READ_MEMBERSHIP'
+  }
 ];
 
 /** Cards for the Reports landing page. */

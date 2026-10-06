@@ -1,0 +1,65 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<h1 mat-dialog-title>
+  @if (approve) {
+    {{ 'membership.approveTitle' | translate: { name: application.name } }}
+  } @else {
+    {{ 'membership.rejectTitle' | translate: { name: application.name } }}
+  }
+</h1>
+
+<form [formGroup]="form" (ngSubmit)="submit()">
+  <div mat-dialog-content>
+    @if (approve) {
+      <p class="lead">{{ 'membership.inOneStep' | translate }}</p>
+      <ol class="steps">
+        <li>{{ 'membership.stepActivate' | translate: { name: application.name } }}</li>
+        <li>{{ 'membership.stepSavings' | translate }}</li>
+        <li>
+          {{
+            'membership.stepShares'
+              | translate: { kitta: application.kitta, amount: (application.shareAmount | formatNumber) }
+          }}
+        </li>
+      </ol>
+    } @else {
+      <p class="lead">{{ 'membership.rejectLead' | translate }}</p>
+      <mat-form-field class="full">
+        <mat-label>{{ 'membership.Reason' | translate }}</mat-label>
+        <textarea matInput formControlName="reason" rows="4" maxlength="1000" required></textarea>
+        @if (form.controls.reason.hasError('required')) {
+          <mat-error>{{ 'membership.errors.reasonRequired' | translate }}</mat-error>
+        }
+      </mat-form-field>
+    }
+
+    <mifosx-nepali-date-input
+      class="full"
+      [label]="'membership.Decision date' | translate"
+      formControlName="date"
+      [minDate]="minDate"
+      [maxDate]="maxDate"
+    />
+  </div>
+
+  <mat-dialog-actions align="end">
+    <button mat-raised-button type="button" mat-dialog-close [disabled]="busy()">
+      {{ 'labels.buttons.Cancel' | translate }}
+    </button>
+    @if (approve) {
+      <button mat-raised-button color="primary" type="submit" [disabled]="busy()">
+        {{ 'membership.Approve' | translate }}
+      </button>
+    } @else {
+      <button mat-raised-button color="warn" type="submit" [disabled]="busy()">
+        {{ 'membership.Refuse' | translate }}
+      </button>
+    }
+  </mat-dialog-actions>
+</form>

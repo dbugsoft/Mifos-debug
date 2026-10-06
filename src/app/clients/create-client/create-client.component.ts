@@ -38,6 +38,10 @@ import { SettingsService } from 'app/settings/settings.service';
 import { MatStepper, MatStepperIcon, MatStep, MatStepLabel } from '@angular/material/stepper';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { ClientPreviewStepComponent } from '../client-stepper/client-preview-step/client-preview-step.component';
+import { MembershipService } from '../membership/membership.service';
+import { MembershipTemplate } from '../membership/membership.models';
+import { MembershipSharesStepComponent } from '../membership/membership-shares-step/membership-shares-step.component';
+import { MembershipSharesPreviewComponent } from '../membership/membership-shares-step/membership-shares-preview.component';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { MemberAddressStepComponent } from '../member-address/member-address-step/member-address-step.component';
 import { MemberAddressPreviewComponent } from '../member-address/member-address-preview/member-address-preview.component';
@@ -63,7 +67,9 @@ import { ClientActionNotifierService } from '../clients-view/client-actions/clie
     ClientDatatableStepComponent,
     ClientPreviewStepComponent,
     MemberAddressStepComponent,
-    MemberAddressPreviewComponent
+    MemberAddressPreviewComponent,
+    MembershipSharesStepComponent,
+    MembershipSharesPreviewComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -72,6 +78,7 @@ export class CreateClientComponent implements AfterViewInit {
   private router = inject(Router);
   private clientsService = inject(ClientsService);
   private memberBsDates = inject(MemberBsDatesService);
+  private membershipService = inject(MembershipService);
   private settingsService = inject(SettingsService);
   private destroyRef = inject(DestroyRef);
   private snackBar = inject(MatSnackBar);
@@ -89,6 +96,9 @@ export class CreateClientComponent implements AfterViewInit {
       labels.push('ADDRESS');
     }
     this.datatables.forEach((dt: any) => labels.push(dt.registeredTableName));
+    if (this.membershipMode) {
+      labels.push('SHARES');
+    }
     labels.push('PREVIEW');
     return labels;
   }
@@ -111,6 +121,15 @@ export class CreateClientComponent implements AfterViewInit {
   clientTemplate: any;
   /** Client Address Field Config */
   clientAddressFieldConfig: any;
+  /** Share products and settings, or null when this user may not read memberships (fineract-dbug ADR 0023) */
+  membershipTemplate: MembershipTemplate | null = null;
+  /** Shares step, present while the share-first rule is on */
+  @ViewChild(MembershipSharesStepComponent) sharesStep: MembershipSharesStepComponent;
+
+  /** With the share-first rule on, a new member is a membership application: a pending client buying shares. */
+  get membershipMode(): boolean {
+    return !!this.membershipTemplate?.settings.shareFirstEnabled && this.membershipTemplate.shareProducts.length > 0;
+  }
 
   /**
    * Fetches client and address template from `resolve`
@@ -122,11 +141,18 @@ export class CreateClientComponent implements AfterViewInit {
   constructor() {
     this.route.data
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((data: { clientTemplate: any; clientAddressFieldConfig: any }) => {
-        this.clientTemplate = data.clientTemplate;
-        this.clientAddressFieldConfig = data.clientAddressFieldConfig;
-        this.setDatatables();
-      });
+      .subscribe(
+        (data: {
+          clientTemplate: any;
+          clientAddressFieldConfig: any;
+          membershipTemplate: MembershipTemplate | null;
+        }) => {
+          this.clientTemplate = data.clientTemplate;
+          this.clientAddressFieldConfig = data.clientAddressFieldConfig;
+          this.membershipTemplate = data.membershipTemplate ?? null;
+          this.setDatatables();
+        }
+      );
   }
 
   ngAfterViewInit() {
@@ -162,6 +188,9 @@ export class CreateClientComponent implements AfterViewInit {
 
   areFormvalids(): boolean {
     let areValids = this.clientGeneralForm.valid && this.memberAddressStep.valid();
+    if (this.membershipMode) {
+      areValids = areValids && !!this.sharesStep?.valid();
+    }
     if (this.clientTemplate.isAddressEnabled) {
       areValids = areValids && this.clientAddressStep.address.address.length > 0;
     }
@@ -231,17 +260,24 @@ export class CreateClientComponent implements AfterViewInit {
 
     const addressDraft = this.memberAddressStep.draft();
     const dateOfBirthBs = this.clientGeneralStep.dateOfBirthBs;
-    this.clientsService
-      .createClient(clientData)
+    // With the share-first rule on, the member is created through a membership application: a pending client and
+    // the shares to buy at approval (fineract-dbug ADR 0023). Everything after the first call is the same.
+    const sharesRequest = this.membershipMode ? this.sharesStep?.request() : null;
+    const created$ = sharesRequest
+      ? this.membershipService
+          .apply({ client: clientData, ...sharesRequest })
+          .pipe(map((a) => ({ clientId: a.clientId })))
+      : this.clientsService.createClient(clientData).pipe(map((response: any) => ({ clientId: response.resourceId })));
+    created$
       .pipe(
-        switchMap((response: any) => {
+        switchMap(({ clientId }) => {
           if (!addressDraft) {
-            return of({ clientId: response.resourceId, addressSaved: true });
+            return of({ clientId, addressSaved: true });
           }
           // The member exists at this point; if the address fails, take the user to it rather than lose the member.
-          return this.memberAddressService.saveDraft(response.resourceId, addressDraft).pipe(
-            map(() => ({ clientId: response.resourceId, addressSaved: true })),
-            catchError(() => of({ clientId: response.resourceId, addressSaved: false }))
+          return this.memberAddressService.saveDraft(clientId, addressDraft).pipe(
+            map(() => ({ clientId, addressSaved: true })),
+            catchError(() => of({ clientId, addressSaved: false }))
           );
         }),
         // Keep the date of birth as typed in BS (fineract-dbug ADR 0020). The AD date is already saved and is what
@@ -256,7 +292,19 @@ export class CreateClientComponent implements AfterViewInit {
         )
       )
       .subscribe(({ clientId, addressSaved }) => {
-        if (addressSaved) {
+        if (sharesRequest) {
+          this.notifier.notify('membership.messages.applicationTaken');
+        }
+        if (addressSaved && sharesRequest) {
+          this.router.navigate(
+            [
+              '../',
+              clientId,
+              'membership'
+            ],
+            { relativeTo: this.route }
+          );
+        } else if (addressSaved) {
           this.router.navigate(
             [
               '../',

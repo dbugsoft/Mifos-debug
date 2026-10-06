@@ -43,3 +43,29 @@
 .mat-card-title-group {
   width: 100%;
 }
+
+// Membership application (fineract-dbug ADR 0023)
+.membership-chip {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  margin-left: 12px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+@media (max-width: 600px) {
+  .membership-chip {
+    margin-left: 0;
+  }
+}
+
+.membership-notice {
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  background: #fff4e0;
+  color: #8a5300;
+}

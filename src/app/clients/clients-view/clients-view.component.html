@@ -62,6 +62,12 @@
               [display]="'right'"
               [hideCopy]="complianceHideClientData"
             ></mifosx-entity-name>
+            @if (applicationPending) {
+              <span class="membership-chip"
+                >{{ 'membership.Membership application' | translate }} ·
+                <mifosx-membership-deadline [application]="membershipApplication()"></mifosx-membership-deadline
+              ></span>
+            }
           </h3>
           <div class="flex-5 align-end-center">
             <button mat-icon-button [matMenuTriggerFor]="clientMenu" aria-label="Client actions" yPosition="below">
@@ -287,26 +293,38 @@
         <button mat-menu-item (click)="doAction('Transfer Client')">
           {{ 'labels.buttons.Transfer Client' | translate }}
         </button>
-        @if (clientViewData.status.value === 'Pending') {
+        @if (applicationPending) {
+          <span
+            ><button mat-menu-item *mifosxHasPermission="'APPROVE_MEMBERSHIP'" (click)="decideMembership('approve')">
+              {{ 'membership.Approve membership' | translate }}
+            </button></span
+          >
+          <span
+            ><button mat-menu-item *mifosxHasPermission="'REJECT_MEMBERSHIP'" (click)="decideMembership('reject')">
+              {{ 'membership.Refuse membership' | translate }}
+            </button></span
+          >
+        }
+        @if (clientViewData.status.value === 'Pending' && !applicationPending && !shareFirstRule()) {
           <span
             ><button mat-menu-item (click)="doAction('Activate')">
               {{ 'labels.buttons.Activate' | translate }}
             </button></span
           >
         }
-        @if (clientViewData.status.value === 'Pending') {
+        @if (clientViewData.status.value === 'Pending' && !applicationPending) {
           <span
             ><button mat-menu-item (click)="doAction('Withdraw')">
               {{ 'labels.buttons.Withdraw' | translate }}
             </button></span
           >
         }
-        @if (clientViewData.status.value === 'Pending') {
+        @if (clientViewData.status.value === 'Pending' && !applicationPending) {
           <span
             ><button mat-menu-item (click)="doAction('Reject')">{{ 'labels.buttons.Reject' | translate }}</button></span
           >
         }
-        @if (clientViewData.status.value === 'Pending') {
+        @if (clientViewData.status.value === 'Pending' && !applicationPending) {
           <span
             ><button mat-menu-item *mifosxHasPermission="'DELETE_CLIENT'" (click)="doAction('Delete')">
               {{ 'labels.buttons.Delete' | translate }}
@@ -399,6 +417,9 @@
   </mat-card-header>
 
   <mat-card-content>
+    @if (clientViewData.status.value === 'Pending' && !membershipApplication() && shareFirstRule()) {
+      <p class="membership-notice">{{ 'membership.noApplicationNotice' | translate }}</p>
+    }
     <nav mat-tab-nav-bar class="navigation-tabs" [tabPanel]="tabPanel">
       <a
         mat-tab-link
@@ -409,6 +430,17 @@
       >
         {{ 'labels.inputs.General' | translate }}
       </a>
+      @if (membershipApplication()) {
+        <a
+          mat-tab-link
+          [routerLink]="['./membership']"
+          routerLinkActive
+          #membership="routerLinkActive"
+          [active]="membership.isActive"
+        >
+          {{ 'membership.Membership' | translate }}
+        </a>
+      }
       <a
         mat-tab-link
         [routerLink]="['./personal-data']"

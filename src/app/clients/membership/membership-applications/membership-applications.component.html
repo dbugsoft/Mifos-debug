@@ -1,0 +1,97 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="container applications">
+  @if (template(); as t) {
+    <p class="rule" [class.on]="t.settings.shareFirstEnabled">
+      <fa-icon [icon]="t.settings.shareFirstEnabled ? 'check-circle' : 'info-circle'" class="m-r-10"></fa-icon>
+      @if (t.settings.shareFirstEnabled) {
+        <b>{{ 'membership.ruleOn' | translate }}</b> {{ 'membership.ruleOnText' | translate }}
+      } @else {
+        <b>{{ 'membership.ruleOff' | translate }}</b> {{ 'membership.ruleOffText' | translate }}
+      }
+    </p>
+  }
+
+  <mat-card>
+    <mat-card-content>
+      <div class="bar">
+        <mat-form-field class="search" subscriptSizing="dynamic">
+          <mat-label>{{ 'membership.Search applicants' | translate }}</mat-label>
+          <input matInput [value]="search()" (input)="search.set($any($event.target).value)" />
+        </mat-form-field>
+        <span class="grow"></span>
+        <button
+          mat-raised-button
+          color="primary"
+          [routerLink]="['/members', 'create']"
+          *mifosxHasPermission="'CREATE_MEMBERSHIP'"
+        >
+          <fa-icon icon="plus" class="m-r-10"></fa-icon>{{ 'membership.New Member Application' | translate }}
+        </button>
+      </div>
+
+      <nav mat-tab-nav-bar [tabPanel]="panel" class="tabs">
+        @for (s of statuses; track s) {
+          <a mat-tab-link [active]="status() === s" (click)="show(s)" (keydown.enter)="show(s)" tabindex="0">
+            {{ 'membership.tab.' + s | translate }}
+          </a>
+        }
+      </nav>
+      <mat-tab-nav-panel #panel>
+        <div class="table-wrap">
+          <table class="list">
+            <thead>
+              <tr>
+                <th>{{ 'membership.SNo' | translate }}</th>
+                <th>{{ 'membership.Applicant' | translate }}</th>
+                <th>{{ 'labels.inputs.Account No' | translate }}</th>
+                <th class="num">{{ 'membership.Kitta' | translate }}</th>
+                <th class="num">{{ 'membership.Share amount' | translate }}</th>
+                <th>{{ 'membership.Applied on' | translate }}</th>
+                <th>
+                  {{ (status() === 'PENDING' ? 'membership.Board decision' : 'membership.Decided on') | translate }}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (a of visible(); track a.id; let i = $index) {
+                <tr (click)="open(a)" (keydown.enter)="open(a)" tabindex="0" class="row">
+                  <td>{{ i + 1 }}</td>
+                  <td>
+                    <b>{{ a.name }}</b>
+                    @if (a.mobileNo) {
+                      <span class="sub">{{ a.mobileNo }}</span>
+                    }
+                  </td>
+                  <td class="num">{{ a.accountNo }}</td>
+                  <td class="num">{{ a.kitta }}</td>
+                  <td class="num">{{ 'membership.Rs' | translate }} {{ a.shareAmount | formatNumber }}</td>
+                  <td>{{ a.submittedOn | dateFormat }}</td>
+                  <td>
+                    @if (status() === 'PENDING') {
+                      <mifosx-membership-deadline [application]="a"></mifosx-membership-deadline>
+                    } @else {
+                      {{ a.decidedOn | dateFormat }}
+                    }
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="7" class="empty">
+                    {{ (loading() ? 'membership.Loading' : 'membership.empty.' + status()) | translate }}
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </mat-tab-nav-panel>
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -1,0 +1,140 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+@if (application(); as a) {
+  <div class="membership-tab">
+    <ol class="steps" [attr.aria-label]="'membership.Membership' | translate">
+      <li class="done">
+        <span class="n">1</span>
+        <div>
+          <b>{{ 'membership.Application taken' | translate }}</b>
+          <span class="sub"
+            >{{ a.submittedOn | dateFormat }} · {{ 'membership.client created pending' | translate }}</span
+          >
+        </div>
+      </li>
+      <li [class]="a.status === 'PENDING' ? 'now' : a.status === 'APPROVED' ? 'done' : 'refused'">
+        <span class="n">2</span>
+        <div>
+          <b>{{ 'membership.Board decision' | translate }}</b>
+          @if (a.status === 'PENDING') {
+            <mifosx-membership-deadline [application]="a"></mifosx-membership-deadline>
+          } @else {
+            <span class="sub"
+              >{{ (a.status === 'APPROVED' ? 'membership.Approved on' : 'membership.Refused on') | translate }}
+              {{ a.decidedOn | dateFormat }}</span
+            >
+          }
+        </div>
+      </li>
+      <li [class]="a.status === 'APPROVED' ? 'done' : ''">
+        <span class="n">3</span>
+        <div>
+          <b>{{ 'membership.Member' | translate }}</b>
+          <span class="sub">{{
+            (a.status === 'APPROVED'
+              ? 'membership.memberActive'
+              : a.status === 'REJECTED'
+                ? 'membership.notAMember'
+                : 'membership.startsAtApproval'
+            ) | translate
+          }}</span>
+        </div>
+      </li>
+    </ol>
+
+    <table class="details">
+      <tbody>
+        <tr>
+          <td>{{ 'membership.Share product' | translate }}</td>
+          <td>{{ a.shareProductName }}</td>
+        </tr>
+        <tr>
+          <td>{{ 'membership.Kitta' | translate }}</td>
+          <td>{{ a.kitta }} ({{ 'membership.Rs' | translate }} {{ a.shareAmount | formatNumber }})</td>
+        </tr>
+        <tr>
+          <td>{{ 'membership.Status' | translate }}</td>
+          <td>
+            <span class="status" [class]="a.status">{{ 'membership.status.' + a.status | translate }}</span>
+          </td>
+        </tr>
+        @if (a.note) {
+          <tr>
+            <td>{{ 'membership.Note' | translate }}</td>
+            <td>{{ a.note }}</td>
+          </tr>
+        }
+        @if (a.rejectionReason) {
+          <tr>
+            <td>{{ 'membership.Reason for refusal' | translate }}</td>
+            <td>{{ a.rejectionReason }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    @if (a.status === 'PENDING') {
+      <div class="actions">
+        <button mat-raised-button color="warn" *mifosxHasPermission="'REJECT_MEMBERSHIP'" (click)="decide('reject')">
+          {{ 'membership.Refuse membership' | translate }}
+        </button>
+        <button
+          mat-raised-button
+          color="primary"
+          *mifosxHasPermission="'APPROVE_MEMBERSHIP'"
+          (click)="decide('approve')"
+        >
+          <fa-icon icon="user-check" class="m-r-10"></fa-icon>{{ 'membership.Approve membership' | translate }}
+        </button>
+      </div>
+    }
+
+    @if (a.status === 'APPROVED') {
+      <h3>{{ 'membership.Accounts opened by the approval' | translate }}</h3>
+      <table class="accounts">
+        <thead>
+          <tr>
+            <th>{{ 'membership.Account' | translate }}</th>
+            <th>{{ 'labels.inputs.Account No' | translate }}</th>
+            <th>{{ 'labels.inputs.Product' | translate }}</th>
+            <th>{{ 'labels.inputs.Status' | translate }}</th>
+            <th>{{ 'membership.Holding' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{{ 'membership.Member savings' | translate }}</td>
+            <td>
+              <a [routerLink]="['../savings-accounts', a.savingsAccountId]">{{
+                savingsAccount()?.accountNo ?? a.savingsAccountId
+              }}</a>
+            </td>
+            <td>{{ savingsAccount()?.productName }}</td>
+            <td>{{ savingsAccount()?.status?.value }}</td>
+            <td>{{ 'membership.Rs' | translate }} {{ savingsAccount()?.accountBalance ?? 0 | formatNumber }}</td>
+          </tr>
+          <tr>
+            <td>{{ 'membership.Shares' | translate }}</td>
+            <td>
+              <a [routerLink]="['../shares-accounts', a.shareAccountId]">{{
+                shareAccount()?.accountNo ?? a.shareAccountId
+              }}</a>
+            </td>
+            <td>{{ shareAccount()?.productName ?? a.shareProductName }}</td>
+            <td>{{ shareAccount()?.status?.value }}</td>
+            <td>
+              {{ a.kitta }} {{ 'membership.kitta' | translate }} · {{ 'membership.Rs' | translate }}
+              {{ a.shareAmount | formatNumber }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    }
+  </div>
+}
