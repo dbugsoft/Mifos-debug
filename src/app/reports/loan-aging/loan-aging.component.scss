@@ -1,0 +1,132 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+.aging {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 0 auto;
+  max-width: 84rem;
+  width: 90%;
+  padding-bottom: 32px;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+
+  mat-form-field {
+    width: 240px;
+  }
+
+  .spacer {
+    flex: 1;
+  }
+}
+
+button fa-icon {
+  margin-right: 8px;
+}
+
+.as-of {
+  margin: 0;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+h3 {
+  margin: 0 0 16px;
+}
+
+.totals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+
+  mat-card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .label {
+    color: var(--mat-sys-on-surface-variant);
+    font-size: 0.875rem;
+  }
+
+  .value {
+    font-size: 1.25rem;
+    font-weight: 500;
+  }
+
+  .overdue {
+    color: var(--mat-sys-error, #c62828);
+  }
+}
+
+.chart-container {
+  position: relative;
+  height: 320px;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+.aging-table {
+  width: 100%;
+
+  .num {
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .sub {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 400;
+    opacity: 0.8;
+  }
+
+  .mat-mdc-footer-cell {
+    font-weight: 500;
+  }
+
+  // Blue header with white partitions, as on the member and loan product lists.
+  .mat-mdc-header-row {
+    background: var(--md-sys-color-primary, #1074b9);
+  }
+
+  th.mat-mdc-header-cell {
+    color: #fff;
+    font-weight: 600;
+    border-bottom: none;
+  }
+
+  th.mat-mdc-header-cell + th.mat-mdc-header-cell {
+    border-left: 1px solid rgb(255 255 255 / 35%);
+  }
+}
+
+.empty {
+  margin: 0;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+@media (width <= 768px) {
+  // 16px side gutter on phones, as on the page title.
+  .aging {
+    width: auto;
+    margin: 0 16px;
+  }
+
+  .filters mat-form-field {
+    width: 100%;
+  }
+}
