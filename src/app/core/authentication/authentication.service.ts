@@ -50,7 +50,24 @@ export class AuthenticationService {
    * @returns Updated user response observable.
    */
   changePassword(userId: string, passwordObj: any) {
-    return this.http.put(`/users/${userId}`, passwordObj);
+    return this.http.put(`/users/${userId}`, passwordObj).pipe(
+      switchMap((response) => {
+        // Basic auth sends the password with every request, so after changing their own password the user must
+        // sign in again with the new one, or every following request is refused.
+        const credentials = this.getCredentials();
+        if (this.authMode !== AuthMode.Basic || String(credentials?.userId) !== String(userId)) {
+          return of(response);
+        }
+        this.authenticationInterceptor.removeAuthorization();
+        this.authenticationInterceptor.removeTwoFactorAuthorization();
+        const loginContext: LoginContext = {
+          username: credentials.username,
+          password: passwordObj.password,
+          remember: this.rememberMe
+        };
+        return this.login(loginContext).pipe(map(() => response));
+      })
+    );
   }
 
   private userLoggedIn$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
