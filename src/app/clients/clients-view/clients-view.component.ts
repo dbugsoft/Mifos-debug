@@ -201,6 +201,9 @@ export class ClientsViewComponent implements OnInit {
     return this.membershipApplication()?.status === 'PENDING';
   }
 
+  /** Every member has a Membership tab for users who may read memberships, with or without an application on record. */
+  readonly canReadMembership = this.membershipService.canRead();
+
   /** Approve and Refuse are offered, unless "a different person must approve" is on and this user entered it. */
   get canDecideMembership(): boolean {
     const application = this.membershipApplication();

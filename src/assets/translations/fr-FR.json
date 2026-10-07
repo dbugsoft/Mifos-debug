@@ -5588,7 +5588,12 @@
     "Earlier applications": "Earlier applications",
     "Reason or note": "Reason or note",
     "MEMBERSHIP": "MEMBERSHIP",
-    "Citizenship": "Citizenship"
+    "Citizenship": "Citizenship",
+    "Member since": "Member since",
+    "Kitta held": "Kitta held",
+    "joinedBeforeApplications": "Joined before membership applications were recorded, so there is no application to show.",
+    "activeWithoutShares": "Active, but holds no shares: under the share-first rule this person is not a member yet. Sell them shares, or close them.",
+    "noApplicationOnRecord": "No membership application on record."
   },
   "error.msg.membership.share.first": "A person becomes a member by buying shares. Take a membership application; approving it activates the member and buys the shares together.",
   "error.msg.membership.application.pending": "This person has a membership application waiting for the board. Approve or refuse the application instead, so the decision and its reason are kept.",

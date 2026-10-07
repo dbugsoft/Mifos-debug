@@ -447,7 +447,7 @@
       >
         {{ 'labels.inputs.General' | translate }}
       </a>
-      @if (membershipApplication()) {
+      @if (canReadMembership) {
         <a
           mat-tab-link
           [routerLink]="['./membership']"

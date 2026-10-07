@@ -62,7 +62,7 @@
                 'membership.enteredLate' | translate: { date: (a.enteredOn | dateFormat), user: a.submittedBy }
               }}</span>
             } @else if (a.submittedBy) {
-              <span class="muted">· {{ 'membership.byUser' | translate: { user: a.submittedBy } }}</span>
+              <span class="muted">&nbsp;· {{ 'membership.byUser' | translate: { user: a.submittedBy } }}</span>
             }
           </td>
         </tr>
@@ -129,7 +129,7 @@
           <td>
             <span class="status" [class]="a.status">{{ 'membership.status.' + a.status | translate }}</span>
             @if (a.decidedBy) {
-              <span class="muted">· {{ 'membership.byUser' | translate: { user: a.decidedBy } }}</span>
+              <span class="muted">&nbsp;· {{ 'membership.byUser' | translate: { user: a.decidedBy } }}</span>
             }
           </td>
         </tr>
@@ -255,6 +255,75 @@
                     >
                   }
                 </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+} @else if (client(); as c) {
+  <!-- A member with no application on record: joined before applications were kept (fineract-dbug ADR 0035) -->
+  <div class="membership-tab">
+    <table class="details">
+      <tbody>
+        <tr>
+          <td>{{ 'membership.Status' | translate }}</td>
+          <td>{{ c.status?.value }}</td>
+        </tr>
+        @if (c.status?.value === 'Active') {
+          <tr>
+            <td>{{ 'membership.Member since' | translate }}</td>
+            <td>{{ c.activationDate | dateFormat }}</td>
+          </tr>
+          <tr>
+            <td>{{ 'membership.Kitta held' | translate }}</td>
+            <td>{{ kittaHeld() }} {{ 'membership.kitta' | translate }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <!-- A pending person's notice and "Enter an existing application" are in the page header already -->
+    @if (c.status?.value !== 'Pending') {
+      <p class="notice">
+        @if (c.status?.value === 'Active') {
+          {{ (kittaHeld() > 0 ? 'membership.joinedBeforeApplications' : 'membership.activeWithoutShares') | translate }}
+        } @else {
+          {{ 'membership.noApplicationOnRecord' | translate }}
+        }
+      </p>
+    }
+
+    @if (canApplyAgain()) {
+      <div class="actions">
+        <button mat-raised-button color="primary" (click)="applyAgain()">
+          <fa-icon icon="redo" class="m-r-10"></fa-icon>{{ 'membership.Apply again' | translate }}
+        </button>
+      </div>
+    }
+
+    @if (shareAccounts().length) {
+      <h3>{{ 'membership.Shares' | translate }}</h3>
+      <div class="table-wrap">
+        <table class="accounts">
+          <thead>
+            <tr>
+              <th>{{ 'labels.inputs.Account No' | translate }}</th>
+              <th>{{ 'labels.inputs.Product' | translate }}</th>
+              <th>{{ 'labels.inputs.Status' | translate }}</th>
+              <th>{{ 'membership.Holding' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (s of shareAccounts(); track s.id) {
+              <tr>
+                <td>
+                  <a [routerLink]="['../shares-accounts', s.id]">{{ s.accountNo }}</a>
+                </td>
+                <td>{{ s.productName }}</td>
+                <td>{{ s.status?.value }}</td>
+                <td>{{ s.totalApprovedShares ?? 0 }} {{ 'membership.kitta' | translate }}</td>
               </tr>
             }
           </tbody>

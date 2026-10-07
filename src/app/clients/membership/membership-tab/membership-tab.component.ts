@@ -29,7 +29,8 @@ import {
 /**
  * A member's membership (fineract-dbug ADR 0023 and 0035): where the latest application stands, what is being bought,
  * the money taken, the decision and its reason or note, and the accounts the approval opened; then every earlier
- * application with its decision. A refused person can apply again from here.
+ * application with its decision. A refused person can apply again from here. For a member with no application on
+ * record (joined before applications were kept), the shares they hold.
  */
 @Component({
   selector: 'mifosx-membership-tab',
@@ -59,22 +60,39 @@ export class MembershipTabComponent {
   readonly template = signal<MembershipTemplate | null>(null);
   readonly savingsAccount = signal<any>(null);
   readonly shareAccount = signal<any>(null);
+  /** The member as Fineract shows them (status, activation date), for a member with no application on record */
+  readonly client = signal<any>(null);
+  /** The member's share accounts that are not closed or rejected */
+  readonly shareAccounts = signal<any[]>([]);
+  /** Kitta held across the member's active share accounts */
+  readonly kittaHeld = computed(() =>
+    this.shareAccounts()
+      .filter((s) => s.status?.active)
+      .reduce((sum, s) => sum + Number(s.totalApprovedShares ?? 0), 0)
+  );
 
   /** "A different person must approve" is on, and this user entered the application. */
   readonly mustBeSomeoneElse = computed(() => {
     const app = this.application();
     return !!app && !this.membershipService.mayDecide(app, this.template()?.settings);
   });
+  /** A refused person applies again: refused application, or refused in Fineract before applications existed. */
   readonly canApplyAgain = computed(
-    () => this.application()?.status === 'REJECTED' && this.membershipService.can('CREATE_MEMBERSHIP')
+    () =>
+      (this.application()?.status === 'REJECTED' ||
+        (!this.application() &&
+          this.client()?.status?.value === 'Rejected' &&
+          !!this.template()?.settings.shareFirstEnabled)) &&
+      this.membershipService.can('CREATE_MEMBERSHIP')
   );
 
   constructor() {
     this.route.parent.data
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((data: { membershipApplication: MembershipApplication | null }) => {
+      .subscribe((data: { membershipApplication: MembershipApplication | null; clientViewData: any }) => {
         const app = data.membershipApplication ?? null;
         this.application.set(app);
+        this.client.set(data.clientViewData ?? null);
         if (app) {
           this.membershipService.history(app.clientId).subscribe((all) => this.history.set(all));
         }
@@ -87,6 +105,9 @@ export class MembershipTabComponent {
         (accounts.savingsAccounts ?? []).find((a: any) => a.id === app?.savingsAccountId) ?? null
       );
       this.shareAccount.set((accounts.shareAccounts ?? []).find((a: any) => a.id === app?.shareAccountId) ?? null);
+      this.shareAccounts.set(
+        (accounts.shareAccounts ?? []).filter((a: any) => !a.status?.closed && !a.status?.rejected)
+      );
     });
   }
 
@@ -112,14 +133,19 @@ export class MembershipTabComponent {
   }
 
   applyAgain(): void {
+    this.openApply('again');
+  }
+
+  private openApply(mode: 'again'): void {
     const application = this.application();
+    const client = this.client();
     const template = this.template();
-    if (application && template) {
+    if ((application || client) && template) {
       openApplyDialog(this.dialog, {
         template,
-        clientId: application.clientId,
-        name: application.name,
-        mode: 'again',
+        clientId: application?.clientId ?? client.id,
+        name: application?.name ?? client.displayName,
+        mode,
         previous: application
       }).subscribe((taken) => {
         if (taken) {
