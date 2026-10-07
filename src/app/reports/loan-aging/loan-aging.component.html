@@ -1,0 +1,176 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="aging">
+  <div class="filters">
+    <mat-form-field>
+      <mat-label>{{ 'loanAging.Office' | translate }}</mat-label>
+      <mat-select [(ngModel)]="officeId" (selectionChange)="load()">
+        <mat-option [value]="null">{{ 'loanAging.All offices' | translate }}</mat-option>
+        @for (office of offices; track office.id) {
+          <mat-option [value]="office.id">{{ office.name }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-button-toggle-group
+      [(ngModel)]="groupBy"
+      (change)="load()"
+      [attr.aria-label]="'loanAging.Group by' | translate"
+    >
+      @for (option of groupByOptions; track option.value) {
+        <mat-button-toggle [value]="option.value">{{ option.label | translate }}</mat-button-toggle>
+      }
+    </mat-button-toggle-group>
+
+    <span class="spacer"></span>
+
+    <button mat-stroked-button type="button" (click)="download('csv')" [disabled]="!report">
+      <fa-icon icon="file-excel"></fa-icon>{{ 'loanAging.Download CSV' | translate }}
+    </button>
+    <button mat-raised-button color="primary" type="button" (click)="download('pdf')" [disabled]="!report">
+      <fa-icon icon="file-pdf"></fa-icon>{{ 'loanAging.Download PDF' | translate }}
+    </button>
+  </div>
+
+  @if (loading) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
+
+  @if (report) {
+    <p class="as-of">
+      {{ report.office }} · {{ 'loanAging.as of' | translate }} {{ report.asOfBs }} BS ({{ report.asOf }} AD)
+    </p>
+
+    <div class="totals">
+      <mat-card>
+        <mat-card-content>
+          <span class="label">{{ 'loanAging.Loans' | translate }}</span>
+          <span class="value">{{ report.total.loans | formatNumber }}</span>
+        </mat-card-content>
+      </mat-card>
+      <mat-card>
+        <mat-card-content>
+          <span class="label">{{ 'loanAging.Outstanding' | translate }}</span>
+          <span class="value">{{ report.total.outstanding | formatNumber }}</span>
+        </mat-card-content>
+      </mat-card>
+      <mat-card>
+        <mat-card-content>
+          <span class="label">{{ 'loanAging.Overdue' | translate }}</span>
+          <span class="value overdue">{{ report.total.overdue | formatNumber }}</span>
+        </mat-card-content>
+      </mat-card>
+      <mat-card>
+        <mat-card-content>
+          <span class="label">{{ 'loanAging.Provision' | translate }}</span>
+          <span class="value">{{ report.total.provision | formatNumber }}</span>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <mat-card>
+      <mat-card-content>
+        <h3>{{ 'loanAging.By age band' | translate }}</h3>
+        <div class="chart-container">
+          <canvas #agingChart></canvas>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card>
+      <mat-card-content>
+        @if (report.rows.length) {
+          <div class="table-scroll">
+            <table mat-table [dataSource]="report.rows" class="aging-table">
+              <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef>
+                  {{ groupByLabel | translate }}
+                </th>
+                <td mat-cell *matCellDef="let row">{{ row.name }}</td>
+                <td mat-footer-cell *matFooterCellDef>{{ 'loanAging.Total' | translate }}</td>
+              </ng-container>
+
+              @for (bucket of report.buckets; track bucket.code; let i = $index) {
+                <ng-container [matColumnDef]="bucket.code">
+                  <th mat-header-cell *matHeaderCellDef class="num">
+                    {{ bucket.label }}
+                    <span class="sub">{{ bucket.loanClass }} · {{ bucket.provisionRate }}%</span>
+                  </th>
+                  <td mat-cell *matCellDef="let row" class="num">
+                    {{ row.cells[i].outstanding | formatNumber }}
+                    <span class="sub">{{ row.cells[i].loans }} {{ 'loanAging.loans' | translate }}</span>
+                  </td>
+                  <td mat-footer-cell *matFooterCellDef class="num">
+                    {{ report.bucketTotals[i].outstanding | formatNumber }}
+                    <span class="sub">{{ report.bucketTotals[i].loans }} {{ 'loanAging.loans' | translate }}</span>
+                  </td>
+                </ng-container>
+              }
+
+              <ng-container matColumnDef="outstanding">
+                <th mat-header-cell *matHeaderCellDef class="num">{{ 'loanAging.Outstanding' | translate }}</th>
+                <td mat-cell *matCellDef="let row" class="num">{{ row.total.outstanding | formatNumber }}</td>
+                <td mat-footer-cell *matFooterCellDef class="num">{{ report.total.outstanding | formatNumber }}</td>
+              </ng-container>
+              <ng-container matColumnDef="overdue">
+                <th mat-header-cell *matHeaderCellDef class="num">{{ 'loanAging.Overdue' | translate }}</th>
+                <td mat-cell *matCellDef="let row" class="num">{{ row.total.overdue | formatNumber }}</td>
+                <td mat-footer-cell *matFooterCellDef class="num">{{ report.total.overdue | formatNumber }}</td>
+              </ng-container>
+              <ng-container matColumnDef="provision">
+                <th mat-header-cell *matHeaderCellDef class="num">{{ 'loanAging.Provision' | translate }}</th>
+                <td mat-cell *matCellDef="let row" class="num">{{ row.total.provision | formatNumber }}</td>
+                <td mat-footer-cell *matFooterCellDef class="num">{{ report.total.provision | formatNumber }}</td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="columns"></tr>
+              <tr mat-row *matRowDef="let row; columns: columns"></tr>
+              <tr mat-footer-row *matFooterRowDef="columns"></tr>
+            </table>
+          </div>
+        } @else {
+          <p class="empty">{{ 'loanAging.No loans to show' | translate }}</p>
+        }
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card>
+      <mat-card-content>
+        <h3>{{ 'loanAging.By loan class' | translate }}</h3>
+        <div class="table-scroll">
+          <table mat-table [dataSource]="report.classes" class="aging-table">
+            <ng-container matColumnDef="label">
+              <th mat-header-cell *matHeaderCellDef>{{ 'loanAging.Loan class' | translate }}</th>
+              <td mat-cell *matCellDef="let c">{{ c.label }}</td>
+            </ng-container>
+            <ng-container matColumnDef="provisionRate">
+              <th mat-header-cell *matHeaderCellDef class="num">{{ 'loanAging.Provision rate' | translate }}</th>
+              <td mat-cell *matCellDef="let c" class="num">{{ c.provisionRate }}%</td>
+            </ng-container>
+            <ng-container matColumnDef="loans">
+              <th mat-header-cell *matHeaderCellDef class="num">{{ 'loanAging.Loans' | translate }}</th>
+              <td mat-cell *matCellDef="let c" class="num">{{ c.loans | formatNumber }}</td>
+            </ng-container>
+            <ng-container matColumnDef="outstanding">
+              <th mat-header-cell *matHeaderCellDef class="num">{{ 'loanAging.Outstanding' | translate }}</th>
+              <td mat-cell *matCellDef="let c" class="num">{{ c.outstanding | formatNumber }}</td>
+            </ng-container>
+            <ng-container matColumnDef="provision">
+              <th mat-header-cell *matHeaderCellDef class="num">{{ 'loanAging.Provision' | translate }}</th>
+              <td mat-cell *matCellDef="let c" class="num">{{ c.provision | formatNumber }}</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="classColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: classColumns"></tr>
+          </table>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  }
+</div>

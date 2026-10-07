@@ -33,7 +33,6 @@ import { PopoverService } from '../../../configuration-wizard/popover/popover.se
 import { ConfigurationWizardService } from '../../../configuration-wizard/configuration-wizard.service';
 import { TranslateService } from '@ngx-translate/core';
 import { MatIcon } from '@angular/material/icon';
-import { MatTooltip } from '@angular/material/tooltip';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { formatTabLabel } from 'app/shared/utils/format-tab-label.util';
 import { normalizeBreadcrumbUrl } from 'app/shared/utils/breadcrumb-url.util';
@@ -90,8 +89,7 @@ const routeHideBreadcrumbTrail = 'hideBreadcrumbTrail';
   styleUrls: ['./breadcrumb.component.scss'],
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
-    MatIcon,
-    MatTooltip
+    MatIcon
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })

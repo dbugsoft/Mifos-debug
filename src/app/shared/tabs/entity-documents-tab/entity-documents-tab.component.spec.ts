@@ -11,7 +11,18 @@ import { MatDialog } from '@angular/material/dialog';
 import { of } from 'rxjs';
 import { TranslateModule } from '@ngx-translate/core';
 import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
-import { faEye, faFile, faPlus, faTimes, faUpload } from '@fortawesome/free-solid-svg-icons';
+import {
+  faDownload,
+  faEye,
+  faFile,
+  faFileExcel,
+  faFilePdf,
+  faFileWord,
+  faPlus,
+  faTimes,
+  faTrash,
+  faUpload
+} from '@fortawesome/free-solid-svg-icons';
 import { describe, it, expect, jest, beforeEach } from '@jest/globals';
 
 import { EntityDocumentsTabComponent } from './entity-documents-tab.component';
@@ -40,7 +51,7 @@ describe('EntityDocumentsTabComponent', () => {
         TranslateModule.forRoot()
       ],
       providers: [
-        { provide: ClientsService, useValue: {} },
+        { provide: ClientsService, useValue: { downloadClientDocument: jest.fn(() => of(new Blob(['%PDF']))) } },
         { provide: LoansService, useValue: {} },
         { provide: SavingsService, useValue: {} },
         { provide: DocumentPreviewService, useValue: { isPreviewable: () => false, release: jest.fn() } },
@@ -50,7 +61,18 @@ describe('EntityDocumentsTabComponent', () => {
       .overrideProvider(MatDialog, { useValue: { open: () => ({ afterClosed: () => of(dialogResult) }) } })
       .compileComponents();
 
-    TestBed.inject(FaIconLibrary).addIcons(faEye, faFile, faPlus, faTimes, faUpload);
+    TestBed.inject(FaIconLibrary).addIcons(
+      faDownload,
+      faEye,
+      faFile,
+      faFileExcel,
+      faFilePdf,
+      faFileWord,
+      faPlus,
+      faTimes,
+      faTrash,
+      faUpload
+    );
 
     fixture = TestBed.createComponent(EntityDocumentsTabComponent);
     component = fixture.componentInstance;
@@ -87,6 +109,24 @@ describe('EntityDocumentsTabComponent', () => {
       'Passport',
       'Citizenship'
     ]);
+  });
+
+  it('downloads a document under its file name from the download button', () => {
+    (URL as any).createObjectURL = jest.fn(() => 'blob:doc');
+    (URL as any).revokeObjectURL = jest.fn();
+    let downloadedAs = '';
+    const click = jest.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(function (
+      this: HTMLAnchorElement
+    ) {
+      downloadedAs = this.download;
+    });
+    component.entityDocuments[0].fileName = 'passport.pdf';
+
+    fixture.nativeElement.querySelector('button[aria-label^="labels.buttons.Download"]').click();
+
+    expect(TestBed.inject(ClientsService).downloadClientDocument).toHaveBeenCalledWith('1', 1);
+    expect(downloadedAs).toBe('passport.pdf');
+    click.mockRestore();
   });
 
   it('renders an uploaded document without a reload', () => {

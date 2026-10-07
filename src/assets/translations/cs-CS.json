@@ -3266,7 +3266,8 @@
       "Remittances": "Remitence",
       "Process Remittance": "Zpracovat remitenci",
       "Undo Write-off": "Zrušit odpis",
-      "Loan Calculator": "Loan Calculator"
+      "Loan Calculator": "Loan Calculator",
+      "Loan Aging": "Loan Aging"
     },
     "placeholders": {
       "Add new server": "Přidat nový server",
@@ -5735,6 +5736,29 @@
       }
     },
     "Watch": "Of which on watch"
+  },
+  "loanAging": {
+    "Office": "Office",
+    "All offices": "All offices",
+    "Group by": "Group by",
+    "Branch": "Branch",
+    "Loan product": "Loan product",
+    "Loan officer": "Loan officer",
+    "Centre": "Centre",
+    "Download CSV": "Download CSV",
+    "Download PDF": "Download PDF",
+    "as of": "as of",
+    "Loans": "Loans",
+    "loans": "loans",
+    "Outstanding": "Outstanding",
+    "Overdue": "Overdue",
+    "Provision": "Provision",
+    "Total": "Total",
+    "By age band": "Outstanding and overdue by age band",
+    "By loan class": "By loan class",
+    "Loan class": "Loan class",
+    "Provision rate": "Provision rate",
+    "No loans to show": "No loans to show for this office."
   },
   "membership": {
     "Membership": "Membership",

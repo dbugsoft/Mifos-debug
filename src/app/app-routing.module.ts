@@ -115,6 +115,15 @@ const routes: Routes = [
       loadComponent: () =>
         import('./loans/loan-calculator/loan-calculator.component').then((m) => m.LoanCalculatorComponent),
       data: { title: 'Loan Calculator', breadcrumb: 'Loan Calculator' }
+    },
+    {
+      path: 'loan-aging',
+      loadComponent: () => import('./reports/loan-aging/loan-aging.component').then((m) => m.LoanAgingComponent),
+      data: {
+        title: 'Loan Aging',
+        breadcrumb: 'Loan Aging',
+        parentBreadcrumb: { label: 'Reports', url: '/reports-overview' }
+      }
     }
   ]),
   {
