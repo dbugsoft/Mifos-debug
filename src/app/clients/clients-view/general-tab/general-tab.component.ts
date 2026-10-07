@@ -333,7 +333,9 @@ export class GeneralTabComponent implements OnDestroy {
       return false;
     }).length;
     // Total Savings: sum of balances
-    this.performanceHistory.totalSavings = allSavings.reduce((sum: number, s: any) => sum + (s.accountBalance || 0), 0);
+    // Rounded: summing decimals in floating point left tails like 830,281.0700000001.
+    const totalSavings = allSavings.reduce((sum: number, s: any) => sum + (s.accountBalance || 0), 0);
+    this.performanceHistory.totalSavings = Math.round(totalSavings * 100) / 100;
   }
 
   /**

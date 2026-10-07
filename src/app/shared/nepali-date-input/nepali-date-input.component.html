@@ -6,7 +6,7 @@
   file, You can obtain one at http://mozilla.org/MPL/2.0/.
 -->
 
-<div class="mfx-bs-picker" #wrapper>
+<div class="mfx-bs-picker" [class.mfx-bs-picker--inline]="inline" #wrapper>
   <!-- ── Trigger form field: BS ─────────────────────────────────────────── -->
   @if (mode === 'BS') {
     <mat-form-field class="flex-fill" (click)="openPanel()">
@@ -40,13 +40,26 @@
           AD
         </button>
       </span>
-      <mat-icon matSuffix class="mfx-bs-picker__cal-icon">calendar_today</mat-icon>
-      <mat-hint>
-        {{ otherCalendarHint }}
-        @if (isProvisional) {
-          <span class="mfx-bs-picker__provisional">· provisional calendar</span>
-        }
-      </mat-hint>
+      <!-- Inline layout: calendar icon right after the date, the other calendar's date after the switch.
+           One element per @if branch: Angular only projects a single-root block into a named slot. -->
+      @if (inline) {
+        <mat-icon class="mfx-bs-picker__cal-icon">calendar_today</mat-icon>
+      } @else {
+        <mat-icon matSuffix class="mfx-bs-picker__cal-icon">calendar_today</mat-icon>
+      }
+      @if (inline) {
+        <span matSuffix class="mfx-bs-picker__other">{{ otherCalendarDate }}</span>
+      }
+      @if (!inline) {
+        <mat-hint>
+          {{ otherCalendarHint }}
+          @if (isProvisional) {
+            <span class="mfx-bs-picker__provisional">· provisional calendar</span>
+          }
+        </mat-hint>
+      } @else if (isProvisional) {
+        <mat-hint class="mfx-bs-picker__provisional">Provisional calendar</mat-hint>
+      }
 
       @if (hasRequiredError) {
         <mat-error>{{ label }} is <strong>required</strong></mat-error>
@@ -87,7 +100,14 @@
           AD
         </button>
       </span>
-      <mat-datepicker-toggle matSuffix [for]="adPicker"></mat-datepicker-toggle>
+      @if (inline) {
+        <mat-datepicker-toggle [for]="adPicker"></mat-datepicker-toggle>
+      } @else {
+        <mat-datepicker-toggle matSuffix [for]="adPicker"></mat-datepicker-toggle>
+      }
+      @if (inline) {
+        <span matSuffix class="mfx-bs-picker__other">{{ otherCalendarDate }}</span>
+      }
       <mat-datepicker #adPicker></mat-datepicker>
       @if (looksLikeBsYear) {
         <mat-hint class="mfx-bs-picker__warning">
@@ -96,13 +116,15 @@
         </mat-hint>
       } @else if (isOutsideBsCalendar) {
         <mat-hint>Outside the BS calendar ({{ minBsYear }}–{{ maxBsYear }} BS): kept in AD only</mat-hint>
-      } @else {
+      } @else if (!inline) {
         <mat-hint>
           {{ otherCalendarHint }}
           @if (isProvisional) {
             <span class="mfx-bs-picker__provisional">· provisional calendar</span>
           }
         </mat-hint>
+      } @else if (isProvisional) {
+        <mat-hint class="mfx-bs-picker__provisional">Provisional calendar</mat-hint>
       }
 
       @if (hasRequiredError || adInputControl.hasError('required')) {

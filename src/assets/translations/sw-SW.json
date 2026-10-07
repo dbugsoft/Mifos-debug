@@ -1,6 +1,7 @@
 ﻿{
   "error.msg.upload.file.too.big": "Faili uliyochagua ni kubwa kuliko kikomo cha MB {{args.0.value}}. Tafadhali chagua faili ndogo zaidi na ujaribu tena.",
-  "APP_NAME": "COIMS",
+  "APP_NAME": "COFMIS",
+  "APP_FULL_NAME": "Cooperative Financial Management & Information System",
   "Logged in as": "Imeingia kama",
   "Remember me": "Nikumbuke",
   "errors": {
@@ -496,6 +497,8 @@
       "Home": "Nyumbani"
     },
     "buttons": {
+      "Photo": "Photo",
+      "Open Module": "Open Module",
       "Accept Transfer": "Kubali Uhamisho",
       "Actions": "Vitendo",
       "Activate": "Amilisha",
@@ -622,6 +625,8 @@
       "Enable": "Wezesha",
       "Expand All": "Panua Yote",
       "Export": "Hamisha",
+      "Export as JSON": "Export as JSON",
+      "Export as PDF": "Export as PDF",
       "Export to File": "Hamisha kwa FILE",
       "Export CSV": "Hamisha CSV",
       "Export XLS": "Hamisha XLS",
@@ -769,7 +774,9 @@
       "DONE": "Imekamilika",
       "Submitting": "Inatuma",
       "OK": "Sawa",
-      "undo_account_transfer": "Futa uhamisho wa akaunti"
+      "undo_account_transfer": "Futa uhamisho wa akaunti",
+      "Calculate": "Calculate",
+      "Share": "Share"
     },
     "catalogs": {
       "Interest payment waiver": "Msamaha wa Malipo ya Riba",
@@ -1563,7 +1570,8 @@
       "identifier id": "kitambulisho",
       "savings-transaction-datatable-tab works": "Savings-transaction-datatable-tab inafanya kazi",
       "successfully select option": "kwa mafanikio. Tafadhali chagua kutoka kwa chaguo zilizo hapa chini ili kuendelea zaidi.",
-      "undo_account_transfer": "Futa uhamisho wa akaunti"
+      "undo_account_transfer": "Futa uhamisho wa akaunti",
+      "Loan Calculator": "Loan Calculator"
     },
     "inputs": {
       "# Remittance": "# Uhawilishaji",
@@ -3094,7 +3102,11 @@
       "s3_secret_key": "s3_ufunguo_wa_siri",
       "task-management component": "sehemu ya usimamizi wa kazi",
       "to": "kwa",
-      "valid": "halali"
+      "valid": "halali",
+      "Member": "Member",
+      "Total Interest": "Total Interest",
+      "Total Repayment": "Total Repayment",
+      "First Repayment": "First Repayment"
     },
     "links": {
       "Community": "Jumuiya",
@@ -3112,6 +3124,17 @@
       "Working with Code": "Kufanya kazi na Kanuni"
     },
     "menus": {
+      "Member Management": "Member Management",
+      "Administration": "Administration",
+      "Collapse Sidebar": "Collapse sidebar",
+      "Collections": "Collections",
+      "Expand Sidebar": "Expand sidebar",
+      "Finance": "Finance",
+      "Home": "Home",
+      "Members": "Members",
+      "Open Menu": "Open menu",
+      "Operations": "Operations",
+      "Overview": "Overview",
       "Unassign Staff": "Batilisha Wafanyikazi",
       "Accounting": "Uhasibu",
       "Account Overview": "Muhtasari wa akaunti",
@@ -3238,7 +3261,8 @@
       "Tasks": "Kazi",
       "Remittances": "Uhawilishaji",
       "Process Remittance": "Chakata uhawilishaji",
-      "Undo Write-off": "Futa Kuandika-mbali"
+      "Undo Write-off": "Futa Kuandika-mbali",
+      "Loan Calculator": "Loan Calculator"
     },
     "placeholders": {
       "Add new server": "Ongeza seva mpya",
@@ -3251,7 +3275,8 @@
       "Enter last name": "Ingiza jina la mwisho",
       "Enter remittance reference number": "Ingiza nambari ya kumbukumbu ya uhawilishaji",
       "Sender name": "Jina la mtumaji",
-      "Loading vendors...": "Inapakia wauzaji..."
+      "Loading vendors...": "Inapakia wauzaji...",
+      "Search active member": "Search an active member by name or account number"
     },
     "status": {
       "Active": "Inayotumika",
@@ -3300,6 +3325,19 @@
       "undo_account_transfer": "Una uhakika unataka kufuta uhamisho huu wa akaunti?"
     },
     "text": {
+      "Welcome back": "Welcome back, {{name}}!",
+      "Home subtitle": "Manage and monitor your cooperative efficiently with {{app}}.",
+      "Total Members": "Total Members",
+      "Total Savings": "Total Savings",
+      "Loans Outstanding": "Loans Outstanding",
+      "Quick Menu": "Quick Menu",
+      "Home Members Description": "Register members and manage their groups and centers.",
+      "Home Dashboard Description": "Key figures, trends and the work that needs attention.",
+      "Home Collection Sheet Description": "Record a meeting's collections for a group or center.",
+      "Home Accounting Description": "Journal entries, chart of accounts and period closing.",
+      "Home Reports Description": "Run member, loan, savings and accounting reports.",
+      "Home Admin Description": "Users, offices, products and system settings.",
+      "Home Quick Menu Tour": "Shortcuts to the main modules you can use.",
       "A": "A",
       "Ability to manage holidays for individual offices": "Uwezo wa kudhibiti likizo kwa ofisi binafsi ni zana muhimu sana kwa shirika linalotumia maeneo mengi.Tumia chaguo hili kubinafsisha likizo kwa kila ofisi ya shirika lako.",
       "About Us": "Kuhusu Sisi",
@@ -4048,7 +4086,9 @@
       "username": "jina la mtumiaji",
       "withhold tax for this account": "zuio la ushuru kwa akaunti hii",
       "withoutCategory": "Bila Kitengo",
-      "“Maker-Checker” principle requires every tasks": "Kanuni ya \"Mtengenezaji-Kikagua\" inahitaji kila kazi kukamilishwa na watu wawili ili kupunguza uwezekano wa makosa na matumizi mabaya. Mtu mmoja anaanzisha mchakato na wa pili anakamilisha."
+      "“Maker-Checker” principle requires every tasks": "Kanuni ya \"Mtengenezaji-Kikagua\" inahitaji kila kazi kukamilishwa na watu wawili ili kupunguza uwezekano wa makosa na matumizi mabaya. Mtu mmoja anaanzisha mchakato na wa pili anakamilisha.",
+      "Pick a member from the search results": "Pick a member from the search results",
+      "Copied to clipboard": "Copied to clipboard"
     },
     "permissions": {
       "actions": {
@@ -4605,7 +4645,8 @@
     "PENDING": "INAKARIBISHWA",
     "INACTIVE": "HAITUMIKI",
     "Process Remittance": "Chakata uhawilishaji",
-    "Allow full term length for each tranche disbursement": "Inapowezeshwa, kila usambazaji wa tranche utafuata ratiba kamili ya mkopo badala ya kulingana na muda uliobaki. Inapatikana tu kwa aina ya ratiba ya mkopo ya MAENDELEO."
+    "Allow full term length for each tranche disbursement": "Inapowezeshwa, kila usambazaji wa tranche utafuata ratiba kamili ya mkopo badala ya kulingana na muda uliobaki. Inapatikana tu kwa aina ya ratiba ya mkopo ya MAENDELEO.",
+    "Loan Calculator": "Loan repayment calculator"
   },
   "countries": {
     "AF": "Afghanistani",

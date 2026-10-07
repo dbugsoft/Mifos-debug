@@ -8,7 +8,17 @@
 
 /** Angular Imports */
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, inject } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  ElementRef,
+  OnInit,
+  ViewChild,
+  inject
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 /** rxjs Imports */
@@ -48,7 +58,7 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ShellComponent implements OnInit {
+export class ShellComponent implements OnInit, AfterViewInit {
   private breakpointObserver = inject(BreakpointObserver);
   private progressBarService = inject(ProgressBarService);
   private cdr = inject(ChangeDetectorRef);
@@ -62,6 +72,8 @@ export class ShellComponent implements OnInit {
   sidenavCollapsed = true;
   /** Progress bar mode. */
   progressBarMode: string;
+  /** Page area beside the sidenav: toolbar, breadcrumb and content. */
+  @ViewChild(MatSidenavContent, { read: ElementRef }) private pageArea: ElementRef<HTMLElement>;
 
   /**
    * Subscribes to progress bar to update its mode.
@@ -71,6 +83,45 @@ export class ShellComponent implements OnInit {
       this.progressBarMode = mode;
       this.cdr.detectChanges();
     });
+  }
+
+  /**
+   * Keeps the page's left edge under the first toolbar menu label as the layout changes
+   * (window resize, sidenav opened / collapsed).
+   */
+  ngAfterViewInit() {
+    const resizeObserver = new ResizeObserver(() => this.alignPageToToolbar());
+    resizeObserver.observe(this.pageArea.nativeElement);
+    this.destroyRef.onDestroy(() => resizeObserver.disconnect());
+  }
+
+  /**
+   * Shifts breadcrumb and content (via --page-shift) so the shared content edge, a centred
+   * box 90% wide and at most 84rem, starts where the first toolbar label's text starts.
+   * Desktop only: on narrow screens the label sits too far in to follow.
+   */
+  private alignPageToToolbar() {
+    const area = this.pageArea.nativeElement;
+    const width = area.clientWidth;
+    const label = area.querySelector('#mifosx-toolbar .tab-link');
+    const text = label && Array.from(label.childNodes).find((node) => node.textContent?.trim());
+    let shift = 0;
+
+    if (text && width >= 960) {
+      const start = text.textContent.search(/\S/);
+      const range = document.createRange();
+      range.setStart(text, start);
+      range.setEnd(text, start + 1);
+      const target = range.getBoundingClientRect().left - area.getBoundingClientRect().left;
+      const maxContent = 84 * parseFloat(getComputedStyle(document.documentElement).fontSize);
+
+      // Edge = shift + 5% of the remaining width, or centred when the 84rem cap applies.
+      shift = (target - 0.05 * width) / 0.95;
+      if (0.9 * (width - shift) > maxContent) {
+        shift = 2 * target - width + maxContent;
+      }
+    }
+    area.style.setProperty('--page-shift', `${Math.round(shift)}px`);
   }
 
   /**

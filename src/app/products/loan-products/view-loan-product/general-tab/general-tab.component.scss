@@ -5,3 +5,53 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
+
+// Actions sit on the product title line. Absolute, not float: the summary
+// is a grid, and a grid next to a float shrinks to fit beside it.
+:host {
+  display: block;
+  position: relative;
+}
+
+.product-actions {
+  position: absolute;
+  top: 16px;
+  right: 0;
+  z-index: 1;
+  display: flex;
+  gap: 8px;
+
+  .btn-icon {
+    margin-right: 8px;
+  }
+
+  .caret {
+    margin-left: 8px;
+  }
+}
+
+.menu-icon {
+  margin-right: 8px;
+  color: var(--md-sys-color-primary, #1074b9);
+}
+
+// No card around the product: align the summary with the page header edge.
+:host ::ng-deep .tab-container {
+  padding: 16px 0;
+}
+
+:host ::ng-deep .mat-h2 {
+  padding-right: 216px;
+}
+
+@media (width <= 768px) {
+  .product-actions {
+    position: static;
+    justify-content: flex-end;
+    padding: 8px 8px 0;
+  }
+
+  :host ::ng-deep .mat-h2 {
+    padding-right: 0;
+  }
+}

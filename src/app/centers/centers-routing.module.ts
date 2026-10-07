@@ -38,7 +38,11 @@ const routes: Routes = [
   Route.withShell([
     {
       path: '',
-      data: { title: 'Centers', breadcrumb: 'Centers' },
+      data: {
+        title: 'Centers',
+        breadcrumb: 'Centers',
+        parentBreadcrumb: { label: 'Member Management', url: '/member-management' }
+      },
       children: [
         {
           path: '',

@@ -1,5 +1,6 @@
 ﻿{
-  "APP_NAME": "COIMS",
+  "APP_NAME": "COFMIS",
+  "APP_FULL_NAME": "Cooperative Financial Management & Information System",
   "Logged in as": "Logged in as",
   "Remember me": "Remember me",
   "error.resource.notImplemented.type": "Not Implemented Error",
@@ -499,6 +500,8 @@
       "Home": "Home"
     },
     "buttons": {
+      "Photo": "Photo",
+      "Open Module": "Open Module",
       "Accept Transfer": "Accept Transfer",
       "Actions": "Actions",
       "Activate": "Activate",
@@ -630,6 +633,8 @@
       "Enable": "Enable",
       "Expand All": "Expand All",
       "Export": "Export",
+      "Export as JSON": "Export as JSON",
+      "Export as PDF": "Export as PDF",
       "Export to File": "Export to File",
       "Export CSV": "Export CSV",
       "Export XLS": "Export XLS",
@@ -772,7 +777,9 @@
       "PRINT": "Print",
       "DONE": "Done",
       "Submitting": "Submitting",
-      "OK": "OK"
+      "OK": "OK",
+      "Calculate": "Calculate",
+      "Share": "Share"
     },
     "catalogs": {
       "Interest payment waiver": "Interest Payment Waiver",
@@ -1573,7 +1580,8 @@
       "savings-transaction-datatable-tab works": "savings-transaction-datatable-tab works",
       "successfully select option": "successfully. Please select from the options below to proceed further.",
       "undo_account_transfer": "Undo Account Transfer",
-      "Quick Access": "Quick Access"
+      "Quick Access": "Quick Access",
+      "Loan Calculator": "Loan Calculator"
     },
     "inputs": {
       "# Remittance": "# Remittance",
@@ -3106,7 +3114,11 @@
       "s3_secret_key": "s3_secret_key",
       "task-management component": "task-management component",
       "to": "to",
-      "valid": "valid"
+      "valid": "valid",
+      "Member": "Member",
+      "Total Interest": "Total Interest",
+      "Total Repayment": "Total Repayment",
+      "First Repayment": "First Repayment"
     },
     "links": {
       "Community": "Community",
@@ -3124,6 +3136,16 @@
       "Working with Code": "Working with Code"
     },
     "menus": {
+      "Administration": "Administration",
+      "Collapse Sidebar": "Collapse sidebar",
+      "Collections": "Collections",
+      "Expand Sidebar": "Expand sidebar",
+      "Finance": "Finance",
+      "Home": "Home",
+      "Members": "Members",
+      "Open Menu": "Open menu",
+      "Operations": "Operations",
+      "Overview": "Overview",
       "Unassign Staff": "Unassign Staff",
       "Accounting": "Accounting",
       "Account Overview": "Account Overview",
@@ -3253,7 +3275,8 @@
       "Apply Additional Shares": "Apply Additional Shares",
       "Redeem Shares": "Redeem Shares",
       "Approve Additional Shares": "Approve Additional Shares",
-      "Reject Additional Shares": "Reject Additional Shares"
+      "Reject Additional Shares": "Reject Additional Shares",
+      "Loan Calculator": "Loan Calculator"
     },
     "placeholders": {
       "# Remittance": "# Remittance",
@@ -3265,7 +3288,8 @@
       "Search Activity": "Search Activity",
       "Sender name": "Sender name",
       "Enter your username": "Enter your username",
-      "Enter your password": "Enter your password"
+      "Enter your password": "Enter your password",
+      "Search active member": "Search an active member by name or account number"
     },
     "status": {
       "Active": "Active",
@@ -3314,6 +3338,19 @@
       "the Transaction Type": "the Transaction Type"
     },
     "text": {
+      "Welcome back": "Welcome back, {{name}}!",
+      "Home subtitle": "Manage and monitor your cooperative efficiently with {{app}}.",
+      "Total Members": "Total Members",
+      "Total Savings": "Total Savings",
+      "Loans Outstanding": "Loans Outstanding",
+      "Quick Menu": "Quick Menu",
+      "Home Members Description": "Register members and manage their groups and centers.",
+      "Home Dashboard Description": "Key figures, trends and the work that needs attention.",
+      "Home Collection Sheet Description": "Record a meeting's collections for a group or center.",
+      "Home Accounting Description": "Journal entries, chart of accounts and period closing.",
+      "Home Reports Description": "Run member, loan, savings and accounting reports.",
+      "Home Admin Description": "Users, offices, products and system settings.",
+      "Home Quick Menu Tour": "Shortcuts to the main modules you can use.",
       "A": "A",
       "Ability to manage holidays for individual offices": "The ability to manage holidays for individual offices is a very useful tool for an organization spanning multiple locations.Use this option to customize holidays for each office of your organization.",
       "About Us": "About Us",
@@ -4169,7 +4206,9 @@
       "Configure offerings": "Configure offerings",
       "Savings accounts": "Savings accounts",
       "Offices and staff": "Offices & staff",
-      "System configuration": "Configuration"
+      "System configuration": "Configuration",
+      "Pick a member from the search results": "Pick a member from the search results",
+      "Copied to clipboard": "Copied to clipboard"
     },
     "permissions": {
       "actions": {
@@ -4726,7 +4765,8 @@
     "Create Interest Refund": "Create Interest Refund",
     "ACTIVE": "ACTIVE",
     "PENDING": "PENDING",
-    "INACTIVE": "INACTIVE"
+    "INACTIVE": "INACTIVE",
+    "Loan Calculator": "Loan repayment calculator"
   },
   "countries": {
     "AF": "Afghanistan",

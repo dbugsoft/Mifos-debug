@@ -185,22 +185,15 @@
 
 <ng-template #productOption let-product="product">
   <div class="product-option-row">
-    <div class="product-option-name">
-      <strong>{{ product.name }}</strong>
-    </div>
-    <div class="product-option-meta">
-      <div class="meta-item">
-        <span class="meta-label">{{ 'labels.inputs.Product Type' | translate }}</span>
-        <span class="meta-value">{{ getLoanProductType(product.productType) | translate }}</span>
-      </div>
-      <div class="meta-item">
-        <span class="meta-label">{{ 'labels.inputs.Short Name' | translate }}</span>
-        <span class="meta-value">{{ product.shortName }}</span>
-      </div>
-      <div class="meta-item">
-        <span class="meta-label">{{ 'labels.inputs.Currency' | translate }}</span>
-        <span class="meta-value">{{ product.currency?.code }}</span>
-      </div>
-    </div>
+    <span class="product-code">{{ product.shortName }}</span>
+    <span class="product-option-text">
+      <span class="product-option-name">{{ product.name }}</span>
+      <span class="product-option-meta">
+        <span>{{ getLoanProductType(product.productType) | translate }}</span>
+        @if (product.currency?.code) {
+          <span class="meta-currency">{{ product.currency.code }}</span>
+        }
+      </span>
+    </span>
   </div>
 </ng-template>

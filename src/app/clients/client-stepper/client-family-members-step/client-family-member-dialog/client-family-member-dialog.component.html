@@ -8,9 +8,9 @@
 
 <h1 mat-dialog-title>{{ data.context }} {{ 'labels.heading.Family Member' | translate }}</h1>
 
-<form [formGroup]="familyMemberForm">
-  <div class="layout-row-wrap responsive-column align-start gap-2px">
-    <mat-form-field class="flex-23">
+<form [formGroup]="familyMemberForm" class="family-member-form">
+  <div class="layout-row-wrap">
+    <mat-form-field>
       <mat-label>{{ 'labels.inputs.First Name' | translate }}</mat-label>
       <input formControlName="firstName" required matInput />
       @if (familyMemberForm.controls.firstName.hasError('required')) {
@@ -21,12 +21,12 @@
       }
     </mat-form-field>
 
-    <mat-form-field class="flex-23">
+    <mat-form-field>
       <mat-label>{{ 'labels.inputs.Middle Name' | translate }}</mat-label>
       <input formControlName="middleName" matInput />
     </mat-form-field>
 
-    <mat-form-field class="flex-23">
+    <mat-form-field>
       <mat-label>{{ 'labels.inputs.Last Name' | translate }}</mat-label>
       <input formControlName="lastName" required matInput />
       @if (familyMemberForm.controls.lastName.hasError('required')) {
@@ -37,7 +37,7 @@
       }
     </mat-form-field>
 
-    <mat-form-field class="flex-21">
+    <mat-form-field>
       <mat-label>{{ 'labels.inputs.Relationship' | translate }}</mat-label>
       <mat-select formControlName="relationshipId" required>
         @for (relation of data.options.relationshipIdOptions; track relation) {
@@ -54,7 +54,7 @@
       }
     </mat-form-field>
 
-    <mat-form-field class="flex-16">
+    <mat-form-field>
       <mat-label>{{ 'labels.inputs.Gender' | translate }}</mat-label>
       <mat-select formControlName="genderId" required>
         @for (gender of data.options.genderIdOptions; track gender) {
@@ -71,7 +71,20 @@
       }
     </mat-form-field>
 
-    <mat-form-field class="flex-22">
+    <mifosx-nepali-date-input
+      [inline]="true"
+      [label]="'labels.inputs.Date Of Birth' | translate"
+      formControlName="dateOfBirth"
+      [maxDate]="maxDate"
+      (bsDateChange)="dateOfBirthBs = $event"
+    />
+
+    <mat-form-field>
+      <mat-label>{{ 'labels.inputs.Age' | translate }}</mat-label>
+      <input type="number" formControlName="age" matInput [min]="0" disabled />
+    </mat-form-field>
+
+    <mat-form-field>
       <mat-label>{{ 'labels.inputs.Marital Status' | translate }}</mat-label>
       <mat-select formControlName="maritalStatusId">
         @for (maritalStatus of data.options.maritalStatusIdOptions; track maritalStatus) {
@@ -82,29 +95,16 @@
       </mat-select>
     </mat-form-field>
 
-    <mifosx-nepali-date-input
-      class="flex-21"
-      [label]="'labels.inputs.Date Of Birth' | translate"
-      formControlName="dateOfBirth"
-      [maxDate]="maxDate"
-      (bsDateChange)="dateOfBirthBs = $event"
-    />
-
-    <mat-form-field class="flex-12">
-      <mat-label>{{ 'labels.inputs.Age' | translate }}</mat-label>
-      <input type="number" formControlName="age" matInput [min]="0" disabled />
-    </mat-form-field>
-
-    <mat-checkbox formControlName="isDependent" labelPosition="before" class="flex-20 is-dependent-checkbox"
+    <mat-checkbox formControlName="isDependent" labelPosition="before" class="is-dependent-checkbox"
       >{{ 'labels.inputs.Is Dependent' | translate }}?</mat-checkbox
     >
 
-    <mat-form-field class="flex-25">
+    <mat-form-field>
       <mat-label>{{ 'labels.inputs.Qualification' | translate }}</mat-label>
       <input formControlName="qualification" matInput />
     </mat-form-field>
 
-    <mat-form-field class="flex-25">
+    <mat-form-field>
       <mat-label>{{ 'labels.inputs.Profession' | translate }}</mat-label>
       <mat-select formControlName="professionId">
         @for (profession of data.options.professionIdOptions; track profession) {
@@ -116,7 +116,7 @@
     </mat-form-field>
   </div>
 
-  <mat-dialog-actions align="center">
+  <mat-dialog-actions align="end">
     <button type="button" mat-raised-button mat-dialog-close>{{ 'labels.buttons.Cancel' | translate }}</button>
     <button
       type="button"

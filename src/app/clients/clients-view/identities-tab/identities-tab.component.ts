@@ -105,16 +105,16 @@ export class IdentitiesTabComponent implements OnDestroy {
   clientId: string;
   /** Identities Columns */
   identitiesColumns: string[] = [
-    'id',
-    'description',
+    'sno',
     'type',
     'documentKey',
     'issued',
     'expires',
-    'documents',
     'status',
     'actions'
   ];
+  /** The row whose description and documents are showing; one at a time. */
+  expandedIdentity: any = null;
 
   /** Identifiers Table */
   @ViewChild('identifiersTable', { static: true }) identifiersTable: MatTable<Element>;
@@ -175,6 +175,11 @@ export class IdentitiesTabComponent implements OnDestroy {
   /** TrackBy function for documents ngFor */
   trackByDocumentId(_: number, doc: any): any {
     return doc?.id;
+  }
+
+  /** Opens a row's description and documents, or closes them if open. */
+  toggleIdentity(identity: any) {
+    this.expandedIdentity = this.expandedIdentity === identity ? null : identity;
   }
 
   /**
@@ -282,6 +287,8 @@ export class IdentitiesTabComponent implements OnDestroy {
    */
   addIdentifier() {
     const dialogRef = this.dialog.open(UploadDocumentDialogComponent, {
+      width: '56rem',
+      maxWidth: '95vw',
       data: {
         documentIdentifier: true,
         ...this.buildIdentifierDialogOptions()
@@ -391,6 +398,8 @@ export class IdentitiesTabComponent implements OnDestroy {
    */
   editIdentifier(identity: any) {
     const dialogRef = this.dialog.open(UploadDocumentDialogComponent, {
+      width: '56rem',
+      maxWidth: '95vw',
       data: {
         documentIdentifier: true,
         identity,

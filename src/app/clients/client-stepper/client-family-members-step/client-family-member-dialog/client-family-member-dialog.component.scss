@@ -6,28 +6,98 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-.mat-form-field-hint {
-  font-size: 75%;
-  color: rgb(0 0 0 / 60%);
-  margin-top: 4px;
-  margin-bottom: 8px;
+@use '../../../../shared/styles/compact-stepper' as *;
+
+// "Edit Family Member" / "Add Family Member": a little bigger, centred, in the app's blue.
+// Set through Material's own title tokens, which its higher-specificity dialog rules read.
+h1.mat-mdc-dialog-title {
+  --mat-dialog-subhead-color: var(--md-sys-color-primary, #1074b9);
+  --mat-dialog-subhead-size: 1.25rem;
+  --mat-dialog-subhead-weight: 600;
+  --mat-dialog-subhead-line-height: 1.75rem;
+
+  text-align: center;
 }
 
 form {
-  padding: 0 1.5rem;
+  padding: 0 24px;
+}
 
-  .layout-row-wrap {
-    width: 100%;
+// Same field sizing as the member forms: each field as wide as what it holds.
+@include compact-stepper('.family-member-form');
+
+// A 24-column grid: each field spans what its content needs, and the rows add up to 24 so the
+// left and right edges line up. Rows: names 8·8·8 | relationship 7, gender 5, date of birth 12 (BS
+// date, switch and AD date on one line) | age 4, marital status 6, dependent 6, qualification 8 |
+// profession 8, under the first name. One column on a phone.
+:host ::ng-deep .family-member-form .layout-row-wrap {
+  display: grid;
+  grid-template-columns: repeat(24, minmax(0, 1fr));
+  gap: 0 16px;
+
+  > mat-form-field,
+  > mat-checkbox,
+  > mifosx-nepali-date-input {
+    min-width: 0;
+    max-width: none;
   }
 
-  mat-error {
-    font-size: 11px;
-    white-space: nowrap;
+  > mat-form-field:has([formcontrolname='firstName']) {
+    grid-column: span 8;
+  }
+
+  > mat-form-field:has([formcontrolname='middleName']) {
+    grid-column: span 8;
+  }
+
+  > mat-form-field:has([formcontrolname='lastName']) {
+    grid-column: span 8;
+  }
+
+  > mat-form-field:has([formcontrolname='relationshipId']) {
+    grid-column: span 7;
+  }
+
+  > mat-form-field:has([formcontrolname='genderId']) {
+    grid-column: span 5;
+  }
+
+  > mat-form-field:has([formcontrolname='maritalStatusId']) {
+    grid-column: span 6;
+  }
+
+  > mat-form-field:has([formcontrolname='age']) {
+    grid-column: span 4;
+  }
+
+  > mat-form-field:has([formcontrolname='qualification']) {
+    grid-column: span 8;
+  }
+
+  > mat-form-field:has([formcontrolname='professionId']) {
+    grid-column: span 8;
+  }
+
+  > mifosx-nepali-date-input {
+    grid-column: span 12;
+  }
+
+  > mat-checkbox {
+    grid-column: span 6;
+  }
+
+  @media (width <= 600px) {
+    grid-template-columns: 1fr;
+
+    > mat-form-field,
+    > mat-checkbox,
+    > mifosx-nepali-date-input {
+      grid-column: 1 / -1 !important;
+    }
   }
 }
 
-.is-dependent-checkbox {
-  white-space: nowrap;
-  margin-top: -40px;
-  align-self: center;
+mat-dialog-actions {
+  gap: 8px;
+  padding: 16px 24px;
 }

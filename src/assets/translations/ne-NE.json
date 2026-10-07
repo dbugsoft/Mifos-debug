@@ -1,6 +1,7 @@
 ﻿{
   "error.msg.upload.file.too.big": "चयन गरिएको फाइल {{args.0.value}} MB सीमाभन्दा ठूलो छ। कृपया सानो फाइल छान्नुहोस् र फेरि प्रयास गर्नुहोस्।",
-  "APP_NAME": "COIMS",
+  "APP_NAME": "COFMIS",
+  "APP_FULL_NAME": "Cooperative Financial Management & Information System",
   "Logged in as": "को रूपमा लग इन गरियो",
   "Remember me": "मलाई सम्झनुहोस्",
   "errors": {
@@ -496,6 +497,8 @@
       "Home": "घर"
     },
     "buttons": {
+      "Photo": "फोटो",
+      "Open Module": "मोड्युल खोल्नुहोस्",
       "Accept Transfer": "स्थानान्तरण स्वीकार गर्नुहोस्",
       "Actions": "कार्यहरू",
       "Activate": "सक्रिय गर्नुहोस्",
@@ -622,6 +625,8 @@
       "Enable": "सक्षम गर्नुहोस्",
       "Expand All": "सबै विस्तार गर्नुहोस्",
       "Export": "निर्यात गर्नुहोस्",
+      "Export as JSON": "Export as JSON",
+      "Export as PDF": "Export as PDF",
       "Export to File": "फाइलमा निर्यात गर्नुहोस्",
       "Export CSV": "CSV निर्यात गर्नुहोस्",
       "Export XLS": "XLS निर्यात गर्नुहोस्",
@@ -769,7 +774,9 @@
       "DONE": "सम्पन्न",
       "Submitting": "पेश गर्दै",
       "OK": "ठीक छ",
-      "undo_account_transfer": "खाता स्थानान्तरण रद्द गर्नुहोस्"
+      "undo_account_transfer": "खाता स्थानान्तरण रद्द गर्नुहोस्",
+      "Calculate": "हिसाब गर्नुहोस्",
+      "Share": "सेयर गर्नुहोस्"
     },
     "catalogs": {
       "Interest payment waiver": "ब्याज भुक्तानी माफी",
@@ -1565,7 +1572,8 @@
       "identifier id": "पहिचानकर्ता आईडी",
       "savings-transaction-datatable-tab works": "बचत-लेनदेन-डेटाटेबल-ट्याब काम गर्दछ",
       "successfully select option": "सफलतापूर्वक। अगाडि बढ्नको लागि कृपया तलका विकल्पहरूबाट चयन गर्नुहोस्।",
-      "undo_account_transfer": "खाता स्थानान्तरण रद्द गर्नुहोस्"
+      "undo_account_transfer": "खाता स्थानान्तरण रद्द गर्नुहोस्",
+      "Loan Calculator": "ऋण क्याल्कुलेटर"
     },
     "inputs": {
       "# Remittance": "# रेमिट्यान्स",
@@ -3096,7 +3104,11 @@
       "s3_secret_key": "s3_secret_key",
       "task-management component": "कार्य व्यवस्थापन घटक",
       "to": "को",
-      "valid": "मान्य"
+      "valid": "मान्य",
+      "Member": "सदस्य",
+      "Total Interest": "कुल ब्याज",
+      "Total Repayment": "कुल भुक्तानी",
+      "First Repayment": "पहिलो किस्ता"
     },
     "links": {
       "Community": "समुदाय",
@@ -3114,6 +3126,17 @@
       "Working with Code": "Code मा काम गर्नुहुन्छ"
     },
     "menus": {
+      "Member Management": "सदस्य व्यवस्थापन",
+      "Administration": "प्रशासन",
+      "Collapse Sidebar": "साइडबार सानो गर्नुहोस्",
+      "Collections": "सङ्कलन",
+      "Expand Sidebar": "साइडबार ठूलो गर्नुहोस्",
+      "Finance": "वित्त",
+      "Home": "गृहपृष्ठ",
+      "Members": "सदस्यहरू",
+      "Open Menu": "मेनु खोल्नुहोस्",
+      "Operations": "सञ्चालन",
+      "Overview": "सारांश",
       "Unassign Staff": "कर्मचारी नियुक्ति रद्द गर्नुहोस्",
       "Accounting": "लेखा",
       "Account Overview": "खाता अवलोकन",
@@ -3241,7 +3264,8 @@
       "Tasks": "कार्यहरू",
       "Remittances": "रेमिट्यान्स",
       "Process Remittance": "रेमिट्यान्स प्रक्रिया",
-      "Undo Write-off": "राइट-अफ पूर्ववत गर्नुहोस्"
+      "Undo Write-off": "राइट-अफ पूर्ववत गर्नुहोस्",
+      "Loan Calculator": "ऋण क्याल्कुलेटर"
     },
     "placeholders": {
       "Add new server": "नयाँ सर्भर थप्नुहोस्",
@@ -3254,7 +3278,8 @@
       "Enter last name": "थर प्रविष्ट गर्नुहोस्",
       "Enter remittance reference number": "रेमिट्यान्स सन्दर्भ नम्बर प्रविष्ट गर्नुहोस्",
       "Sender name": "पठाउनेको नाम",
-      "Loading vendors...": "विक्रेताहरू लोड हुँदैछ..."
+      "Loading vendors...": "विक्रेताहरू लोड हुँदैछ...",
+      "Search active member": "नाम वा खाता नम्बरबाट सक्रिय सदस्य खोज्नुहोस्"
     },
     "status": {
       "Active": "सक्रिय",
@@ -3303,6 +3328,19 @@
       "undo_account_transfer": "के तपाईं यो खाता स्थानान्तरण रद्द गर्न निश्चित हुनुहुन्छ?"
     },
     "text": {
+      "Welcome back": "फेरि स्वागत छ, {{name}}!",
+      "Home subtitle": "{{app}} मार्फत आफ्नो सहकारी कुशलतापूर्वक व्यवस्थापन र अनुगमन गर्नुहोस्।",
+      "Total Members": "कुल सदस्य",
+      "Total Savings": "कुल बचत",
+      "Loans Outstanding": "बाँकी ऋण",
+      "Quick Menu": "छिटो मेनु",
+      "Home Members Description": "सदस्य दर्ता गर्नुहोस् र तिनका समूह तथा केन्द्र व्यवस्थापन गर्नुहोस्।",
+      "Home Dashboard Description": "मुख्य तथ्याङ्क, प्रवृत्ति र ध्यान दिनुपर्ने कामहरू।",
+      "Home Collection Sheet Description": "समूह वा केन्द्रको बैठकको सङ्कलन रेकर्ड गर्नुहोस्।",
+      "Home Accounting Description": "जर्नल प्रविष्टि, खाता तालिका र अवधि बन्द।",
+      "Home Reports Description": "सदस्य, ऋण, बचत र लेखा प्रतिवेदन चलाउनुहोस्।",
+      "Home Admin Description": "प्रयोगकर्ता, कार्यालय, उत्पादन र प्रणाली सेटिङ।",
+      "Home Quick Menu Tour": "तपाईंले प्रयोग गर्न सक्ने मुख्य मोड्युलका छोटो बाटोहरू।",
       "A": "ए",
       "Ability to manage holidays for individual offices": "व्यक्तिगत कार्यालयहरूको लागि छुट्टिहरू व्यवस्थापन गर्ने क्षमता धेरै स्थानहरूमा फैलिएको संगठनको लागि एक धेरै उपयोगी उपकरण हो। तपाईंको संगठनको प्रत्येक कार्यालयको लागि छुट्टिहरू अनुकूलन गर्न यो विकल्प प्रयोग गर्नुहोस्।",
       "About Us": "हाम्रो बारेमा",
@@ -4051,7 +4089,9 @@
       "username": "प्रयोगकर्ता नाम",
       "withhold tax for this account": "यस खाताको लागि कर रोक्नुहोस्",
       "withoutCategory": "बिना श्रेणी",
-      "“Maker-Checker” principle requires every tasks": "\"मेकर-चेकर\" सिद्धान्तले त्रुटि र दुरुपयोगको सम्भावना कम गर्न प्रत्येक कार्यहरू दुई व्यक्तिद्वारा पूरा गर्न आवश्यक छ। एक व्यक्तिले प्रक्रिया सुरु गर्छ र दोस्रोले यसलाई पूरा गर्दछ।"
+      "“Maker-Checker” principle requires every tasks": "\"मेकर-चेकर\" सिद्धान्तले त्रुटि र दुरुपयोगको सम्भावना कम गर्न प्रत्येक कार्यहरू दुई व्यक्तिद्वारा पूरा गर्न आवश्यक छ। एक व्यक्तिले प्रक्रिया सुरु गर्छ र दोस्रोले यसलाई पूरा गर्दछ।",
+      "Pick a member from the search results": "खोज नतिजाबाट सदस्य छान्नुहोस्",
+      "Copied to clipboard": "क्लिपबोर्डमा कपी भयो"
     },
     "permissions": {
       "actions": {
@@ -4608,7 +4648,8 @@
     "PENDING": "पेन्डिङ",
     "INACTIVE": "निष्क्रिय",
     "Process Remittance": "रेमिट्यान्स प्रक्रिया",
-    "Allow full term length for each tranche disbursement": "सक्षम गरिएमा, प्रत्येक किस्ता वितरण बाँकी अवधिमा फिट हुनुको सट्टा पूर्ण ऋण अवधि तालिका अनुसरण गर्नेछ। केवल PROGRESSIVE ऋण तालिका प्रकारको लागि उपलब्ध।"
+    "Allow full term length for each tranche disbursement": "सक्षम गरिएमा, प्रत्येक किस्ता वितरण बाँकी अवधिमा फिट हुनुको सट्टा पूर्ण ऋण अवधि तालिका अनुसरण गर्नेछ। केवल PROGRESSIVE ऋण तालिका प्रकारको लागि उपलब्ध।",
+    "Loan Calculator": "ऋण किस्ता क्याल्कुलेटर"
   },
   "countries": {
     "AF": "अफगानिस्तान",

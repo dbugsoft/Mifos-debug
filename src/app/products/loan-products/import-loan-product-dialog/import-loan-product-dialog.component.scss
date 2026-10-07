@@ -5,21 +5,165 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-mat-dialog-content {
-  padding: 20px 24px;
-  min-height: 150px;
 
-  p {
-    margin-bottom: 20px;
-    color: rgb(0 0 0 / 60%);
+:host {
+  --imp-accent: var(--md-sys-color-primary, #1074b9);
+  --imp-line: var(--md-sys-color-outline-variant, #cbd5e1);
+  --imp-muted: var(--md-sys-color-on-surface-variant, #64748b);
+
+  // Material's own spacing hooks: 24px frame, tight between sections.
+  --mat-dialog-headline-padding: 24px 24px 8px;
+  --mat-dialog-content-padding: 8px 24px;
+  --mat-dialog-with-actions-content-padding: 8px 24px;
+  --mat-dialog-actions-padding: 16px 24px 24px;
+
+  display: block;
+}
+
+// Material's title adds a 40px ::before baseline strut; in a flex row it pushes the
+// icon up and adds a phantom gap, so drop it.
+.dialog-title {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  line-height: 1.4;
+
+  &::before {
+    display: none;
   }
 }
 
-mat-dialog-actions {
-  padding: 8px 24px 16px;
-  margin: 0;
+.title-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: var(--imp-accent);
+  background: color-mix(in srgb, var(--imp-accent) 10%, transparent);
 
-  button {
-    margin-left: 8px;
+  mat-icon {
+    width: 20px;
+    height: 20px;
+    font-size: 20px;
+  }
+}
+
+// Whole zone is the file picker: click anywhere or drop a file on it.
+.drop-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 24px;
+  text-align: center;
+  border: 1.5px dashed var(--imp-line);
+  border-radius: 12px;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+
+  &:hover,
+  &--active {
+    border-color: var(--imp-accent);
+    background: color-mix(in srgb, var(--imp-accent) 5%, transparent);
+  }
+
+  // Keyboard focus only: the dialog focuses the input on open, which must not look like a second border.
+  &:has(input:focus-visible) {
+    border-color: var(--imp-accent);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--imp-accent) 14%, transparent);
+  }
+
+  input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+  }
+}
+
+.drop-icon {
+  width: 32px;
+  height: 32px;
+  font-size: 32px;
+  color: var(--imp-accent);
+}
+
+.drop-text {
+  max-width: 360px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.drop-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8125rem;
+  color: var(--imp-muted);
+}
+
+.browse-pill {
+  padding: 2px 16px;
+  border-radius: 16px;
+  font-weight: 600;
+  color: var(--md-sys-color-on-primary, #fff);
+  background: var(--imp-accent);
+}
+
+.file-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 8px 8px 16px;
+  border: 1px solid var(--imp-accent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--imp-accent) 5%, transparent);
+}
+
+.file-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  color: var(--md-sys-color-on-primary, #fff);
+  background: var(--imp-accent);
+}
+
+.file-meta {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.file-name {
+  overflow: hidden;
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.file-size {
+  font-size: 0.8125rem;
+  color: var(--imp-muted);
+}
+
+mat-dialog-actions {
+  gap: 8px;
+  min-height: 0;
+
+  mat-icon {
+    margin-right: 8px;
   }
 }

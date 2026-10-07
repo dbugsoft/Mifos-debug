@@ -1,6 +1,7 @@
 ﻿{
   "error.msg.upload.file.too.big": "Le fichier sélectionné dépasse la limite de {{args.0.value}} Mo. Veuillez choisir un fichier plus petit et réessayer.",
-  "APP_NAME": "COIMS",
+  "APP_NAME": "COFMIS",
+  "APP_FULL_NAME": "Cooperative Financial Management & Information System",
   "Logged in as": "connecté en tant que",
   "Remember me": "Souviens-toi de moi",
   "errors": {
@@ -496,6 +497,8 @@
       "Home": "Maison"
     },
     "buttons": {
+      "Photo": "Photo",
+      "Open Module": "Open Module",
       "Accept Transfer": "Accepter le transfert",
       "Actions": "Actions",
       "Activate": "Activer",
@@ -622,6 +625,8 @@
       "Enable": "Activer",
       "Expand All": "Développer tout",
       "Export": "Exporter",
+      "Export as JSON": "Export as JSON",
+      "Export as PDF": "Export as PDF",
       "Export to File": "Exporter vers un fichier",
       "Export CSV": "Exporter au format CSV",
       "Export XLS": "Exporter au format XLS",
@@ -769,7 +774,9 @@
       "DONE": "Terminer",
       "Submitting": "Envoi en cours",
       "OK": "OK",
-      "undo_account_transfer": "Annuler le transfert de compte"
+      "undo_account_transfer": "Annuler le transfert de compte",
+      "Calculate": "Calculate",
+      "Share": "Share"
     },
     "catalogs": {
       "Interest payment waiver": "Renonciation au paiement des intérêts",
@@ -1569,7 +1576,8 @@
       "identifier id": "identifiant",
       "savings-transaction-datatable-tab works": "l'onglet datatable-transaction-d'épargne fonctionne",
       "successfully select option": "avec succès. Veuillez sélectionner parmi les options ci-dessous pour continuer.",
-      "undo_account_transfer": "Annuler le transfert de compte"
+      "undo_account_transfer": "Annuler le transfert de compte",
+      "Loan Calculator": "Loan Calculator"
     },
     "inputs": {
       "# Remittance": "# Transfert",
@@ -3100,7 +3108,11 @@
       "s3_secret_key": "s3_secret_key",
       "task-management component": "composant de gestion des tâches",
       "to": "à",
-      "valid": "valide"
+      "valid": "valide",
+      "Member": "Member",
+      "Total Interest": "Total Interest",
+      "Total Repayment": "Total Repayment",
+      "First Repayment": "First Repayment"
     },
     "links": {
       "Community": "Communauté",
@@ -3118,6 +3130,17 @@
       "Working with Code": "Travailler avec du code"
     },
     "menus": {
+      "Member Management": "Member Management",
+      "Administration": "Administration",
+      "Collapse Sidebar": "Collapse sidebar",
+      "Collections": "Collections",
+      "Expand Sidebar": "Expand sidebar",
+      "Finance": "Finance",
+      "Home": "Home",
+      "Members": "Members",
+      "Open Menu": "Open menu",
+      "Operations": "Operations",
+      "Overview": "Overview",
       "Unassign Staff": "Annuler l'affectation du personnel",
       "Accounting": "Comptabilité",
       "Account Overview": "Aperçu du compte",
@@ -3245,7 +3268,8 @@
       "Tasks": "Tâches",
       "Remittances": "Transferts",
       "Process Remittance": "Traiter le transfert",
-      "Undo Write-off": "Annuler l'abandon de créance"
+      "Undo Write-off": "Annuler l'abandon de créance",
+      "Loan Calculator": "Loan Calculator"
     },
     "placeholders": {
       "Add new server": "Ajouter un nouveau serveur",
@@ -3258,7 +3282,8 @@
       "Enter last name": "Saisir le nom de famille",
       "Enter remittance reference number": "Saisir le numéro de référence du transfert",
       "Sender name": "Nom de l'expéditeur",
-      "Loading vendors...": "Chargement des fournisseurs..."
+      "Loading vendors...": "Chargement des fournisseurs...",
+      "Search active member": "Search an active member by name or account number"
     },
     "status": {
       "Active": "Actif",
@@ -3307,6 +3332,19 @@
       "undo_account_transfer": "Êtes-vous sûr de vouloir annuler ce transfert de compte ?"
     },
     "text": {
+      "Welcome back": "Welcome back, {{name}}!",
+      "Home subtitle": "Manage and monitor your cooperative efficiently with {{app}}.",
+      "Total Members": "Total Members",
+      "Total Savings": "Total Savings",
+      "Loans Outstanding": "Loans Outstanding",
+      "Quick Menu": "Quick Menu",
+      "Home Members Description": "Register members and manage their groups and centers.",
+      "Home Dashboard Description": "Key figures, trends and the work that needs attention.",
+      "Home Collection Sheet Description": "Record a meeting's collections for a group or center.",
+      "Home Accounting Description": "Journal entries, chart of accounts and period closing.",
+      "Home Reports Description": "Run member, loan, savings and accounting reports.",
+      "Home Admin Description": "Users, offices, products and system settings.",
+      "Home Quick Menu Tour": "Shortcuts to the main modules you can use.",
       "A": "UN",
       "Ability to manage holidays for individual offices": "La possibilité de gérer les congés de chaque bureau est un outil très utile pour une organisation répartie sur plusieurs sites. Utilisez cette option pour personnaliser les congés de chaque bureau de votre organisation.",
       "About Us": "À Propos de Nous",
@@ -4054,7 +4092,9 @@
       "username": "nom d'utilisateur",
       "withhold tax for this account": "retenir l'impôt sur ce compte",
       "withoutCategory": "Sans catégorie",
-      "“Maker-Checker” principle requires every tasks": "Le principe « Maker-Checker » exige que chaque tâche soit effectuée par deux personnes afin de réduire les risques d'erreurs et de mauvaise utilisation. Une personne lance le processus et la seconde le termine."
+      "“Maker-Checker” principle requires every tasks": "Le principe « Maker-Checker » exige que chaque tâche soit effectuée par deux personnes afin de réduire les risques d'erreurs et de mauvaise utilisation. Une personne lance le processus et la seconde le termine.",
+      "Pick a member from the search results": "Pick a member from the search results",
+      "Copied to clipboard": "Copied to clipboard"
     },
     "permissions": {
       "actions": {
@@ -4611,7 +4651,8 @@
     "PENDING": "EN ATTENTE",
     "INACTIVE": "INACTIF",
     "Process Remittance": "Traiter le transfert",
-    "Allow full term length for each tranche disbursement": "Lorsqu'activé, chaque décaissement de tranche suivra le calendrier complet du prêt au lieu de s'adapter à la durée restante. Disponible uniquement pour le type de calendrier PROGRESSIF."
+    "Allow full term length for each tranche disbursement": "Lorsqu'activé, chaque décaissement de tranche suivra le calendrier complet du prêt au lieu de s'adapter à la durée restante. Disponible uniquement pour le type de calendrier PROGRESSIF.",
+    "Loan Calculator": "Loan repayment calculator"
   },
   "countries": {
     "AF": "Afghanistan",

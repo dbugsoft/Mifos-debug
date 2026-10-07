@@ -9,196 +9,167 @@
 <mat-card class="account-card">
   <mat-card-header class="header layout-column">
     <mat-card-title-group class="header-title-group">
-      <div class="profile-image-container">
-        <div>
-          <img mat-card-md-image class="profile-image" [src]="clientImage() ?? 'assets/images/user_placeholder.png'" />
-        </div>
-        <div class="m-b-5 flex-center">
-          <button
-            class="client-image-button"
-            mat-raised-button
-            (click)="doAction('Upload Image')"
-            matTooltip="{{ 'tooltips.Upload Image' | translate }}"
-            *mifosxHasPermission="'CREATE_CLIENTIMAGE'"
-          >
-            <i class="fa fa-upload"></i>
-          </button>
-          <button
-            class="client-image-button"
-            mat-raised-button
-            (click)="doAction('Capture Image')"
-            matTooltip="{{ 'tooltips.Capture Image' | translate }}"
-            *mifosxHasPermission="'CREATE_CLIENTIMAGE'"
-          >
-            <i class="fa fa-camera"></i>
-          </button>
-          <button
-            class="client-image-button"
-            mat-raised-button
-            (click)="doAction('Delete Image')"
-            matTooltip="{{ 'tooltips.Delete Image' | translate }}"
-            *mifosxHasPermission="'DELETE_CLIENTIMAGE'"
-          >
-            <i class="fa fa-trash"></i>
-          </button>
-          <br />
-        </div>
-        <p (click)="doAction('View Signature')" class="signature">{{ 'labels.inputs.View Signature' | translate }}</p>
-      </div>
-
-      <div class="mat-typography account-card-title">
-        <mat-card-title class="make-flex content">
-          <h3 class="flex-95">
-            <i
-              class="fa fa-stop m-r-10"
-              [ngClass]="clientViewData.status.code | statusLookup"
-              matTooltip="{{ 'labels.status.' + clientViewData.status.value | translate }}"
-            ></i>
-            <b>{{ 'labels.inputs.Client Name' | translate }} :</b>
-            <mifosx-entity-name
-              [entityName]="
-                complianceHideClientData ? maskName(clientViewData.displayName) : clientViewData.displayName
-              "
-              [display]="'right'"
-              [hideCopy]="complianceHideClientData"
-            ></mifosx-entity-name>
-            @if (applicationPending) {
-              <span class="membership-chip"
-                >{{ 'membership.Membership application' | translate }} ·
-                <mifosx-membership-deadline [application]="membershipApplication()"></mifosx-membership-deadline
-              ></span>
-            }
-          </h3>
-          <div class="flex-5 align-end-center">
-            <button mat-icon-button [matMenuTriggerFor]="clientMenu" aria-label="Client actions" yPosition="below">
-              <mat-icon matListIcon class="actions-menu">
-                <fa-icon icon="bars" size="sm"></fa-icon>
-              </mat-icon>
+      <!-- Photo with its actions | name, status, Actions menu and the member's details -->
+      <div class="member-summary">
+        <div class="photo-column">
+          <!-- Photo actions sit on the photo, so they read as being about the photo -->
+          <div class="photo-frame">
+            <img
+              class="profile-image"
+              [class.clickable]="!!clientImage()"
+              [src]="clientImage() ?? 'assets/images/user_placeholder.png'"
+              [alt]="clientImage() ? clientViewData.displayName : ''"
+              (click)="clientImage() && openPhoto()"
+            />
+            <button
+              class="photo-menu-button"
+              type="button"
+              [matMenuTriggerFor]="photoMenu"
+              *mifosxHasPermission="['CREATE_CLIENTIMAGE', 'DELETE_CLIENTIMAGE']"
+            >
+              <i class="fa fa-camera"></i>
+              <span>{{ 'labels.buttons.Photo' | translate }}</span>
+              <i class="fa fa-caret-down"></i>
             </button>
           </div>
-        </mat-card-title>
+          <!-- Full-size photo, opened by clicking the photo when there is one -->
+          <ng-template #photoPreview>
+            <div class="photo-preview">
+              <img [src]="clientImage()" [alt]="clientViewData.displayName" />
+              <button
+                type="button"
+                class="photo-preview-close"
+                (click)="dialog.closeAll()"
+                [attr.aria-label]="'labels.buttons.Close' | translate"
+              >
+                <i class="fa fa-times"></i>
+              </button>
+            </div>
+          </ng-template>
+          <mat-menu #photoMenu="matMenu" class="photo-menu">
+            <button mat-menu-item (click)="doAction('Upload Image')" *mifosxHasPermission="'CREATE_CLIENTIMAGE'">
+              <span class="menu-tile"><i class="fa fa-upload"></i></span>
+              <span>{{ 'tooltips.Upload Image' | translate }}</span>
+            </button>
+            <button mat-menu-item (click)="doAction('Capture Image')" *mifosxHasPermission="'CREATE_CLIENTIMAGE'">
+              <span class="menu-tile"><i class="fa fa-camera"></i></span>
+              <span>{{ 'tooltips.Capture Image' | translate }}</span>
+            </button>
+            <mat-divider *mifosxHasPermission="'DELETE_CLIENTIMAGE'"></mat-divider>
+            <button
+              mat-menu-item
+              class="danger"
+              (click)="doAction('Delete Image')"
+              *mifosxHasPermission="'DELETE_CLIENTIMAGE'"
+            >
+              <span class="menu-tile"><i class="fa fa-trash"></i></span>
+              <span>{{ 'tooltips.Delete Image' | translate }}</span>
+            </button>
+          </mat-menu>
+          <button class="photo-button" mat-flat-button (click)="doAction('View Signature')">
+            <i class="fa fa-pencil"></i>
+            <span>{{ 'labels.inputs.View Signature' | translate }}</span>
+          </button>
+        </div>
 
-        <mat-card-subtitle>
-          <div class="layout-row responsive-column">
-            <div class="flex-50">
-              <table class="account-overview">
-                <tbody>
-                  <tr>
-                    <td>
-                      <b>{{ 'labels.inputs.Office' | translate }}</b>
-                    </td>
-                    <td><mifosx-entity-name [entityName]="clientViewData.officeName"></mifosx-entity-name></td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <b>{{ 'labels.inputs.Client' | translate }}</b>
-                    </td>
-                    <td><mifosx-account-number accountNo="{{ clientViewData.accountNo }}"></mifosx-account-number></td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <b>{{ 'labels.inputs.External Id' | translate }}</b>
-                    </td>
-                    <td>
-                      <mifosx-external-identifier
-                        [externalId]="
-                          complianceHideClientData ? maskValue(clientViewData.externalId) : clientViewData.externalId
-                        "
-                        [completed]="true"
-                        [hideCopy]="complianceHideClientData"
-                      ></mifosx-external-identifier>
-                    </td>
-                  </tr>
-                  @if (clientViewData.activationDate) {
-                    <tr>
-                      <td>
-                        <b>{{ 'labels.inputs.Activation Date' | translate }}</b>
-                      </td>
-                      <td>{{ clientViewData.activationDate | dateFormat }}</td>
-                    </tr>
-                  }
-                  <tr>
-                    <td>
-                      <b>{{ 'labels.inputs.Staff' | translate }}</b>
-                    </td>
-                    @if (clientViewData.staffName) {
-                      <td>{{ clientViewData.staffName }}</td>
-                    }
-                    @if (!clientViewData.staffName) {
-                      <td>{{ 'labels.inputs.Unassigned' | translate }}</td>
-                    }
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="flex-50">
-              <table class="account-overview">
-                <tbody>
-                  @if (clientViewData.groups.length > 0) {
-                    <tr>
-                      <td>
-                        <b>{{ 'labels.inputs.Member Of' | translate }}</b>
-                      </td>
-                      <td>
-                        @for (group of clientViewData.groups; track group) {
-                          <span>
-                            <span class="m-r-3">{{ group.name }}</span>
-                          </span>
-                        }
-                      </td>
-                    </tr>
-                  }
-                  @if (clientViewData.clientType) {
-                    <tr>
-                      <td>
-                        <b>{{ 'labels.inputs.Client Type' | translate }}</b>
-                      </td>
-                      <td>{{ clientViewData.clientType.name }}</td>
-                    </tr>
-                    @if (clientViewData.clientClassification) {
-                      <tr>
-                        <td>
-                          <b>{{ 'labels.inputs.Client Classification' | translate }}</b>
-                        </td>
-                        <td>{{ clientViewData.clientClassification.name }}</td>
-                      </tr>
-                    }
-                  }
-                  <tr>
-                    <td>
-                      <b>{{ 'labels.inputs.Mobile Number' | translate }}</b>
-                    </td>
-                    <td>
-                      <mifosx-external-identifier
-                        [externalId]="
-                          complianceHideClientData ? maskValue(clientViewData.mobileNo) : clientViewData.mobileNo
-                        "
-                        [completed]="true"
-                        [hideCopy]="complianceHideClientData"
-                      ></mifosx-external-identifier>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <b>{{ 'labels.inputs.Email' | translate }}</b>
-                    </td>
-                    <td>
-                      <mifosx-external-identifier
-                        [externalId]="
-                          complianceHideClientData
-                            ? maskEmail(clientViewData.emailAddress)
-                            : clientViewData.emailAddress
-                        "
-                        [completed]="true"
-                        [hideCopy]="complianceHideClientData"
-                      ></mifosx-external-identifier>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+        <div class="member-details">
+          <div class="title-row">
+            <h3 class="member-name">
+              {{ complianceHideClientData ? maskName(clientViewData.displayName) : clientViewData.displayName }}
+              <span class="status-chip" [ngClass]="clientViewData.status.code | statusLookup">
+                {{ 'labels.status.' + clientViewData.status.value | translate }}
+              </span>
+              @if (applicationPending) {
+                <span class="membership-chip"
+                  >{{ 'membership.Membership application' | translate }} ·
+                  <mifosx-membership-deadline [application]="membershipApplication()"></mifosx-membership-deadline
+                ></span>
+              }
+            </h3>
+            <button
+              type="button"
+              class="actions-button"
+              [matMenuTriggerFor]="clientMenu"
+              [matTooltip]="'labels.buttons.Actions' | translate"
+              [attr.aria-label]="'labels.buttons.Actions' | translate"
+            >
+              <i class="fa fa-bars"></i>
+            </button>
           </div>
-        </mat-card-subtitle>
+
+          <div class="detail-columns">
+            <dl class="personal-details">
+              <dt>{{ 'labels.inputs.Account No' | translate }}</dt>
+              <dd>{{ clientViewData.accountNo }}</dd>
+              <dt>{{ 'labels.inputs.External Id' | translate }}</dt>
+              <dd>
+                {{
+                  (complianceHideClientData ? maskValue(clientViewData.externalId) : clientViewData.externalId) || '—'
+                }}
+              </dd>
+              <dt>{{ 'labels.inputs.Legal Form' | translate }}</dt>
+              <dd>{{ clientViewData.legalForm?.value || '—' }}</dd>
+              <dt>{{ 'labels.inputs.Gender' | translate }}</dt>
+              <dd>{{ clientViewData.gender?.name || '—' }}</dd>
+              <dt>{{ 'labels.inputs.Date of Birth' | translate }} (BS/AD)</dt>
+              <dd>
+                @if (clientViewData.dateOfBirth) {
+                  {{ clientViewData.dateOfBirth | adToBs }} / {{ clientViewData.dateOfBirth | dateFormat }} AD
+                } @else {
+                  —
+                }
+              </dd>
+              <dt>{{ 'labels.inputs.Mobile No' | translate }}</dt>
+              <dd>
+                {{ (complianceHideClientData ? maskValue(clientViewData.mobileNo) : clientViewData.mobileNo) || '—' }}
+              </dd>
+              <dt>{{ 'labels.inputs.Email' | translate }}</dt>
+              <dd>
+                {{
+                  (complianceHideClientData ? maskEmail(clientViewData.emailAddress) : clientViewData.emailAddress) ||
+                    '—'
+                }}
+              </dd>
+            </dl>
+            <dl class="office-details">
+              <dt>{{ 'labels.inputs.Office' | translate }}</dt>
+              <dd>{{ clientViewData.officeName }}</dd>
+              <dt>{{ 'labels.inputs.Staff' | translate }}</dt>
+              <dd>{{ clientViewData.staffName || ('labels.inputs.Unassigned' | translate) }}</dd>
+              <dt>{{ 'labels.inputs.Is staff' | translate }}?</dt>
+              <dd>{{ (clientViewData.isStaff ? 'labels.buttons.Yes' : 'labels.buttons.No') | translate }}</dd>
+              <dt>{{ 'labels.inputs.Client Type' | translate }}</dt>
+              <dd>{{ clientViewData.clientType?.name || '—' }}</dd>
+              <dt>{{ 'labels.inputs.Client Classification' | translate }}</dt>
+              <dd>{{ clientViewData.clientClassification?.name || '—' }}</dd>
+              <dt>{{ 'labels.inputs.Submitted On' | translate }}</dt>
+              <dd>
+                @if (clientViewData.timeline?.submittedOnDate) {
+                  {{ clientViewData.timeline.submittedOnDate | adToBs }} /
+                  {{ clientViewData.timeline.submittedOnDate | dateFormat }} AD
+                } @else {
+                  —
+                }
+              </dd>
+              <dt>{{ 'labels.inputs.Activated On' | translate }}</dt>
+              <dd>
+                @if (clientViewData.activationDate) {
+                  {{ clientViewData.activationDate | adToBs }} / {{ clientViewData.activationDate | dateFormat }} AD
+                } @else {
+                  —
+                }
+              </dd>
+              @if (clientViewData.groups?.length) {
+                <dt>{{ 'labels.inputs.Member Of' | translate }}</dt>
+                <dd>
+                  @for (group of clientViewData.groups; track group.id) {
+                    <span class="group-name">{{ group.name }}</span>
+                  }
+                </dd>
+              }
+            </dl>
+          </div>
+        </div>
       </div>
 
       <mat-menu #clientMenu="matMenu">

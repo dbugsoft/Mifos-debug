@@ -82,7 +82,7 @@ const routes: Routes = [
   Route.withShell([
     {
       path: '',
-      redirectTo: '/member-management',
+      redirectTo: '/home',
       pathMatch: 'full'
     },
     {

@@ -6,42 +6,287 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+// Member page in the app's pattern. Scoped here: loans, savings and the other account
+// pages share the global .account-card look and keep it.
 .account-card {
+  max-width: 84rem;
+  overflow: hidden;
+  border-radius: 12px;
+
+  // Same blue as the sidebar and the menu cards; everything on it is white.
   .header {
-    .profile-image-container {
-      .client-image-button {
-        min-width: 26px;
-        padding: 0 6px;
-        margin: 4px;
-        line-height: 25px;
-      }
+    padding: 24px;
+    background: linear-gradient(135deg, #1074b9 0%, #0c5e98 55%, #003a63 100%);
+    color: #fff;
+  }
 
-      .signature {
-        color: white;
-        text-align: center;
-        margin: 0;
-        padding: 2%;
-
-        &:hover {
-          cursor: pointer;
-        }
-      }
-    }
+  .header-title-group {
+    width: 100%;
   }
 }
 
-.account-overview {
-  color: white;
-  min-width: 85%;
-  margin-left: 10px;
-}
-
-.make-flex {
+.member-summary {
   display: flex;
+  gap: 32px;
+  width: 100%;
+
+  @media (width <= 768px) {
+    flex-direction: column;
+    gap: 16px;
+  }
 }
 
-.mat-card-title-group {
+// Photo with its four actions stacked under it, each the photo's width.
+.photo-column {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 136px;
+  flex-shrink: 0;
+
+  // Block, so no baseline gap under it: the frame is exactly the photo.
+  .profile-image {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    background: rgb(255 255 255 / 15%);
+  }
+}
+
+// The photo with its own "Photo" menu pinned to its bottom edge. The frame carries the border and
+// the rounded corners and clips, so the strip lines up with the photo and follows its corners.
+.photo-frame {
+  position: relative;
+  overflow: hidden;
+  border: 3px solid rgb(255 255 255 / 85%);
+  border-radius: 12px;
+}
+
+.photo-menu-button {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 28px;
+  border: 0;
+  background: rgb(0 0 0 / 55%);
+  color: #fff;
+  font: inherit;
+  font-size: 0.75rem;
+  cursor: pointer;
+
+  &:hover {
+    background: rgb(0 0 0 / 70%);
+  }
+}
+
+// The Photo menu opens in an overlay outside this component, hence ::ng-deep on its panel class.
+// As wide as the photo it belongs to (the photo column's 136px).
+::ng-deep .photo-menu {
+  --mat-menu-container-shape: 10px;
+  --mat-menu-item-label-text-size: 0.8rem;
+  --mat-menu-item-label-text-weight: 500;
+
+  width: 136px;
+  min-width: 0 !important;
+
+  .mat-mdc-menu-content {
+    padding: 4px;
+  }
+
+  .mat-mdc-menu-item {
+    min-height: 36px;
+    padding: 0 8px;
+    border-radius: 6px;
+  }
+
+  .mat-mdc-menu-item-text {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+  }
+
+  .menu-tile {
+    width: 16px;
+    margin-right: 8px;
+    color: var(--md-sys-color-primary, #1074b9);
+    text-align: center;
+  }
+
+  .mat-divider {
+    margin: 4px 0;
+  }
+
+  // Removing the photo can't be undone: say so with colour.
+  .danger,
+  .danger .menu-tile {
+    color: #d32f2f;
+  }
+}
+
+.photo-button {
+  --mat-button-filled-container-shape: 6px;
+  --mat-button-filled-container-color: rgb(255 255 255 / 15%);
+  --mat-button-filled-label-text-color: #fff;
+  --mat-button-filled-horizontal-padding: 8px;
+
   width: 100%;
+  min-width: 0;
+  height: 32px;
+  font-size: 0.8rem;
+
+  // Icon and label on one line, centred like the Photo strip above.
+  ::ng-deep .mdc-button__label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+
+  i {
+    flex-shrink: 0;
+  }
+}
+
+.member-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.member-name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin: 0;
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+// Status in its colour on a white chip, readable on the blue.
+.status-chip {
+  padding: 2px 10px;
+  border-radius: 12px;
+  background: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 20px;
+}
+
+// Hamburger only; its name shows on hover and is read out by screen readers.
+.actions-button {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #fff;
+  font-size: 1.25rem;
+  cursor: pointer;
+
+  &:hover {
+    background: rgb(255 255 255 / 15%);
+  }
+}
+
+// Two columns of label / value pairs; one column on a phone.
+.detail-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 48px;
+
+  @media (width <= 768px) {
+    grid-template-columns: 1fr;
+  }
+
+  dl {
+    display: grid;
+    grid-template-columns: minmax(120px, 40%) 1fr;
+    gap: 6px 16px;
+    align-content: start;
+    margin: 0;
+  }
+
+  dt {
+    color: rgb(255 255 255 / 70%);
+    font-size: 0.875rem;
+  }
+
+  dd {
+    margin: 0;
+    color: #fff;
+    font-size: 0.875rem;
+    font-weight: 500;
+    overflow-wrap: anywhere;
+  }
+
+  .group-name + .group-name::before {
+    content: ', ';
+  }
+}
+
+// The tab bar spans the whole card, edge to edge; each tab pads its own content.
+.account-card > mat-card-content {
+  padding: 0;
+}
+
+.navigation-tabs {
+  border-bottom: 1px solid rgb(127 127 127 / 20%);
+}
+
+.profile-image.clickable {
+  cursor: zoom-in;
+}
+
+// The photo dialog renders outside this component, but the template is ours, so these apply.
+.photo-preview {
+  position: relative;
+
+  // Shown large, not at the stored photo's small size: up to 480px wide, within the screen.
+  img {
+    display: block;
+    width: min(480px, 80vw);
+    max-height: 80vh;
+    border-radius: 8px;
+    object-fit: contain;
+  }
+}
+
+.photo-preview-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(0 0 0 / 55%);
+  color: #fff;
+  cursor: pointer;
+
+  &:hover {
+    background: rgb(0 0 0 / 75%);
+  }
 }
 
 // Membership application (fineract-dbug ADR 0023)
@@ -56,7 +301,7 @@
   font-weight: 500;
 }
 
-@media (max-width: 600px) {
+@media (width <= 600px) {
   .membership-chip {
     margin-left: 0;
   }
