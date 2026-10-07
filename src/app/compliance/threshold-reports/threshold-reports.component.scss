@@ -1,0 +1,82 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+@use '../compliance' as compliance;
+
+@include compliance.page;
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+
+  mat-button-toggle-group {
+    flex-wrap: wrap;
+  }
+}
+
+.selection-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--md-sys-color-primary, #1074b9) 12%, transparent);
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.movements {
+  margin-top: 12px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-top: 12px;
+
+  .spacer {
+    flex: 1;
+  }
+}
+
+.row-actions {
+  white-space: nowrap;
+
+  button {
+    margin: 2px 4px 2px 0;
+  }
+}
+
+.problems {
+  margin: 6px 0 0;
+  padding-left: 18px;
+  font-size: 0.8rem;
+  color: #7a4a00;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+@media (width <= 768px) {
+  .row-actions {
+    white-space: normal;
+  }
+}

@@ -74,6 +74,12 @@
         <fa-icon class="mr-05" icon="chart-bar" size="lg"></fa-icon>
         {{ 'labels.menus.Reports' | translate }}
       </a>
+      @if (compliance.access().showMenu) {
+        <a class="tab-link" [routerLink]="['/compliance']" tabindex="0">
+          <fa-icon class="mr-05" icon="user-shield" size="lg"></fa-icon>
+          {{ 'compliance.Compliance' | translate }}
+        </a>
+      }
       <a
         #admin
         class="tab-link"

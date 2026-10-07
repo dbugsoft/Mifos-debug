@@ -117,6 +117,25 @@ const routes: Routes = [
       data: { title: 'Loan Calculator', breadcrumb: 'Loan Calculator' }
     },
     {
+      path: 'compliance',
+      data: { title: 'Compliance', breadcrumb: 'Compliance' },
+      children: [
+        {
+          path: '',
+          loadComponent: () =>
+            import('./compliance/compliance-home/compliance-home.component').then((m) => m.ComplianceHomeComponent)
+        },
+        {
+          path: 'threshold-reports',
+          loadComponent: () =>
+            import('./compliance/threshold-reports/threshold-reports.component').then(
+              (m) => m.ThresholdReportsComponent
+            ),
+          data: { title: 'Threshold reports', breadcrumb: 'Threshold reports' }
+        }
+      ]
+    },
+    {
       path: 'loan-aging',
       loadComponent: () => import('./reports/loan-aging/loan-aging.component').then((m) => m.LoanAgingComponent),
       data: {

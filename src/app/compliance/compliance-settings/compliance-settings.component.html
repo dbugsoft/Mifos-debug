@@ -1,0 +1,210 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="compliance-settings">
+  @if (!view()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  } @else {
+    <p class="hint">{{ 'compliance.Settings explanation' | translate }}</p>
+
+    <form [formGroup]="form" (ngSubmit)="save()">
+      <section class="frame">
+        <h3 class="legend">{{ 'compliance.Amounts' | translate }}</h3>
+        <div class="fields">
+          <ng-container
+            *ngTemplateOutlet="amount; context: { key: 'riskLine', label: 'compliance.High risk line' }"
+          ></ng-container>
+          <mat-form-field>
+            <mat-label>{{ 'compliance.Exactly at the line counts as' | translate }}</mat-label>
+            <mat-select formControlName="atLineCountsAs">
+              <mat-option value="MEDIUM">{{ 'compliance.Medium risk' | translate }}</mat-option>
+              <mat-option value="HIGH">{{ 'compliance.High risk' | translate }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>{{ 'compliance.Measure the line' | translate }}</mat-label>
+            <mat-select formControlName="lineMeasured">
+              <mat-option value="PER_PRODUCT">{{ 'compliance.Per product' | translate }}</mat-option>
+              <mat-option value="COMBINED">{{
+                'compliance.Savings, shares and loans together' | translate
+              }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <ng-container
+            *ngTemplateOutlet="amount; context: { key: 'unusualYearlyLine', label: 'compliance.Unusual yearly total' }"
+          ></ng-container>
+          <mat-form-field>
+            <mat-label>{{ 'compliance.A year means' | translate }}</mat-label>
+            <mat-select formControlName="yearBasis">
+              <mat-option value="FISCAL_YEAR">{{ 'compliance.Fiscal year' | translate }}</mat-option>
+              <mat-option value="ROLLING_12_MONTHS">{{ 'compliance.The last 12 months' | translate }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <ng-container
+            *ngTemplateOutlet="
+              amount;
+              context: { key: 'eddMonitoringLine', label: 'compliance.Monitoring line for extra checks' }
+            "
+          ></ng-container>
+          <ng-container
+            *ngTemplateOutlet="
+              amount;
+              context: { key: 'ttrLine', label: 'compliance.Threshold report: cash in one day' }
+            "
+          ></ng-container>
+          <ng-container
+            *ngTemplateOutlet="
+              amount;
+              context: { key: 'sourceOfFundsLine', label: 'compliance.Ask the source of money from' }
+            "
+          ></ng-container>
+          <mat-form-field>
+            <mat-label>{{ 'compliance.Full-KYM members below the line are' | translate }}</mat-label>
+            <mat-select formControlName="fullKymBelowLineGrade">
+              <mat-option value="MEDIUM">{{ 'compliance.Medium risk' | translate }}</mat-option>
+              <mat-option value="NORMAL">{{ 'compliance.Normal risk' | translate }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-checkbox formControlName="sourceOfFundsDayTotal" class="wide">{{
+            'compliance.Also ask when the day total reaches the amount' | translate
+          }}</mat-checkbox>
+          <mat-checkbox formControlName="sharesCountAsCash" class="wide">{{
+            'compliance.Count share purchases as cash' | translate
+          }}</mat-checkbox>
+          <mat-checkbox formControlName="unknownPaymentCountsAsCash" class="wide">{{
+            'compliance.Count unclassified payments as cash' | translate
+          }}</mat-checkbox>
+        </div>
+      </section>
+
+      <section class="frame">
+        <h3 class="legend">{{ 'compliance.Deadlines and reviews' | translate }}</h3>
+        <div class="fields">
+          @for (
+            f of [
+              { key: 'ttrDays', label: 'compliance.Threshold report within (days)' },
+              { key: 'strTargetDays', label: 'compliance.Suspicious report target (days after deciding)' },
+              { key: 'changeNoticeDays', label: 'compliance.Member change notice (days)' },
+              { key: 'reviewYearsHigh', label: 'compliance.Review high risk every (years)' },
+              { key: 'reviewYearsMedium', label: 'compliance.Review medium risk every (years)' },
+              { key: 'reviewYearsNormal', label: 'compliance.Review normal risk every (years)' },
+              { key: 'retentionYears', label: 'compliance.Keep records (years)' },
+              {
+                key: 'pepRetentionYears',
+                label: 'compliance.Keep records of politically exposed people after they leave office (years)'
+              },
+              { key: 'structuringWindowDays', label: 'compliance.Look at split deposits over (days)' },
+              { key: 'structuringBandPercent', label: 'compliance.Split deposits from (percent of the threshold)' }
+            ];
+            track f.key
+          ) {
+            <mat-form-field>
+              <mat-label>{{ f.label | translate }}</mat-label>
+              <input matInput type="number" [formControlName]="f.key" min="1" />
+              <mat-hint>{{ 'compliance.Policy' | translate }}: {{ policy($any(f.key)) }}</mat-hint>
+            </mat-form-field>
+          }
+        </div>
+      </section>
+
+      <section class="frame">
+        <h3 class="legend">{{ 'compliance.Incomplete KYM' | translate }}</h3>
+        <div class="fields">
+          <mat-checkbox formControlName="kymGateEnabled" class="wide">{{
+            'compliance.Stop money going out while KYM is incomplete' | translate
+          }}</mat-checkbox>
+          <mat-form-field>
+            <mat-label>{{ 'compliance.From this date, stop every transaction' | translate }}</mat-label>
+            <input matInput type="date" formControlName="kymGateAllFrom" />
+            <mat-hint>{{ 'compliance.Leave empty for never' | translate }}</mat-hint>
+          </mat-form-field>
+        </div>
+      </section>
+
+      <section class="frame">
+        <h3 class="legend">{{ 'compliance.Payment types' | translate }}</h3>
+        <p class="hint">{{ 'compliance.Payment types explanation' | translate }}</p>
+        <div class="table-scroll">
+          <table mat-table [dataSource]="view()!.paymentTypes" class="blue">
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef>{{ 'compliance.Payment type' | translate }}</th>
+              <td mat-cell *matCellDef="let t">
+                {{ t.name }}
+                @if (!t.cashClass) {
+                  <span class="chip amber">{{ 'compliance.Not classified' | translate }}</span>
+                }
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="cashClass">
+              <th mat-header-cell *matHeaderCellDef>{{ 'compliance.Counts as' | translate }}</th>
+              <td mat-cell *matCellDef="let t">
+                <mat-form-field class="inline-select" subscriptSizing="dynamic">
+                  <mat-select
+                    [value]="classes[t.id]"
+                    (selectionChange)="setClass(t, $event.value)"
+                    [disabled]="!canEdit()"
+                    [attr.aria-label]="t.name"
+                    [placeholder]="'compliance.Choose' | translate"
+                  >
+                    @for (c of cashClasses; track c) {
+                      <mat-option [value]="c">{{ 'compliance.cashClass.' + c | translate }}</mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+              </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="paymentColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: paymentColumns"></tr>
+          </table>
+        </div>
+      </section>
+
+      <section class="frame">
+        <h3 class="legend">goAML</h3>
+        <div class="fields">
+          <mat-form-field>
+            <mat-label>{{ 'compliance.Reporting entity id' | translate }}</mat-label>
+            <input matInput formControlName="goamlEntityId" maxlength="50" />
+            <mat-hint>{{ 'compliance.Given by FIU-Nepal at registration' | translate }}</mat-hint>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>{{ 'compliance.Branch code' | translate }}</mat-label>
+            <input matInput formControlName="goamlBranchCode" maxlength="50" />
+          </mat-form-field>
+          <mat-checkbox formControlName="remittanceService" class="wide">{{
+            'compliance.We run a remittance service' | translate
+          }}</mat-checkbox>
+        </div>
+      </section>
+
+      <div class="actions">
+        @if (view()!.lastChange; as c) {
+          <span class="hint"
+            >{{ 'compliance.Last changed' | translate }} {{ c.at.slice(0, 10) | adToBs }} ·
+            {{ c.name || c.username }}</span
+          >
+        }
+        <span class="spacer"></span>
+        @if (canEdit()) {
+          <button mat-stroked-button type="button" (click)="cancel()">{{ 'labels.buttons.Cancel' | translate }}</button>
+          <button mat-raised-button color="primary" type="submit" [disabled]="saving()">
+            {{ 'labels.buttons.Save' | translate }}
+          </button>
+        }
+      </div>
+    </form>
+
+    <ng-template #amount let-key="key" let-label="label">
+      <mat-form-field [formGroup]="form">
+        <mat-label>{{ label | translate }}</mat-label>
+        <input matInput type="number" [formControlName]="key" min="1" />
+        <mat-hint>{{ 'compliance.Policy' | translate }}: {{ policy(key) }}</mat-hint>
+      </mat-form-field>
+    </ng-template>
+  }
+</div>
