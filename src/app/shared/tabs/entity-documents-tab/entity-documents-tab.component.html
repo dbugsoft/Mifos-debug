@@ -40,9 +40,11 @@
                   loading="lazy"
                 />
               } @else {
-                <div class="placeholder">
-                  <fa-icon icon="file"></fa-icon>
-                  <span>{{ document.fileName || document.name }}</span>
+                <div class="placeholder" [attr.data-ext]="fileExtension(document)">
+                  <fa-icon [icon]="fileIcon(document)"></fa-icon>
+                  @if (fileExtension(document)) {
+                    <span class="ext">{{ fileExtension(document) }}</span>
+                  }
                 </div>
               }
               @if (isPreviewable(document)) {
@@ -52,9 +54,9 @@
               }
             </div>
             <div class="card-body">
-              <div class="title">{{ document.name }}</div>
+              <div class="title" [title]="document.name">{{ document.name }}</div>
               @if (document.fileName) {
-                <div class="meta">{{ document.fileName }}</div>
+                <div class="meta file-name" [title]="document.fileName">{{ document.fileName }}</div>
               }
               @if (document.description) {
                 <div class="description">{{ document.description }}</div>
@@ -74,13 +76,22 @@
               <div class="actions">
                 <button
                   mat-icon-button
-                  color="warn"
+                  class="download"
+                  (click)="downloadDocument(document)"
+                  [title]="'labels.buttons.Download' | translate"
+                  [attr.aria-label]="('labels.buttons.Download' | translate) + ': ' + document.name"
+                >
+                  <fa-icon icon="download"></fa-icon>
+                </button>
+                <button
+                  mat-icon-button
+                  class="delete"
                   (click)="deleteDocument(document.id, document.name)"
-                  title="Delete"
-                  [attr.aria-label]="'labels.buttons.Delete' | translate"
+                  [title]="'labels.buttons.Delete' | translate"
+                  [attr.aria-label]="('labels.buttons.Delete' | translate) + ': ' + document.name"
                   *mifosxHasPermission="'DELETE_DOCUMENT'"
                 >
-                  <fa-icon icon="times"></fa-icon>
+                  <fa-icon icon="trash"></fa-icon>
                 </button>
               </div>
             </div>
