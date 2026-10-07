@@ -34,8 +34,8 @@ h1.mat-mdc-dialog-title {
 
 // A 24-column grid: each field spans what its content needs, and rows add up to 24 so the edges
 // line up. Identity: document type 9, status 6, document key 9 | description | issue and expiry
-// date 12 each (BS date, switch and AD date on one line) | file. Document: file name and
-// description 12 each | the dates | file. One column on a phone.
+// date 12 each (BS date, switch and AD date on one line) | file. Document: file name 9,
+// description 15 | the dates | file. One column on a phone.
 :host ::ng-deep .upload-form {
   display: grid;
   grid-template-columns: repeat(24, minmax(0, 1fr));
@@ -60,12 +60,12 @@ h1.mat-mdc-dialog-title {
   }
 
   > mat-form-field:has([formcontrolname='fileName']) {
-    grid-column: span 12;
+    grid-column: span 9;
   }
 
   // Beside the file name in a document upload; a full row for an identity.
   > mat-form-field:has([formcontrolname='fileName']) ~ mat-form-field:has([formcontrolname='description']) {
-    grid-column: span 12;
+    grid-column: span 15;
   }
 
   // The two dates' wrapper steps aside so they sit in the grid themselves, side by side.

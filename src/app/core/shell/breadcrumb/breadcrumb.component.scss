@@ -8,13 +8,8 @@
 
 @use 'assets/styles/helper';
 
-// Back button (40px) + gap (16px): how far the button hangs into the left margin.
-$back-offset: 56px;
-
-// Measure the header's own width (sidebar open or collapsed), not the window.
 :host {
   display: block;
-  container-type: inline-size;
 }
 
 .breadcrumb-wrapper {
@@ -36,36 +31,7 @@ $back-offset: 56px;
   row-gap: 4px;
 }
 
-// Title, trail and page content share one left edge at every width.
-// Narrow: the back arrow sits above the title.
-.page-header--with-back .breadcrumb-back {
-  margin-bottom: 4px;
-}
-
-// Wide enough that the 5% side margin fits the arrow (5% of 1140px > 56px):
-// the arrow hangs in the margin, beside the title and trail.
-@container (width >= 1140px) {
-  .page-header--with-back {
-    grid-template-columns: 40px minmax(0, 1fr);
-    column-gap: 16px;
-    margin-left: -$back-offset;
-
-    .breadcrumb-back {
-      grid-row: 1 / span 2;
-      margin-bottom: 0;
-    }
-
-    &:not(:has(.breadcrumb-trail)) .breadcrumb-back {
-      grid-row: auto;
-    }
-
-    .title-row,
-    .breadcrumb-trail {
-      grid-column: 2;
-    }
-  }
-}
-
+// Title, trail and page content share one left edge; the back button sits above the title.
 .title-row {
   display: flex;
   align-items: center;
@@ -75,11 +41,13 @@ $back-offset: 56px;
 .breadcrumb-back {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  align-self: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
+  justify-self: start;
+  gap: 8px;
+  height: 36px;
+  padding: 0 16px 0 12px;
+  margin-bottom: 8px;
+  border-radius: 18px;
+  font-weight: 500;
   color: var(--bc-accent);
   background: var(--md-sys-color-surface, #fff);
   border: 1px solid var(--md-sys-color-outline-variant, #cbd5e1);

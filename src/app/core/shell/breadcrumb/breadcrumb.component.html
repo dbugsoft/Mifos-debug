@@ -7,15 +7,11 @@
 -->
 
 <nav class="breadcrumb-wrapper" aria-label="Page navigation">
-  <div class="page-header" [class.page-header--with-back]="backUrl">
+  <div class="page-header">
     @if (backUrl) {
-      <a
-        class="breadcrumb-back"
-        [routerLink]="backUrl"
-        [matTooltip]="'labels.buttons.Back to Name' | translate: { name: getTranslate(backLabel) }"
-        [attr.aria-label]="'labels.buttons.Back to Name' | translate: { name: getTranslate(backLabel) }"
-      >
+      <a class="breadcrumb-back" [routerLink]="backUrl">
         <mat-icon>arrow_back</mat-icon>
+        <span>{{ 'labels.buttons.Back to Name' | translate: { name: getTranslate(backLabel) } }}</span>
       </a>
     }
     <div class="title-row">

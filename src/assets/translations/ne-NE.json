@@ -3265,7 +3265,8 @@
       "Remittances": "रेमिट्यान्स",
       "Process Remittance": "रेमिट्यान्स प्रक्रिया",
       "Undo Write-off": "राइट-अफ पूर्ववत गर्नुहोस्",
-      "Loan Calculator": "ऋण क्याल्कुलेटर"
+      "Loan Calculator": "ऋण क्याल्कुलेटर",
+      "Loan Aging": "ऋण भाखा विश्लेषण"
     },
     "placeholders": {
       "Add new server": "नयाँ सर्भर थप्नुहोस्",
@@ -5445,6 +5446,29 @@
       }
     },
     "Watch": "जसमध्ये निगरानीमा"
+  },
+  "loanAging": {
+    "Office": "कार्यालय",
+    "All offices": "सबै कार्यालय",
+    "Group by": "समूह अनुसार",
+    "Branch": "शाखा",
+    "Loan product": "ऋण प्रोडक्ट",
+    "Loan officer": "ऋण अधिकृत",
+    "Centre": "केन्द्र",
+    "Download CSV": "CSV डाउनलोड",
+    "Download PDF": "PDF डाउनलोड",
+    "as of": "मिति",
+    "Loans": "ऋण संख्या",
+    "loans": "ऋण",
+    "Outstanding": "बाँकी साँवा",
+    "Overdue": "भाखा नाघेको",
+    "Provision": "कर्जा नोक्सानी व्यवस्था",
+    "Total": "जम्मा",
+    "By age band": "भाखा नाघेको अवधि अनुसार बाँकी र भाखा नाघेको रकम",
+    "By loan class": "कर्जा वर्ग अनुसार",
+    "Loan class": "कर्जा वर्ग",
+    "Provision rate": "व्यवस्था दर",
+    "No loans to show": "यो कार्यालयमा देखाउने ऋण छैन।"
   },
   "membership": {
     "Membership": "सदस्यता",

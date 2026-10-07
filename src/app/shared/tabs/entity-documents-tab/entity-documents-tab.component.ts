@@ -149,6 +149,40 @@ export class EntityDocumentsTabComponent implements OnInit, OnDestroy {
     });
   }
 
+  downloadDocument(document: any): void {
+    this.getDownloadObservable(document.id).subscribe((blob: Blob) => {
+      const objectUrl = URL.createObjectURL(blob);
+      const anchor = window.document.createElement('a');
+      anchor.href = objectUrl;
+      anchor.download = document.fileName || document.name || 'document';
+      anchor.click();
+      // Revoking straight after click() can cancel the download in some browsers.
+      setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+    });
+  }
+
+  /** Upper-case extension of the stored file ("PDF"), or '' when there is none. */
+  fileExtension(document: any): string {
+    const match = /\.([a-z0-9]{1,5})$/i.exec(document.fileName || '');
+    return match ? match[1].toUpperCase() : '';
+  }
+
+  fileIcon(document: any): string {
+    switch (this.fileExtension(document)) {
+      case 'PDF':
+        return 'file-pdf';
+      case 'DOC':
+      case 'DOCX':
+        return 'file-word';
+      case 'XLS':
+      case 'XLSX':
+      case 'CSV':
+        return 'file-excel';
+      default:
+        return 'file';
+    }
+  }
+
   isPreviewable(document: any): boolean {
     return this.documentPreviewService.isPreviewable(document);
   }
