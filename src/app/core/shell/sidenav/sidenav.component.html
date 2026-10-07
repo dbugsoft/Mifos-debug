@@ -79,6 +79,20 @@
           </mat-icon>
           <a matLine #dashboard>{{ 'labels.menus.Dashboard' | translate }}</a>
         </mat-list-item>
+        @if (compliance.access().showMenu) {
+          <mat-list-item
+            [routerLink]="['/compliance']"
+            [matTooltipPosition]="tooltipPosition"
+            matTooltip="{{ 'compliance.Compliance' | translate }}"
+            routerLinkActive="active-menu"
+            [routerLinkActiveOptions]="{ exact: false }"
+          >
+            <mat-icon matListIcon>
+              <fa-icon icon="user-shield" size="sm"></fa-icon>
+            </mat-icon>
+            <a matLine>{{ 'compliance.Compliance' | translate }}</a>
+          </mat-list-item>
+        }
         <mat-list-item
           [routerLink]="['/navigation']"
           [matTooltipPosition]="tooltipPosition"

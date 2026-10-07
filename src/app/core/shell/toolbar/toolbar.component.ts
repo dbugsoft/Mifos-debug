@@ -52,6 +52,7 @@ import { MatIcon } from '@angular/material/icon';
 import { NotificationsTrayComponent as NotificationsTrayComponent_1 } from '../../../shared/notifications-tray/notifications-tray.component';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { DocumentationLinksService } from 'app/shared/services/documentation-links.service';
+import { ComplianceService } from 'app/compliance/compliance.service';
 
 /**
  * Toolbar component.
@@ -86,6 +87,8 @@ export class ToolbarComponent implements OnInit, AfterViewInit, AfterContentChec
   private changeDetector = inject(ChangeDetectorRef);
   private documentationLinks = inject(DocumentationLinksService);
   private destroyRef = inject(DestroyRef);
+  /** Compliance (fineract-dbug ADR 0036): the menu shows only for roles given the compliance permissions by name. */
+  readonly compliance = inject(ComplianceService);
 
   /* Reference of institution */
   @ViewChild('institution') institution: ElementRef<any>;
@@ -114,6 +117,8 @@ export class ToolbarComponent implements OnInit, AfterViewInit, AfterContentChec
    * Subscribes to breakpoint for handset.
    */
   ngOnInit() {
+    // asked afresh at each sign-in: the shell, and with it this toolbar, is created after signing in
+    this.compliance.loadAccess(true).pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
     this.isHandset$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((isHandset) => {
       if (isHandset && this.sidenavCollapsed) {
         this.toggleSidenavCollapse(false);

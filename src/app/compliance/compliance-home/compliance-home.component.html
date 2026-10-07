@@ -1,0 +1,154 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="compliance-page">
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  } @else if (!access()?.showMenu) {
+    <p class="empty">{{ 'compliance.You have no compliance access' | translate }}</p>
+  } @else {
+    @if (settings()?.unclassified) {
+      <div class="notice" role="status">
+        <span>{{ 'compliance.Payment types not classified' | translate: { count: settings()?.unclassified } }}</span>
+        <a [routerLink]="['/system', 'configurations']">{{ 'compliance.Classify them' | translate }}</a>
+      </div>
+    }
+
+    @if (summary(); as s) {
+      <div class="tiles">
+        <a class="tile" [class.warn]="s.dueSoon > 0" [class.bad]="s.overdue > 0" [routerLink]="['threshold-reports']">
+          <span class="label">{{ 'compliance.Threshold reports to send' | translate }}</span>
+          <span class="value">{{ s.toReport }}</span>
+          <span class="sub">
+            @if (s.nextDue) {
+              {{ 'compliance.Next due' | translate }} {{ s.nextDue | adToBs }}
+            } @else {
+              {{ 'compliance.Nothing waiting' | translate }}
+            }
+          </span>
+        </a>
+        <a class="tile" [class.bad]="s.overdue > 0" [routerLink]="['threshold-reports']">
+          <span class="label">{{ 'compliance.Late' | translate }}</span>
+          <span class="value">{{ s.overdue }}</span>
+          <span class="sub">{{ 'compliance.Past the 15 day deadline' | translate }}</span>
+        </a>
+        <a class="tile" [class.warn]="s.dueSoon > 0" [routerLink]="['threshold-reports']">
+          <span class="label">{{ 'compliance.Due within 3 days' | translate }}</span>
+          <span class="value">{{ s.dueSoon }}</span>
+        </a>
+        @if (s.historical > 0) {
+          <a class="tile warn" [routerLink]="['threshold-reports']" [queryParams]="{ status: 'HISTORICAL' }">
+            <span class="label">{{ 'compliance.Found after their deadline' | translate }}</span>
+            <span class="value">{{ s.historical }}</span>
+            <span class="sub">{{ 'compliance.Decide whether to report late' | translate }}</span>
+          </a>
+        }
+        @if (s.needsCorrection > 0) {
+          <a class="tile bad" [routerLink]="['threshold-reports']">
+            <span class="label">{{ 'compliance.Need a correction' | translate }}</span>
+            <span class="value">{{ s.needsCorrection }}</span>
+          </a>
+        }
+      </div>
+    }
+
+    @if (can('READ_AMLCOMPLIANCE')) {
+      <section class="frame">
+        <h2 class="legend">{{ 'compliance.Deadlines' | translate }}</h2>
+        @if (deadlines().length) {
+          <div class="table-scroll">
+            <table mat-table [dataSource]="deadlines()" class="blue">
+              <ng-container matColumnDef="dueOn">
+                <th mat-header-cell *matHeaderCellDef>{{ 'compliance.Send by' | translate }}</th>
+                <td mat-cell *matCellDef="let i">
+                  {{ isoDate(i.dueOn) | adToBs }}
+                  <span class="sub">{{ isoDate(i.dueOn) }} AD</span>
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="what">
+                <th mat-header-cell *matHeaderCellDef>{{ 'compliance.What' | translate }}</th>
+                <td mat-cell *matCellDef="let i">
+                  {{
+                    (i.direction === 'IN'
+                      ? 'compliance.Threshold report, cash in'
+                      : 'compliance.Threshold report, cash out'
+                    ) | translate
+                  }}
+                  <span class="sub">{{ isoDate(i.transactionDate) | adToBs }}</span>
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="member">
+                <th mat-header-cell *matHeaderCellDef>{{ 'compliance.Member' | translate }}</th>
+                <td mat-cell *matCellDef="let i">
+                  {{ i.name }}
+                  <span class="sub">{{ i.accountNo }} · {{ i.office }}</span>
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="amount">
+                <th mat-header-cell *matHeaderCellDef class="num">{{ 'compliance.Amount' | translate }}</th>
+                <td mat-cell *matCellDef="let i" class="num">{{ i.totalAmount | formatNumber }}</td>
+              </ng-container>
+              <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef>{{ 'compliance.Deadline' | translate }}</th>
+                <td mat-cell *matCellDef="let i"><mifosx-due-chip [daysLeft]="i.daysLeft"></mifosx-due-chip></td>
+              </ng-container>
+              <tr mat-header-row *matHeaderRowDef="deadlineColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: deadlineColumns" [routerLink]="['threshold-reports']"></tr>
+            </table>
+          </div>
+        } @else {
+          <p class="empty">{{ 'compliance.No threshold reports waiting' | translate }}</p>
+        }
+      </section>
+    }
+
+    <div class="two-columns">
+      @if (ledger(); as l) {
+        <section class="frame">
+          <h2 class="legend">{{ 'compliance.Transaction monitoring' | translate }}</h2>
+          <dl class="facts one-column">
+            <div class="fact">
+              <dt class="fact-label">{{ 'compliance.Movements watched' | translate }}</dt>
+              <dd class="fact-value">{{ l.counted | number }}</dd>
+            </div>
+            <div class="fact">
+              <dt class="fact-label">{{ 'compliance.From' | translate }}</dt>
+              <dd class="fact-value">{{ l.firstDate ? (l.firstDate | adToBs) : '—' }}</dd>
+            </div>
+            <div class="fact">
+              <dt class="fact-label">{{ 'compliance.Last nightly check' | translate }}</dt>
+              <dd class="fact-value">
+                {{
+                  l.lastReconciled ? (l.lastReconciled.slice(0, 10) | adToBs) : ('compliance.Not run yet' | translate)
+                }}
+              </dd>
+            </div>
+          </dl>
+        </section>
+      }
+
+      @if (access()?.holders; as holders) {
+        <section class="frame">
+          <h2 class="legend">{{ 'compliance.Who can see compliance data' | translate }}</h2>
+          @if (holders.length) {
+            <ul class="holders">
+              @for (h of holders; track h.userId) {
+                <li>
+                  <span class="holder-name">{{ h.name || h.username }}</span>
+                  <span class="sub">{{ h.roles.join(', ') }} · {{ h.office }}</span>
+                </li>
+              }
+            </ul>
+          } @else {
+            <p class="empty">{{ 'compliance.Nobody yet' | translate }}</p>
+          }
+        </section>
+      }
+    </div>
+  }
+</div>

@@ -1,0 +1,187 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+// The compliance pages' shared look: the app's own patterns (the member page's framed sections and label: value grid,
+// the loan aging report's totals cards and blue-header tables), nothing new.
+@use 'app/clients/clients-view/member-tab' as mt;
+
+@mixin page {
+  .compliance-page {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 90%;
+    max-width: 84rem;
+    margin: 0 auto;
+    padding-bottom: 32px;
+  }
+
+  @media (width <= 768px) {
+    .compliance-page {
+      width: auto;
+      margin: 0 16px;
+    }
+  }
+
+  @include mt.framed-section('.frame', '> .legend');
+
+  .frame {
+    margin: 12px 0 0;
+    background: var(--mat-sys-surface, #fff);
+  }
+
+  .notice {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    align-items: center;
+    padding: 10px 16px;
+    border: 1px solid #f0d08a;
+    border-radius: 8px;
+    background: #fff4dc;
+    color: #5c3d00;
+    font-size: 0.875rem;
+
+    a {
+      color: inherit;
+      font-weight: 600;
+    }
+  }
+
+  .tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 16px;
+  }
+
+  .tile {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 14px 18px;
+    border: 1px solid rgb(127 127 127 / 25%);
+    border-left: 3px solid var(--md-sys-color-primary, #1074b9);
+    border-radius: 8px;
+    background: var(--mat-sys-surface, #fff);
+    color: inherit;
+    text-decoration: none;
+
+    .label {
+      color: var(--mat-sys-on-surface-variant);
+      font-size: 0.875rem;
+    }
+
+    .value {
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .sub {
+      color: var(--mat-sys-on-surface-variant);
+      font-size: 0.75rem;
+    }
+
+    &.warn {
+      border-left-color: #c77700;
+    }
+
+    &.bad {
+      border-left-color: #b3261e;
+    }
+  }
+
+  .table-scroll {
+    overflow-x: auto;
+
+    // On a phone the table keeps readable columns and scrolls sideways, like the app's other wide tables.
+    table.blue {
+      min-width: 640px;
+    }
+  }
+
+  table.blue {
+    width: 100%;
+    border: 1px solid rgb(127 127 127 / 20%);
+    border-radius: 8px;
+    overflow: hidden;
+
+    .mat-mdc-header-row {
+      background: var(--md-sys-color-primary, #1074b9);
+    }
+
+    th.mat-mdc-header-cell {
+      color: #fff;
+      font-weight: 600;
+      border-bottom: none;
+      white-space: nowrap;
+    }
+
+    th.mat-mdc-header-cell + th.mat-mdc-header-cell {
+      border-left: 1px solid rgb(255 255 255 / 35%);
+    }
+
+    .num {
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .sub {
+      display: block;
+      font-size: 0.75rem;
+      opacity: 0.8;
+    }
+  }
+
+  .chip {
+    display: inline-block;
+    padding: 0 8px;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 20px;
+    white-space: nowrap;
+
+    &.red {
+      color: #9f1f17;
+      background: #fdeceb;
+    }
+
+    &.amber {
+      color: #7a4a00;
+      background: #fff0d1;
+    }
+
+    &.green {
+      color: #1b6b2a;
+      background: #e3f3e6;
+    }
+
+    &.blue {
+      color: #0b5488;
+      background: #e0edf8;
+    }
+
+    &.grey {
+      color: #3f4448;
+      background: #eceff1;
+    }
+  }
+
+  .empty {
+    margin: 0;
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  .hint {
+    margin: 0;
+    color: var(--mat-sys-on-surface-variant);
+    font-size: 0.875rem;
+  }
+
+  @include mt.label-value-grid('.facts', '.fact', '.fact-label', '.fact-value');
+}

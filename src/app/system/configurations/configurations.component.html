@@ -24,6 +24,13 @@
           </ng-template>
         </mat-tab>
       }
+      @if (compliance.can('READ_AMLCOMPLIANCE', 'UPDATE_AMLSETTINGS')) {
+        <mat-tab label="{{ 'compliance.Compliance' | translate }}">
+          <ng-template matTabContent>
+            <mifosx-compliance-settings></mifosx-compliance-settings>
+          </ng-template>
+        </mat-tab>
+      }
     </mat-tab-group>
   </mat-card-content>
 </mat-card>
