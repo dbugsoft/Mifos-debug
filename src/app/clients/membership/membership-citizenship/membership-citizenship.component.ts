@@ -14,6 +14,11 @@ import { NepalLocationService } from '../../member-address/nepal-location.servic
 import { LocationOption } from '../../member-address/nepal-location-index';
 import { injectNepaliFirst } from '../../member-address/nepali-first';
 
+/** A district as the backend stores the citizenship's issuing district: province code and district code together. */
+export function issuingDistrictOption(provinceCode: string, district: LocationOption): LocationOption {
+  return { ...district, code: provinceCode + district.code };
+}
+
 /**
  * The citizenship number and the district that issued it, on a membership application (fineract-dbug ADR 0035). The
  * number is saved as the member's "Citizenship" identifier (their Identities tab) and must not belong to anyone else.
@@ -98,7 +103,9 @@ export class MembershipCitizenshipComponent implements OnInit {
         this.districts.set(
           index
             .provinces()
-            .flatMap((province) => index.districts(province.code))
+            // a district code repeats across provinces ("01" is Taplejung, Dolakha and more), so the value is
+            // province and district together, "301" for Dolakha (fineract-dbug #209)
+            .flatMap((province) => index.districts(province.code).map((d) => issuingDistrictOption(province.code, d)))
             .sort((a, b) => a.nameEn.localeCompare(b.nameEn, 'en'))
         )
       );
