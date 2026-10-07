@@ -16,6 +16,7 @@ import {
   Input,
   OnInit,
   Output,
+  ViewChild,
   inject
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -35,6 +36,7 @@ import { MatStepperNext } from '@angular/material/stepper';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { NepaliDateInputComponent } from 'app/shared/nepali-date-input/nepali-date-input.component';
+import { MembershipCitizenshipComponent } from '../../membership/membership-citizenship/membership-citizenship.component';
 
 /**
  * Create Client Component
@@ -51,7 +53,8 @@ import { NepaliDateInputComponent } from 'app/shared/nepali-date-input/nepali-da
     MatCheckbox,
     FaIconComponent,
     MatStepperNext,
-    NepaliDateInputComponent
+    NepaliDateInputComponent,
+    MembershipCitizenshipComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -89,6 +92,13 @@ export class ClientGeneralStepComponent implements OnInit {
    * savings account, when the board approves; so Active, Activation Date and Open Savings Account are not asked.
    */
   @Input() membershipMode = false;
+  /** The citizenship fields, present on a membership application */
+  @ViewChild(MembershipCitizenshipComponent) citizenship?: MembershipCitizenshipComponent;
+
+  /** The step is complete: the client form, and on a membership application the citizenship too. */
+  get valid(): boolean {
+    return this.createClientForm.valid && (!this.membershipMode || !!this.citizenship?.value());
+  }
   /** Create Client Form */
   createClientForm: FormGroup;
 

@@ -97,7 +97,7 @@ export class CreateClientComponent implements AfterViewInit {
     }
     this.datatables.forEach((dt: any) => labels.push(dt.registeredTableName));
     if (this.membershipMode) {
-      labels.push('SHARES');
+      labels.push('MEMBERSHIP');
     }
     labels.push('PREVIEW');
     return labels;
@@ -194,7 +194,7 @@ export class CreateClientComponent implements AfterViewInit {
   }
 
   areFormvalids(): boolean {
-    let areValids = this.clientGeneralForm.valid && this.memberAddressStep.valid();
+    let areValids = this.clientGeneralStep.valid && this.memberAddressStep.valid();
     if (this.membershipMode) {
       areValids = areValids && !!this.sharesStep?.valid();
     }
@@ -272,7 +272,7 @@ export class CreateClientComponent implements AfterViewInit {
     const sharesRequest = this.membershipMode ? this.sharesStep?.request() : null;
     const created$ = sharesRequest
       ? this.membershipService
-          .apply({ client: clientData, ...sharesRequest })
+          .apply({ client: clientData, ...this.clientGeneralStep.citizenship?.value(), ...sharesRequest })
           .pipe(map((a) => ({ clientId: a.clientId })))
       : this.clientsService.createClient(clientData).pipe(map((response: any) => ({ clientId: response.resourceId })));
     created$

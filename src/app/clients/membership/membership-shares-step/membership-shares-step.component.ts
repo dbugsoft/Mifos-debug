@@ -16,9 +16,6 @@ import { FormatNumberPipe } from 'app/pipes/format-number.pipe';
 import { NepaliDateInputComponent } from 'app/shared/nepali-date-input/nepali-date-input.component';
 import { SettingsService } from 'app/settings/settings.service';
 import { Dates } from 'app/core/utils/dates';
-import { NepalLocationService } from '../../member-address/nepal-location.service';
-import { LocationOption } from '../../member-address/nepal-location-index';
-import { injectNepaliFirst } from '../../member-address/nepali-first';
 import { MembershipApplyRequest, MembershipTemplate, Nominee, ShareProductOption } from '../membership.models';
 
 /** What the applicant buys, as shown in the step, the preview and the request. */
@@ -40,9 +37,9 @@ export interface SharesChoice {
 export type ApplicationMode = 'new' | 'again' | 'existing';
 
 /**
- * The Shares step of a membership application (fineract-dbug ADR 0023 and 0035): which share product, how many kitta,
- * the citizenship number and the district that issued it, the nominee, and the money when the cooperative takes it with
- * the application. Shown in the Create Member form while the share-first rule is on, and in the dialog for applying
+ * The Membership step of a membership application (fineract-dbug ADR 0023 and 0035): the shares (product, kitta and
+ * what they cost), the money when the cooperative takes it with the application, the nominee and a note. The citizenship
+ * is asked with the person's details, in the General step. Shown in the Create Member form while the share-first rule is on, and in the dialog for applying
  * again or entering an existing application ({@link embedded}).
  */
 @Component({
@@ -62,22 +59,17 @@ export type ApplicationMode = 'new' | 'again' | 'existing';
 export class MembershipSharesStepComponent implements OnInit {
   private formBuilder = inject(FormBuilder);
   private destroyRef = inject(DestroyRef);
-  private locationService = inject(NepalLocationService);
   private settingsService = inject(SettingsService);
   private dates = inject(Dates);
-  readonly nepaliFirst = injectNepaliFirst();
 
   @Input({ required: true }) template!: MembershipTemplate;
   @Input() mode: ApplicationMode = 'new';
   /** In a dialog rather than the stepper: no Previous / Next buttons. */
   @Input() embedded = false;
-  /** The person already has a citizenship number on record (applying again), so it need not be given. */
-  @Input() hasCitizenship = false;
   /** The person already has a nominee on record. */
   @Input() hasNominee = false;
 
   readonly today = this.settingsService.businessDate ?? new Date();
-  readonly districts = signal<LocationOption[]>([]);
 
   readonly form = this.formBuilder.group({
     shareProductId: [
@@ -95,11 +87,6 @@ export class MembershipSharesStepComponent implements OnInit {
       '',
       Validators.maxLength(1000)
     ],
-    citizenshipNumber: [
-      '',
-      Validators.maxLength(50)
-    ],
-    citizenshipDistrictCode: [null as string | null],
     nomineeName: [
       '',
       Validators.maxLength(200)
@@ -183,19 +170,6 @@ export class MembershipSharesStepComponent implements OnInit {
       this.status.set(this.form.status);
     });
     this.form.statusChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((s) => this.status.set(s));
-    if (!this.hasCitizenship) {
-      this.locationService
-        .locations()
-        .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe((index) =>
-          this.districts.set(
-            index
-              .provinces()
-              .flatMap((province) => index.districts(province.code))
-              .sort((a, b) => a.nameEn.localeCompare(b.nameEn, 'en'))
-          )
-        );
-    }
   }
 
   /** The total, put in the amount received when staff have not typed one, so the usual case is one click. */
@@ -208,7 +182,10 @@ export class MembershipSharesStepComponent implements OnInit {
   }
 
   /** The request fields this step contributes. */
-  request(): Omit<MembershipApplyRequest, 'client' | 'clientId'> | null {
+  request(): Omit<
+    MembershipApplyRequest,
+    'client' | 'clientId' | 'citizenshipNumber' | 'citizenshipDistrictCode'
+  > | null {
     const choice = this.choice();
     if (!choice) {
       return null;
@@ -222,8 +199,6 @@ export class MembershipSharesStepComponent implements OnInit {
       kitta: choice.kitta,
       shareProductId: choice.product.id,
       note: choice.note || undefined,
-      citizenshipNumber: this.hasCitizenship ? undefined : text(v.citizenshipNumber),
-      citizenshipDistrictCode: this.hasCitizenship ? undefined : (v.citizenshipDistrictCode ?? undefined),
       nominee,
       amountReceived: this.paidNow ? Number(v.amountReceived) : undefined,
       receiptNumber: this.paidNow ? text(v.receiptNumber) : undefined,
@@ -232,17 +207,9 @@ export class MembershipSharesStepComponent implements OnInit {
     };
   }
 
-  districtName(d: LocationOption): string {
-    return this.nepaliFirst() ? `${d.nameNp} (${d.nameEn})` : `${d.nameEn} (${d.nameNp})`;
-  }
-
   /** Which fields are required follows the settings and the kind of application. */
   private setRules(): void {
     const c = this.form.controls;
-    if (!this.hasCitizenship) {
-      c.citizenshipNumber.addValidators(Validators.required);
-      c.citizenshipDistrictCode.addValidators(Validators.required);
-    }
     if (this.nomineeRequired) {
       c.nomineeName.addValidators(Validators.required);
       c.nomineeRelationship.addValidators(Validators.required);

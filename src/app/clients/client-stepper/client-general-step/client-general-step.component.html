@@ -208,6 +208,11 @@
       </mat-checkbox>
     }
 
+    <!-- Membership application: the citizenship, with the person's details (fineract-dbug ADR 0035) -->
+    @if (membershipMode) {
+      <mifosx-membership-citizenship class="flex-98"></mifosx-membership-citizenship>
+    }
+
     <mat-divider class="flex-98"></mat-divider>
 
     <!-- Row 3: Mobile No, Email Address, Member Type, Member Classification -->
@@ -304,7 +309,7 @@
   </div>
 
   <div class="layout-row align-center gap-2percent margin-t">
-    <button mat-raised-button color="primary" matStepperNext [disabled]="createClientForm.invalid">
+    <button mat-raised-button color="primary" matStepperNext [disabled]="!valid">
       {{ 'labels.buttons.Next' | translate }}
       <fa-icon icon="arrow-right" class="m-l-10"></fa-icon>
     </button>

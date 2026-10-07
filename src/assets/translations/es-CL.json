@@ -5584,7 +5584,9 @@
     "Apply again": "Apply again",
     "Enter an existing application": "Enter an existing application",
     "Earlier applications": "Earlier applications",
-    "Reason or note": "Reason or note"
+    "Reason or note": "Reason or note",
+    "MEMBERSHIP": "MEMBERSHIP",
+    "Citizenship": "Citizenship"
   },
   "error.msg.membership.share.first": "A person becomes a member by buying shares. Take a membership application; approving it activates the member and buys the shares together.",
   "error.msg.membership.application.pending": "This person has a membership application waiting for the board. Approve or refuse the application instead, so the decision and its reason are kept.",
