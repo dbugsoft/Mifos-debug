@@ -97,7 +97,7 @@ export class CreateClientComponent implements AfterViewInit {
     }
     this.datatables.forEach((dt: any) => labels.push(dt.registeredTableName));
     if (this.membershipMode) {
-      labels.push('SHARES');
+      labels.push('MEMBERSHIP');
     }
     labels.push('PREVIEW');
     return labels;
@@ -125,6 +125,13 @@ export class CreateClientComponent implements AfterViewInit {
   membershipTemplate: MembershipTemplate | null = null;
   /** Shares step, present while the share-first rule is on */
   @ViewChild(MembershipSharesStepComponent) sharesStep: MembershipSharesStepComponent;
+
+  /**
+   * An administrator entering an existing application (on paper) with its original date: `?existing=true`
+   * (fineract-dbug ADR 0035).
+   */
+  readonly existingApplication =
+    this.route.snapshot?.queryParamMap?.get('existing') === 'true' && this.membershipService.can('ENTER_MEMBERSHIP');
 
   /** With the share-first rule on, a new member is a membership application: a pending client buying shares. */
   get membershipMode(): boolean {
@@ -187,7 +194,7 @@ export class CreateClientComponent implements AfterViewInit {
   }
 
   areFormvalids(): boolean {
-    let areValids = this.clientGeneralForm.valid && this.memberAddressStep.valid();
+    let areValids = this.clientGeneralStep.valid && this.memberAddressStep.valid();
     if (this.membershipMode) {
       areValids = areValids && !!this.sharesStep?.valid();
     }
@@ -265,7 +272,7 @@ export class CreateClientComponent implements AfterViewInit {
     const sharesRequest = this.membershipMode ? this.sharesStep?.request() : null;
     const created$ = sharesRequest
       ? this.membershipService
-          .apply({ client: clientData, ...sharesRequest })
+          .apply({ client: clientData, ...this.clientGeneralStep.citizenship?.value(), ...sharesRequest })
           .pipe(map((a) => ({ clientId: a.clientId })))
       : this.clientsService.createClient(clientData).pipe(map((response: any) => ({ clientId: response.resourceId })));
     created$

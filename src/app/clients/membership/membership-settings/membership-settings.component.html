@@ -19,12 +19,6 @@
       </mat-form-field>
 
       <mat-form-field>
-        <mat-label>{{ 'membership.Board decides within (days)' | translate }}</mat-label>
-        <input matInput type="number" min="1" max="365" formControlName="decisionDays" required />
-        <mat-hint>{{ 'membership.decisionDaysHint' | translate }}</mat-hint>
-      </mat-form-field>
-
-      <mat-form-field>
         <mat-label>{{ 'membership.Member savings product' | translate }}</mat-label>
         <mat-select formControlName="savingsProductId">
           @for (p of template()?.savingsProducts ?? []; track p.id) {
@@ -40,6 +34,62 @@
           @for (p of template()?.shareProducts ?? []; track p.id) {
             <mat-option [value]="p.id">{{ p.name }}</mat-option>
           }
+        </mat-select>
+        <mat-hint>{{ 'membership.shareProductHint' | translate }}</mat-hint>
+      </mat-form-field>
+    </div>
+
+    @if (noAccounting()) {
+      <p class="warning" role="alert">
+        <fa-icon icon="exclamation-triangle" class="m-r-10"></fa-icon>{{ 'membership.noAccountingWarning' | translate }}
+      </p>
+    }
+
+    <h3 class="rules-title">{{ 'membership.Rules' | translate }}</h3>
+    <div class="grid">
+      <div class="deadline">
+        <mat-form-field>
+          <mat-label>{{ 'membership.Decision deadline' | translate }}</mat-label>
+          <mat-select formControlName="deadlineOn">
+            <mat-option [value]="false">{{ 'membership.deadlineOff' | translate }}</mat-option>
+            <mat-option [value]="true">{{ 'membership.deadlineOn' | translate }}</mat-option>
+          </mat-select>
+          <mat-hint>{{ 'membership.deadlineHint' | translate }}</mat-hint>
+        </mat-form-field>
+        @if (form.value.deadlineOn) {
+          <mat-form-field class="days">
+            <mat-label>{{ 'membership.Days' | translate }}</mat-label>
+            <input matInput type="number" min="1" max="365" formControlName="decisionDays" required />
+            @if (form.controls.decisionDays.invalid) {
+              <mat-error>{{ 'membership.errors.decisionDays' | translate }}</mat-error>
+            }
+          </mat-form-field>
+        }
+      </div>
+
+      <mat-form-field>
+        <mat-label>{{ 'membership.A different person must approve' | translate }}</mat-label>
+        <mat-select formControlName="separateApprover">
+          <mat-option [value]="false">{{ 'membership.Off' | translate }}</mat-option>
+          <mat-option [value]="true">{{ 'membership.On' | translate }}</mat-option>
+        </mat-select>
+        <mat-hint>{{ 'membership.separateApproverHint' | translate }}</mat-hint>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>{{ 'membership.Payment taken' | translate }}</mat-label>
+        <mat-select formControlName="paymentTaken">
+          <mat-option value="AT_APPROVAL">{{ 'membership.paymentTaken.AT_APPROVAL' | translate }}</mat-option>
+          <mat-option value="AT_APPLICATION">{{ 'membership.paymentTaken.AT_APPLICATION' | translate }}</mat-option>
+        </mat-select>
+        <mat-hint>{{ 'membership.paymentTakenHint' | translate }}</mat-hint>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>{{ 'membership.Nominee required at joining' | translate }}</mat-label>
+        <mat-select formControlName="nomineeRequired">
+          <mat-option [value]="false">{{ 'membership.Off' | translate }}</mat-option>
+          <mat-option [value]="true">{{ 'membership.On' | translate }}</mat-option>
         </mat-select>
       </mat-form-field>
     </div>

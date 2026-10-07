@@ -20,3 +20,37 @@
   display: block;
   width: 100%;
 }
+
+.received {
+  display: block;
+  margin: 0 0 8px;
+}
+
+.paid {
+  margin: 0 0 16px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: #f6f9fc;
+}
+
+:host-context(.dark-theme) .paid {
+  background: rgb(255 255 255 / 4%);
+}
+
+.error {
+  color: #c62828;
+  font-size: 12px;
+  margin: 0 0 8px;
+}
+
+.pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 16px;
+}
+
+@media (width <= 600px) {
+  .pair {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

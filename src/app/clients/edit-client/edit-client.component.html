@@ -257,7 +257,11 @@
             formControlName="mobileNo"
             [placeholder]="'labels.inputs.Mobile No' | translate"
             [title]="'labels.inputs.Mobile No' | translate"
+            required
           />
+          @if (editClientForm.controls.mobileNo.hasError('required')) {
+            <mat-error>{{ 'membership.errors.phoneRequired' | translate }}</mat-error>
+          }
         </mat-form-field>
 
         <mat-form-field>

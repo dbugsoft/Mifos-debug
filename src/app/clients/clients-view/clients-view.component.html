@@ -264,7 +264,7 @@
         <button mat-menu-item (click)="doAction('Transfer Client')">
           {{ 'labels.buttons.Transfer Client' | translate }}
         </button>
-        @if (applicationPending) {
+        @if (canDecideMembership) {
           <span
             ><button mat-menu-item *mifosxHasPermission="'APPROVE_MEMBERSHIP'" (click)="decideMembership('approve')">
               {{ 'membership.Approve membership' | translate }}
@@ -275,6 +275,16 @@
               {{ 'membership.Refuse membership' | translate }}
             </button></span
           >
+        }
+        @if (canApplyAgain) {
+          <button mat-menu-item (click)="applyForMembership('again')">
+            {{ 'membership.Apply again' | translate }}
+          </button>
+        }
+        @if (canEnterExisting) {
+          <button mat-menu-item (click)="applyForMembership('existing')">
+            {{ 'membership.Enter an existing application' | translate }}
+          </button>
         }
         @if (clientViewData.status.value === 'Pending' && !applicationPending && !shareFirstRule()) {
           <span
@@ -389,7 +399,14 @@
 
   <mat-card-content>
     @if (clientViewData.status.value === 'Pending' && !membershipApplication() && shareFirstRule()) {
-      <p class="membership-notice">{{ 'membership.noApplicationNotice' | translate }}</p>
+      <p class="membership-notice">
+        {{ 'membership.noApplicationNotice' | translate }}
+        @if (canEnterExisting) {
+          <button mat-stroked-button color="primary" class="m-l-10" (click)="applyForMembership('existing')">
+            {{ 'membership.Enter an existing application' | translate }}
+          </button>
+        }
+      </p>
     }
     <nav mat-tab-nav-bar class="navigation-tabs" [tabPanel]="tabPanel">
       <a
@@ -401,7 +418,7 @@
       >
         {{ 'labels.inputs.General' | translate }}
       </a>
-      @if (membershipApplication()) {
+      @if (canReadMembership) {
         <a
           mat-tab-link
           [routerLink]="['./membership']"

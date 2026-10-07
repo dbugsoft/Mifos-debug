@@ -24,6 +24,9 @@
           <b>{{ 'membership.Board decision' | translate }}</b>
           @if (a.status === 'PENDING') {
             <mifosx-membership-deadline [application]="a"></mifosx-membership-deadline>
+            @if (a.daysRemaining == null) {
+              <span class="sub">{{ 'membership.Waiting for a decision' | translate }}</span>
+            }
           } @else {
             <span class="sub"
               >{{ (a.status === 'APPROVED' ? 'membership.Approved on' : 'membership.Refused on') | translate }}
@@ -51,6 +54,19 @@
     <table class="details">
       <tbody>
         <tr>
+          <td>{{ 'membership.Applied on' | translate }}</td>
+          <td>
+            {{ a.submittedOn | dateFormat }}
+            @if (a.enteredLate) {
+              <span class="tag">{{
+                'membership.enteredLate' | translate: { date: (a.enteredOn | dateFormat), user: a.submittedBy }
+              }}</span>
+            } @else if (a.submittedBy) {
+              <span class="muted">&nbsp;· {{ 'membership.byUser' | translate: { user: a.submittedBy } }}</span>
+            }
+          </td>
+        </tr>
+        <tr>
           <td>{{ 'membership.Share product' | translate }}</td>
           <td>{{ a.shareProductName }}</td>
         </tr>
@@ -58,16 +74,75 @@
           <td>{{ 'membership.Kitta' | translate }}</td>
           <td>{{ a.kitta }} ({{ 'membership.Rs' | translate }} {{ a.shareAmount | formatNumber }})</td>
         </tr>
+        @for (charge of a.charges; track charge.id) {
+          <tr>
+            <td>{{ charge.name }}</td>
+            <td>{{ 'membership.Rs' | translate }} {{ charge.amount | formatNumber }}</td>
+          </tr>
+        }
+        <tr>
+          <td>{{ 'membership.Payment' | translate }}</td>
+          <td>
+            @if (a.amountReceived != null) {
+              {{
+                'membership.paidOn'
+                  | translate: { amount: (a.amountReceived | formatNumber), date: (a.paidOn | dateFormat) }
+              }}
+              @if (a.receiptNumber) {
+                · {{ 'membership.receiptNo' | translate: { number: a.receiptNumber } }}
+              }
+            } @else {
+              {{ 'membership.dueAtApproval' | translate: { amount: (a.amountDue | formatNumber) } }}
+            }
+          </td>
+        </tr>
+        @if (a.refundAmount != null) {
+          <tr>
+            <td>{{ 'membership.Refund' | translate }}</td>
+            <td>
+              {{ 'membership.Rs' | translate }} {{ a.refundAmount | formatNumber }}
+              @if (a.refundReceiptNumber) {
+                · {{ 'membership.receiptNo' | translate: { number: a.refundReceiptNumber } }}
+              }
+            </td>
+          </tr>
+        }
+        @if (a.citizenshipNumber) {
+          <tr>
+            <td>{{ 'membership.Citizenship number' | translate }}</td>
+            <td>{{ a.citizenshipNumber }} · {{ a.citizenshipDistrictName ?? a.citizenshipDistrictCode }}</td>
+          </tr>
+        }
+        @if (a.nominee) {
+          <tr>
+            <td>{{ 'membership.Nominee' | translate }}</td>
+            <td>
+              {{ a.nominee.name }} ({{ a.nominee.relationship }})
+              @if (a.nominee.mobileNo) {
+                · {{ a.nominee.mobileNo }}
+              }
+            </td>
+          </tr>
+        }
         <tr>
           <td>{{ 'membership.Status' | translate }}</td>
           <td>
             <span class="status" [class]="a.status">{{ 'membership.status.' + a.status | translate }}</span>
+            @if (a.decidedBy) {
+              <span class="muted">&nbsp;· {{ 'membership.byUser' | translate: { user: a.decidedBy } }}</span>
+            }
           </td>
         </tr>
         @if (a.note) {
           <tr>
             <td>{{ 'membership.Note' | translate }}</td>
             <td>{{ a.note }}</td>
+          </tr>
+        }
+        @if (a.approvalNote) {
+          <tr>
+            <td>{{ 'membership.Approval note' | translate }}</td>
+            <td>{{ a.approvalNote }}</td>
           </tr>
         }
         @if (a.rejectionReason) {
@@ -80,17 +155,29 @@
     </table>
 
     @if (a.status === 'PENDING') {
+      @if (mustBeSomeoneElse()) {
+        <p class="notice">{{ 'membership.someoneElseDecides' | translate }}</p>
+      } @else {
+        <div class="actions">
+          <button mat-raised-button color="warn" *mifosxHasPermission="'REJECT_MEMBERSHIP'" (click)="decide('reject')">
+            {{ 'membership.Refuse membership' | translate }}
+          </button>
+          <button
+            mat-raised-button
+            color="primary"
+            *mifosxHasPermission="'APPROVE_MEMBERSHIP'"
+            (click)="decide('approve')"
+          >
+            <fa-icon icon="user-check" class="m-r-10"></fa-icon>{{ 'membership.Approve membership' | translate }}
+          </button>
+        </div>
+      }
+    }
+
+    @if (canApplyAgain() && template()) {
       <div class="actions">
-        <button mat-raised-button color="warn" *mifosxHasPermission="'REJECT_MEMBERSHIP'" (click)="decide('reject')">
-          {{ 'membership.Refuse membership' | translate }}
-        </button>
-        <button
-          mat-raised-button
-          color="primary"
-          *mifosxHasPermission="'APPROVE_MEMBERSHIP'"
-          (click)="decide('approve')"
-        >
-          <fa-icon icon="user-check" class="m-r-10"></fa-icon>{{ 'membership.Approve membership' | translate }}
+        <button mat-raised-button color="primary" (click)="applyAgain()">
+          <fa-icon icon="redo" class="m-r-10"></fa-icon>{{ 'membership.Apply again' | translate }}
         </button>
       </div>
     }
@@ -135,6 +222,113 @@
           </tr>
         </tbody>
       </table>
+    }
+
+    @if (earlier().length) {
+      <h3>{{ 'membership.Earlier applications' | translate }}</h3>
+      <div class="table-wrap">
+        <table class="accounts">
+          <thead>
+            <tr>
+              <th>{{ 'membership.Applied on' | translate }}</th>
+              <th>{{ 'membership.Kitta' | translate }}</th>
+              <th>{{ 'membership.Status' | translate }}</th>
+              <th>{{ 'membership.Decided on' | translate }}</th>
+              <th>{{ 'membership.Reason or note' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (e of earlier(); track e.id) {
+              <tr>
+                <td>{{ e.submittedOn | dateFormat }}</td>
+                <td>{{ e.kitta }}</td>
+                <td>
+                  <span class="status" [class]="e.status">{{ 'membership.status.' + e.status | translate }}</span>
+                </td>
+                <td>{{ e.decidedOn | dateFormat }}</td>
+                <td>
+                  {{ e.rejectionReason ?? e.approvalNote ?? '' }}
+                  @if (e.refundAmount != null) {
+                    <span class="muted"
+                      >· {{ 'membership.Refund' | translate }} {{ 'membership.Rs' | translate }}
+                      {{ e.refundAmount | formatNumber }}</span
+                    >
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+} @else if (client(); as c) {
+  <!-- A member with no application on record: joined before applications were kept (fineract-dbug ADR 0035) -->
+  <div class="membership-tab">
+    <table class="details">
+      <tbody>
+        <tr>
+          <td>{{ 'membership.Status' | translate }}</td>
+          <td>{{ c.status?.value }}</td>
+        </tr>
+        @if (c.status?.value === 'Active') {
+          <tr>
+            <td>{{ 'membership.Member since' | translate }}</td>
+            <td>{{ c.activationDate | dateFormat }}</td>
+          </tr>
+          <tr>
+            <td>{{ 'membership.Kitta held' | translate }}</td>
+            <td>{{ kittaHeld() }} {{ 'membership.kitta' | translate }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <!-- A pending person's notice and "Enter an existing application" are in the page header already -->
+    @if (c.status?.value !== 'Pending') {
+      <p class="notice">
+        @if (c.status?.value === 'Active') {
+          {{ (kittaHeld() > 0 ? 'membership.joinedBeforeApplications' : 'membership.activeWithoutShares') | translate }}
+        } @else {
+          {{ 'membership.noApplicationOnRecord' | translate }}
+        }
+      </p>
+    }
+
+    @if (canApplyAgain()) {
+      <div class="actions">
+        <button mat-raised-button color="primary" (click)="applyAgain()">
+          <fa-icon icon="redo" class="m-r-10"></fa-icon>{{ 'membership.Apply again' | translate }}
+        </button>
+      </div>
+    }
+
+    @if (shareAccounts().length) {
+      <h3>{{ 'membership.Shares' | translate }}</h3>
+      <div class="table-wrap">
+        <table class="accounts">
+          <thead>
+            <tr>
+              <th>{{ 'labels.inputs.Account No' | translate }}</th>
+              <th>{{ 'labels.inputs.Product' | translate }}</th>
+              <th>{{ 'labels.inputs.Status' | translate }}</th>
+              <th>{{ 'membership.Holding' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (s of shareAccounts(); track s.id) {
+              <tr>
+                <td>
+                  <a [routerLink]="['../shares-accounts', s.id]">{{ s.accountNo }}</a>
+                </td>
+                <td>{{ s.productName }}</td>
+                <td>{{ s.status?.value }}</td>
+                <td>{{ s.totalApprovedShares ?? 0 }} {{ 'membership.kitta' | translate }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
     }
   </div>
 }

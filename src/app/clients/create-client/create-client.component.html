@@ -34,7 +34,7 @@
       <fa-icon icon="eye" size="sm"></fa-icon>
     </ng-template>
 
-    <mat-step [completed]="clientGeneralForm.valid">
+    <mat-step [completed]="clientGeneralStep.valid">
       <ng-template matStepLabel
         ><strong>{{ 'labels.inputs.GENERAL' | translate }}</strong></ng-template
       >
@@ -87,8 +87,12 @@
 
     @if (membershipMode) {
       <mat-step [completed]="sharesStep.valid()">
-        <ng-template matStepLabel>{{ 'membership.SHARES' | translate }}</ng-template>
-        <mifosx-membership-shares-step #sharesStep [template]="membershipTemplate"></mifosx-membership-shares-step>
+        <ng-template matStepLabel>{{ 'membership.MEMBERSHIP' | translate }}</ng-template>
+        <mifosx-membership-shares-step
+          #sharesStep
+          [template]="membershipTemplate"
+          [mode]="existingApplication ? 'existing' : 'new'"
+        ></mifosx-membership-shares-step>
       </mat-step>
     }
 
@@ -96,14 +100,6 @@
       <ng-template matStepLabel
         ><strong>{{ 'labels.inputs.PREVIEW' | translate }}</strong></ng-template
       >
-      @if (membershipMode) {
-        <mifosx-membership-shares-preview [choice]="sharesStep?.choice() ?? null"></mifosx-membership-shares-preview>
-      }
-      <mifosx-member-address-preview
-        [permanent]="memberAddress.permanentPreview()"
-        [temporary]="memberAddress.temporaryPreview()"
-        [temporaryChoice]="memberAddress.choice()"
-      ></mifosx-member-address-preview>
       <mifosx-client-preview-step
         [clientTemplate]="clientTemplate"
         [clientAddressFieldConfig]="clientAddressFieldConfig"
@@ -111,6 +107,23 @@
         [membershipMode]="membershipMode"
         (submitEvent)="submit()"
       >
+        <mifosx-member-address-preview
+          [permanent]="memberAddress.permanentPreview()"
+          [temporary]="memberAddress.temporaryPreview()"
+          [temporaryChoice]="memberAddress.choice()"
+        ></mifosx-member-address-preview>
+        @if (membershipMode) {
+          <mifosx-membership-shares-preview
+            [choice]="sharesStep?.choice() ?? null"
+            [citizenshipNumber]="clientGeneralStep.citizenship?.value()?.citizenshipNumber ?? null"
+            [district]="clientGeneralStep.citizenship?.districtLabel() ?? null"
+            [nomineeName]="sharesStep?.form?.value?.nomineeName ?? null"
+            [nomineeRelationship]="sharesStep?.form?.value?.nomineeRelationship ?? null"
+            [nomineeMobileNo]="sharesStep?.form?.value?.nomineeMobileNo ?? null"
+            [receiptNumber]="sharesStep?.form?.value?.receiptNumber ?? null"
+            [submittedOn]="sharesStep?.form?.value?.submittedOn ?? null"
+          ></mifosx-membership-shares-preview>
+        }
       </mifosx-client-preview-step>
     </mat-step>
   </mat-stepper>

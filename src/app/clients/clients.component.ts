@@ -89,7 +89,7 @@ export class ClientsComponent implements OnInit, OnDestroy {
   private destroyRef = inject(DestroyRef);
   private membershipService = inject(MembershipService);
   /** With the share-first rule on, a new member is a membership application (fineract-dbug ADR 0023) */
-  readonly shareFirstRule = signal(false);
+  readonly shareFirstRule = signal<boolean | null>(null);
 
   private searchInput$ = new Subject<string>();
   private clientsRequestSub: Subscription | null = null;

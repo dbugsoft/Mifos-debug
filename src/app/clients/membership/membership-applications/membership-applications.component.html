@@ -26,6 +26,17 @@
           <input matInput [value]="search()" (input)="search.set($any($event.target).value)" />
         </mat-form-field>
         <span class="grow"></span>
+        @if (template()?.settings?.shareFirstEnabled) {
+          <button
+            mat-stroked-button
+            color="primary"
+            [routerLink]="['/members', 'create']"
+            [queryParams]="{ existing: true }"
+            *mifosxHasPermission="'ENTER_MEMBERSHIP'"
+          >
+            {{ 'membership.Enter an existing application' | translate }}
+          </button>
+        }
         <button
           mat-raised-button
           color="primary"
@@ -75,7 +86,14 @@
                   <td>{{ a.submittedOn | dateFormat }}</td>
                   <td>
                     @if (status() === 'PENDING') {
-                      <mifosx-membership-deadline [application]="a"></mifosx-membership-deadline>
+                      @if (a.daysRemaining != null) {
+                        <mifosx-membership-deadline [application]="a"></mifosx-membership-deadline>
+                      } @else {
+                        <span class="waiting">{{ 'membership.Waiting' | translate }}</span>
+                      }
+                      @if (a.enteredLate) {
+                        <span class="sub">{{ 'membership.Existing application' | translate }}</span>
+                      }
                     } @else {
                       {{ a.decidedOn | dateFormat }}
                     }
