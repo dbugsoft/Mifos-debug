@@ -12,7 +12,10 @@ import { DueChipComponent } from './due-chip.component';
 
 describe('DueChipComponent', () => {
   function chip(daysLeft: number | null) {
-    TestBed.configureTestingModule({ imports: [DueChipComponent, TranslateModule.forRoot()] });
+    TestBed.configureTestingModule({ imports: [
+        DueChipComponent,
+        TranslateModule.forRoot()
+      ] });
     const fixture = TestBed.createComponent(DueChipComponent);
     fixture.componentRef.setInput('daysLeft', daysLeft);
     fixture.detectChanges();
@@ -28,6 +31,9 @@ describe('DueChipComponent', () => {
 
   it('warns three days ahead, in amber', () => {
     expect(chip(3).tone()).toBe('chip amber');
+  });
+
+  it('says when a report is due today', () => {
     expect(chip(0).label()).toBe('compliance.Due today');
   });
 

@@ -43,6 +43,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatLine } from '@angular/material/grid-list';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { remittanceConfig } from '../../../remittances/remittance.config';
+import { ComplianceService } from 'app/compliance/compliance.service';
 
 import { catchError, finalize, of, take } from 'rxjs';
 
@@ -69,6 +70,9 @@ import { catchError, finalize, of, take } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SidenavComponent implements OnInit, AfterViewInit {
+  /** Compliance (fineract-dbug ADR 0036): on phones the top bar hides its links, so the menu offers it too. */
+  readonly compliance = inject(ComplianceService);
+
   private router = inject(Router);
   dialog = inject(MatDialog);
   private authenticationService = inject(AuthenticationService);

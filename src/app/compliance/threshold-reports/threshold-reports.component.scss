@@ -36,6 +36,11 @@
   cursor: pointer;
 }
 
+// seven columns: wider than the shared minimum before scrolling sideways on a phone
+.table-scroll table.blue {
+  min-width: 820px;
+}
+
 .movements {
   margin-top: 12px;
 }

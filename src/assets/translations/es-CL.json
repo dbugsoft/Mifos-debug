@@ -5824,6 +5824,11 @@
       "CORRECTED": "Replaced by a correction",
       "DISCARDED": "Discarded"
     },
+    "product": {
+      "SAVINGS": "Savings",
+      "LOAN": "Loan",
+      "SHARE": "Shares"
+    },
     "kind": {
       "DEPOSIT": "Deposit",
       "WITHDRAWAL": "Withdrawal",

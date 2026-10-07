@@ -97,6 +97,11 @@
 
   .table-scroll {
     overflow-x: auto;
+
+    // On a phone the table keeps readable columns and scrolls sideways, like the app's other wide tables.
+    table.blue {
+      min-width: 640px;
+    }
   }
 
   table.blue {

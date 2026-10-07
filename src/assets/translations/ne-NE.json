@@ -5822,6 +5822,11 @@
       "CORRECTED": "सच्याइएकोले प्रतिस्थापित",
       "DISCARDED": "हटाइएको"
     },
+    "product": {
+      "SAVINGS": "बचत",
+      "LOAN": "ऋण",
+      "SHARE": "सेयर"
+    },
     "kind": {
       "DEPOSIT": "जम्मा",
       "WITHDRAWAL": "झिकेको",

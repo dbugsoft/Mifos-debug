@@ -134,7 +134,7 @@
               <th mat-header-cell *matHeaderCellDef>{{ 'compliance.Transaction' | translate }}</th>
               <td mat-cell *matCellDef="let m">
                 {{ 'compliance.kind.' + m.kind | translate }}
-                <span class="sub">{{ m.product }} {{ m.sourceId }}</span>
+                <span class="sub">{{ 'compliance.product.' + m.product | translate }}</span>
               </td>
             </ng-container>
             <ng-container matColumnDef="paymentType">

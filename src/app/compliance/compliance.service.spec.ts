@@ -17,7 +17,10 @@ describe('ComplianceService', () => {
   let http: HttpTestingController;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting()] });
+    TestBed.configureTestingModule({ providers: [
+        provideHttpClient(),
+        provideHttpClientTesting()
+      ] });
     service = TestBed.inject(ComplianceService);
     http = TestBed.inject(HttpTestingController);
   });
@@ -64,16 +67,30 @@ describe('ComplianceService', () => {
   });
 
   it('makes threshold reports from the chosen items', () => {
-    service.makeTtrReports([1, 2]).subscribe();
+    service
+      .makeTtrReports([
+        1,
+        2
+      ])
+      .subscribe();
     const req = http.expectOne('/nepal/aml/goaml/reports');
-    expect(req.request.body).toEqual({ type: 'TTR', ttrItemIds: [1, 2] });
+    expect(req.request.body).toEqual({ type: 'TTR', ttrItemIds: [
+        1,
+        2
+      ] });
     req.flush([]);
   });
 });
 
 describe('isoDate', () => {
   it('reads both of the date shapes Fineract sends', () => {
-    expect(isoDate([2026, 10, 7])).toBe('2026-10-07');
+    expect(
+      isoDate([
+        2026,
+        10,
+        7
+      ])
+    ).toBe('2026-10-07');
     expect(isoDate('2026-10-07')).toBe('2026-10-07');
     expect(isoDate('2026-10-07T18:02:34+05:45')).toBe('2026-10-07');
     expect(isoDate(null)).toBe('');

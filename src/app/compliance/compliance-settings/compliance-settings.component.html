@@ -203,7 +203,7 @@
       <mat-form-field [formGroup]="form">
         <mat-label>{{ label | translate }}</mat-label>
         <input matInput type="number" [formControlName]="key" min="1" />
-        <mat-hint>{{ 'compliance.Policy' | translate }}: {{ policy(key) }}</mat-hint>
+        <mat-hint>{{ 'compliance.Policy' | translate }}: {{ $any(policy(key)) | number }}</mat-hint>
       </mat-form-field>
     </ng-template>
   }
