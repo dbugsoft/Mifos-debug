@@ -1,6 +1,7 @@
 ﻿{
   "error.msg.upload.file.too.big": "선택한 파일이 {{args.0.value}}MB 제한을 초과합니다. 더 작은 파일을 선택한 후 다시 시도하세요.",
-  "APP_NAME": "COIMS",
+  "APP_NAME": "COFMIS",
+  "APP_FULL_NAME": "Cooperative Financial Management & Information System",
   "Logged in as": "다음 계정으로 로그인됨",
   "Remember me": "날 기억해",
   "errors": {
@@ -496,6 +497,8 @@
       "Home": "집"
     },
     "buttons": {
+      "Photo": "Photo",
+      "Open Module": "Open Module",
       "Accept Transfer": "전송 수락",
       "Actions": "행위",
       "Activate": "활성화",
@@ -622,6 +625,8 @@
       "Enable": "할 수 있게 하다",
       "Expand All": "모두 확장",
       "Export": "내보내다",
+      "Export as JSON": "Export as JSON",
+      "Export as PDF": "Export as PDF",
       "Export to File": "파일로 내보내기",
       "Export CSV": "CSV 내보내기",
       "Export XLS": "XLS 내보내기",
@@ -769,7 +774,9 @@
       "DONE": "완료",
       "Submitting": "제출 중",
       "OK": "확인",
-      "undo_account_transfer": "계좌 이체 취소"
+      "undo_account_transfer": "계좌 이체 취소",
+      "Calculate": "Calculate",
+      "Share": "Share"
     },
     "catalogs": {
       "Interest payment waiver": "이자 지급 면제",
@@ -1567,7 +1574,8 @@
       "identifier id": "식별자 ID",
       "savings-transaction-datatable-tab works": "저축 거래 데이터 테이블 탭이 작동합니다.",
       "successfully select option": "성공적으로. 계속 진행하려면 아래 옵션 중에서 선택하세요.",
-      "undo_account_transfer": "계좌 이체 취소"
+      "undo_account_transfer": "계좌 이체 취소",
+      "Loan Calculator": "Loan Calculator"
     },
     "inputs": {
       "# Remittance": "# 송금",
@@ -3097,7 +3105,11 @@
       "s3_secret_key": "s3_비밀_키",
       "task-management component": "작업 관리 구성 요소",
       "to": "에게",
-      "valid": "유효한"
+      "valid": "유효한",
+      "Member": "Member",
+      "Total Interest": "Total Interest",
+      "Total Repayment": "Total Repayment",
+      "First Repayment": "First Repayment"
     },
     "links": {
       "Community": "지역 사회",
@@ -3115,6 +3127,17 @@
       "Working with Code": "코드 작업"
     },
     "menus": {
+      "Member Management": "Member Management",
+      "Administration": "Administration",
+      "Collapse Sidebar": "Collapse sidebar",
+      "Collections": "Collections",
+      "Expand Sidebar": "Expand sidebar",
+      "Finance": "Finance",
+      "Home": "Home",
+      "Members": "Members",
+      "Open Menu": "Open menu",
+      "Operations": "Operations",
+      "Overview": "Overview",
       "Unassign Staff": "직원 할당 해제",
       "Accounting": "회계",
       "Account Overview": "계정 개요",
@@ -3241,7 +3264,9 @@
       "Tasks": "작업",
       "Remittances": "송금",
       "Process Remittance": "송금 처리",
-      "Undo Write-off": "상각 취소"
+      "Undo Write-off": "상각 취소",
+      "Loan Calculator": "Loan Calculator",
+      "Loan Aging": "Loan Aging"
     },
     "placeholders": {
       "Add new server": "새 서버 추가",
@@ -3254,7 +3279,8 @@
       "Enter last name": "성을 입력하세요",
       "Enter remittance reference number": "송금 참조 번호를 입력하세요",
       "Sender name": "송금인 이름",
-      "Loading vendors...": "제공업체 로딩 중..."
+      "Loading vendors...": "제공업체 로딩 중...",
+      "Search active member": "Search an active member by name or account number"
     },
     "status": {
       "Active": "활동적인",
@@ -3303,6 +3329,19 @@
       "undo_account_transfer": "이 계좌 이체를 취소하시겠습니까?"
     },
     "text": {
+      "Welcome back": "Welcome back, {{name}}!",
+      "Home subtitle": "Manage and monitor your cooperative efficiently with {{app}}.",
+      "Total Members": "Total Members",
+      "Total Savings": "Total Savings",
+      "Loans Outstanding": "Loans Outstanding",
+      "Quick Menu": "Quick Menu",
+      "Home Members Description": "Register members and manage their groups and centers.",
+      "Home Dashboard Description": "Key figures, trends and the work that needs attention.",
+      "Home Collection Sheet Description": "Record a meeting's collections for a group or center.",
+      "Home Accounting Description": "Journal entries, chart of accounts and period closing.",
+      "Home Reports Description": "Run member, loan, savings and accounting reports.",
+      "Home Admin Description": "Users, offices, products and system settings.",
+      "Home Quick Menu Tour": "Shortcuts to the main modules you can use.",
       "A": "ㅏ",
       "Ability to manage holidays for individual offices": "개별 사무실의 휴일을 관리하는 기능은 여러 위치에 걸쳐 있는 조직에 매우 유용한 도구입니다. 조직의 각 사무실에 대한 휴일을 사용자 정의하려면 이 옵션을 사용하십시오.",
       "About Us": "회사 소개",
@@ -4051,7 +4090,9 @@
       "username": "사용자 이름",
       "withhold tax for this account": "이 계정에 대한 원천징수세",
       "withoutCategory": "카테고리 없음",
-      "“Maker-Checker” principle requires every tasks": "\"Maker-Checker\" 원칙은 오류와 오용 가능성을 줄이기 위해 모든 작업을 두 사람이 완료하도록 요구합니다. 한 사람이 프로세스를 시작하고 두 번째 사람이 프로세스를 완료합니다."
+      "“Maker-Checker” principle requires every tasks": "\"Maker-Checker\" 원칙은 오류와 오용 가능성을 줄이기 위해 모든 작업을 두 사람이 완료하도록 요구합니다. 한 사람이 프로세스를 시작하고 두 번째 사람이 프로세스를 완료합니다.",
+      "Pick a member from the search results": "Pick a member from the search results",
+      "Copied to clipboard": "Copied to clipboard"
     },
     "permissions": {
       "actions": {
@@ -4608,7 +4649,8 @@
     "PENDING": "보류 중",
     "INACTIVE": "비활성",
     "Process Remittance": "송금 처리",
-    "Allow full term length for each tranche disbursement": "활성화되면 각 트란셰 지급은 남은 기간에 맞추는 대신 전체 대출 기간 일정을 따릅니다. PROGRESSIVE 대출 일정 유형에만 사용 가능합니다."
+    "Allow full term length for each tranche disbursement": "활성화되면 각 트란셰 지급은 남은 기간에 맞추는 대신 전체 대출 기간 일정을 따릅니다. PROGRESSIVE 대출 일정 유형에만 사용 가능합니다.",
+    "Loan Calculator": "Loan repayment calculator"
   },
   "countries": {
     "AF": "아프가니스탄",
@@ -5405,6 +5447,29 @@
     },
     "Watch": "Of which on watch"
   },
+  "loanAging": {
+    "Office": "Office",
+    "All offices": "All offices",
+    "Group by": "Group by",
+    "Branch": "Branch",
+    "Loan product": "Loan product",
+    "Loan officer": "Loan officer",
+    "Centre": "Centre",
+    "Download CSV": "Download CSV",
+    "Download PDF": "Download PDF",
+    "as of": "as of",
+    "Loans": "Loans",
+    "loans": "loans",
+    "Outstanding": "Outstanding",
+    "Overdue": "Overdue",
+    "Provision": "Provision",
+    "Total": "Total",
+    "By age band": "Outstanding and overdue by age band",
+    "By loan class": "By loan class",
+    "Loan class": "Loan class",
+    "Provision rate": "Provision rate",
+    "No loans to show": "No loans to show for this office."
+  },
   "membership": {
     "Membership": "Membership",
     "Membership Applications": "Membership Applications",
@@ -5430,7 +5495,18 @@
       "atLeastOne": "At least one kitta (share) must be bought: membership begins with a share purchase.",
       "belowMinimum": "This share product needs at least {{min}} kitta.",
       "aboveMaximum": "This share product allows at most {{max}} kitta per member.",
-      "reasonRequired": "Give the reason for refusing: the applicant must be told why."
+      "reasonRequired": "Give the reason for refusing: the applicant must be told why.",
+      "decisionDays": "Between 1 and 365 days.",
+      "citizenshipRequired": "Enter the citizenship number.",
+      "districtRequired": "Choose the district that issued the citizenship.",
+      "amountRequired": "Enter the amount received.",
+      "amountNotTotal": "The amount received must be the amount due, Rs {{total}}.",
+      "nomineeRequired": "This cooperative needs a nominee at joining.",
+      "relationshipRequired": "Give the nominee's relationship.",
+      "phoneRequired": "The phone number is required.",
+      "confirmMoney": "Confirm the money was received before approving.",
+      "refundRequired": "Enter the amount refunded (0 if nothing is given back).",
+      "refundRange": "Between 0 and Rs {{amount}}."
     },
     "daysLeft": "{{left}} of {{total}} days left",
     "daysOverdue": "{{days}} days overdue",
@@ -5509,7 +5585,76 @@
       "approved": "Approved: the applicant is now a member, with savings and shares.",
       "rejected": "Application refused; the reason is kept.",
       "settingsSaved": "Membership settings saved."
-    }
+    },
+    "shareProductHint": "Its price, minimum kitta and charges apply to every application",
+    "noAccountingWarning": "This share product has no accounting set up: share money and fees will not reach the books.",
+    "switchOnAnyway": "Switch the rule on anyway",
+    "Rules": "Rules",
+    "Decision deadline": "Decision deadline",
+    "deadlineOff": "Off: no countdown",
+    "deadlineOn": "On: decide within a number of days",
+    "deadlineHint": "When off, no countdown or \"overdue\" is shown anywhere",
+    "Days": "Days",
+    "A different person must approve": "A different person must approve",
+    "Off": "Off",
+    "On": "On",
+    "separateApproverHint": "When on, whoever entered an application cannot approve or refuse it",
+    "Payment taken": "Payment taken",
+    "paymentTaken": {
+      "AT_APPROVAL": "At approval",
+      "AT_APPLICATION": "At application"
+    },
+    "paymentTakenHint": "At application: the amount is recorded with the application and refunded if it is refused",
+    "Nominee required at joining": "Nominee required at joining",
+    "existingExplanation": "An application already made on paper: it keeps its original date and still goes through approval.",
+    "Application date": "Application date",
+    "Citizenship number": "Citizenship number",
+    "Issuing district": "District that issued it",
+    "To pay now": "To pay now",
+    "Paid with the application": "Paid with the application",
+    "Payment": "Payment",
+    "Amount received (cash)": "Amount received (cash)",
+    "Receipt number": "Receipt number",
+    "receiptHint": "The number on the paper receipt, if any",
+    "Nominee": "Nominee",
+    "optional": "optional",
+    "nomineeOnRecord": "A nominee is already on record. Fill these in only to change it.",
+    "Nominee name": "Nominee's name",
+    "Relationship": "Relationship",
+    "Nominee phone": "Nominee's phone",
+    "stepBuyShares": "Buy {{kitta}} kitta (Rs {{amount}})",
+    "stepCharge": "Take the {{name}} (Rs {{amount}})",
+    "moneyReceived": "I have received Rs {{amount}} in cash",
+    "alreadyPaid": "Rs {{amount}} was received with the application on {{date}}.",
+    "Approval note": "Approval note",
+    "refundLead": "Rs {{amount}} was received with the application on {{date}}. Record what is given back.",
+    "Amount refunded": "Amount refunded",
+    "Refund receipt number": "Refund receipt number",
+    "applyAgainTitle": "{{name}} applies again",
+    "enterExistingTitle": "Enter {{name}}'s existing application",
+    "applyAgainLead": "A new application on the same record. The earlier ones stay in the history.",
+    "Take the application": "Take the application",
+    "Waiting for a decision": "Waiting for a decision",
+    "Waiting": "Waiting",
+    "Existing application": "Existing application",
+    "enteredLate": "entered on {{date}} by {{user}}",
+    "byUser": "by {{user}}",
+    "paidOn": "Rs {{amount}} received on {{date}}",
+    "receiptNo": "receipt {{number}}",
+    "dueAtApproval": "Rs {{amount}}, to pay at approval",
+    "Refund": "Refund",
+    "someoneElseDecides": "You entered this application, so a different person must approve or refuse it.",
+    "Apply again": "Apply again",
+    "Enter an existing application": "Enter an existing application",
+    "Earlier applications": "Earlier applications",
+    "Reason or note": "Reason or note",
+    "MEMBERSHIP": "MEMBERSHIP",
+    "Citizenship": "Citizenship",
+    "Member since": "Member since",
+    "Kitta held": "Kitta held",
+    "joinedBeforeApplications": "Joined before membership applications were recorded, so there is no application to show.",
+    "activeWithoutShares": "Active, but holds no shares: under the share-first rule this person is not a member yet. Sell them shares, or close them.",
+    "noApplicationOnRecord": "No membership application on record."
   },
   "error.msg.membership.share.first": "A person becomes a member by buying shares. Take a membership application; approving it activates the member and buys the shares together.",
   "error.msg.membership.application.pending": "This person has a membership application waiting for the board. Approve or refuse the application instead, so the decision and its reason are kept.",
