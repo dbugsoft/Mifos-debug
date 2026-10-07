@@ -7,99 +7,178 @@
 -->
 
 <form [formGroup]="form" class="shares-step">
-  <div class="layout-row-wrap gap-2percent responsive-column">
-    <mat-form-field class="flex-48">
-      <mat-label>{{ 'membership.Share product' | translate }}</mat-label>
-      <mat-select formControlName="shareProductId" required>
-        @for (option of template.shareProducts; track option.id) {
-          <mat-option [value]="option.id">
-            {{ option.name }} · {{ 'membership.Rs' | translate }} {{ option.unitPrice | formatNumber }}
-            {{ 'membership.a kitta' | translate }}
-          </mat-option>
+  @if (mode === 'existing') {
+    <section>
+      <p class="existing">
+        <fa-icon icon="info-circle" class="m-r-10"></fa-icon>{{ 'membership.existingExplanation' | translate }}
+      </p>
+      <div class="row">
+        <mifosx-nepali-date-input
+          class="half"
+          [label]="'membership.Application date' | translate"
+          formControlName="submittedOn"
+          [maxDate]="today"
+        />
+      </div>
+    </section>
+  }
+
+  <section>
+    <h4>{{ 'membership.Shares' | translate }}</h4>
+    <div class="row">
+      <div class="half fields">
+        @if (template.shareProducts.length > 1) {
+          <mat-form-field>
+            <mat-label>{{ 'membership.Share product' | translate }}</mat-label>
+            <mat-select formControlName="shareProductId" required>
+              @for (option of template.shareProducts; track option.id) {
+                <mat-option [value]="option.id">{{ option.name }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
         }
-      </mat-select>
-      @if (product(); as p) {
-        <mat-hint>
-          {{ 'membership.kitta per member' | translate: { min: minimum(), max: maximum() ?? '—' } }}
-          @if (p.charges.length) {
-            · {{ 'membership.charges' | translate }}:
-            @for (charge of p.charges; track charge.id; let last = $last) {
-              {{ charge.name }} {{ 'membership.Rs' | translate }} {{ charge.amount | formatNumber
-              }}{{ last ? '' : ', ' }}
-            }
+        <mat-form-field subscriptSizing="dynamic">
+          <mat-label>{{ 'membership.Kitta' | translate }}</mat-label>
+          <input matInput type="number" min="1" step="1" formControlName="kitta" required />
+          @if (product(); as p) {
+            <mat-hint>
+              {{ p.name }} · {{ 'membership.Rs' | translate }} {{ p.unitPrice | formatNumber }}
+              {{ 'membership.a kitta' | translate }} ·
+              {{ 'membership.kitta per member' | translate: { min: minimum(), max: maximum() ?? '—' } }}
+            </mat-hint>
           }
-        </mat-hint>
-      }
-    </mat-form-field>
+          @if (form.controls.kitta.hasError('required')) {
+            <mat-error>{{ 'membership.errors.kittaRequired' | translate }}</mat-error>
+          }
+          @if (form.controls.kitta.hasError('atLeastOne')) {
+            <mat-error>{{ 'membership.errors.atLeastOne' | translate }}</mat-error>
+          }
+          @if (form.controls.kitta.hasError('belowMinimum')) {
+            <mat-error>{{
+              'membership.errors.belowMinimum' | translate: form.controls.kitta.errors?.['belowMinimum']
+            }}</mat-error>
+          }
+          @if (form.controls.kitta.hasError('aboveMaximum')) {
+            <mat-error>{{
+              'membership.errors.aboveMaximum' | translate: form.controls.kitta.errors?.['aboveMaximum']
+            }}</mat-error>
+          }
+        </mat-form-field>
+      </div>
 
-    <mat-form-field class="flex-48" subscriptSizing="dynamic">
-      <mat-label>{{ 'membership.Kitta' | translate }}</mat-label>
-      <input matInput type="number" min="1" step="1" formControlName="kitta" required />
-      @if (form.controls.kitta.hasError('required')) {
-        <mat-error>{{ 'membership.errors.kittaRequired' | translate }}</mat-error>
-      }
-      @if (form.controls.kitta.hasError('atLeastOne')) {
-        <mat-error>{{ 'membership.errors.atLeastOne' | translate }}</mat-error>
-      }
-      @if (form.controls.kitta.hasError('belowMinimum')) {
-        <mat-error>{{
-          'membership.errors.belowMinimum' | translate: form.controls.kitta.errors?.['belowMinimum']
-        }}</mat-error>
-      }
-      @if (form.controls.kitta.hasError('aboveMaximum')) {
-        <mat-error>{{
-          'membership.errors.aboveMaximum' | translate: form.controls.kitta.errors?.['aboveMaximum']
-        }}</mat-error>
-      }
-    </mat-form-field>
+      <div class="half total" aria-live="polite">
+        @if (choice(); as c) {
+          <div class="line">
+            <span
+              >{{ c.kitta }} {{ 'membership.kitta' | translate }} × {{ 'membership.Rs' | translate }}
+              {{ c.product.unitPrice | formatNumber }}</span
+            >
+            <span>{{ 'membership.Rs' | translate }} {{ c.shareAmount | formatNumber }}</span>
+          </div>
+          @for (charge of c.charges; track charge.name) {
+            <div class="line">
+              <span>{{ charge.name }}</span
+              ><span>{{ 'membership.Rs' | translate }} {{ charge.amount | formatNumber }}</span>
+            </div>
+          }
+          <div class="line sum">
+            <span>{{ (c.paidNow ? 'membership.To pay now' : 'membership.To pay at approval') | translate }}</span>
+            <span>{{ 'membership.Rs' | translate }} {{ c.total | formatNumber }}</span>
+          </div>
+        } @else {
+          <span class="muted">{{ 'membership.Enter the kitta to see the total' | translate }}</span>
+        }
+      </div>
+    </div>
+  </section>
 
-    <mat-form-field class="flex-48">
-      <mat-label>{{ 'membership.Note' | translate }}</mat-label>
-      <input
+  @if (paidNow) {
+    <section>
+      <h4>{{ 'membership.Payment' | translate }}</h4>
+      <div class="row">
+        <mat-form-field class="half">
+          <mat-label>{{ 'membership.Amount received (cash)' | translate }}</mat-label>
+          <input matInput type="number" min="0" step="0.01" formControlName="amountReceived" required />
+          @if (form.controls.amountReceived.hasError('required')) {
+            <mat-error>{{ 'membership.errors.amountRequired' | translate }}</mat-error>
+          }
+          @if (form.controls.amountReceived.hasError('notTotal')) {
+            <mat-error>{{
+              'membership.errors.amountNotTotal'
+                | translate: { total: (form.controls.amountReceived.errors?.['notTotal'].total | formatNumber) }
+            }}</mat-error>
+          }
+        </mat-form-field>
+        <mat-form-field class="half">
+          <mat-label>{{ 'membership.Receipt number' | translate }}</mat-label>
+          <input matInput formControlName="receiptNumber" maxlength="50" />
+          <mat-hint>{{ 'membership.receiptHint' | translate }}</mat-hint>
+        </mat-form-field>
+      </div>
+    </section>
+  }
+
+  <section>
+    <h4>
+      {{ 'membership.Nominee' | translate }}
+      @if (!nomineeRequired) {
+        <span class="optional">({{ 'membership.optional' | translate }})</span>
+      }
+    </h4>
+    @if (hasNominee) {
+      <p class="muted">{{ 'membership.nomineeOnRecord' | translate }}</p>
+    }
+    <div class="row">
+      <mat-form-field class="third">
+        <mat-label>{{ 'membership.Nominee name' | translate }}</mat-label>
+        <input matInput formControlName="nomineeName" maxlength="200" [required]="nomineeRequired" />
+        @if (form.controls.nomineeName.hasError('required')) {
+          <mat-error>{{ 'membership.errors.nomineeRequired' | translate }}</mat-error>
+        }
+      </mat-form-field>
+      <mat-form-field class="third">
+        <mat-label>{{ 'membership.Relationship' | translate }}</mat-label>
+        <input matInput formControlName="nomineeRelationship" maxlength="100" [required]="nomineeRequired" />
+        @if (form.controls.nomineeRelationship.hasError('required')) {
+          <mat-error>{{ 'membership.errors.relationshipRequired' | translate }}</mat-error>
+        }
+      </mat-form-field>
+      <mat-form-field class="third">
+        <mat-label>{{ 'membership.Nominee phone' | translate }}</mat-label>
+        <input matInput formControlName="nomineeMobileNo" maxlength="50" />
+      </mat-form-field>
+    </div>
+  </section>
+
+  <section>
+    <h4>
+      {{ 'membership.Note' | translate }} <span class="optional">({{ 'membership.optional' | translate }})</span>
+    </h4>
+    <mat-form-field class="full">
+      <textarea
         matInput
         formControlName="note"
+        rows="2"
         maxlength="1000"
         [placeholder]="'membership.notePlaceholder' | translate"
-      />
+      ></textarea>
     </mat-form-field>
+  </section>
 
-    <div class="flex-48 total" aria-live="polite">
-      @if (choice(); as c) {
-        <div class="row">
-          <span
-            >{{ c.kitta }} {{ 'membership.kitta' | translate }} × {{ 'membership.Rs' | translate }}
-            {{ c.product.unitPrice | formatNumber }}</span
-          >
-          <span>{{ 'membership.Rs' | translate }} {{ c.shareAmount | formatNumber }}</span>
-        </div>
-        @for (charge of c.charges; track charge.name) {
-          <div class="row">
-            <span>{{ charge.name }}</span
-            ><span>{{ 'membership.Rs' | translate }} {{ charge.amount | formatNumber }}</span>
-          </div>
-        }
-        <div class="row sum">
-          <span>{{ 'membership.To pay at approval' | translate }}</span>
-          <span>{{ 'membership.Rs' | translate }} {{ c.total | formatNumber }}</span>
-        </div>
-      } @else {
-        <span class="muted">{{ 'membership.Enter the kitta to see the total' | translate }}</span>
-      }
+  @if (!embedded) {
+    <p class="info">
+      <fa-icon icon="info-circle" class="m-r-10"></fa-icon>{{ 'membership.pendingExplanation' | translate }}
+    </p>
+
+    <div class="layout-row align-center gap-2percent margin-t responsive-column">
+      <button mat-raised-button matStepperPrevious type="button">
+        <fa-icon icon="arrow-left" class="m-r-10"></fa-icon>
+        {{ 'labels.buttons.Previous' | translate }}
+      </button>
+      <button mat-raised-button color="primary" matStepperNext type="button" [disabled]="!valid()">
+        {{ 'labels.buttons.Next' | translate }}
+        <fa-icon icon="arrow-right" class="m-l-10"></fa-icon>
+      </button>
     </div>
-  </div>
-
-  <p class="info">
-    <fa-icon icon="info-circle" class="m-r-10"></fa-icon>{{ 'membership.pendingExplanation' | translate }}
-  </p>
-
-  <div class="layout-row align-center gap-2percent margin-t responsive-column">
-    <button mat-raised-button matStepperPrevious type="button">
-      <fa-icon icon="arrow-left" class="m-r-10"></fa-icon>
-      {{ 'labels.buttons.Previous' | translate }}
-    </button>
-    <button mat-raised-button color="primary" matStepperNext type="button" [disabled]="!valid()">
-      {{ 'labels.buttons.Next' | translate }}
-      <fa-icon icon="arrow-right" class="m-l-10"></fa-icon>
-    </button>
-  </div>
+  }
 </form>

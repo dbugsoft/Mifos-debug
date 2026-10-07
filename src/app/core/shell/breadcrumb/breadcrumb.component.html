@@ -9,9 +9,9 @@
 <nav class="breadcrumb-wrapper" aria-label="Page navigation">
   <div class="page-header">
     @if (backUrl) {
-      <a mat-stroked-button color="primary" class="breadcrumb-back" [routerLink]="backUrl">
+      <a class="breadcrumb-back" [routerLink]="backUrl">
         <mat-icon>arrow_back</mat-icon>
-        {{ 'labels.buttons.Back to Name' | translate: { name: getTranslate(backLabel) } }}
+        <span>{{ 'labels.buttons.Back to Name' | translate: { name: getTranslate(backLabel) } }}</span>
       </a>
     }
     <div class="title-row">

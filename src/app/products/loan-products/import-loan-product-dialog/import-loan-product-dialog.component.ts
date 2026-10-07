@@ -15,7 +15,9 @@ import {
   MatDialogContent
 } from '@angular/material/dialog';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
-import { FileUploadComponent } from '../../../shared/file-upload/file-upload.component';
+import { MatIcon } from '@angular/material/icon';
+import { MatIconButton } from '@angular/material/button';
+import { MatTooltip } from '@angular/material/tooltip';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 @Component({
@@ -26,7 +28,9 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     ...STANDALONE_SHARED_IMPORTS,
     MatDialogTitle,
     MatDialogContent,
-    FileUploadComponent,
+    MatIcon,
+    MatIconButton,
+    MatTooltip,
     MatDialogActions,
     MatDialogClose
   ],
@@ -39,6 +43,12 @@ export class ImportLoanProductDialogComponent implements OnInit {
 
   /** Import Loan Product form. */
   importLoanProductForm: UntypedFormGroup;
+  /** Whether a file is being dragged over the drop zone. */
+  isDragging = false;
+
+  get file(): File | null {
+    return this.importLoanProductForm.get('file').value || null;
+  }
 
   ngOnInit() {
     this.createImportLoanProductForm();
@@ -58,11 +68,32 @@ export class ImportLoanProductDialogComponent implements OnInit {
 
   /**
    * Sets file form control value.
-   * @param {any} $event file change event.
+   * @param {Event} $event file input change event.
    */
-  onFileSelect($event: any) {
-    if ($event.target.files.length > 0) {
-      const file = $event.target.files[0];
+  onFileSelect($event: Event) {
+    const input = $event.target as HTMLInputElement;
+    this.setFile(input.files?.[0]);
+    input.value = '';
+  }
+
+  onDragOver($event: DragEvent) {
+    $event.preventDefault();
+    this.isDragging = true;
+  }
+
+  onDrop($event: DragEvent) {
+    $event.preventDefault();
+    this.isDragging = false;
+    this.setFile($event.dataTransfer?.files?.[0]);
+  }
+
+  clearFile() {
+    this.importLoanProductForm.get('file').setValue('');
+  }
+
+  /** Only .json files are accepted; dropped files bypass the input's accept filter. */
+  private setFile(file?: File) {
+    if (file && file.name.toLowerCase().endsWith('.json')) {
       this.importLoanProductForm.get('file').setValue(file);
     }
   }

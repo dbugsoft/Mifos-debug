@@ -15,6 +15,7 @@ import { NotFoundComponent } from './not-found/not-found.component';
 import { CallbackComponent } from './zitadel/callback/callback.component';
 import { UnconfiguredHostComponent } from './unconfigured-host/unconfigured-host.component';
 import { unmappedHostGuard } from './unconfigured-host/unmapped-host.guard';
+import { Route } from './core/route/route.service';
 
 /**
  * App routing module.
@@ -108,6 +109,23 @@ const routes: Routes = [
     path: 'appusers',
     loadChildren: () => import('./users/users.module').then((m) => m.UsersModule)
   },
+  Route.withShell([
+    {
+      path: 'loan-calculator',
+      loadComponent: () =>
+        import('./loans/loan-calculator/loan-calculator.component').then((m) => m.LoanCalculatorComponent),
+      data: { title: 'Loan Calculator', breadcrumb: 'Loan Calculator' }
+    },
+    {
+      path: 'loan-aging',
+      loadComponent: () => import('./reports/loan-aging/loan-aging.component').then((m) => m.LoanAgingComponent),
+      data: {
+        title: 'Loan Aging',
+        breadcrumb: 'Loan Aging',
+        parentBreadcrumb: { label: 'Reports', url: '/reports-overview' }
+      }
+    }
+  ]),
   {
     path: 'callback',
     component: CallbackComponent

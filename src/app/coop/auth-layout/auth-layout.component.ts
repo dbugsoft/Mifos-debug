@@ -26,7 +26,7 @@ export class AuthLayoutComponent {
    */
   logoPath = 'assets/images/debug-bg.png';
 
-  @Input() title = 'Welcome to CoIMS';
+  @Input() title = 'Welcome to COFMIS';
 
   @Input()
   subtitle =

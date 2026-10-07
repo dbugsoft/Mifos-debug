@@ -6,53 +6,67 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-.tab-container {
-  padding: 1%;
-  margin: 1%;
+@use '../member-tab' as *;
 
-  h3 {
-    margin: 1% auto;
+@include member-tab;
+
+// Five headline figures as tiles.
+.performance-history {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(168px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 16px;
+    border: 1px solid rgb(127 127 127 / 20%);
+    border-left: 4px solid var(--md-sys-color-primary, #1074b9);
+    border-radius: 8px;
   }
 
-  .performance-history-container {
-    border: 1px solid;
-    padding: 1%;
+  .stat-label {
+    font-size: 0.8rem;
+    opacity: 0.7;
   }
 
-  table {
-    width: 100%;
-
-    td:hover {
-      cursor: pointer;
-    }
-
-    .account-action-button {
-      min-width: 26px;
-      padding: 0 6px;
-      margin: 4px;
-      line-height: 25px;
-    }
-
-    .select-row:hover {
-      cursor: pointer;
-    }
+  .stat-value {
+    font-size: 1.25rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
   }
 }
 
+// Section title left, its buttons flush with the right edge of the tiles and tables below.
 .heading-content {
-  display: flex; /* Use flexbox for alignment */
-  align-items: center; /* Align items vertically */
-  justify-content: space-between; /* Space out title and buttons */
-  margin-bottom: 1%;
-  margin-top: 1%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+
+  // The markup splits the row into two 50% columns with a bottom margin and a floated button:
+  // let each take its own width instead.
+  > .layout-column {
+    flex: 0 1 auto;
+    margin: 0;
+  }
+
+  .f-right {
+    float: none;
+    margin: 0;
+  }
 }
 
 .heading-name {
-  margin: 0; /* Reset margin to avoid misalignment */
+  margin: 0;
 }
 
 .layout-row.align-flex-end {
   display: flex;
-  align-items: center; /* Ensure buttons are vertically aligned */
-  gap: 0.5rem; /* Add spacing between buttons if needed */
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
 }

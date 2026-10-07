@@ -153,7 +153,10 @@ export class EditClientComponent implements OnInit {
       accountNo: [{ value: '', disabled: true }],
       externalId: [''],
       genderId: [''],
-      mobileNo: [''],
+      mobileNo: [
+        '',
+        Validators.required
+      ],
       emailAddress: [
         '',
         Validators.email

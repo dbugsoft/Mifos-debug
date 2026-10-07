@@ -62,7 +62,8 @@ const reportsCards: MenuCard[] = [
       'Accounting'
     ],
     permission: 'READ_REPORT'
-  }
+  },
+  { label: 'labels.menus.Loan Aging', icon: 'clock', path: ['/loan-aging'], permission: 'READ_LOAN' }
 ];
 
 /** Cards for the Admin landing page. */
@@ -82,7 +83,7 @@ const routes: Routes = [
   Route.withShell([
     {
       path: '',
-      redirectTo: '/member-management',
+      redirectTo: '/home',
       pathMatch: 'full'
     },
     {

@@ -13,7 +13,7 @@
     </div>
     <div class="action-button m-b-10 gap-25px">
       <button
-        mat-raised-button
+        mat-stroked-button
         color="primary"
         (click)="addIdentifier()"
         *mifosxHasPermission="'CREATE_CLIENTIDENTIFIER'"
@@ -29,10 +29,18 @@
   }
 
   <div class="table-container">
-    <table mat-table #identifiersTable [dataSource]="clientIdentities">
-      <ng-container matColumnDef="id">
-        <th mat-header-cell *matHeaderCellDef>{{ 'labels.inputs.Id' | translate }}</th>
-        <td mat-cell *matCellDef="let identity">{{ identity.id }}</td>
+    <table mat-table #identifiersTable [dataSource]="clientIdentities" multiTemplateDataRows>
+      <ng-container matColumnDef="sno">
+        <th mat-header-cell *matHeaderCellDef>S.No.</th>
+        <td mat-cell *matCellDef="let identity; let i = dataIndex">
+          <!-- Arrow shows the row opens for more details -->
+          <i
+            class="fa expand-icon"
+            [class.fa-chevron-up]="expandedIdentity === identity"
+            [class.fa-chevron-down]="expandedIdentity !== identity"
+          ></i>
+          {{ i + 1 }}
+        </td>
       </ng-container>
 
       <ng-container matColumnDef="type">
@@ -45,58 +53,69 @@
         <td mat-cell *matCellDef="let identity">{{ identity.documentKey }}</td>
       </ng-container>
 
-      <ng-container matColumnDef="description">
-        <th mat-header-cell *matHeaderCellDef>{{ 'labels.inputs.Description' | translate }}</th>
-        <td mat-cell *matCellDef="let identity">{{ identity.description }}</td>
+      <!-- Empty cell under S.No., so the details start in line with Type -->
+      <ng-container matColumnDef="detailsSpacer">
+        <td mat-cell *matCellDef="let identity"></td>
       </ng-container>
 
-      <ng-container matColumnDef="documents">
-        <th mat-header-cell *matHeaderCellDef>{{ 'labels.inputs.Identity Documents' | translate }}</th>
-        <td mat-cell *matCellDef="let identity">
-          @if (identity.documents?.length) {
-            <div class="document-grid">
-              @for (document of identity.documents; track trackByDocumentId($index, document)) {
-                <div class="document-card">
-                  <div
-                    class="thumb"
-                    [class.clickable]="isPreviewable(document)"
-                    role="button"
-                    tabindex="0"
-                    [attr.aria-label]="('labels.buttons.Preview' | translate) + ': ' + document.name"
-                    (keydown.enter)="isPreviewable(document) && openDocumentPreview(identity, document)"
-                    (keydown.space)="isPreviewable(document) && openDocumentPreview(identity, document)"
-                    (click)="isPreviewable(document) && openDocumentPreview(identity, document)"
-                  >
-                    @if (previewThumbnails[document.id]) {
-                      <img
-                        [src]="previewThumbnails[document.id]"
-                        [alt]="document.name"
-                        [title]="document.name"
-                        loading="lazy"
-                      />
-                    } @else {
-                      <div class="placeholder">
-                        <fa-icon icon="file"></fa-icon>
-                        <span>{{ document.fileName || document.name }}</span>
+      <!-- Description and documents, shown when the row is open -->
+      <ng-container matColumnDef="details">
+        <td mat-cell *matCellDef="let identity" [attr.colspan]="identitiesColumns.length - 1">
+          @if (expandedIdentity === identity) {
+            <dl class="identity-details">
+              <div>
+                <dt>{{ 'labels.inputs.Description' | translate }}</dt>
+                <dd>{{ identity.description || '—' }}</dd>
+              </div>
+            </dl>
+            <div class="identity-documents">
+              <span class="documents-label">{{ 'labels.inputs.Identity Documents' | translate }}</span>
+              @if (identity.documents?.length) {
+                <div class="document-grid">
+                  @for (document of identity.documents; track trackByDocumentId($index, document)) {
+                    <div class="document-card">
+                      <div
+                        class="thumb"
+                        [class.clickable]="isPreviewable(document)"
+                        role="button"
+                        tabindex="0"
+                        [attr.aria-label]="('labels.buttons.Preview' | translate) + ': ' + document.name"
+                        (keydown.enter)="isPreviewable(document) && openDocumentPreview(identity, document)"
+                        (keydown.space)="isPreviewable(document) && openDocumentPreview(identity, document)"
+                        (click)="isPreviewable(document) && openDocumentPreview(identity, document)"
+                      >
+                        @if (previewThumbnails[document.id]) {
+                          <img
+                            [src]="previewThumbnails[document.id]"
+                            [alt]="document.name"
+                            [title]="document.name"
+                            loading="lazy"
+                          />
+                        } @else {
+                          <div class="placeholder">
+                            <fa-icon icon="file"></fa-icon>
+                            <span>{{ document.fileName || document.name }}</span>
+                          </div>
+                        }
+                        @if (isPreviewable(document)) {
+                          <div class="preview-overlay">
+                            <fa-icon icon="eye"></fa-icon>
+                          </div>
+                        }
                       </div>
-                    }
-                    @if (isPreviewable(document)) {
-                      <div class="preview-overlay">
-                        <fa-icon icon="eye"></fa-icon>
+                      <div class="card-body">
+                        <div class="title">{{ document.name }}</div>
+                        @if (document.fileName) {
+                          <div class="meta">{{ document.fileName }}</div>
+                        }
                       </div>
-                    }
-                  </div>
-                  <div class="card-body">
-                    <div class="title">{{ document.name }}</div>
-                    @if (document.fileName) {
-                      <div class="meta">{{ document.fileName }}</div>
-                    }
-                  </div>
+                    </div>
+                  }
                 </div>
+              } @else {
+                <span class="muted">{{ 'labels.text.NoDocuments' | translate }}</span>
               }
             </div>
-          } @else {
-            <span class="muted">{{ 'labels.text.NoDocuments' | translate }}</span>
           }
         </td>
       </ng-container>
@@ -119,7 +138,13 @@
       <ng-container matColumnDef="status">
         <th mat-header-cell *matHeaderCellDef>{{ 'labels.inputs.Status' | translate }}</th>
         <td mat-cell *matCellDef="let identity">
-          {{ identity.status === 'clientIdentifierStatusType.active' ? 'active' : 'inactive' }}
+          <span
+            class="status-chip"
+            [class.status-active]="identity.status === 'clientIdentifierStatusType.active'"
+            [class.status-inactive]="identity.status !== 'clientIdentifierStatusType.active'"
+          >
+            {{ identity.status === 'clientIdentifierStatusType.active' ? 'active' : 'inactive' }}
+          </span>
           @if (isExpired(identity)) {
             <span class="identity-expired">{{ 'bsDates.Expired' | translate }}</span>
           }
@@ -128,28 +153,22 @@
 
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef>{{ 'labels.inputs.Actions' | translate }}</th>
-        <td mat-cell *matCellDef="let identity; let i = index">
+        <td mat-cell *matCellDef="let identity; let i = dataIndex">
           <button
-            class="identity-action-button"
+            class="account-action-button"
             mat-raised-button
-            color="primary"
-            [title]="'labels.buttons.Edit' | translate"
-            [attr.aria-label]="'labels.buttons.Edit' | translate"
-            (click)="editIdentifier(identity)"
+            (click)="$event.stopPropagation(); editIdentifier(identity)"
             *mifosxHasPermission="'UPDATE_CLIENTIDENTIFIER'"
           >
-            <fa-icon icon="edit"></fa-icon>
+            <i class="fa fa-edit"></i><span class="action-label">{{ 'labels.buttons.Edit' | translate }}</span>
           </button>
           <button
-            class="identity-action-button"
+            class="account-action-button delete-button"
             mat-raised-button
-            color="warn"
-            [title]="'labels.buttons.Delete' | translate"
-            [attr.aria-label]="'labels.buttons.Delete' | translate"
-            (click)="deleteIdentifier(identity.clientId, identity.id, i)"
+            (click)="$event.stopPropagation(); deleteIdentifier(identity.clientId, identity.id, i)"
             *mifosxHasPermission="'DELETE_CLIENTIDENTIFIER'"
           >
-            <fa-icon icon="times"></fa-icon>
+            <i class="fa fa-trash"></i><span class="action-label">{{ 'labels.buttons.Delete' | translate }}</span>
           </button>
         </td>
       </ng-container>
@@ -167,7 +186,16 @@
         mat-row
         *matRowDef="let row; columns: identitiesColumns"
         [id]="'identity-row-' + row.id"
+        class="identity-row"
+        [class.open]="expandedIdentity === row"
         [class.highlighted-row]="row.id === highlightedIdentityId"
+        (click)="toggleIdentity(row)"
+      ></tr>
+      <tr
+        mat-row
+        *matRowDef="let row; columns: ['detailsSpacer', 'details']"
+        class="details-row"
+        [class.open]="expandedIdentity === row"
       ></tr>
       @if (clientIdentities?.length === 0) {
         <tr mat-footer-row *matFooterRowDef="['no-data']"></tr>

@@ -35,7 +35,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { MatIcon } from '@angular/material/icon';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { formatTabLabel } from 'app/shared/utils/format-tab-label.util';
-import { isSelfLink, normalizeBreadcrumbUrl } from 'app/shared/utils/breadcrumb-url.util';
+import { normalizeBreadcrumbUrl } from 'app/shared/utils/breadcrumb-url.util';
 
 /**
  * Route data property to generate breadcrumb using a static string.
@@ -65,6 +65,13 @@ const routeResolveBreadcrumb = 'routeResolveBreadcrumb';
  * Example- addBreadcrumbLink: false
  */
 const routeAddBreadcrumbLink = 'addBreadcrumbLink';
+/**
+ * Route data property to put a parent page crumb before this route's own, for sections whose
+ * landing page lives in another module. Read from the route config only, so children do not inherit it.
+ *
+ * Example- parentBreadcrumb: { label: 'Member Management', url: '/member-management' }
+ */
+const routeParentBreadcrumb = 'parentBreadcrumb';
 /**
  * Route data property to hide the breadcrumb trail (the `home › ...` line)
  * while still showing the page title. Useful for top-level landing pages.
@@ -253,8 +260,14 @@ export class BreadcrumbComponent implements AfterViewInit {
 
             const breadcrumb: Breadcrumb = {
               label: breadcrumbLabel,
-              url: url
+              url: url,
+              hostsPage: !!(route.routeConfig?.component || route.routeConfig?.loadComponent)
             };
+
+            const parentBreadcrumb: Breadcrumb | undefined = route.routeConfig?.data?.[routeParentBreadcrumb];
+            if (parentBreadcrumb) {
+              this.breadcrumbs.push(parentBreadcrumb);
+            }
 
             if (breadcrumbLabel) {
               this.breadcrumbs.push(breadcrumb);
@@ -274,7 +287,9 @@ export class BreadcrumbComponent implements AfterViewInit {
     const currentUrl = this.router.url.split('?')[0];
     const parents = this.breadcrumbs
       .slice(0, -1)
-      .filter((crumb) => typeof crumb.url === 'string' && crumb.url && !isSelfLink(crumb.url, currentUrl));
+      // Not the page itself: the same url, or a view that shows this page inside it (a tab). A sibling
+      // page such as a member's Edit keeps the member as its parent.
+      .filter((crumb) => typeof crumb.url === 'string' && crumb.url && crumb.url !== currentUrl && !crumb.hostsPage);
     const parent = parents.length ? parents[parents.length - 1] : null;
     this.backUrl = parent ? parent.url : null;
     this.backLabel = parent ? parent.label : '';

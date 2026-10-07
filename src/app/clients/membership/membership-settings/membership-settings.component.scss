@@ -22,6 +22,33 @@
   margin-top: 20px;
 }
 
+.rules-title {
+  margin: 28px 0 12px;
+}
+
+.deadline {
+  display: flex;
+  gap: 12px;
+
+  mat-form-field {
+    flex: 1;
+  }
+
+  .days {
+    flex: 0 0 110px;
+  }
+}
+
+.warning {
+  display: flex;
+  align-items: center;
+  margin: 16px 0 0;
+  padding: 10px 14px;
+  border-radius: 6px;
+  background: #fff1dc;
+  color: #7a4500;
+}
+
 .cleanup {
   margin-top: 32px;
 
@@ -74,7 +101,7 @@
 
   td {
     padding: 10px 16px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    border-bottom: 1px solid rgb(0 0 0 / 12%);
   }
 
   .empty {
@@ -82,7 +109,7 @@
   }
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .grid {
     grid-template-columns: minmax(0, 1fr);
   }

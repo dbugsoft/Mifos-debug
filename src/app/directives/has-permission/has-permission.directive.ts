@@ -27,6 +27,9 @@ export class HasPermissionDirective {
   /** User Permissions */
   private userPermissions: any[];
 
+  /** Whether the template is shown; null until the first permission arrives. */
+  private shown: boolean | null = null;
+
   /** RBAC Feature Flag */
   private rbacEnabled: boolean = environment.productionModeEnableRBAC;
 
@@ -49,10 +52,15 @@ export class HasPermissionDirective {
     if (typeof permission !== 'string' && !Array.isArray(permission)) {
       throw new Error('hasPermission value must be a string or an array of strings');
     }
-    /** Clear the template beforehand to prevent overlap OnChanges. */
+    const allowed = this.hasPermission(permission);
+    // A new but equal array (e.g. computed in a template) must not rebuild the view and lose its state.
+    if (allowed === this.shown) {
+      return;
+    }
+    this.shown = allowed;
     this.viewContainer.clear();
     /** Shows Template if user has permission */
-    if (this.hasPermission(permission)) {
+    if (allowed) {
       this.viewContainer.createEmbeddedView(this.templateRef);
     }
   }

@@ -16,7 +16,7 @@ import { ActivatedRoute } from '@angular/router';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { TranslateService } from '@ngx-translate/core';
-import { filter, switchMap } from 'rxjs';
+import { filter, Subscription, switchMap } from 'rxjs';
 
 import { ClientActionNotifierService } from 'app/clients/clients-view/client-actions/client-action-notifier.service';
 import { DeleteDialogComponent } from 'app/shared/delete-dialog/delete-dialog.component';
@@ -69,7 +69,9 @@ export class MemberAddressTabComponent implements OnInit {
   private readonly translateService = inject(TranslateService);
   private readonly destroyRef = inject(DestroyRef);
 
-  readonly clientId = this.route.parent?.snapshot.paramMap.get('clientId') ?? '';
+  /** Follows the address: Angular reuses this tab when only the member id changes (Back/Forward). */
+  clientId = '';
+  private loading?: Subscription;
 
   readonly addresses = signal<MemberAddress[] | null>(null);
   readonly loadFailed = signal(false);
@@ -96,12 +98,17 @@ export class MemberAddressTabComponent implements OnInit {
   ]);
 
   ngOnInit(): void {
-    this.load();
+    this.route.parent?.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
+      this.clientId = params.get('clientId') ?? '';
+      this.addresses.set(null);
+      this.load();
+    });
   }
 
   load(): void {
     this.loadFailed.set(false);
-    this.addressService
+    this.loading?.unsubscribe();
+    this.loading = this.addressService
       .getAddresses(this.clientId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({

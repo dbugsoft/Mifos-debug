@@ -18,14 +18,76 @@
   font-size: 0.875rem;
 }
 
-// Issue and expiry dates side by side, stacked on a phone (fineract-dbug ADR 0020)
-.document-dates {
-  display: flex;
-  flex-wrap: wrap;
+// Title: a little bigger, centred, in the app's blue (through Material's own title tokens).
+h1.mat-mdc-dialog-title {
+  --mat-dialog-subhead-color: var(--md-sys-color-primary, #1074b9);
+  --mat-dialog-subhead-size: 1.25rem;
+  --mat-dialog-subhead-weight: 600;
+  --mat-dialog-subhead-line-height: 1.75rem;
+
+  text-align: center;
+}
+
+.upload-body {
+  padding: 0 24px;
+}
+
+// A 24-column grid: each field spans what its content needs, and rows add up to 24 so the edges
+// line up. Identity: document type 9, status 6, document key 9 | description | issue and expiry
+// date 12 each (BS date, switch and AD date on one line) | file. Document: file name 9,
+// description 15 | the dates | file. One column on a phone.
+:host ::ng-deep .upload-form {
+  display: grid;
+  grid-template-columns: repeat(24, minmax(0, 1fr));
   gap: 0 16px;
 
-  mifosx-nepali-date-input {
-    flex: 1 1 220px;
+  > mat-form-field,
+  > mifosx-file-upload,
+  > .server-error-banner,
+  > mat-dialog-actions,
+  .document-dates > mifosx-nepali-date-input {
+    grid-column: 1 / -1;
+    min-width: 0;
+  }
+
+  > mat-form-field:has([formcontrolname='documentTypeId']),
+  > mat-form-field:has([formcontrolname='documentKey']) {
+    grid-column: span 9;
+  }
+
+  > mat-form-field:has([formcontrolname='status']) {
+    grid-column: span 6;
+  }
+
+  > mat-form-field:has([formcontrolname='fileName']) {
+    grid-column: span 9;
+  }
+
+  // Beside the file name in a document upload; a full row for an identity.
+  > mat-form-field:has([formcontrolname='fileName']) ~ mat-form-field:has([formcontrolname='description']) {
+    grid-column: span 15;
+  }
+
+  // The two dates' wrapper steps aside so they sit in the grid themselves, side by side.
+  .document-dates {
+    display: contents;
+
+    > mifosx-nepali-date-input {
+      grid-column: span 12;
+    }
+  }
+
+  .document-dates__error {
+    grid-column: 1 / -1;
+  }
+
+  @media (width <= 768px) {
+    grid-template-columns: 1fr;
+
+    > mat-form-field,
+    .document-dates > mifosx-nepali-date-input {
+      grid-column: 1 / -1 !important;
+    }
   }
 }
 

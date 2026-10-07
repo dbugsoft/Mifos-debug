@@ -132,7 +132,8 @@
     }
 
     <mifosx-nepali-date-input
-      class="flex-13"
+      class="bs-date"
+      [inline]="true"
       [label]="getDateLabel(createClientForm.value.legalFormId, ['Date of Birth', 'Incorporation Date'])"
       formControlName="dateOfBirth"
       [maxDate]="maxDate"
@@ -163,7 +164,8 @@
           </mat-select>
         </mat-form-field>
         <mifosx-nepali-date-input
-          class="flex-14"
+          class="bs-date"
+          [inline]="true"
           label="Incorporation Validity Till Date"
           formControlName="incorpValidityTillDate"
         />
@@ -208,12 +210,20 @@
       </mat-checkbox>
     }
 
+    <!-- Membership application: the citizenship, with the person's details (fineract-dbug ADR 0035) -->
+    @if (membershipMode) {
+      <mifosx-membership-citizenship class="flex-98"></mifosx-membership-citizenship>
+    }
+
     <mat-divider class="flex-98"></mat-divider>
 
     <!-- Row 3: Mobile No, Email Address, Member Type, Member Classification -->
     <mat-form-field class="flex-11">
       <mat-label>{{ 'labels.inputs.Mobile No' | translate }}</mat-label>
-      <input matInput type="text" formControlName="mobileNo" />
+      <input matInput type="text" formControlName="mobileNo" required />
+      @if (createClientForm.controls.mobileNo.hasError('required')) {
+        <mat-error>{{ 'membership.errors.phoneRequired' | translate }}</mat-error>
+      }
       @if (createClientForm.controls.mobileNo.hasError('pattern')) {
         <mat-error>Mobile number must be exactly 10 digits</mat-error>
       }
@@ -253,7 +263,8 @@
 
     <!-- Row 4: Submitted On, Active?, Activation Date, Open Savings Account?, Savings Product -->
     <mifosx-nepali-date-input
-      class="flex-13"
+      class="bs-date"
+      [inline]="true"
       label="Submitted On"
       formControlName="submittedOnDate"
       [minDate]="minDate"
@@ -267,7 +278,8 @@
 
       @if (createClientForm.contains('activationDate')) {
         <mifosx-nepali-date-input
-          class="flex-13 activation-date"
+          class="bs-date"
+          [inline]="true"
           label="Activation Date"
           formControlName="activationDate"
           [minDate]="createClientForm.value.submittedOnDate"
@@ -301,7 +313,7 @@
   </div>
 
   <div class="layout-row align-center gap-2percent margin-t">
-    <button mat-raised-button color="primary" matStepperNext [disabled]="createClientForm.invalid">
+    <button mat-raised-button color="primary" matStepperNext [disabled]="!valid">
       {{ 'labels.buttons.Next' | translate }}
       <fa-icon icon="arrow-right" class="m-l-10"></fa-icon>
     </button>

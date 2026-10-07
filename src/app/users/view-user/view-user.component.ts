@@ -17,6 +17,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { UsersService } from '../users.service';
 import { LoginStatus, StaffLoginService } from '../staff-login.service';
 import { AlertService } from 'app/core/alert/alert.service';
+import { AuthenticationService } from 'app/core/authentication/authentication.service';
 
 /** Custom Components */
 import { DeleteDialogComponent } from 'app/shared/delete-dialog/delete-dialog.component';
@@ -48,6 +49,7 @@ export class ViewUserComponent {
   private staffLogins = inject(StaffLoginService);
   private alertService = inject(AlertService);
   private translate = inject(TranslateService);
+  private authenticationService = inject(AuthenticationService);
 
   /** User Data. */
   userData: any;
@@ -143,7 +145,7 @@ export class ViewUserComponent {
         const repeatPassword = response.repeatPassword;
         const firstname = this.userData.firstname;
         const data = { password: password, repeatPassword: repeatPassword, firstname: firstname };
-        this.usersService.changePassword(this.userData.id, data).subscribe(() => {
+        this.authenticationService.changePassword(this.userData.id, data).subscribe(() => {
           this.router.navigate(['/appusers']);
         });
       }

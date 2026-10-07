@@ -6,9 +6,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslateService } from '@ngx-translate/core';
@@ -17,11 +19,12 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { ConfirmationDialogComponent } from 'app/shared/confirmation-dialog/confirmation-dialog.component';
 import { AuthenticationService } from 'app/core/authentication/authentication.service';
 import { MembershipService } from '../membership.service';
-import { MembersWithoutShares, MembershipTemplate } from '../membership.models';
+import { MembersWithoutShares, MembershipTemplate, PaymentTaken } from '../membership.models';
 
 /**
- * Membership settings (fineract-dbug ADR 0023): the share-first rule, the board's decision period, the member savings
- * and share products, and the active members who hold no shares, to clear before the rule is switched on.
+ * Membership settings (fineract-dbug ADR 0023 and 0035): the share-first rule, the products, and the rules each
+ * cooperative chooses (decision deadline, a different person to approve, when the money is taken, nominee at joining),
+ * with the active members who hold no shares, to clear before the rule is switched on.
  */
 @Component({
   selector: 'mifosx-membership-settings',
@@ -29,7 +32,8 @@ import { MembersWithoutShares, MembershipTemplate } from '../membership.models';
   styleUrls: ['./membership-settings.component.scss'],
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
-    RouterLink
+    RouterLink,
+    FaIconComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -40,6 +44,7 @@ export class MembershipSettingsComponent implements OnInit {
   private dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
   private translate = inject(TranslateService);
+  private destroyRef = inject(DestroyRef);
 
   readonly template = signal<MembershipTemplate | null>(null);
   readonly withoutShares = signal<MembersWithoutShares | null>(null);
@@ -51,19 +56,37 @@ export class MembershipSettingsComponent implements OnInit {
 
   readonly form = this.formBuilder.group({
     shareFirstEnabled: [false],
+    deadlineOn: [false],
     decisionDays: [
-      35,
+      35 as number | null,
       [
         Validators.required,
         Validators.min(1),
         Validators.max(365)
       ]
     ],
+    separateApprover: [false],
+    paymentTaken: ['AT_APPROVAL' as PaymentTaken],
+    nomineeRequired: [false],
     savingsProductId: [null as number | null],
     shareProductId: [null as number | null]
   });
 
+  private readonly chosenShareProductId = signal<number | null>(null);
+
+  /** The chosen share product has no accounting: share money and fees will not reach the books. */
+  readonly noAccounting = computed(() => {
+    const product = this.template()?.shareProducts.find((p) => p.id === this.chosenShareProductId());
+    return !!product && !product.hasAccounting;
+  });
+
   ngOnInit(): void {
+    this.form.controls.deadlineOn.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((on) => this.toggleDays(!!on));
+    this.form.controls.shareProductId.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((id) => this.chosenShareProductId.set(id ?? null));
     this.load();
   }
 
@@ -73,12 +96,20 @@ export class MembershipSettingsComponent implements OnInit {
     }
     const turningOn = !!this.form.value.shareFirstEnabled && !this.template()?.settings.shareFirstEnabled;
     const count = this.withoutShares()?.count ?? 0;
+    const warnings: string[] = [];
     if (turningOn && count > 0) {
+      warnings.push(this.translate.instant('membership.switchOnWarning', { count }));
+    }
+    if (turningOn && this.noAccounting()) {
+      warnings.push(this.translate.instant('membership.noAccountingWarning'));
+    }
+    if (warnings.length) {
+      warnings.push(this.translate.instant('membership.switchOnAnyway'));
       this.dialog
         .open(ConfirmationDialogComponent, {
           data: {
             heading: this.translate.instant('membership.Switch the rule on'),
-            dialogContext: this.translate.instant('membership.switchOnWarning', { count }),
+            dialogContext: warnings.join(' '),
             type: 'Mild'
           }
         })
@@ -99,7 +130,10 @@ export class MembershipSettingsComponent implements OnInit {
     this.membershipService
       .updateSettings({
         shareFirstEnabled: !!v.shareFirstEnabled,
-        decisionDays: Number(v.decisionDays),
+        decisionDays: v.deadlineOn ? Number(v.decisionDays) : null,
+        separateApprover: !!v.separateApprover,
+        paymentTaken: v.paymentTaken ?? 'AT_APPROVAL',
+        nomineeRequired: !!v.nomineeRequired,
         savingsProductId: v.savingsProductId ?? undefined,
         shareProductId: v.shareProductId ?? undefined
       })
@@ -128,18 +162,34 @@ export class MembershipSettingsComponent implements OnInit {
       ]) => {
         this.template.set(template);
         this.withoutShares.set(withoutShares);
+        const s = template.settings;
         this.form.reset({
-          shareFirstEnabled: template.settings.shareFirstEnabled,
-          decisionDays: template.settings.decisionDays,
-          savingsProductId: template.settings.savingsProductId ?? null,
-          shareProductId: template.settings.shareProductId ?? null
+          shareFirstEnabled: s.shareFirstEnabled,
+          deadlineOn: s.decisionDays != null,
+          decisionDays: s.decisionDays ?? 35,
+          separateApprover: !!s.separateApprover,
+          paymentTaken: s.paymentTaken ?? 'AT_APPROVAL',
+          nomineeRequired: !!s.nomineeRequired,
+          savingsProductId: s.savingsProductId ?? null,
+          shareProductId: s.shareProductId ?? null
         });
         if (this.canUpdate) {
           this.form.enable();
+          this.toggleDays(s.decisionDays != null);
         } else {
           this.form.disable();
         }
       }
     );
+  }
+
+  /** The number of days only counts, and is only checked, while the deadline is on. */
+  private toggleDays(on: boolean): void {
+    const days = this.form.controls.decisionDays;
+    if (on && this.canUpdate) {
+      days.enable({ emitEvent: false });
+    } else {
+      days.disable({ emitEvent: false });
+    }
   }
 }

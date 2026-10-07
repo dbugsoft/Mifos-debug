@@ -41,6 +41,12 @@ $color: #e2e4ec;
   mifosx-content {
     flex: 1;
   }
+
+  // Set by ShellComponent so the page edge lines up with the first toolbar label.
+  mifosx-breadcrumb,
+  mifosx-content {
+    margin-left: var(--page-shift, 0);
+  }
 }
 
 @keyframes move {

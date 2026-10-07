@@ -1,6 +1,7 @@
 ﻿{
   "error.msg.upload.file.too.big": "Faili uliyochagua ni kubwa kuliko kikomo cha MB {{args.0.value}}. Tafadhali chagua faili ndogo zaidi na ujaribu tena.",
-  "APP_NAME": "COIMS",
+  "APP_NAME": "COFMIS",
+  "APP_FULL_NAME": "Cooperative Financial Management & Information System",
   "Logged in as": "Imeingia kama",
   "Remember me": "Nikumbuke",
   "errors": {
@@ -496,6 +497,8 @@
       "Home": "Nyumbani"
     },
     "buttons": {
+      "Photo": "Photo",
+      "Open Module": "Open Module",
       "Accept Transfer": "Kubali Uhamisho",
       "Actions": "Vitendo",
       "Activate": "Amilisha",
@@ -622,6 +625,8 @@
       "Enable": "Wezesha",
       "Expand All": "Panua Yote",
       "Export": "Hamisha",
+      "Export as JSON": "Export as JSON",
+      "Export as PDF": "Export as PDF",
       "Export to File": "Hamisha kwa FILE",
       "Export CSV": "Hamisha CSV",
       "Export XLS": "Hamisha XLS",
@@ -769,7 +774,9 @@
       "DONE": "Imekamilika",
       "Submitting": "Inatuma",
       "OK": "Sawa",
-      "undo_account_transfer": "Futa uhamisho wa akaunti"
+      "undo_account_transfer": "Futa uhamisho wa akaunti",
+      "Calculate": "Calculate",
+      "Share": "Share"
     },
     "catalogs": {
       "Interest payment waiver": "Msamaha wa Malipo ya Riba",
@@ -1563,7 +1570,8 @@
       "identifier id": "kitambulisho",
       "savings-transaction-datatable-tab works": "Savings-transaction-datatable-tab inafanya kazi",
       "successfully select option": "kwa mafanikio. Tafadhali chagua kutoka kwa chaguo zilizo hapa chini ili kuendelea zaidi.",
-      "undo_account_transfer": "Futa uhamisho wa akaunti"
+      "undo_account_transfer": "Futa uhamisho wa akaunti",
+      "Loan Calculator": "Loan Calculator"
     },
     "inputs": {
       "# Remittance": "# Uhawilishaji",
@@ -3094,7 +3102,11 @@
       "s3_secret_key": "s3_ufunguo_wa_siri",
       "task-management component": "sehemu ya usimamizi wa kazi",
       "to": "kwa",
-      "valid": "halali"
+      "valid": "halali",
+      "Member": "Member",
+      "Total Interest": "Total Interest",
+      "Total Repayment": "Total Repayment",
+      "First Repayment": "First Repayment"
     },
     "links": {
       "Community": "Jumuiya",
@@ -3112,6 +3124,17 @@
       "Working with Code": "Kufanya kazi na Kanuni"
     },
     "menus": {
+      "Member Management": "Member Management",
+      "Administration": "Administration",
+      "Collapse Sidebar": "Collapse sidebar",
+      "Collections": "Collections",
+      "Expand Sidebar": "Expand sidebar",
+      "Finance": "Finance",
+      "Home": "Home",
+      "Members": "Members",
+      "Open Menu": "Open menu",
+      "Operations": "Operations",
+      "Overview": "Overview",
       "Unassign Staff": "Batilisha Wafanyikazi",
       "Accounting": "Uhasibu",
       "Account Overview": "Muhtasari wa akaunti",
@@ -3238,7 +3261,9 @@
       "Tasks": "Kazi",
       "Remittances": "Uhawilishaji",
       "Process Remittance": "Chakata uhawilishaji",
-      "Undo Write-off": "Futa Kuandika-mbali"
+      "Undo Write-off": "Futa Kuandika-mbali",
+      "Loan Calculator": "Loan Calculator",
+      "Loan Aging": "Loan Aging"
     },
     "placeholders": {
       "Add new server": "Ongeza seva mpya",
@@ -3251,7 +3276,8 @@
       "Enter last name": "Ingiza jina la mwisho",
       "Enter remittance reference number": "Ingiza nambari ya kumbukumbu ya uhawilishaji",
       "Sender name": "Jina la mtumaji",
-      "Loading vendors...": "Inapakia wauzaji..."
+      "Loading vendors...": "Inapakia wauzaji...",
+      "Search active member": "Search an active member by name or account number"
     },
     "status": {
       "Active": "Inayotumika",
@@ -3300,6 +3326,19 @@
       "undo_account_transfer": "Una uhakika unataka kufuta uhamisho huu wa akaunti?"
     },
     "text": {
+      "Welcome back": "Welcome back, {{name}}!",
+      "Home subtitle": "Manage and monitor your cooperative efficiently with {{app}}.",
+      "Total Members": "Total Members",
+      "Total Savings": "Total Savings",
+      "Loans Outstanding": "Loans Outstanding",
+      "Quick Menu": "Quick Menu",
+      "Home Members Description": "Register members and manage their groups and centers.",
+      "Home Dashboard Description": "Key figures, trends and the work that needs attention.",
+      "Home Collection Sheet Description": "Record a meeting's collections for a group or center.",
+      "Home Accounting Description": "Journal entries, chart of accounts and period closing.",
+      "Home Reports Description": "Run member, loan, savings and accounting reports.",
+      "Home Admin Description": "Users, offices, products and system settings.",
+      "Home Quick Menu Tour": "Shortcuts to the main modules you can use.",
       "A": "A",
       "Ability to manage holidays for individual offices": "Uwezo wa kudhibiti likizo kwa ofisi binafsi ni zana muhimu sana kwa shirika linalotumia maeneo mengi.Tumia chaguo hili kubinafsisha likizo kwa kila ofisi ya shirika lako.",
       "About Us": "Kuhusu Sisi",
@@ -4048,7 +4087,9 @@
       "username": "jina la mtumiaji",
       "withhold tax for this account": "zuio la ushuru kwa akaunti hii",
       "withoutCategory": "Bila Kitengo",
-      "“Maker-Checker” principle requires every tasks": "Kanuni ya \"Mtengenezaji-Kikagua\" inahitaji kila kazi kukamilishwa na watu wawili ili kupunguza uwezekano wa makosa na matumizi mabaya. Mtu mmoja anaanzisha mchakato na wa pili anakamilisha."
+      "“Maker-Checker” principle requires every tasks": "Kanuni ya \"Mtengenezaji-Kikagua\" inahitaji kila kazi kukamilishwa na watu wawili ili kupunguza uwezekano wa makosa na matumizi mabaya. Mtu mmoja anaanzisha mchakato na wa pili anakamilisha.",
+      "Pick a member from the search results": "Pick a member from the search results",
+      "Copied to clipboard": "Copied to clipboard"
     },
     "permissions": {
       "actions": {
@@ -4605,7 +4646,8 @@
     "PENDING": "INAKARIBISHWA",
     "INACTIVE": "HAITUMIKI",
     "Process Remittance": "Chakata uhawilishaji",
-    "Allow full term length for each tranche disbursement": "Inapowezeshwa, kila usambazaji wa tranche utafuata ratiba kamili ya mkopo badala ya kulingana na muda uliobaki. Inapatikana tu kwa aina ya ratiba ya mkopo ya MAENDELEO."
+    "Allow full term length for each tranche disbursement": "Inapowezeshwa, kila usambazaji wa tranche utafuata ratiba kamili ya mkopo badala ya kulingana na muda uliobaki. Inapatikana tu kwa aina ya ratiba ya mkopo ya MAENDELEO.",
+    "Loan Calculator": "Loan repayment calculator"
   },
   "countries": {
     "AF": "Afghanistani",
@@ -5402,6 +5444,29 @@
     },
     "Watch": "Of which on watch"
   },
+  "loanAging": {
+    "Office": "Office",
+    "All offices": "All offices",
+    "Group by": "Group by",
+    "Branch": "Branch",
+    "Loan product": "Loan product",
+    "Loan officer": "Loan officer",
+    "Centre": "Centre",
+    "Download CSV": "Download CSV",
+    "Download PDF": "Download PDF",
+    "as of": "as of",
+    "Loans": "Loans",
+    "loans": "loans",
+    "Outstanding": "Outstanding",
+    "Overdue": "Overdue",
+    "Provision": "Provision",
+    "Total": "Total",
+    "By age band": "Outstanding and overdue by age band",
+    "By loan class": "By loan class",
+    "Loan class": "Loan class",
+    "Provision rate": "Provision rate",
+    "No loans to show": "No loans to show for this office."
+  },
   "membership": {
     "Membership": "Membership",
     "Membership Applications": "Membership Applications",
@@ -5427,7 +5492,18 @@
       "atLeastOne": "At least one kitta (share) must be bought: membership begins with a share purchase.",
       "belowMinimum": "This share product needs at least {{min}} kitta.",
       "aboveMaximum": "This share product allows at most {{max}} kitta per member.",
-      "reasonRequired": "Give the reason for refusing: the applicant must be told why."
+      "reasonRequired": "Give the reason for refusing: the applicant must be told why.",
+      "decisionDays": "Between 1 and 365 days.",
+      "citizenshipRequired": "Enter the citizenship number.",
+      "districtRequired": "Choose the district that issued the citizenship.",
+      "amountRequired": "Enter the amount received.",
+      "amountNotTotal": "The amount received must be the amount due, Rs {{total}}.",
+      "nomineeRequired": "This cooperative needs a nominee at joining.",
+      "relationshipRequired": "Give the nominee's relationship.",
+      "phoneRequired": "The phone number is required.",
+      "confirmMoney": "Confirm the money was received before approving.",
+      "refundRequired": "Enter the amount refunded (0 if nothing is given back).",
+      "refundRange": "Between 0 and Rs {{amount}}."
     },
     "daysLeft": "{{left}} of {{total}} days left",
     "daysOverdue": "{{days}} days overdue",
@@ -5506,7 +5582,76 @@
       "approved": "Approved: the applicant is now a member, with savings and shares.",
       "rejected": "Application refused; the reason is kept.",
       "settingsSaved": "Membership settings saved."
-    }
+    },
+    "shareProductHint": "Its price, minimum kitta and charges apply to every application",
+    "noAccountingWarning": "This share product has no accounting set up: share money and fees will not reach the books.",
+    "switchOnAnyway": "Switch the rule on anyway",
+    "Rules": "Rules",
+    "Decision deadline": "Decision deadline",
+    "deadlineOff": "Off: no countdown",
+    "deadlineOn": "On: decide within a number of days",
+    "deadlineHint": "When off, no countdown or \"overdue\" is shown anywhere",
+    "Days": "Days",
+    "A different person must approve": "A different person must approve",
+    "Off": "Off",
+    "On": "On",
+    "separateApproverHint": "When on, whoever entered an application cannot approve or refuse it",
+    "Payment taken": "Payment taken",
+    "paymentTaken": {
+      "AT_APPROVAL": "At approval",
+      "AT_APPLICATION": "At application"
+    },
+    "paymentTakenHint": "At application: the amount is recorded with the application and refunded if it is refused",
+    "Nominee required at joining": "Nominee required at joining",
+    "existingExplanation": "An application already made on paper: it keeps its original date and still goes through approval.",
+    "Application date": "Application date",
+    "Citizenship number": "Citizenship number",
+    "Issuing district": "District that issued it",
+    "To pay now": "To pay now",
+    "Paid with the application": "Paid with the application",
+    "Payment": "Payment",
+    "Amount received (cash)": "Amount received (cash)",
+    "Receipt number": "Receipt number",
+    "receiptHint": "The number on the paper receipt, if any",
+    "Nominee": "Nominee",
+    "optional": "optional",
+    "nomineeOnRecord": "A nominee is already on record. Fill these in only to change it.",
+    "Nominee name": "Nominee's name",
+    "Relationship": "Relationship",
+    "Nominee phone": "Nominee's phone",
+    "stepBuyShares": "Buy {{kitta}} kitta (Rs {{amount}})",
+    "stepCharge": "Take the {{name}} (Rs {{amount}})",
+    "moneyReceived": "I have received Rs {{amount}} in cash",
+    "alreadyPaid": "Rs {{amount}} was received with the application on {{date}}.",
+    "Approval note": "Approval note",
+    "refundLead": "Rs {{amount}} was received with the application on {{date}}. Record what is given back.",
+    "Amount refunded": "Amount refunded",
+    "Refund receipt number": "Refund receipt number",
+    "applyAgainTitle": "{{name}} applies again",
+    "enterExistingTitle": "Enter {{name}}'s existing application",
+    "applyAgainLead": "A new application on the same record. The earlier ones stay in the history.",
+    "Take the application": "Take the application",
+    "Waiting for a decision": "Waiting for a decision",
+    "Waiting": "Waiting",
+    "Existing application": "Existing application",
+    "enteredLate": "entered on {{date}} by {{user}}",
+    "byUser": "by {{user}}",
+    "paidOn": "Rs {{amount}} received on {{date}}",
+    "receiptNo": "receipt {{number}}",
+    "dueAtApproval": "Rs {{amount}}, to pay at approval",
+    "Refund": "Refund",
+    "someoneElseDecides": "You entered this application, so a different person must approve or refuse it.",
+    "Apply again": "Apply again",
+    "Enter an existing application": "Enter an existing application",
+    "Earlier applications": "Earlier applications",
+    "Reason or note": "Reason or note",
+    "MEMBERSHIP": "MEMBERSHIP",
+    "Citizenship": "Citizenship",
+    "Member since": "Member since",
+    "Kitta held": "Kitta held",
+    "joinedBeforeApplications": "Joined before membership applications were recorded, so there is no application to show.",
+    "activeWithoutShares": "Active, but holds no shares: under the share-first rule this person is not a member yet. Sell them shares, or close them.",
+    "noApplicationOnRecord": "No membership application on record."
   },
   "error.msg.membership.share.first": "A person becomes a member by buying shares. Take a membership application; approving it activates the member and buys the shares together.",
   "error.msg.membership.application.pending": "This person has a membership application waiting for the board. Approve or refuse the application instead, so the decision and its reason are kept.",

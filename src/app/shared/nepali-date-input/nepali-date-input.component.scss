@@ -350,3 +350,193 @@
   text-decoration: underline;
   cursor: pointer;
 }
+
+// ── Inline layout ─────────────────────────────────────────────────────────────
+// `18 Ashwin 2083 [cal] ··· [BS|AD] 4 Oct 2026 AD`: the input is as wide as its date so the calendar icon
+// sits right after it; the switch and the other calendar's date stay at the end of the field.
+.mfx-bs-picker--inline {
+  ::ng-deep .mat-mdc-form-field-infix {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    // Material's fixed 180px width would push the field past its slot; size to the date instead.
+    width: auto;
+    min-width: 0;
+  }
+
+  .mfx-bs-picker__input,
+  input {
+    flex: 0 1 auto;
+    width: auto;
+    min-width: 0;
+    // A global rule gives the AD input a 5px vertical margin, which made the field taller than its neighbours.
+    margin: 0;
+    field-sizing: content;
+  }
+
+  .mfx-bs-picker__cal-icon {
+    flex-shrink: 0;
+  }
+
+  // On a narrow screen the other calendar's date gives way (ellipsis) rather than widening the field.
+  mat-form-field,
+  ::ng-deep .mat-mdc-text-field-wrapper,
+  ::ng-deep .mat-mdc-form-field-flex,
+  ::ng-deep .mat-mdc-form-field-icon-suffix {
+    min-width: 0;
+  }
+
+  // A fixed slot for the other calendar's date (fits "32 Mangsir 2083 BS"), so the BS | AD switch stays
+  // in the same place when the mode, and with it the length of this date, changes.
+  .mfx-bs-picker__other {
+    flex: 0 0 136px;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    // Material's suffix area has line-height 0, which with overflow: hidden clips the text away.
+    line-height: 1.5;
+  }
+
+  // Narrow phones: a smaller slot, still the same width in both modes.
+  @media (width <= 480px) {
+    .mfx-bs-picker__other {
+      flex-basis: 104px;
+    }
+  }
+
+  // The switch and the slot never shrink; the date side of the field gives way instead.
+  ::ng-deep .mat-mdc-form-field-icon-suffix {
+    flex-shrink: 0;
+  }
+
+  // In AD mode Material's datepicker button is 32px, inside an inline element that adds line height:
+  // make both 24px so the field is as high as its neighbours, with the same 20px icon as BS mode.
+  ::ng-deep .mat-datepicker-toggle {
+    display: flex;
+    flex-shrink: 0;
+  }
+
+  ::ng-deep .mat-datepicker-toggle .mat-mdc-icon-button {
+    --mat-icon-button-state-layer-size: 24px;
+    --mat-icon-button-touch-target-size: 24px;
+
+    width: 24px;
+    height: 24px;
+    padding: 2px;
+
+    .mat-mdc-button-touch-target {
+      width: 24px;
+      height: 24px;
+    }
+
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  // The calendar in use leads the switch: [BS|AD] in BS, [AD|BS] in AD.
+  .mfx-cal-switch--on {
+    order: -1;
+  }
+}
+
+.mfx-bs-picker__other {
+  color: var(--mat-sys-on-surface-variant, #616161);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+// Inline look: one line high like its neighbours, read as date · calendar switch · picker.
+:host ::ng-deep .mfx-bs-picker--inline {
+  // Material's 180px minimum input width pushed the calendar icon under the switch.
+  .mat-mdc-form-field-infix {
+    min-width: 0;
+  }
+
+  // The whole field opens the calendar in BS mode, so the whole field says so.
+  .mat-mdc-text-field-wrapper {
+    cursor: pointer;
+  }
+
+  // Empty field: the label sits where the date goes, and a content-sized input put the calendar icon on top
+  // of it. Until the label floats, the input fills the line so the icon waits at its end.
+  .mat-mdc-form-field:not(:has(.mdc-floating-label--float-above)) .mat-mdc-form-field-infix input {
+    flex: 1 1 auto;
+  }
+
+  .mat-mdc-form-field-icon-suffix {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 8px;
+    padding-right: 8px;
+  }
+
+  // Segmented control: a soft track with the chosen calendar as a raised segment.
+  .mfx-cal-switch {
+    display: inline-flex;
+    gap: 2px;
+    margin: 0;
+    padding: 2px;
+    border: 0;
+    border-radius: 8px;
+    background: var(--md-sys-color-surface-container-high, #e8edf3);
+
+    button {
+      min-width: 32px;
+      height: 20px;
+      padding: 0 8px;
+      border-radius: 6px;
+      color: var(--md-sys-color-on-surface-variant, #64748b);
+      font-family: inherit;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      line-height: 20px;
+      letter-spacing: 0.04em;
+      transition:
+        background-color 0.15s ease,
+        color 0.15s ease;
+
+      &:hover:not(:disabled, .mfx-cal-switch--on) {
+        color: var(--md-sys-color-on-surface, #1e293b);
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--md-sys-color-primary, #1074b9);
+        outline-offset: 1px;
+      }
+    }
+
+    .mfx-cal-switch--on {
+      background: var(--md-sys-color-surface, #fff);
+      color: var(--md-sys-color-primary, #1074b9);
+      box-shadow: 0 1px 2px rgb(15 23 42 / 16%);
+    }
+  }
+
+  // The other calendar's date reads as part of the value, not a caption: near the date's size, muted.
+  .mfx-bs-picker__other {
+    color: var(--md-sys-color-on-surface-variant, #64748b);
+    font-size: 0.875rem;
+  }
+
+  .mfx-bs-picker__cal-icon {
+    width: 20px !important;
+    height: 20px !important;
+    font-size: 20px !important;
+    color: var(--md-sys-color-on-surface-variant, #64748b);
+    opacity: 1;
+  }
+
+  // The other-calendar date (ADR-0020): a quiet caption aligned with the date text above it.
+  .mat-mdc-form-field-hint-wrapper {
+    padding-left: 16px;
+  }
+
+  .mat-mdc-form-field-hint {
+    color: var(--md-sys-color-on-surface-variant, #64748b);
+    font-size: 0.75rem;
+    letter-spacing: 0.01em;
+  }
+}

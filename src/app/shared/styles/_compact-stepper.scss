@@ -1,0 +1,189 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+// Create / edit stepper forms: fields sized by what they hold, not by row fraction.
+// Prefixed with .mat-stepper-vertical so it outranks each step's own scoped rules.
+// $root lets a plain (non-stepper) form use the same field sizing, e.g. the loan calculator.
+@mixin compact-stepper($root: '.mat-stepper-vertical') {
+  :host ::ng-deep #{$root} {
+    --lp-line: var(--md-sys-color-outline-variant, #cbd5e1);
+    --lp-muted: var(--md-sys-color-on-surface-variant, #64748b);
+    --lp-accent: var(--md-sys-color-primary, #1074b9);
+    --mat-form-field-outlined-container-shape: 8px;
+    --mat-form-field-outlined-outline-color: var(--lp-line);
+    --mat-form-field-outlined-hover-outline-color: var(--lp-muted);
+    --mat-form-field-outlined-focus-outline-color: var(--lp-accent);
+    --mat-form-field-outlined-focus-outline-width: 2px;
+    --mat-form-field-outlined-label-text-color: var(--lp-muted);
+
+    // No card: the steps sit on the page, on the same left edge as the page title.
+    background: transparent;
+
+    .mat-vertical-stepper-header {
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    .mat-vertical-content-container {
+      margin-left: 12px;
+    }
+
+    .mat-vertical-content {
+      padding: 8px 24px 16px;
+    }
+
+    // Reserve error space only when there is an error, not under every field.
+    // The message flows (not absolutely positioned) so it pushes the next row down
+    // instead of overlapping it.
+    .mat-mdc-form-field-bottom-align::before {
+      display: none;
+    }
+
+    .mat-mdc-form-field-error-wrapper,
+    .mat-mdc-form-field-hint-wrapper {
+      position: static;
+      padding: 4px 8px 0;
+    }
+
+    // The datepicker toggle is a 48px icon button, which made date fields taller than the rest.
+    // The M2 theme writes width / height / padding directly, so override those, not just tokens.
+    .mat-datepicker-toggle .mat-mdc-icon-button {
+      --mat-icon-button-state-layer-size: 32px;
+      --mat-icon-button-touch-target-size: 32px;
+
+      width: 32px;
+      height: 32px;
+      padding: 4px;
+
+      .mat-mdc-button-touch-target {
+        width: 32px;
+        height: 32px;
+      }
+    }
+
+    .mat-mdc-form-field-error {
+      font-size: 0.75rem;
+      line-height: 1.3;
+    }
+
+    .mat-mdc-form-field-disabled .mat-mdc-text-field-wrapper {
+      border-radius: 8px;
+      background: var(--md-sys-color-surface-container-low, #f1f5f9);
+    }
+
+    // Checkboxes as setting tiles: label left, box right, whole tile clickable.
+    mat-checkbox {
+      display: flex;
+      align-items: center;
+      box-sizing: border-box;
+      min-height: 48px;
+      margin-bottom: 8px;
+      padding: 0 4px 0 16px;
+      border: 1px solid var(--lp-line);
+      border-radius: 8px;
+      transition:
+        border-color 0.15s ease,
+        background-color 0.15s ease;
+
+      &:hover {
+        border-color: var(--lp-muted);
+      }
+
+      &:has(input:checked) {
+        border-color: var(--lp-accent);
+        background: color-mix(in srgb, var(--lp-accent) 6%, transparent);
+      }
+
+      .mdc-form-field {
+        flex: 1;
+        justify-content: space-between;
+        min-width: 0;
+      }
+
+      label {
+        flex: 1;
+        padding: 8px 0;
+        cursor: pointer;
+      }
+    }
+
+    mat-divider {
+      margin: 8px 0 16px;
+    }
+
+    h3,
+    h4,
+    mat-radio-group {
+      margin: 8px 0;
+    }
+
+    h4.mat-h4 {
+      margin-top: 16px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--lp-accent);
+    }
+
+    .mat-elevation-z1 {
+      margin: 8px 0 16px;
+    }
+
+    .margin-t {
+      margin-top: 8px;
+    }
+
+    // Field widths follow content. Later rules win for the more specific field kinds.
+    // Stay a wrapping row at every width (responsive-column would turn the
+    // flex-basis widths below into heights); fields go full width on small screens.
+    .layout-row-wrap {
+      flex-direction: row;
+      gap: 0 16px;
+      align-items: flex-start;
+
+      > mat-form-field {
+        flex: 0 1 320px;
+        max-width: 100%;
+      }
+
+      > mat-form-field:has([type='number']) {
+        flex-basis: 200px;
+      }
+
+      > mat-form-field:has(mat-datepicker-toggle) {
+        flex-basis: 216px;
+      }
+
+      > mat-form-field:has([formcontrolname='shortName']) {
+        flex-basis: 168px;
+      }
+
+      > mat-form-field:has([formcontrolname='name']),
+      > mat-form-field:has([formcontrolname='productId']) {
+        flex-basis: 480px;
+      }
+
+      > mat-form-field:has(textarea) {
+        flex: 1 1 100%;
+      }
+
+      > mat-checkbox,
+      > mifosx-gl-account-selector {
+        flex: 0 1 400px;
+        max-width: 100%;
+      }
+    }
+
+    @media (width <= 768px) {
+      .layout-row-wrap > mat-form-field,
+      .layout-row-wrap > mat-checkbox,
+      .layout-row-wrap > mifosx-gl-account-selector {
+        flex: 1 1 100%;
+      }
+    }
+  }
+}

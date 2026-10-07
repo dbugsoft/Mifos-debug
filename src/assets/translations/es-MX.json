@@ -1,6 +1,7 @@
 ﻿{
   "error.msg.upload.file.too.big": "El archivo seleccionado supera el límite de {{args.0.value}} MB. Elija un archivo más pequeño e inténtelo de nuevo.",
-  "APP_NAME": "COIMS",
+  "APP_NAME": "COFMIS",
+  "APP_FULL_NAME": "Cooperative Financial Management & Information System",
   "Logged in as": "Conectado como",
   "Remember me": "Recordar me",
   "errors": {
@@ -496,6 +497,8 @@
       "Home": "Inicio"
     },
     "buttons": {
+      "Photo": "Photo",
+      "Open Module": "Open Module",
       "Accept Transfer": "Aceptar transferencia",
       "Actions": "Acciones",
       "Activate": "Activar",
@@ -622,6 +625,8 @@
       "Enable": "Permitir",
       "Expand All": "Expandir Todo",
       "Export": "Exportar",
+      "Export as JSON": "Export as JSON",
+      "Export as PDF": "Export as PDF",
       "Export to File": "Exportar Archivo",
       "Export CSV": "Exportar CSV",
       "Export XLS": "Exportar XLS",
@@ -770,7 +775,9 @@
       "Submitting": "Enviando",
       "OK": "OK",
       "undo_account_transfer": "Revertir transferencia de cuenta",
-      "Quick Access": "Acceso Rápido"
+      "Quick Access": "Acceso Rápido",
+      "Calculate": "Calculate",
+      "Share": "Share"
     },
     "catalogs": {
       "Interest payment waiver": "Exención de pago de intereses",
@@ -1570,7 +1577,8 @@
       "savings-transaction-datatable-tab works": "La pestaña de tabla de datos de transacciones de ahorro funciona",
       "successfully select option": "exitosamente. Seleccione una de las opciones siguientes para continuar.",
       "undo_account_transfer": "Revertir transferencia de cuenta",
-      "Quick Access": "Quick Access"
+      "Quick Access": "Quick Access",
+      "Loan Calculator": "Loan Calculator"
     },
     "inputs": {
       "# Remittance": "# Remesa",
@@ -3102,7 +3110,11 @@
       "s3_secret_key": "s3_clave_secreta",
       "task-management component": "componente de gestión de tareas",
       "to": "a",
-      "valid": "válido"
+      "valid": "válido",
+      "Member": "Member",
+      "Total Interest": "Total Interest",
+      "Total Repayment": "Total Repayment",
+      "First Repayment": "First Repayment"
     },
     "links": {
       "Community": "Comunidad",
@@ -3120,6 +3132,17 @@
       "Working with Code": "Trabajar con código"
     },
     "menus": {
+      "Member Management": "Member Management",
+      "Administration": "Administration",
+      "Collapse Sidebar": "Collapse sidebar",
+      "Collections": "Collections",
+      "Expand Sidebar": "Expand sidebar",
+      "Finance": "Finance",
+      "Home": "Home",
+      "Members": "Members",
+      "Open Menu": "Open menu",
+      "Operations": "Operations",
+      "Overview": "Overview",
       "Unassign Staff": "Desasignar Asesor",
       "Accounting": "Contabilidad",
       "Account Overview": "Descripción de cuenta",
@@ -3247,7 +3270,9 @@
       "Reject Additional Shares": "Rechazar acciones adicionales",
       "Tasks": "Tareas",
       "Process Remittance": "Procesar remesa",
-      "Undo Write-off": "Deshacer castigo contable"
+      "Undo Write-off": "Deshacer castigo contable",
+      "Loan Calculator": "Loan Calculator",
+      "Loan Aging": "Loan Aging"
     },
     "placeholders": {
       "# Remittance": "# Remesa",
@@ -3259,7 +3284,8 @@
       "Search Activity": "Actividad de búsqueda",
       "Sender name": "Nombre del remitente",
       "Enter your username": "Ingrese su nombre de usuario",
-      "Enter your password": "Ingrese su contraseña"
+      "Enter your password": "Ingrese su contraseña",
+      "Search active member": "Search an active member by name or account number"
     },
     "status": {
       "Active": "Activo",
@@ -3308,6 +3334,19 @@
       "undo_account_transfer": "¿Está seguro de que desea revertir esta transferencia de cuenta?"
     },
     "text": {
+      "Welcome back": "Welcome back, {{name}}!",
+      "Home subtitle": "Manage and monitor your cooperative efficiently with {{app}}.",
+      "Total Members": "Total Members",
+      "Total Savings": "Total Savings",
+      "Loans Outstanding": "Loans Outstanding",
+      "Quick Menu": "Quick Menu",
+      "Home Members Description": "Register members and manage their groups and centers.",
+      "Home Dashboard Description": "Key figures, trends and the work that needs attention.",
+      "Home Collection Sheet Description": "Record a meeting's collections for a group or center.",
+      "Home Accounting Description": "Journal entries, chart of accounts and period closing.",
+      "Home Reports Description": "Run member, loan, savings and accounting reports.",
+      "Home Admin Description": "Users, offices, products and system settings.",
+      "Home Quick Menu Tour": "Shortcuts to the main modules you can use.",
       "A": "Una",
       "Ability to manage holidays for individual offices": "La capacidad de gestionar días festivos para sucursales individuales es una herramienta muy útil para una organización que abarca varias ubicaciones. Utilice esta opción para personalizar los días festivos para cada sucursal de su organización.",
       "About Us": "Sobre Nosotros",
@@ -4067,7 +4106,9 @@
       "Configure offerings": "Configure offerings",
       "Savings accounts": "Savings accounts",
       "Offices and staff": "Offices & staff",
-      "System configuration": "Configuration"
+      "System configuration": "Configuration",
+      "Pick a member from the search results": "Pick a member from the search results",
+      "Copied to clipboard": "Copied to clipboard"
     },
     "permissions": {
       "actions": {
@@ -4624,7 +4665,8 @@
     "ACTIVE": "ACTIVO",
     "PENDING": "PENDIENTE",
     "INACTIVE": "INACTIVO",
-    "Allow full term length for each tranche disbursement": "Cuando está habilitado, cada desembolso de tramo seguirá el cronograma completo del préstamo en lugar de ajustarse al plazo restante. Solo disponible para el tipo de cronograma PROGRESIVO."
+    "Allow full term length for each tranche disbursement": "Cuando está habilitado, cada desembolso de tramo seguirá el cronograma completo del préstamo en lugar de ajustarse al plazo restante. Solo disponible para el tipo de cronograma PROGRESIVO.",
+    "Loan Calculator": "Loan repayment calculator"
   },
   "countries": {
     "AF": "Afganistán",
@@ -5419,6 +5461,29 @@
     },
     "Watch": "Of which on watch"
   },
+  "loanAging": {
+    "Office": "Office",
+    "All offices": "All offices",
+    "Group by": "Group by",
+    "Branch": "Branch",
+    "Loan product": "Loan product",
+    "Loan officer": "Loan officer",
+    "Centre": "Centre",
+    "Download CSV": "Download CSV",
+    "Download PDF": "Download PDF",
+    "as of": "as of",
+    "Loans": "Loans",
+    "loans": "loans",
+    "Outstanding": "Outstanding",
+    "Overdue": "Overdue",
+    "Provision": "Provision",
+    "Total": "Total",
+    "By age band": "Outstanding and overdue by age band",
+    "By loan class": "By loan class",
+    "Loan class": "Loan class",
+    "Provision rate": "Provision rate",
+    "No loans to show": "No loans to show for this office."
+  },
   "membership": {
     "Membership": "Membership",
     "Membership Applications": "Membership Applications",
@@ -5444,7 +5509,18 @@
       "atLeastOne": "At least one kitta (share) must be bought: membership begins with a share purchase.",
       "belowMinimum": "This share product needs at least {{min}} kitta.",
       "aboveMaximum": "This share product allows at most {{max}} kitta per member.",
-      "reasonRequired": "Give the reason for refusing: the applicant must be told why."
+      "reasonRequired": "Give the reason for refusing: the applicant must be told why.",
+      "decisionDays": "Between 1 and 365 days.",
+      "citizenshipRequired": "Enter the citizenship number.",
+      "districtRequired": "Choose the district that issued the citizenship.",
+      "amountRequired": "Enter the amount received.",
+      "amountNotTotal": "The amount received must be the amount due, Rs {{total}}.",
+      "nomineeRequired": "This cooperative needs a nominee at joining.",
+      "relationshipRequired": "Give the nominee's relationship.",
+      "phoneRequired": "The phone number is required.",
+      "confirmMoney": "Confirm the money was received before approving.",
+      "refundRequired": "Enter the amount refunded (0 if nothing is given back).",
+      "refundRange": "Between 0 and Rs {{amount}}."
     },
     "daysLeft": "{{left}} of {{total}} days left",
     "daysOverdue": "{{days}} days overdue",
@@ -5523,7 +5599,76 @@
       "approved": "Approved: the applicant is now a member, with savings and shares.",
       "rejected": "Application refused; the reason is kept.",
       "settingsSaved": "Membership settings saved."
-    }
+    },
+    "shareProductHint": "Its price, minimum kitta and charges apply to every application",
+    "noAccountingWarning": "This share product has no accounting set up: share money and fees will not reach the books.",
+    "switchOnAnyway": "Switch the rule on anyway",
+    "Rules": "Rules",
+    "Decision deadline": "Decision deadline",
+    "deadlineOff": "Off: no countdown",
+    "deadlineOn": "On: decide within a number of days",
+    "deadlineHint": "When off, no countdown or \"overdue\" is shown anywhere",
+    "Days": "Days",
+    "A different person must approve": "A different person must approve",
+    "Off": "Off",
+    "On": "On",
+    "separateApproverHint": "When on, whoever entered an application cannot approve or refuse it",
+    "Payment taken": "Payment taken",
+    "paymentTaken": {
+      "AT_APPROVAL": "At approval",
+      "AT_APPLICATION": "At application"
+    },
+    "paymentTakenHint": "At application: the amount is recorded with the application and refunded if it is refused",
+    "Nominee required at joining": "Nominee required at joining",
+    "existingExplanation": "An application already made on paper: it keeps its original date and still goes through approval.",
+    "Application date": "Application date",
+    "Citizenship number": "Citizenship number",
+    "Issuing district": "District that issued it",
+    "To pay now": "To pay now",
+    "Paid with the application": "Paid with the application",
+    "Payment": "Payment",
+    "Amount received (cash)": "Amount received (cash)",
+    "Receipt number": "Receipt number",
+    "receiptHint": "The number on the paper receipt, if any",
+    "Nominee": "Nominee",
+    "optional": "optional",
+    "nomineeOnRecord": "A nominee is already on record. Fill these in only to change it.",
+    "Nominee name": "Nominee's name",
+    "Relationship": "Relationship",
+    "Nominee phone": "Nominee's phone",
+    "stepBuyShares": "Buy {{kitta}} kitta (Rs {{amount}})",
+    "stepCharge": "Take the {{name}} (Rs {{amount}})",
+    "moneyReceived": "I have received Rs {{amount}} in cash",
+    "alreadyPaid": "Rs {{amount}} was received with the application on {{date}}.",
+    "Approval note": "Approval note",
+    "refundLead": "Rs {{amount}} was received with the application on {{date}}. Record what is given back.",
+    "Amount refunded": "Amount refunded",
+    "Refund receipt number": "Refund receipt number",
+    "applyAgainTitle": "{{name}} applies again",
+    "enterExistingTitle": "Enter {{name}}'s existing application",
+    "applyAgainLead": "A new application on the same record. The earlier ones stay in the history.",
+    "Take the application": "Take the application",
+    "Waiting for a decision": "Waiting for a decision",
+    "Waiting": "Waiting",
+    "Existing application": "Existing application",
+    "enteredLate": "entered on {{date}} by {{user}}",
+    "byUser": "by {{user}}",
+    "paidOn": "Rs {{amount}} received on {{date}}",
+    "receiptNo": "receipt {{number}}",
+    "dueAtApproval": "Rs {{amount}}, to pay at approval",
+    "Refund": "Refund",
+    "someoneElseDecides": "You entered this application, so a different person must approve or refuse it.",
+    "Apply again": "Apply again",
+    "Enter an existing application": "Enter an existing application",
+    "Earlier applications": "Earlier applications",
+    "Reason or note": "Reason or note",
+    "MEMBERSHIP": "MEMBERSHIP",
+    "Citizenship": "Citizenship",
+    "Member since": "Member since",
+    "Kitta held": "Kitta held",
+    "joinedBeforeApplications": "Joined before membership applications were recorded, so there is no application to show.",
+    "activeWithoutShares": "Active, but holds no shares: under the share-first rule this person is not a member yet. Sell them shares, or close them.",
+    "noApplicationOnRecord": "No membership application on record."
   },
   "error.msg.membership.share.first": "A person becomes a member by buying shares. Take a membership application; approving it activates the member and buys the shares together.",
   "error.msg.membership.application.pending": "This person has a membership application waiting for the board. Approve or refuse the application instead, so the decision and its reason are kept.",

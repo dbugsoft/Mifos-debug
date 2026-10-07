@@ -30,9 +30,11 @@ export interface MembershipDecisionData {
 }
 
 /**
- * The board's decision on a membership application. Approving activates the member, opens the member savings account
- * and buys the shares in one step; if Fineract refuses any part, nothing changes and the dialog stays open (the error
- * itself is shown by the global error handler). Refusing needs the reason the applicant will be told.
+ * The decision on a membership application. Approving activates the member, opens the member savings account and buys
+ * the shares in one step; if Fineract refuses any part, nothing changes and the dialog stays open (the error itself is
+ * shown by the global error handler). When the money is taken at approval, staff confirm they received it and may note
+ * the paper receipt number. Refusing needs the reason the applicant will be told, and the refund when the money was
+ * taken with the application (fineract-dbug ADR 0035).
  */
 @Component({
   selector: 'mifosx-membership-decision-dialog',
@@ -59,6 +61,10 @@ export class MembershipDecisionDialogComponent {
 
   readonly approve = this.data.decision === 'approve';
   readonly application = this.data.application;
+  /** Approving takes the money now, unless it was taken with the application. */
+  readonly takesMoney = this.approve && !this.application.paidAtApplication;
+  /** Refusing gives back the money taken with the application. */
+  readonly refunds = !this.approve && this.application.paidAtApplication;
   readonly minDate = this.fromIso(this.application.submittedOn);
   readonly maxDate = this.settingsService.businessDate ?? new Date();
   readonly busy = signal(false);
@@ -74,6 +80,30 @@ export class MembershipDecisionDialogComponent {
             Validators.required,
             Validators.maxLength(1000)
           ]
+    ],
+    approvalNote: [
+      '',
+      Validators.maxLength(1000)
+    ],
+    moneyReceived: [
+      false,
+      this.takesMoney ? Validators.requiredTrue : []
+    ],
+    receiptNumber: [
+      '',
+      Validators.maxLength(50)
+    ],
+    refundAmount: [
+      (this.application.amountReceived ?? null) as number | null,
+      this.refunds ? [
+            Validators.required,
+            Validators.min(0),
+            Validators.max(this.application.amountReceived ?? 0)
+          ] : []
+    ],
+    refundReceiptNumber: [
+      '',
+      Validators.maxLength(50)
     ]
   });
 
@@ -83,10 +113,21 @@ export class MembershipDecisionDialogComponent {
       return;
     }
     this.busy.set(true);
-    const date = this.dates.formatDate(this.form.value.date, 'yyyy-MM-dd');
+    const v = this.form.getRawValue();
+    const text = (s: string | null | undefined) => (s ?? '').trim() || undefined;
+    const date = this.dates.formatDate(v.date, 'yyyy-MM-dd');
     const call = this.approve
-      ? this.membershipService.approve(this.application.id, date)
-      : this.membershipService.reject(this.application.id, (this.form.value.reason ?? '').trim(), date);
+      ? this.membershipService.approve(this.application.id, {
+          date,
+          approvalNote: text(v.approvalNote),
+          receiptNumber: this.takesMoney ? text(v.receiptNumber) : undefined
+        })
+      : this.membershipService.reject(this.application.id, {
+          reason: (v.reason ?? '').trim(),
+          date,
+          refundAmount: this.refunds ? Number(v.refundAmount) : undefined,
+          refundReceiptNumber: this.refunds ? text(v.refundReceiptNumber) : undefined
+        });
     call.subscribe({
       next: (decided) => this.dialogRef.close(decided),
       error: () => this.busy.set(false)
