@@ -5944,7 +5944,15 @@
     "Kitta held": "Kitta held",
     "joinedBeforeApplications": "Joined before membership applications were recorded, so there is no application to show.",
     "activeWithoutShares": "Active, but holds no shares: under the share-first rule this person is not a member yet. Sell them shares, or close them.",
-    "noApplicationOnRecord": "No membership application on record."
+    "noApplicationOnRecord": "No membership application on record.",
+    "organisationNote": "An organisation names no nominee. After the application, link its board members, chief executive and account operators on its KYM tab.",
+    "KYM complete before approval": "KYM complete before approval",
+    "kymRequiredHint": "An application is approved only once the applicant's KYM is complete",
+    "kymBlocks": "The applicant's KYM still lacks {{count}} item(s). Complete it before approving.",
+    "Open the KYM": "Open the KYM",
+    "Organisation": "Organisation",
+    "kymComplete": "KYM complete",
+    "kymMissing": "KYM: {{count}} item(s) missing"
   },
   "error.msg.membership.share.first": "A person becomes a member by buying shares. Take a membership application; approving it activates the member and buys the shares together.",
   "error.msg.membership.application.pending": "This person has a membership application waiting for the board. Approve or refuse the application instead, so the decision and its reason are kept.",

@@ -28,14 +28,16 @@ import { SharesChoice } from './membership-shares-step.component';
               <span class="value">{{ submittedOn | dateFormat }}</span>
             </div>
           }
-          <div class="item">
-            <span class="label">{{ 'membership.Citizenship number' | translate }}</span>
-            <span class="value">{{ citizenshipNumber || '—' }}</span>
-          </div>
-          <div class="item">
-            <span class="label">{{ 'membership.Issuing district' | translate }}</span>
-            <span class="value">{{ district || '—' }}</span>
-          </div>
+          @if (!organisation) {
+            <div class="item">
+              <span class="label">{{ 'membership.Citizenship number' | translate }}</span>
+              <span class="value">{{ citizenshipNumber || '—' }}</span>
+            </div>
+            <div class="item">
+              <span class="label">{{ 'membership.Issuing district' | translate }}</span>
+              <span class="value">{{ district || '—' }}</span>
+            </div>
+          }
           <div class="item">
             <span class="label">{{ 'membership.Shares' | translate }}</span>
             <span class="value"
@@ -60,19 +62,21 @@ import { SharesChoice } from './membership-shares-step.component';
               }
             </span>
           </div>
-          <div class="item">
-            <span class="label">{{ 'membership.Nominee' | translate }}</span>
-            <span class="value">
-              @if (nomineeName) {
-                {{ nomineeName }} ({{ nomineeRelationship }})
-                @if (nomineeMobileNo) {
-                  · {{ nomineeMobileNo }}
+          @if (!organisation) {
+            <div class="item">
+              <span class="label">{{ 'membership.Nominee' | translate }}</span>
+              <span class="value">
+                @if (nomineeName) {
+                  {{ nomineeName }} ({{ nomineeRelationship }})
+                  @if (nomineeMobileNo) {
+                    · {{ nomineeMobileNo }}
+                  }
+                } @else {
+                  —
                 }
-              } @else {
-                —
-              }
-            </span>
-          </div>
+              </span>
+            </div>
+          }
           @if (choice.note) {
             <div class="item wide">
               <span class="label">{{ 'membership.Note' | translate }}</span>
@@ -130,6 +134,8 @@ import { SharesChoice } from './membership-shares-step.component';
 })
 export class MembershipSharesPreviewComponent {
   @Input() choice: SharesChoice | null = null;
+  /** An organisation applying: no citizenship and no nominee (fineract-dbug ADR 0042) */
+  @Input() organisation = false;
   @Input() citizenshipNumber: string | null = null;
   @Input() district: string | null = null;
   @Input() nomineeName: string | null = null;

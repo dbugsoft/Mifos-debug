@@ -69,6 +69,28 @@ export class MembershipSharesStepComponent implements OnInit {
   /** The person already has a nominee on record. */
   @Input() hasNominee = false;
 
+  private isOrganisation = false;
+  /** An organisation applying names no nominee (fineract-dbug ADR 0042): the nominee fields are left out. */
+  @Input() set organisation(value: boolean) {
+    this.isOrganisation = !!value;
+    const c = this.form.controls;
+    for (const control of [
+      c.nomineeName,
+      c.nomineeRelationship,
+      c.nomineeMobileNo
+    ]) {
+      if (this.isOrganisation) {
+        control.disable({ emitEvent: false });
+      } else {
+        control.enable({ emitEvent: false });
+      }
+    }
+    this.status.set(this.form.status);
+  }
+  get organisation(): boolean {
+    return this.isOrganisation;
+  }
+
   readonly today = this.settingsService.businessDate ?? new Date();
 
   readonly form = this.formBuilder.group({
@@ -192,9 +214,10 @@ export class MembershipSharesStepComponent implements OnInit {
     }
     const v = this.form.getRawValue();
     const text = (s: string | null | undefined) => (s ?? '').trim() || undefined;
-    const nominee: Nominee | undefined = text(v.nomineeName)
-      ? { name: text(v.nomineeName), relationship: text(v.nomineeRelationship), mobileNo: text(v.nomineeMobileNo) }
-      : undefined;
+    const nominee: Nominee | undefined =
+      !this.isOrganisation && text(v.nomineeName)
+        ? { name: text(v.nomineeName), relationship: text(v.nomineeRelationship), mobileNo: text(v.nomineeMobileNo) }
+        : undefined;
     return {
       kitta: choice.kitta,
       shareProductId: choice.product.id,

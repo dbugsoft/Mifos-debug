@@ -272,7 +272,12 @@ export class CreateClientComponent implements AfterViewInit {
     const sharesRequest = this.membershipMode ? this.sharesStep?.request() : null;
     const created$ = sharesRequest
       ? this.membershipService
-          .apply({ client: clientData, ...this.clientGeneralStep.citizenship?.value(), ...sharesRequest })
+          .apply({
+            client: clientData,
+            // an organisation has no citizenship (fineract-dbug ADR 0042)
+            ...(this.legalFormType === 2 ? {} : this.clientGeneralStep.citizenship?.value()),
+            ...sharesRequest
+          })
           .pipe(map((a) => ({ clientId: a.clientId })))
       : this.clientsService.createClient(clientData).pipe(map((response: any) => ({ clientId: response.resourceId })));
     created$
