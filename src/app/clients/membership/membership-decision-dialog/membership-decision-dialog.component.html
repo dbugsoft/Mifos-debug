@@ -17,6 +17,14 @@
 <form [formGroup]="form" (ngSubmit)="submit()">
   <div mat-dialog-content>
     @if (approve) {
+      @if (kymBlocks()) {
+        <p class="kym-blocks">
+          {{ 'membership.kymBlocks' | translate: { count: application.kymMissing } }}
+          <a [routerLink]="['/members', application.clientId, 'kym']" mat-dialog-close>{{
+            'membership.Open the KYM' | translate
+          }}</a>
+        </p>
+      }
       <p class="lead">{{ 'membership.inOneStep' | translate }}</p>
       <ol class="steps">
         <li>{{ 'membership.stepActivate' | translate: { name: application.name } }}</li>
@@ -114,7 +122,7 @@
       {{ 'labels.buttons.Cancel' | translate }}
     </button>
     @if (approve) {
-      <button mat-raised-button color="primary" type="submit" [disabled]="busy()">
+      <button mat-raised-button color="primary" type="submit" [disabled]="busy() || kymBlocks()">
         {{ 'membership.Approve' | translate }}
       </button>
     } @else {

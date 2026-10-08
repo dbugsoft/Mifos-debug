@@ -76,8 +76,17 @@
                   <td>{{ i + 1 }}</td>
                   <td>
                     <b>{{ a.name }}</b>
+                    @if (a.organisation) {
+                      <span class="tag">{{ 'membership.Organisation' | translate }}</span>
+                    }
                     @if (a.mobileNo) {
                       <span class="sub">{{ a.mobileNo }}</span>
+                    }
+                    @if (a.kymMissing !== undefined && a.kymMissing !== null) {
+                      <span class="kym" [class.done]="a.kymMissing === 0">{{
+                        (a.kymMissing === 0 ? 'membership.kymComplete' : 'membership.kymMissing')
+                          | translate: { count: a.kymMissing }
+                      }}</span>
                     }
                   </td>
                   <td class="num">{{ a.accountNo }}</td>

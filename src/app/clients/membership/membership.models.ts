@@ -78,6 +78,10 @@ export interface MembershipApplication {
   /** Only while PENDING and when the cooperative has a decision deadline; negative once overdue */
   daysRemaining?: number;
   overdue: boolean;
+  /** An organisation applying (legal form Entity): no citizenship, no nominee */
+  organisation?: boolean;
+  /** Only while PENDING: how many items the applicant's KYM still lacks */
+  kymMissing?: number;
 }
 
 export interface MembershipSettings {
@@ -90,6 +94,8 @@ export interface MembershipSettings {
   separateApprover: boolean;
   paymentTaken: PaymentTaken;
   nomineeRequired: boolean;
+  /** Approval waits for a complete KYM (on by default, fineract-dbug ADR 0042) */
+  kymRequiredForApproval?: boolean;
 }
 
 export interface ShareProductOption {

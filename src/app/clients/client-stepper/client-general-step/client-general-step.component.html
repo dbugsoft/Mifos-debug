@@ -210,8 +210,9 @@
       </mat-checkbox>
     }
 
-    <!-- Membership application: the citizenship, with the person's details (fineract-dbug ADR 0035) -->
-    @if (membershipMode) {
+    <!-- Membership application: the citizenship, with the person's details (fineract-dbug ADR 0035); not for an
+         organisation, whose people are linked on its KYM tab (ADR 0042) -->
+    @if (membershipMode && !isOrganisation) {
       <mifosx-membership-citizenship class="flex-98"></mifosx-membership-citizenship>
     }
 

@@ -54,3 +54,17 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+.kym-blocks {
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  background: #fdeceb;
+  color: #9f1f17;
+
+  a {
+    margin-left: 6px;
+    font-weight: 600;
+    color: inherit;
+  }
+}

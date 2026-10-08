@@ -118,37 +118,41 @@
     </section>
   }
 
-  <section>
-    <h4>
-      {{ 'membership.Nominee' | translate }}
-      @if (!nomineeRequired) {
-        <span class="optional">({{ 'membership.optional' | translate }})</span>
+  @if (!organisation) {
+    <section>
+      <h4>
+        {{ 'membership.Nominee' | translate }}
+        @if (!nomineeRequired) {
+          <span class="optional">({{ 'membership.optional' | translate }})</span>
+        }
+      </h4>
+      @if (hasNominee) {
+        <p class="muted">{{ 'membership.nomineeOnRecord' | translate }}</p>
       }
-    </h4>
-    @if (hasNominee) {
-      <p class="muted">{{ 'membership.nomineeOnRecord' | translate }}</p>
-    }
-    <div class="row">
-      <mat-form-field class="third">
-        <mat-label>{{ 'membership.Nominee name' | translate }}</mat-label>
-        <input matInput formControlName="nomineeName" maxlength="200" [required]="nomineeRequired" />
-        @if (form.controls.nomineeName.hasError('required')) {
-          <mat-error>{{ 'membership.errors.nomineeRequired' | translate }}</mat-error>
-        }
-      </mat-form-field>
-      <mat-form-field class="third">
-        <mat-label>{{ 'membership.Relationship' | translate }}</mat-label>
-        <input matInput formControlName="nomineeRelationship" maxlength="100" [required]="nomineeRequired" />
-        @if (form.controls.nomineeRelationship.hasError('required')) {
-          <mat-error>{{ 'membership.errors.relationshipRequired' | translate }}</mat-error>
-        }
-      </mat-form-field>
-      <mat-form-field class="third">
-        <mat-label>{{ 'membership.Nominee phone' | translate }}</mat-label>
-        <input matInput formControlName="nomineeMobileNo" maxlength="50" />
-      </mat-form-field>
-    </div>
-  </section>
+      <div class="row">
+        <mat-form-field class="third">
+          <mat-label>{{ 'membership.Nominee name' | translate }}</mat-label>
+          <input matInput formControlName="nomineeName" maxlength="200" [required]="nomineeRequired" />
+          @if (form.controls.nomineeName.hasError('required')) {
+            <mat-error>{{ 'membership.errors.nomineeRequired' | translate }}</mat-error>
+          }
+        </mat-form-field>
+        <mat-form-field class="third">
+          <mat-label>{{ 'membership.Relationship' | translate }}</mat-label>
+          <input matInput formControlName="nomineeRelationship" maxlength="100" [required]="nomineeRequired" />
+          @if (form.controls.nomineeRelationship.hasError('required')) {
+            <mat-error>{{ 'membership.errors.relationshipRequired' | translate }}</mat-error>
+          }
+        </mat-form-field>
+        <mat-form-field class="third">
+          <mat-label>{{ 'membership.Nominee phone' | translate }}</mat-label>
+          <input matInput formControlName="nomineeMobileNo" maxlength="50" />
+        </mat-form-field>
+      </div>
+    </section>
+  } @else {
+    <p class="muted">{{ 'membership.organisationNote' | translate }}</p>
+  }
 
   <section>
     <h4>
