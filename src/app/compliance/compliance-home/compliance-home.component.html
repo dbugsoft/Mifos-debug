@@ -57,6 +57,59 @@
       </div>
     }
 
+    @if (riskSummary(); as r) {
+      <div class="tiles">
+        <a
+          class="tile"
+          [class.warn]="r.byGrade.HIGH > 0"
+          [routerLink]="can('READ_AMLCOMPLIANCE') ? ['risk'] : null"
+          [queryParams]="{ view: 'high' }"
+        >
+          <span class="label">{{ 'compliance.risk.High-risk members' | translate }}</span>
+          <span class="value">{{ r.byGrade.HIGH }}</span>
+          <span class="sub">{{
+            'compliance.risk.mediumNormal' | translate: { medium: r.byGrade.MEDIUM, normal: r.byGrade.NORMAL }
+          }}</span>
+        </a>
+        <a
+          class="tile"
+          [class.bad]="r.reviewsOverdue > 0"
+          [routerLink]="can('READ_AMLCOMPLIANCE') ? ['risk'] : null"
+          [queryParams]="{ view: 'review_due' }"
+        >
+          <span class="label">{{ 'compliance.risk.Reviews overdue' | translate }}</span>
+          <span class="value">{{ r.reviewsOverdue }}</span>
+        </a>
+        @if (eddSummary(); as e) {
+          <a
+            class="tile"
+            [class.warn]="e.reviewsDue > 0"
+            [routerLink]="can('READ_AMLCOMPLIANCE') ? ['risk'] : null"
+            [queryParams]="{ view: 'edd' }"
+          >
+            <span class="label">{{ 'compliance.edd.Under enhanced checks' | translate }}</span>
+            <span class="value">{{ e.open }}</span>
+            <span class="sub">{{ 'compliance.edd.reviewsDue' | translate: { count: e.reviewsDue } }}</span>
+          </a>
+        }
+      </div>
+    }
+
+    @if (can('READ_AMLCOMPLIANCE')) {
+      <nav class="links">
+        <a mat-stroked-button color="primary" [routerLink]="['risk']">{{ 'compliance.risk.view.HIGH' | translate }}</a>
+        <a mat-stroked-button color="primary" [routerLink]="['peps']">{{
+          'compliance.pep.Politically exposed persons' | translate
+        }}</a>
+        <a mat-stroked-button color="primary" [routerLink]="['peps']" [queryParams]="{ view: 'suggestions' }">{{
+          'compliance.pep.To check' | translate
+        }}</a>
+        <a mat-stroked-button color="primary" [routerLink]="['risk-tables']">{{
+          'compliance.pep.Occupation and area grades' | translate
+        }}</a>
+      </nav>
+    }
+
     @if (can('READ_AMLCOMPLIANCE')) {
       <section class="frame">
         <h2 class="legend">{{ 'compliance.Deadlines' | translate }}</h2>

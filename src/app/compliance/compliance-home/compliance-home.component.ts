@@ -15,6 +15,8 @@ import { AdToBsPipe } from 'app/pipes/ad-to-bs.pipe';
 import { FormatNumberPipe } from 'app/pipes/format-number.pipe';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { ComplianceService } from '../compliance.service';
+import { RiskService } from '../risk/risk.service';
+import { EddSummary, RiskSummary } from '../risk/risk.models';
 import { AmlSettingsView, ComplianceAccess, LedgerStatus, TtrItem, TtrSummary, isoDate } from '../compliance.models';
 import { DueChipComponent } from '../due-chip/due-chip.component';
 
@@ -38,6 +40,7 @@ import { DueChipComponent } from '../due-chip/due-chip.component';
 })
 export class ComplianceHomeComponent implements OnInit {
   private compliance = inject(ComplianceService);
+  private risk = inject(RiskService);
   private destroyRef = inject(DestroyRef);
 
   readonly loading = signal(true);
@@ -46,6 +49,8 @@ export class ComplianceHomeComponent implements OnInit {
   readonly deadlines = signal<TtrItem[]>([]);
   readonly settings = signal<AmlSettingsView | null>(null);
   readonly ledger = signal<LedgerStatus | null>(null);
+  readonly riskSummary = signal<RiskSummary | null>(null);
+  readonly eddSummary = signal<EddSummary | null>(null);
 
   readonly deadlineColumns = [
     'dueOn',
@@ -75,6 +80,12 @@ export class ComplianceHomeComponent implements OnInit {
               : of(null),
             ledger: can('READ_AMLCOMPLIANCE', 'UPDATE_AMLSETTINGS')
               ? this.compliance.ledgerStatus().pipe(catchError(() => of(null)))
+              : of(null),
+            risk: can('READ_AMLCOMPLIANCE', 'READ_AMLSUMMARY')
+              ? this.risk.summary().pipe(catchError(() => of(null)))
+              : of(null),
+            edd: can('READ_AMLCOMPLIANCE', 'READ_AMLSUMMARY')
+              ? this.risk.eddSummary().pipe(catchError(() => of(null)))
               : of(null)
           });
         }),
@@ -85,6 +96,8 @@ export class ComplianceHomeComponent implements OnInit {
         this.deadlines.set(data.deadlines.slice(0, 10));
         this.settings.set(data.settings);
         this.ledger.set(data.ledger);
+        this.riskSummary.set(data.risk);
+        this.eddSummary.set(data.edd);
         this.loading.set(false);
       });
   }

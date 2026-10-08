@@ -1,0 +1,85 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+@use '../../compliance' as compliance;
+
+@include compliance.page;
+
+.head {
+  padding-top: 16px;
+
+  .title {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .name {
+    margin: 0;
+    font-size: 1.35rem;
+  }
+}
+
+.sub {
+  display: block;
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.links {
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid rgb(127 127 127 / 15%);
+  }
+
+  &.ended {
+    opacity: 0.75;
+  }
+}
+
+.add {
+  margin-top: 8px;
+
+  .picked {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px 16px;
+  }
+}
+
+@media (width <= 600px) {
+  .add .row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+}

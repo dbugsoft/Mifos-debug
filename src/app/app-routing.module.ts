@@ -132,6 +132,40 @@ const routes: Routes = [
               (m) => m.ThresholdReportsComponent
             ),
           data: { title: 'Threshold reports', breadcrumb: 'Threshold reports' }
+        },
+        {
+          path: 'risk',
+          loadComponent: () =>
+            import('./compliance/risk/risk-list/risk-list.component').then((m) => m.RiskListComponent),
+          data: { title: 'Member risk', breadcrumb: 'Member risk' }
+        },
+        {
+          path: 'members/:clientId',
+          loadComponent: () =>
+            import('./compliance/risk/member-risk/member-risk.component').then((m) => m.MemberRiskComponent),
+          data: { title: 'Compliance profile', breadcrumb: 'Compliance profile', routeParamBreadcrumb: false }
+        },
+        {
+          path: 'peps',
+          loadComponent: () =>
+            import('./compliance/pep/pep-register/pep-register.component').then((m) => m.PepRegisterComponent),
+          data: { title: 'Politically exposed persons', breadcrumb: 'Politically exposed persons' }
+        },
+        {
+          path: 'peps/:id',
+          loadComponent: () =>
+            import('./compliance/pep/pep-detail/pep-detail.component').then((m) => m.PepDetailComponent),
+          data: {
+            title: 'Politically exposed person',
+            breadcrumb: 'Politically exposed person',
+            routeParamBreadcrumb: false
+          }
+        },
+        {
+          path: 'risk-tables',
+          loadComponent: () =>
+            import('./compliance/pep/risk-tables/risk-tables.component').then((m) => m.RiskTablesComponent),
+          data: { title: 'Occupation and area grades', breadcrumb: 'Occupation and area grades' }
         }
       ]
     },
