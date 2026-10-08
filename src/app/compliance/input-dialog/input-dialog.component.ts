@@ -14,7 +14,11 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 export interface InputDialogField {
   name: string;
   label: string;
-  type?: 'text' | 'textarea' | 'date';
+  type?: 'text' | 'textarea' | 'date' | 'select';
+  /** For a select: the choices, with their labels to translate */
+  options?: { value: string; label: string }[];
+  /** A hint under the field, to translate */
+  hint?: string;
   required?: boolean;
   maxLength?: number;
   value?: string;
@@ -43,6 +47,12 @@ export interface InputDialogData {
             <mat-label>{{ f.label | translate }}</mat-label>
             @if (f.type === 'textarea') {
               <textarea matInput rows="4" [formControlName]="f.name" [attr.maxlength]="f.maxLength ?? 1000"></textarea>
+            } @else if (f.type === 'select') {
+              <mat-select [formControlName]="f.name">
+                @for (o of f.options ?? []; track o.value) {
+                  <mat-option [value]="o.value">{{ o.label | translate }}</mat-option>
+                }
+              </mat-select>
             } @else {
               <input
                 matInput
@@ -50,6 +60,9 @@ export interface InputDialogData {
                 [formControlName]="f.name"
                 [attr.maxlength]="f.maxLength ?? 200"
               />
+            }
+            @if (f.hint) {
+              <mat-hint>{{ f.hint | translate }}</mat-hint>
             }
           </mat-form-field>
         }

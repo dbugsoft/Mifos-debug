@@ -53,3 +53,9 @@
 tr.mat-mdc-row {
   cursor: pointer;
 }
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
