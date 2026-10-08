@@ -1,0 +1,86 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="compliance-page">
+  @if (allowed() === false) {
+    <p class="empty">{{ 'compliance.You have no compliance access' | translate }}</p>
+  } @else {
+    <div class="filters">
+      <mat-button-toggle-group [value]="view()" (change)="show($event.value)">
+        @for (v of views; track v) {
+          <mat-button-toggle [value]="v">{{ 'compliance.alert.view.' + v | translate }}</mat-button-toggle>
+        }
+      </mat-button-toggle-group>
+      <mat-form-field class="rule" subscriptSizing="dynamic">
+        <mat-label>{{ 'compliance.alert.Rule' | translate }}</mat-label>
+        <mat-select [value]="rule()" (selectionChange)="show(null, $event.value)">
+          <mat-option [value]="null">{{ 'compliance.alert.Every rule' | translate }}</mat-option>
+          @for (r of rules; track r) {
+            <mat-option [value]="r">{{ 'compliance.alert.rule.' + r | translate }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <p class="hint">{{ 'compliance.alert.lead' | translate }}</p>
+
+    @if (loading()) {
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }
+
+    <section class="frame">
+      <h2 class="legend">{{ 'compliance.alert.view.' + view() | translate }}</h2>
+      @if (alerts().length) {
+        <div class="table-scroll">
+          <table class="plain-rows">
+            <thead>
+              <tr>
+                <th>{{ 'compliance.Member' | translate }}</th>
+                <th>{{ 'compliance.alert.What' | translate }}</th>
+                <th class="wide">{{ 'compliance.Amount' | translate }}</th>
+                <th class="wide">{{ 'compliance.alert.Found' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (a of alerts(); track a.id) {
+                <tr class="row" tabindex="0" (click)="open(a)" (keydown.enter)="open(a)">
+                  <td>
+                    {{ a.name ?? ('compliance.alert.Not a member' | translate) }}
+                    @if (a.accountNo) {
+                      <span class="sub">{{ a.accountNo }}</span>
+                    }
+                    @if (a.riskGrade) {
+                      <span
+                        class="chip"
+                        [class.red]="a.riskGrade === 'HIGH'"
+                        [class.amber]="a.riskGrade === 'MEDIUM'"
+                        [class.green]="a.riskGrade === 'NORMAL'"
+                        >{{ 'compliance.grade.' + a.riskGrade | translate }}</span
+                      >
+                    }
+                  </td>
+                  <td>
+                    <b>{{ 'compliance.alert.rule.' + a.rule | translate }}</b>
+                    <span class="sub">{{ a.detail }}</span>
+                    @if (a.status !== 'NEW' && a.status !== 'IN_REVIEW') {
+                      <span class="sub">{{ 'compliance.alert.status.' + a.status | translate }}</span>
+                    }
+                  </td>
+                  <td class="wide num">{{ a.amount !== null ? (a.amount | formatNumber) : '—' }}</td>
+                  <td class="wide">{{ a.createdAt.slice(0, 10) | adToBs }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else if (!loading()) {
+        <p class="empty">{{ 'compliance.alert.empty' | translate }}</p>
+      }
+    </section>
+  }
+</div>

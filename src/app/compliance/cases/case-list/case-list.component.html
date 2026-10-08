@@ -1,0 +1,70 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="compliance-page">
+  @if (allowed() === false) {
+    <p class="empty">{{ 'compliance.You have no compliance access' | translate }}</p>
+  } @else {
+    <div class="filters">
+      <mat-button-toggle-group [value]="view()" (change)="show($event.value)">
+        @for (v of views; track v) {
+          <mat-button-toggle [value]="v">{{ 'compliance.case.view.' + v | translate }}</mat-button-toggle>
+        }
+      </mat-button-toggle-group>
+    </div>
+
+    <p class="hint">{{ 'compliance.case.lead' | translate }}</p>
+
+    @if (loading()) {
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }
+
+    <section class="frame">
+      <h2 class="legend">{{ 'compliance.case.view.' + view() | translate }}</h2>
+      @if (list().length) {
+        <div class="table-scroll">
+          <table class="plain-rows">
+            <thead>
+              <tr>
+                <th>{{ 'compliance.case.Case' | translate }}</th>
+                <th>{{ 'compliance.Member' | translate }}</th>
+                <th>{{ 'compliance.case.Where it stands' | translate }}</th>
+                <th class="wide">{{ 'compliance.case.Opened' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (k of list(); track k.id) {
+                <tr class="row" tabindex="0" (click)="open(k)" (keydown.enter)="open(k)">
+                  <td>
+                    <b>{{ k.reference }}</b>
+                    <span class="sub">{{ k.summary }}</span>
+                  </td>
+                  <td>
+                    {{ k.name ?? '—' }}
+                    @if (k.accountNo) {
+                      <span class="sub">{{ k.accountNo }}</span>
+                    }
+                  </td>
+                  <td>
+                    {{ 'compliance.case.status.' + k.status | translate }}{{ k.reportType ? ' · ' + k.reportType : '' }}
+                    @if (k.status === 'DECIDED_REPORT' && k.daysLeft !== undefined) {
+                      <mifosx-due-chip [daysLeft]="k.daysLeft"></mifosx-due-chip>
+                    }
+                  </td>
+                  <td class="wide">{{ k.openedAt.slice(0, 10) | adToBs }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else if (!loading()) {
+        <p class="empty">{{ 'compliance.case.empty' | translate }}</p>
+      }
+    </section>
+  }
+</div>

@@ -235,6 +235,13 @@
         }
 
         <button mat-menu-item [matMenuTriggerFor]="More">{{ 'labels.buttons.More' | translate }}</button>
+        <!-- fineract-dbug #133: any staff member can tell the compliance officer what they noticed -->
+        <button mat-menu-item (click)="raiseConcern()">
+          <mat-icon matListIcon>
+            <fa-icon icon="flag" size="sm"></fa-icon>
+          </mat-icon>
+          <span>{{ 'compliance.concern.Raise a concern' | translate }}</span>
+        </button>
       </mat-menu>
 
       <mat-menu #accountApplications="matMenu">

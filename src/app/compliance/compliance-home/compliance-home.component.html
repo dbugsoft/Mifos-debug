@@ -57,6 +57,33 @@
       </div>
     }
 
+    @if (alertSummary() || caseSummary()) {
+      <div class="tiles">
+        @if (alertSummary(); as a) {
+          <a class="tile" [class.warn]="a.open > 0" [routerLink]="can('READ_AMLCOMPLIANCE') ? ['alerts'] : null">
+            <span class="label">{{ 'compliance.alert.Open alerts' | translate }}</span>
+            <span class="value">{{ a.open }}</span>
+            <span class="sub">{{
+              'compliance.alert.openSub' | translate: { high: a.openHighRisk, concerns: a.concerns }
+            }}</span>
+          </a>
+        }
+        @if (caseSummary(); as k) {
+          <a
+            class="tile"
+            [class.warn]="k.toFile > 0"
+            [class.bad]="k.late > 0"
+            [routerLink]="can('READ_AMLCOMPLIANCE') ? ['cases'] : null"
+            [queryParams]="{ view: k.toFile > 0 ? 'decided_report' : 'open' }"
+          >
+            <span class="label">{{ 'compliance.case.Reports to file' | translate }}</span>
+            <span class="value">{{ k.toFile }}</span>
+            <span class="sub">{{ 'compliance.case.tileSub' | translate: { open: k.open, late: k.late } }}</span>
+          </a>
+        }
+      </div>
+    }
+
     @if (riskSummary(); as r) {
       <div class="tiles">
         <a
@@ -97,6 +124,8 @@
 
     @if (can('READ_AMLCOMPLIANCE')) {
       <nav class="links">
+        <a mat-stroked-button color="primary" [routerLink]="['alerts']">{{ 'compliance.alert.Alerts' | translate }}</a>
+        <a mat-stroked-button color="primary" [routerLink]="['cases']">{{ 'compliance.case.Cases' | translate }}</a>
         <a mat-stroked-button color="primary" [routerLink]="['risk']">{{ 'compliance.risk.view.HIGH' | translate }}</a>
         <a mat-stroked-button color="primary" [routerLink]="['peps']">{{
           'compliance.pep.Politically exposed persons' | translate
