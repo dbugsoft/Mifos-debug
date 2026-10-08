@@ -10,6 +10,8 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px 16px;
+  // A hint under one field must not stretch its neighbour's outline (#221)
+  align-items: start;
 
   mat-form-field {
     width: 100%;

@@ -6,7 +6,15 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  OnInit,
+  inject,
+  signal
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, Validators } from '@angular/forms';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
@@ -78,6 +86,7 @@ export class MembershipCitizenshipComponent implements OnInit {
   private formBuilder = inject(FormBuilder);
   private locationService = inject(NepalLocationService);
   private destroyRef = inject(DestroyRef);
+  private cdr = inject(ChangeDetectorRef);
   readonly nepaliFirst = injectNepaliFirst();
   readonly districts = signal<LocationOption[]>([]);
 
@@ -118,6 +127,12 @@ export class MembershipCitizenshipComponent implements OnInit {
     return this.form.valid && number
       ? { citizenshipNumber: number, citizenshipDistrictCode: v.citizenshipDistrictCode }
       : null;
+  }
+
+  /** Turns the missing fields red, when Next is pressed before the step is complete. */
+  showErrors(): void {
+    this.form.markAllAsTouched();
+    this.cdr.markForCheck();
   }
 
   /** The chosen district's name, for the preview. */
