@@ -16,14 +16,33 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { FormatNumberPipe } from 'app/pipes/format-number.pipe';
 import { InputDialogComponent, InputDialogData } from 'app/compliance/input-dialog/input-dialog.component';
 import { CodeOption, KymService } from '../kym.service';
-import { FIX_TAB, KymHistoryRow, KymMissing, KymView } from '../kym.models';
+import { FIX_TAB, KYM_DOCUMENTS, KymHistoryRow, KymMissing, KymView, OrganisationPerson } from '../kym.models';
 import { KymEditDialogComponent, KymEditDialogData } from '../kym-edit-dialog/kym-edit-dialog.component';
 import { KymOwnerDialogComponent } from '../kym-owner-dialog/kym-owner-dialog.component';
+import { KymOrgDialogComponent, KymOrgDialogData } from '../kym-org-dialog/kym-org-dialog.component';
+import { KymPersonDialogComponent, KymPersonDialogData } from '../kym-person-dialog/kym-person-dialog.component';
+import {
+  KymDocumentDialogComponent,
+  KymDocumentDialogData
+} from '../kym-document-dialog/kym-document-dialog.component';
+
+/** The role a missing organisation item asks for. */
+const ROLE_FOR: Record<string, string> = {
+  boardMembers: 'BOARD_MEMBER',
+  chiefExecutive: 'CHIEF_EXECUTIVE',
+  accountOperators: 'ACCOUNT_OPERATOR'
+};
+
+/** Fixed on this tab rather than on another one. */
+const HERE = [
+  'owners',
+  'people'
+];
 
 /**
  * A member's KYM (fineract-dbug #123, #124, #199; ADR 0039): its status, what is still missing (with the tab where each
  * thing is put right, because much of it is what Fineract already keeps), the form's own answers, the beneficial
- * owners, and every change. Staff with UPDATE_KYM change it with the member present; a second person with VERIFY_KYM
+ * owners (for an organisation: its own answers and its people, #191), and every change. Staff with UPDATE_KYM change it with the member present; a second person with VERIFY_KYM
  * verifies it.
  */
 @Component({
@@ -50,6 +69,7 @@ export class KymTabComponent {
   readonly canRead = this.kymService.canRead();
   readonly canUpdate = this.kymService.canUpdate();
   readonly canVerify = this.kymService.canVerify();
+  readonly canUpload = this.kymService.canUploadDocuments();
 
   readonly kym = signal<KymView | null>(null);
   readonly failed = signal(false);
@@ -59,11 +79,13 @@ export class KymTabComponent {
 
   /** The items fixed on other tabs, and those fixed on this tab's form, kept apart so each gets one clear action. */
   readonly elsewhere = computed(() =>
-    (this.kym()?.missing ?? []).filter((m) => FIX_TAB[m.item] && FIX_TAB[m.item] !== 'owners')
+    (this.kym()?.missing ?? []).filter((m) => FIX_TAB[m.item] && !HERE.includes(FIX_TAB[m.item]))
   );
   readonly onForm = computed(() =>
-    (this.kym()?.missing ?? []).filter((m) => !FIX_TAB[m.item] || FIX_TAB[m.item] === 'owners')
+    (this.kym()?.missing ?? []).filter((m) => !FIX_TAB[m.item] || HERE.includes(FIX_TAB[m.item]))
   );
+  /** An organisation member (legal form Entity) has the organisation form instead of the personal one. */
+  readonly isOrganisation = computed(() => !!this.kym()?.values.organisation);
   readonly occupation = computed(() => {
     const id = this.kym()?.values.occupationId;
     return id == null ? null : (this.professions().find((p) => p.id === id)?.name ?? null);
@@ -110,7 +132,10 @@ export class KymTabComponent {
 
   /** The translated words for a missing item, or the server's own words. */
   missingText(m: KymMissing): string {
-    const key = 'kym.missing.' + m.item;
+    if (m.item === 'personKym') {
+      return m.message; // names the person
+    }
+    const key = (this.isOrganisation() ? 'kym.org.missing.' : 'kym.missing.') + m.item;
     const t = this.translate.instant(key);
     return t && t !== key ? t : m.message;
   }
@@ -158,6 +183,94 @@ export class KymTabComponent {
 
   fixTab(m: KymMissing): string {
     return FIX_TAB[m.item];
+  }
+
+  /** A document the KYM looks for by name, which can be uploaded from here. */
+  isDocument(m: KymMissing): boolean {
+    return !!KYM_DOCUMENTS[m.item];
+  }
+
+  /** The action that puts a missing item right on this tab. */
+  fill(m: KymMissing): void {
+    if (m.item === 'beneficialOwner') {
+      this.addOwner();
+    } else if (ROLE_FOR[m.item]) {
+      this.addPerson(ROLE_FOR[m.item]);
+    } else if (m.item === 'personKym') {
+      document.getElementById('kym-people')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else if (this.isOrganisation()) {
+      this.editOrganisation();
+    } else {
+      this.edit(m.item);
+    }
+  }
+
+  editOrganisation(): void {
+    const k = this.kym();
+    if (!k) {
+      return;
+    }
+    this.dialog
+      .open<KymOrgDialogComponent, KymOrgDialogData, KymView>(KymOrgDialogComponent, {
+        data: { clientId: this.clientId, kym: k },
+        width: '720px',
+        maxWidth: '96vw',
+        autoFocus: false
+      })
+      .afterClosed()
+      .subscribe((updated) => updated && this.updated(updated));
+  }
+
+  addPerson(role?: string): void {
+    this.dialog
+      .open<KymPersonDialogComponent, KymPersonDialogData, KymView>(KymPersonDialogComponent, {
+        data: { clientId: this.clientId, role },
+        width: '640px',
+        maxWidth: '96vw',
+        autoFocus: false
+      })
+      .afterClosed()
+      .subscribe((updated) => updated && this.updated(updated));
+  }
+
+  endPerson(p: OrganisationPerson): void {
+    this.dialog
+      .open<InputDialogComponent, InputDialogData, { reason: string }>(InputDialogComponent, {
+        data: {
+          title: this.translate.instant('kym.org.endTitle', {
+            name: p.name,
+            role: this.translate.instant('kym.org.role.' + p.role)
+          }),
+          fields: [{ name: 'reason', label: 'kym.Reason', type: 'textarea', required: true, maxLength: 500 }],
+          confirm: 'kym.End'
+        }
+      })
+      .afterClosed()
+      .subscribe((r) => {
+        if (r?.reason) {
+          this.run(this.kymService.endPerson(this.clientId, p.id, r.reason));
+        }
+      });
+  }
+
+  upload(m: KymMissing): void {
+    this.dialog
+      .open<KymDocumentDialogComponent, KymDocumentDialogData, boolean>(KymDocumentDialogComponent, {
+        data: { clientId: this.clientId, item: m.item, label: this.missingText(m) },
+        width: '520px',
+        maxWidth: '96vw',
+        autoFocus: false
+      })
+      .afterClosed()
+      .subscribe((done) => done && this.load());
+  }
+
+  /** A dialog changed the KYM: show it, and the history if it is open. */
+  private updated(k: KymView): void {
+    this.kym.set(k);
+    if (this.history()) {
+      this.loadHistory();
+    }
   }
 
   edit(focus?: string): void {

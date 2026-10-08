@@ -45,7 +45,13 @@
       </div>
       <div class="actions">
         @if (canUpdate) {
-          <button mat-raised-button color="primary" type="button" (click)="edit()" [disabled]="busy()">
+          <button
+            mat-raised-button
+            color="primary"
+            type="button"
+            (click)="isOrganisation() ? editOrganisation() : edit()"
+            [disabled]="busy()"
+          >
             <mat-icon>edit</mat-icon>{{ 'kym.Update KYM' | translate }}
           </button>
         }
@@ -79,7 +85,12 @@
             @for (m of elsewhere(); track m.item) {
               <li>
                 <span>{{ missingText(m) }}</span>
-                <a class="fix" [routerLink]="['..', fixTab(m)]">{{ 'kym.tab.' + fixTab(m) | translate }} →</a>
+                <span class="fixes">
+                  @if (isDocument(m) && canUpload) {
+                    <a class="fix" (click)="upload(m)">{{ 'kym.doc.Upload' | translate }}</a>
+                  }
+                  <a class="fix" [routerLink]="['..', fixTab(m)]">{{ 'kym.tab.' + fixTab(m) | translate }} →</a>
+                </span>
               </li>
             }
           </ul>
@@ -90,12 +101,17 @@
             @for (m of onForm(); track m.item) {
               <li>
                 <span>{{ missingText(m) }}</span>
-                @if (canUpdate) {
-                  @if (m.item === 'beneficialOwner') {
-                    <a class="fix" (click)="addOwner()">{{ 'kym.Add an owner' | translate }}</a>
-                  } @else {
-                    <a class="fix" (click)="edit(m.item)">{{ 'kym.Fill in' | translate }}</a>
-                  }
+                @if (m.item === 'personKym') {
+                  <a class="fix" (click)="fill(m)">{{ 'kym.org.See the people' | translate }}</a>
+                } @else if (canUpdate) {
+                  <a class="fix" (click)="fill(m)">{{
+                    (m.item === 'beneficialOwner'
+                      ? 'kym.Add an owner'
+                      : fixTab(m) === 'people'
+                        ? 'kym.org.Add a person'
+                        : 'kym.Fill in'
+                    ) | translate
+                  }}</a>
                 }
               </li>
             }
@@ -104,205 +120,327 @@
       </section>
     }
 
-    <!-- The form's answers -->
-    <section class="frame">
-      <h3 class="legend">{{ 'kym.Family and occupation' | translate }}</h3>
-      <dl class="facts">
-        <div class="fact">
-          <dt class="fact-label">{{ 'kym.field.maritalStatus' | translate }}</dt>
-          <dd class="fact-value">
-            {{ k.values.maritalStatus ? ('kym.marital.' + k.values.maritalStatus | translate) : '—' }}
-          </dd>
-        </div>
-        <div class="fact">
-          <dt class="fact-label">{{ 'kym.field.familyType' | translate }}</dt>
-          <dd class="fact-value">
-            {{ k.values.familyType ? ('kym.familyType.' + k.values.familyType | translate) : '—' }}
-          </dd>
-        </div>
-        <div class="fact">
-          <dt class="fact-label">{{ 'kym.field.occupation' | translate }}</dt>
-          <dd class="fact-value">
-            {{ occupation() ?? '—' }}{{ k.values.occupationDetail ? ' · ' + k.values.occupationDetail : '' }}
-          </dd>
-        </div>
-        <div class="fact">
-          <dt class="fact-label">{{ 'kym.field.pan' | translate }}</dt>
-          <dd class="fact-value">{{ (k.values.noPan ? 'kym.No PAN' : 'kym.On the Identities tab') | translate }}</dd>
-        </div>
-        <div class="fact">
-          <dt class="fact-label">{{ 'kym.field.pepShort' | translate }}</dt>
-          <dd class="fact-value">
-            @if (!has(k.values.pepDeclared)) {
-              —
-            } @else if (k.values.pepDeclared) {
-              {{ 'kym.Yes' | translate }}: {{ k.values.pepName }} ({{ k.values.pepRelationship }},
-              {{ k.values.pepPost }})
-            } @else {
-              {{ 'kym.No' | translate }}
+    @if (isOrganisation()) {
+      <!-- The organisation form's answers (Fineract's own details are on the General tab) -->
+      @if (k.values.organisation; as o) {
+        <section class="frame">
+          <h3 class="legend">{{ 'kym.org.The organisation' | translate }}</h3>
+          <dl class="facts">
+            <div class="fact">
+              <dt class="fact-label">{{ 'kym.org.field.orgType' | translate }}</dt>
+              <dd class="fact-value">{{ o.orgType ? ('kym.org.type.' + o.orgType | translate) : '—' }}</dd>
+            </div>
+            <div class="fact">
+              <dt class="fact-label">{{ 'kym.org.field.registrationDate' | translate }}</dt>
+              <dd class="fact-value">{{ o.registrationDate ? (o.registrationDate | dateFormat) : '—' }}</dd>
+            </div>
+            <div class="fact">
+              <dt class="fact-label">{{ 'kym.org.field.registrationOffice' | translate }}</dt>
+              <dd class="fact-value">{{ o.registrationOffice ?? '—' }}</dd>
+            </div>
+            <div class="fact">
+              <dt class="fact-label">{{ 'kym.org.field.panVatNo' | translate }}</dt>
+              <dd class="fact-value">{{ o.panVatNo ?? '—' }}</dd>
+            </div>
+            <div class="fact">
+              <dt class="fact-label">{{ 'kym.org.field.mainObjective' | translate }}</dt>
+              <dd class="fact-value">{{ o.mainObjective ?? '—' }}</dd>
+            </div>
+            <div class="fact">
+              <dt class="fact-label">{{ 'kym.org.field.workingArea' | translate }}</dt>
+              <dd class="fact-value">{{ o.workingArea ?? '—' }}</dd>
+            </div>
+            <div class="fact">
+              <dt class="fact-label">{{ 'kym.org.field.branchCount' | translate }}</dt>
+              <dd class="fact-value">
+                {{ has(o.branchCount) ? o.branchCount : '—'
+                }}{{ o.branchCount && o.branchLocations ? ' · ' + o.branchLocations : '' }}
+              </dd>
+            </div>
+            <div class="fact">
+              <dt class="fact-label">{{ 'kym.org.field.expectedYearlyTransactions' | translate }}</dt>
+              <dd class="fact-value">
+                {{
+                  has(o.expectedYearlyTransactions)
+                    ? ('kym.Rs' | translate) + ' ' + (o.expectedYearlyTransactions | formatNumber)
+                    : '—'
+                }}
+              </dd>
+            </div>
+            @if (o.otherDetails) {
+              <div class="fact">
+                <dt class="fact-label">{{ 'kym.org.field.otherDetails' | translate }}</dt>
+                <dd class="fact-value">{{ o.otherDetails }}</dd>
+              </div>
             }
-          </dd>
+          </dl>
+        </section>
+      }
+
+      <section class="frame" id="kym-people">
+        <h3 class="legend">{{ 'kym.org.People' | translate }}</h3>
+        <div class="frame-head">
+          <p class="hint">{{ 'kym.org.peopleHint' | translate }}</p>
+          @if (canUpdate) {
+            <button mat-stroked-button type="button" (click)="addPerson()">
+              <mat-icon>person_add</mat-icon>{{ 'kym.org.Add a person' | translate }}
+            </button>
+          }
         </div>
-        @if (k.values.guardianName || k.values.guardianClientId) {
+        @if (k.values.organisationPeople?.length) {
+          <div class="table-scroll">
+            <table class="plain">
+              <thead>
+                <tr>
+                  <th>{{ 'kym.org.Person' | translate }}</th>
+                  <th>{{ 'kym.org.Role' | translate }}</th>
+                  <th>{{ 'kym.org.Their KYM' | translate }}</th>
+                  @if (canUpdate) {
+                    <th></th>
+                  }
+                </tr>
+              </thead>
+              <tbody>
+                @for (p of k.values.organisationPeople; track p.id) {
+                  <tr>
+                    <td>
+                      <a [routerLink]="['/members', p.clientId, 'kym']">{{ p.name }}</a>
+                      <span class="sub">{{ p.accountNo }}</span>
+                    </td>
+                    <td>
+                      {{ 'kym.org.role.' + p.role | translate }}
+                      @if (p.title) {
+                        <span class="sub">{{ p.title }}</span>
+                      }
+                    </td>
+                    <td>
+                      <span
+                        class="chip"
+                        [class.red]="p.kymStatus === 'INCOMPLETE'"
+                        [class.blue]="p.kymStatus === 'COMPLETE'"
+                        [class.green]="p.kymStatus === 'VERIFIED'"
+                        >{{ 'kym.status.' + p.kymStatus | translate }}</span
+                      >
+                    </td>
+                    @if (canUpdate) {
+                      <td>
+                        <button mat-button type="button" (click)="endPerson(p)">{{ 'kym.End' | translate }}</button>
+                      </td>
+                    }
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        } @else {
+          <p class="empty">{{ 'kym.org.noPeople' | translate }}</p>
+        }
+      </section>
+    } @else {
+      <!-- The form's answers -->
+      <section class="frame">
+        <h3 class="legend">{{ 'kym.Family and occupation' | translate }}</h3>
+        <dl class="facts">
           <div class="fact">
-            <dt class="fact-label">{{ 'kym.field.guardian' | translate }}</dt>
-            <dd class="fact-value">{{ k.values.guardianName ?? '#' + k.values.guardianClientId }}</dd>
+            <dt class="fact-label">{{ 'kym.field.maritalStatus' | translate }}</dt>
+            <dd class="fact-value">
+              {{ k.values.maritalStatus ? ('kym.marital.' + k.values.maritalStatus | translate) : '—' }}
+            </dd>
+          </div>
+          <div class="fact">
+            <dt class="fact-label">{{ 'kym.field.familyType' | translate }}</dt>
+            <dd class="fact-value">
+              {{ k.values.familyType ? ('kym.familyType.' + k.values.familyType | translate) : '—' }}
+            </dd>
+          </div>
+          <div class="fact">
+            <dt class="fact-label">{{ 'kym.field.occupation' | translate }}</dt>
+            <dd class="fact-value">
+              {{ occupation() ?? '—' }}{{ k.values.occupationDetail ? ' · ' + k.values.occupationDetail : '' }}
+            </dd>
+          </div>
+          <div class="fact">
+            <dt class="fact-label">{{ 'kym.field.pan' | translate }}</dt>
+            <dd class="fact-value">{{ (k.values.noPan ? 'kym.No PAN' : 'kym.On the Identities tab') | translate }}</dd>
+          </div>
+          <div class="fact">
+            <dt class="fact-label">{{ 'kym.field.pepShort' | translate }}</dt>
+            <dd class="fact-value">
+              @if (!has(k.values.pepDeclared)) {
+                —
+              } @else if (k.values.pepDeclared) {
+                {{ 'kym.Yes' | translate }}: {{ k.values.pepName }} ({{ k.values.pepRelationship }},
+                {{ k.values.pepPost }})
+              } @else {
+                {{ 'kym.No' | translate }}
+              }
+            </dd>
+          </div>
+          @if (k.values.guardianName || k.values.guardianClientId) {
+            <div class="fact">
+              <dt class="fact-label">{{ 'kym.field.guardian' | translate }}</dt>
+              <dd class="fact-value">{{ k.values.guardianName ?? '#' + k.values.guardianClientId }}</dd>
+            </div>
+          }
+        </dl>
+      </section>
+
+      <section class="frame">
+        <h3 class="legend">{{ 'kym.Living and membership' | translate }}</h3>
+        <dl class="facts">
+          <div class="fact">
+            <dt class="fact-label">{{ 'kym.field.workingAreaResidence' | translate }}</dt>
+            <dd class="fact-value">
+              {{ k.values.workingAreaResidence ? ('kym.residence.' + k.values.workingAreaResidence | translate) : '—' }}
+            </dd>
+          </div>
+          <div class="fact">
+            <dt class="fact-label">{{ 'kym.field.timeInWorkingArea' | translate }}</dt>
+            <dd class="fact-value">{{ k.values.timeInWorkingArea ?? '—' }}</dd>
+          </div>
+          <div class="fact">
+            <dt class="fact-label">{{ 'kym.field.votingPollingPlace' | translate }}</dt>
+            <dd class="fact-value">{{ k.values.votingPollingPlace ?? '—' }}</dd>
+          </div>
+          <div class="fact">
+            <dt class="fact-label">{{ 'kym.field.purposeOfJoining' | translate }}</dt>
+            <dd class="fact-value">{{ k.values.purposeOfJoining ?? '—' }}</dd>
+          </div>
+          <div class="fact">
+            <dt class="fact-label">{{ 'kym.field.otherCoop' | translate }}</dt>
+            <dd class="fact-value">{{ yesNo(k.values.otherCoopMember) | translate }}</dd>
+          </div>
+          <div class="fact">
+            <dt class="fact-label">{{ 'kym.field.familyOtherCoop' | translate }}</dt>
+            <dd class="fact-value">{{ yesNo(k.values.familyOtherCoopMember) | translate }}</dd>
+          </div>
+          <div class="fact">
+            <dt class="fact-label">{{ 'kym.field.familyHere' | translate }}</dt>
+            <dd class="fact-value">
+              @if (k.values.familyHere.length) {
+                @for (p of k.values.familyHere; track p.clientId; let last = $last) {
+                  <a [routerLink]="['/members', p.clientId]">{{ p.name }}</a
+                  >{{ p.relationship ? ' (' + p.relationship + ')' : '' }}{{ last ? '' : ', ' }}
+                }
+              } @else {
+                {{ yesNo(k.values.familyInThisCoop) | translate }}
+              }
+            </dd>
+          </div>
+          <div class="fact">
+            <dt class="fact-label">{{ 'kym.field.recommenders' | translate }}</dt>
+            <dd class="fact-value">
+              @if (k.values.foundingMember) {
+                {{ 'kym.Founding member' | translate }}
+              } @else if (k.values.recommenders.length) {
+                @for (p of k.values.recommenders; track p.clientId; let last = $last) {
+                  <a [routerLink]="['/members', p.clientId]">{{ p.name }}</a
+                  >{{ last ? '' : ', ' }}
+                }
+              } @else {
+                —
+              }
+            </dd>
+          </div>
+        </dl>
+        @if (k.values.otherCoops.length) {
+          <div class="table-scroll">
+            <table class="plain">
+              <thead>
+                <tr>
+                  <th>{{ 'kym.Whose' | translate }}</th>
+                  <th>{{ 'kym.Cooperative' | translate }}</th>
+                  <th>{{ 'kym.Membership number' | translate }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (c of k.values.otherCoops; track c.id) {
+                  <tr>
+                    <td>
+                      {{ 'kym.whose.' + c.whose | translate }}{{ c.personName ? ': ' + c.personName : ''
+                      }}{{ c.relationship ? ' (' + c.relationship + ')' : '' }}
+                    </td>
+                    <td>{{ c.coopNameAddress }}</td>
+                    <td>{{ c.membershipNo ?? '—' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
           </div>
         }
-      </dl>
-    </section>
+      </section>
 
-    <section class="frame">
-      <h3 class="legend">{{ 'kym.Living and membership' | translate }}</h3>
-      <dl class="facts">
-        <div class="fact">
-          <dt class="fact-label">{{ 'kym.field.workingAreaResidence' | translate }}</dt>
-          <dd class="fact-value">
-            {{ k.values.workingAreaResidence ? ('kym.residence.' + k.values.workingAreaResidence | translate) : '—' }}
-          </dd>
-        </div>
-        <div class="fact">
-          <dt class="fact-label">{{ 'kym.field.timeInWorkingArea' | translate }}</dt>
-          <dd class="fact-value">{{ k.values.timeInWorkingArea ?? '—' }}</dd>
-        </div>
-        <div class="fact">
-          <dt class="fact-label">{{ 'kym.field.votingPollingPlace' | translate }}</dt>
-          <dd class="fact-value">{{ k.values.votingPollingPlace ?? '—' }}</dd>
-        </div>
-        <div class="fact">
-          <dt class="fact-label">{{ 'kym.field.purposeOfJoining' | translate }}</dt>
-          <dd class="fact-value">{{ k.values.purposeOfJoining ?? '—' }}</dd>
-        </div>
-        <div class="fact">
-          <dt class="fact-label">{{ 'kym.field.otherCoop' | translate }}</dt>
-          <dd class="fact-value">{{ yesNo(k.values.otherCoopMember) | translate }}</dd>
-        </div>
-        <div class="fact">
-          <dt class="fact-label">{{ 'kym.field.familyOtherCoop' | translate }}</dt>
-          <dd class="fact-value">{{ yesNo(k.values.familyOtherCoopMember) | translate }}</dd>
-        </div>
-        <div class="fact">
-          <dt class="fact-label">{{ 'kym.field.familyHere' | translate }}</dt>
-          <dd class="fact-value">
-            @if (k.values.familyHere.length) {
-              @for (p of k.values.familyHere; track p.clientId; let last = $last) {
-                <a [routerLink]="['/members', p.clientId]">{{ p.name }}</a
-                >{{ p.relationship ? ' (' + p.relationship + ')' : '' }}{{ last ? '' : ', ' }}
-              }
-            } @else {
-              {{ yesNo(k.values.familyInThisCoop) | translate }}
-            }
-          </dd>
-        </div>
-        <div class="fact">
-          <dt class="fact-label">{{ 'kym.field.recommenders' | translate }}</dt>
-          <dd class="fact-value">
-            @if (k.values.foundingMember) {
-              {{ 'kym.Founding member' | translate }}
-            } @else if (k.values.recommenders.length) {
-              @for (p of k.values.recommenders; track p.clientId; let last = $last) {
-                <a [routerLink]="['/members', p.clientId]">{{ p.name }}</a
-                >{{ last ? '' : ', ' }}
-              }
-            } @else {
-              —
-            }
-          </dd>
-        </div>
-      </dl>
-      @if (k.values.otherCoops.length) {
-        <div class="table-scroll">
-          <table class="plain">
-            <thead>
-              <tr>
-                <th>{{ 'kym.Whose' | translate }}</th>
-                <th>{{ 'kym.Cooperative' | translate }}</th>
-                <th>{{ 'kym.Membership number' | translate }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (c of k.values.otherCoops; track c.id) {
+      <section class="frame">
+        <h3 class="legend">{{ 'kym.Income and transactions' | translate }}</h3>
+        <dl class="facts">
+          <div class="fact">
+            <dt class="fact-label">{{ 'kym.field.incomeBand' | translate }}</dt>
+            <dd class="fact-value">
+              {{ k.values.incomeBand ? ('kym.band.' + k.values.incomeBand | translate) : '—' }}
+            </dd>
+          </div>
+          <div class="fact">
+            <dt class="fact-label">{{ 'kym.field.expectedTransactionsYear' | translate }}</dt>
+            <dd class="fact-value">{{ k.values.expectedTransactionsYear ?? '—' }}</dd>
+          </div>
+          <div class="fact">
+            <dt class="fact-label">{{ 'kym.field.expectedDepositYear' | translate }}</dt>
+            <dd class="fact-value">
+              {{
+                has(k.values.expectedDepositYear)
+                  ? ('kym.Rs' | translate) + ' ' + (k.values.expectedDepositYear | formatNumber)
+                  : '—'
+              }}
+            </dd>
+          </div>
+          <div class="fact">
+            <dt class="fact-label">{{ 'kym.field.expectedBorrowing' | translate }}</dt>
+            <dd class="fact-value">
+              {{
+                has(k.values.expectedBorrowing)
+                  ? ('kym.Rs' | translate) + ' ' + (k.values.expectedBorrowing | formatNumber)
+                  : '—'
+              }}
+            </dd>
+          </div>
+        </dl>
+        @if (k.values.incomeSources.length) {
+          <div class="table-scroll">
+            <table class="plain">
+              <thead>
                 <tr>
-                  <td>
-                    {{ 'kym.whose.' + c.whose | translate }}{{ c.personName ? ': ' + c.personName : ''
-                    }}{{ c.relationship ? ' (' + c.relationship + ')' : '' }}
-                  </td>
-                  <td>{{ c.coopNameAddress }}</td>
-                  <td>{{ c.membershipNo ?? '—' }}</td>
+                  <th>{{ 'kym.Source of income' | translate }}</th>
+                  <th>{{ 'kym.Details' | translate }}</th>
+                  <th class="num">{{ 'kym.Last year (Rs)' | translate }}</th>
                 </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-      }
-    </section>
-
-    <section class="frame">
-      <h3 class="legend">{{ 'kym.Income and transactions' | translate }}</h3>
-      <dl class="facts">
-        <div class="fact">
-          <dt class="fact-label">{{ 'kym.field.incomeBand' | translate }}</dt>
-          <dd class="fact-value">{{ k.values.incomeBand ? ('kym.band.' + k.values.incomeBand | translate) : '—' }}</dd>
-        </div>
-        <div class="fact">
-          <dt class="fact-label">{{ 'kym.field.expectedTransactionsYear' | translate }}</dt>
-          <dd class="fact-value">{{ k.values.expectedTransactionsYear ?? '—' }}</dd>
-        </div>
-        <div class="fact">
-          <dt class="fact-label">{{ 'kym.field.expectedDepositYear' | translate }}</dt>
-          <dd class="fact-value">
-            {{
-              has(k.values.expectedDepositYear)
-                ? ('kym.Rs' | translate) + ' ' + (k.values.expectedDepositYear | formatNumber)
-                : '—'
-            }}
-          </dd>
-        </div>
-        <div class="fact">
-          <dt class="fact-label">{{ 'kym.field.expectedBorrowing' | translate }}</dt>
-          <dd class="fact-value">
-            {{
-              has(k.values.expectedBorrowing)
-                ? ('kym.Rs' | translate) + ' ' + (k.values.expectedBorrowing | formatNumber)
-                : '—'
-            }}
-          </dd>
-        </div>
-      </dl>
-      @if (k.values.incomeSources.length) {
-        <div class="table-scroll">
-          <table class="plain">
-            <thead>
-              <tr>
-                <th>{{ 'kym.Source of income' | translate }}</th>
-                <th>{{ 'kym.Details' | translate }}</th>
-                <th class="num">{{ 'kym.Last year (Rs)' | translate }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (s of k.values.incomeSources; track $index) {
-                <tr>
-                  <td>{{ 'kym.heading.' + s.heading | translate }}</td>
-                  <td>{{ s.detail ?? '—' }}</td>
-                  <td class="num">{{ s.amount | formatNumber }}</td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-      }
-    </section>
+              </thead>
+              <tbody>
+                @for (s of k.values.incomeSources; track $index) {
+                  <tr>
+                    <td>{{ 'kym.heading.' + s.heading | translate }}</td>
+                    <td>{{ s.detail ?? '—' }}</td>
+                    <td class="num">{{ s.amount | formatNumber }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </section>
+    }
 
     <section class="frame">
       <h3 class="legend">{{ 'kym.Beneficial owners' | translate }}</h3>
       <div class="frame-head">
         <p class="hint">
           {{
-            (!has(k.values.someoneElseDirects)
-              ? 'kym.ownerNotAsked'
-              : k.values.someoneElseDirects
-                ? 'kym.ownerYes'
-                : 'kym.ownerNo'
+            (isOrganisation()
+              ? 'kym.org.ownersHint'
+              : !has(k.values.someoneElseDirects)
+                ? 'kym.ownerNotAsked'
+                : k.values.someoneElseDirects
+                  ? 'kym.ownerYes'
+                  : 'kym.ownerNo'
             ) | translate
           }}
         </p>
@@ -376,21 +514,23 @@
       }
     </section>
 
-    <section class="frame">
-      <h3 class="legend">{{ 'kym.Declaration' | translate }}</h3>
-      <dl class="facts">
-        <div class="fact">
-          <dt class="fact-label">{{ 'kym.field.declaration' | translate }}</dt>
-          <dd class="fact-value">{{ yesNo(k.values.declarationAccepted) | translate }}</dd>
-        </div>
-        @if (k.values.remarks) {
+    @if (!isOrganisation()) {
+      <section class="frame">
+        <h3 class="legend">{{ 'kym.Declaration' | translate }}</h3>
+        <dl class="facts">
           <div class="fact">
-            <dt class="fact-label">{{ 'kym.field.remarks' | translate }}</dt>
-            <dd class="fact-value">{{ k.values.remarks }}</dd>
+            <dt class="fact-label">{{ 'kym.field.declaration' | translate }}</dt>
+            <dd class="fact-value">{{ yesNo(k.values.declarationAccepted) | translate }}</dd>
           </div>
-        }
-      </dl>
-    </section>
+          @if (k.values.remarks) {
+            <div class="fact">
+              <dt class="fact-label">{{ 'kym.field.remarks' | translate }}</dt>
+              <dd class="fact-value">{{ k.values.remarks }}</dd>
+            </div>
+          }
+        </dl>
+      </section>
+    }
 
     <!-- Every change -->
     <section class="frame">

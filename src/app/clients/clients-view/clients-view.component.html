@@ -85,6 +85,11 @@
                   <mifosx-membership-deadline [application]="membershipApplication()"></mifosx-membership-deadline
                 ></span>
               }
+              @if (
+                canReadKym && (clientViewData.status.value === 'Active' || clientViewData.status.value === 'Pending')
+              ) {
+                <mifosx-kym-chip [clientId]="clientViewData.id"></mifosx-kym-chip>
+              }
             </h3>
             <button
               type="button"

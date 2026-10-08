@@ -72,6 +72,11 @@
   .hint + ul {
     margin-top: 4px;
   }
+
+  .fixes {
+    display: inline-flex;
+    gap: 16px;
+  }
 }
 
 .fix {

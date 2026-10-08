@@ -1,0 +1,150 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+// The Membership Applications list's look (blue-header table, tabs), with the compliance pages' chips.
+@use 'app/compliance/compliance' as c;
+
+@include c.page;
+
+.lead,
+.empty-note {
+  margin: 0 0 16px;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 8px;
+
+  .search {
+    width: 360px;
+    max-width: 100%;
+  }
+
+  .office {
+    width: 280px;
+    max-width: 100%;
+  }
+}
+
+.tabs {
+  margin-bottom: 12px;
+
+  a {
+    cursor: pointer;
+  }
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.list {
+  width: 100%;
+  min-width: 640px;
+  border-collapse: collapse;
+
+  th {
+    background: #1074b9;
+    color: #fff;
+    text-align: left;
+    padding: 14px 16px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  th:first-child {
+    border-top-left-radius: 6px;
+  }
+
+  th:last-child {
+    border-top-right-radius: 6px;
+  }
+
+  td {
+    padding: 12px 16px;
+    border-bottom: 1px solid rgb(0 0 0 / 12%);
+    vertical-align: top;
+  }
+
+  .num {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .row {
+    cursor: pointer;
+  }
+
+  .row:hover td,
+  .row:focus td {
+    background: rgb(16 116 185 / 6%);
+    outline: none;
+  }
+
+  .sub {
+    display: block;
+    margin-top: 2px;
+    font-size: 12.5px;
+    opacity: 0.75;
+  }
+
+  .count {
+    font-weight: 600;
+    color: #9f1f17;
+  }
+
+  .tag {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 0 8px;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    line-height: 20px;
+    color: #3f4448;
+    background: #eceff1;
+  }
+
+  .empty {
+    text-align: center;
+    padding: 28px;
+    opacity: 0.7;
+  }
+}
+
+// On a phone the account number and office move under the name, so what is missing stays in view.
+.list .narrow {
+  display: none;
+}
+
+@media (width <= 600px) {
+  .list {
+    min-width: 0;
+
+    .wide {
+      display: none;
+    }
+
+    .narrow {
+      display: block;
+    }
+
+    th,
+    td {
+      padding: 10px 12px;
+    }
+  }
+}
+
+.more {
+  display: flex;
+  justify-content: center;
+  padding: 16px 0 4px;
+}

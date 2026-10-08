@@ -103,7 +103,54 @@ export interface KymValues {
   recommenders: KymPerson[];
   familyHere: KymPerson[];
   beneficialOwners: BeneficialOwner[];
+  /** Only for an organisation (legal form Entity): the organisation form's own answers */
+  organisation?: OrganisationValues;
+  /** Only for an organisation: the people linked to it now */
+  organisationPeople?: OrganisationPerson[];
 }
+
+/** The organisation form's answers that Fineract has no field for (issue #191, Schedule 2). */
+export interface OrganisationValues {
+  orgType?: string | null;
+  registrationDate?: string | null;
+  registrationOffice?: string | null;
+  mainObjective?: string | null;
+  workingArea?: string | null;
+  branchCount?: number | null;
+  branchLocations?: string | null;
+  expectedYearlyTransactions?: number | null;
+  panVatNo?: string | null;
+  otherDetails?: string | null;
+}
+
+export interface OrganisationPerson {
+  /** The link's id, for ending it */
+  id: number;
+  clientId: number;
+  name: string;
+  accountNo: string;
+  role: string;
+  title: string | null;
+  since: string;
+  kymStatus: KymStatus;
+}
+
+/** One row of the incomplete-KYM list (GET /nepal/kym?status=). */
+export interface KymListRow {
+  clientId: number;
+  name: string;
+  accountNo: string;
+  office: string;
+  status: KymStatus;
+  missing: number | null;
+  /** The missing item codes, comma-separated; null until the member's KYM was computed since the list began */
+  missingItems: string | null;
+  nextReviewOn: string | null;
+  level: 'FULL' | 'SIMPLIFIED';
+  organisation: boolean;
+}
+
+export type KymListStatus = 'INCOMPLETE' | 'COMPLETE' | 'REVIEW_DUE' | 'BLOCKED';
 
 export interface KymView {
   clientId: number;
@@ -160,6 +207,18 @@ export const OWNER_CONTROLS = [
   'BENEFITS',
   'OTHER'
 ];
+export const ORGANISATION_TYPES = [
+  'COOPERATIVE',
+  'COMPANY',
+  'GROUP',
+  'INSTITUTION',
+  'OTHER'
+];
+export const ORGANISATION_ROLES = [
+  'BOARD_MEMBER',
+  'CHIEF_EXECUTIVE',
+  'ACCOUNT_OPERATOR'
+];
 export const OWNER_IDENTIFIED_BY = [
   'DOCUMENTS_SEEN',
   'MEMBER_DECLARED',
@@ -188,5 +247,41 @@ export const FIX_TAB: Record<string, string> = {
   spouseOccupation: 'family-members',
   thumbprint: 'documents',
   guardianThumbprint: 'documents',
-  beneficialOwner: 'owners'
+  beneficialOwner: 'owners',
+  // an organisation: what Fineract keeps is changed on its Edit screen, the head office is its address
+  name: 'edit',
+  registrationNo: 'edit',
+  renewalDate: 'edit',
+  businessType: 'edit',
+  headOffice: 'address',
+  byeLaws: 'documents',
+  financialStatements: 'documents',
+  taxClearance: 'documents',
+  boardDecision: 'documents',
+  boardMembers: 'people',
+  chiefExecutive: 'people',
+  accountOperators: 'people',
+  personKym: 'people'
+};
+
+/**
+ * The documents the KYM looks for by name, with the names a clerk may give each (the server matches the start of the
+ * name). Uploading from the KYM tab gives the right name, so nobody has to type it.
+ */
+export const KYM_DOCUMENTS: Record<string, string[]> = {
+  thumbprint: [
+    'thumbprint-right',
+    'thumbprint-left'
+  ],
+  guardianThumbprint: [
+    'guardian-thumbprint-right',
+    'guardian-thumbprint-left'
+  ],
+  byeLaws: [
+    'bye-laws',
+    'authorised-letter'
+  ],
+  financialStatements: ['financial-statements'],
+  taxClearance: ['tax-clearance'],
+  boardDecision: ['board-decision']
 };
