@@ -17,10 +17,12 @@ import {
   OnInit,
   Output,
   ViewChild,
+  DoCheck,
   effect,
   inject
 } from '@angular/core';
 import { ControlValueAccessor, NgControl, UntypedFormControl, Validators } from '@angular/forms';
+import { ErrorStateMatcher } from '@angular/material/core';
 import { MatIcon } from '@angular/material/icon';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { BS_MONTHS, BsCalendarService } from 'app/core/bs-calendar/bs-calendar.service';
@@ -90,7 +92,7 @@ const AD_FORMAT: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short', 
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class NepaliDateInputComponent implements ControlValueAccessor, OnInit {
+export class NepaliDateInputComponent implements ControlValueAccessor, OnInit, DoCheck {
   @Input() label = 'Date (BS)';
   /**
    * Inline layout: `18 Ashwin 2083 [cal] ... [BS|AD] 4 Oct 2026 AD`. The calendar icon sits right after the date,
@@ -240,6 +242,21 @@ export class NepaliDateInputComponent implements ControlValueAccessor, OnInit {
   get hasRequiredError(): boolean {
     const ctrl = this.ngControl?.control;
     return !!(ctrl && ctrl.touched && ctrl.hasError('required'));
+  }
+
+  /** The inner field turns red on the form's required error too, not only on its own control's errors. */
+  readonly errorStateMatcher: ErrorStateMatcher = {
+    isErrorState: (ctrl) => this.hasRequiredError || !!(ctrl?.invalid && ctrl.touched)
+  };
+
+  private shownRequiredError = false;
+
+  /** OnPush: a form marked touched from outside (Next pressed early) must still redraw the error. */
+  ngDoCheck(): void {
+    if (this.hasRequiredError !== this.shownRequiredError) {
+      this.shownRequiredError = this.hasRequiredError;
+      this.cdr.markForCheck();
+    }
   }
 
   get isDisabled(): boolean {

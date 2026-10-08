@@ -702,7 +702,102 @@
     {{ 'coopDashboard.Income section' | translate }}
   </h3>
   <div class="coop__grid">
-    <mat-card class="card span-8">
+    <mat-card class="card span-12">
+      <div class="card__head">
+        <div>
+          <h3>
+            {{ 'coopDashboard.Margins' | translate }}
+            <mifosx-info-tip key="margins"></mifosx-info-tip>
+          </h3>
+          <p class="card__hint">{{ 'coopDashboard.yearly rates' | translate }}</p>
+        </div>
+      </div>
+      @if (inc) {
+        <div class="income__split">
+          <div class="income__rates">
+            <div class="margins">
+              <div class="margin">
+                <span class="margin__value">{{ percent(inc.loanYield) }}</span>
+                <span class="margin__label">
+                  {{ 'coopDashboard.Loan yield' | translate }}
+                  <mifosx-info-tip key="loanYield"></mifosx-info-tip>
+                </span>
+              </div>
+              <div class="margin">
+                <span class="margin__value">{{ percent(inc.costOfDeposits) }}</span>
+                <span class="margin__label">
+                  {{ 'coopDashboard.Cost of deposits' | translate }}
+                  <mifosx-info-tip key="costOfDeposits"></mifosx-info-tip>
+                </span>
+              </div>
+              <div class="margin margin--accent">
+                <span class="margin__value">{{ percent(inc.spread) }}</span>
+                <span class="margin__label">
+                  {{ 'coopDashboard.Spread' | translate }}
+                  <mifosx-info-tip key="spread"></mifosx-info-tip>
+                </span>
+              </div>
+            </div>
+            @let rs = inc.rateSpread;
+            @let gauge = spreadGauge(rs.spread, rs.cap);
+            <div class="spread" [class.spread--over]="!rs.withinCap">
+              <div class="spread__head">
+                <span class="spread__label">
+                  {{ 'coopDashboard.Rate spread' | translate }}
+                  <mifosx-info-tip key="rateSpread"></mifosx-info-tip>
+                </span>
+                <span class="spread__value">
+                  {{
+                    rs.spread !== null && rs.spread !== undefined
+                      ? rs.spread + ' ' + ('coopDashboard.pts' | translate)
+                      : '–'
+                  }}
+                </span>
+              </div>
+              <div class="spread__gauge" role="img" [attr.aria-label]="'coopDashboard.Rate spread' | translate">
+                <i class="spread__allowed" [style.width.%]="gauge.cap"></i>
+                <i class="spread__fill" [style.width.%]="gauge.value"></i>
+                <i class="spread__cap" [style.left.%]="gauge.cap"></i>
+              </div>
+              <div class="spread__foot">
+                <span>
+                  {{
+                    'coopDashboard.lending minus deposits'
+                      | translate: { lending: percent(rs.lendingRate, 2), deposit: percent(rs.depositRate, 2) }
+                  }}
+                </span>
+                <span class="spread__status">
+                  <fa-icon [icon]="rs.withinCap ? 'check-circle' : 'exclamation-circle'"></fa-icon>
+                  {{
+                    (rs.withinCap ? 'coopDashboard.within cap' : 'coopDashboard.over cap') | translate: { cap: rs.cap }
+                  }}
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="lines">
+            @for (type of ['INCOME', 'EXPENSE']; track type) {
+              <div>
+                <h4>{{ (type === 'INCOME' ? 'coopDashboard.Income' : 'coopDashboard.Expenses') | translate }}</h4>
+                @for (l of incomeLines(inc, $any(type)); track l.glCode) {
+                  <div class="line">
+                    <span class="line__name">{{ l.name }}</span>
+                    <span class="line__amount">{{ short(l.amount) }}</span>
+                    <span class="line__bar line__bar--{{ type }}">
+                      <i [style.width.%]="lineShare(l.amount, type === 'INCOME' ? inc.income : inc.expense)"></i>
+                    </span>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      } @else {
+        <ng-container *ngTemplateOutlet="pending; context: { name: 'income', tall: true }"></ng-container>
+      }
+    </mat-card>
+
+    <mat-card class="card span-12">
       <div class="card__head">
         <div>
           <h3>
@@ -728,93 +823,6 @@
         ></mifosx-coop-chart>
       } @else {
         <ng-container *ngTemplateOutlet="pending; context: { name: 'income' }"></ng-container>
-      }
-    </mat-card>
-
-    <mat-card class="card span-4">
-      <div class="card__head">
-        <div>
-          <h3>
-            {{ 'coopDashboard.Margins' | translate }}
-            <mifosx-info-tip key="margins"></mifosx-info-tip>
-          </h3>
-          <p class="card__hint">{{ 'coopDashboard.yearly rates' | translate }}</p>
-        </div>
-      </div>
-      @if (inc) {
-        <div class="margins">
-          <div class="margin">
-            <span class="margin__value">{{ percent(inc.loanYield) }}</span>
-            <span class="margin__label">
-              {{ 'coopDashboard.Loan yield' | translate }}
-              <mifosx-info-tip key="loanYield"></mifosx-info-tip>
-            </span>
-          </div>
-          <div class="margin">
-            <span class="margin__value">{{ percent(inc.costOfDeposits) }}</span>
-            <span class="margin__label">
-              {{ 'coopDashboard.Cost of deposits' | translate }}
-              <mifosx-info-tip key="costOfDeposits"></mifosx-info-tip>
-            </span>
-          </div>
-          <div class="margin margin--accent">
-            <span class="margin__value">{{ percent(inc.spread) }}</span>
-            <span class="margin__label">
-              {{ 'coopDashboard.Spread' | translate }}
-              <mifosx-info-tip key="spread"></mifosx-info-tip>
-            </span>
-          </div>
-        </div>
-        @let rs = inc.rateSpread;
-        @let gauge = spreadGauge(rs.spread, rs.cap);
-        <div class="spread" [class.spread--over]="!rs.withinCap">
-          <div class="spread__head">
-            <span class="spread__label">
-              {{ 'coopDashboard.Rate spread' | translate }}
-              <mifosx-info-tip key="rateSpread"></mifosx-info-tip>
-            </span>
-            <span class="spread__value">
-              {{
-                rs.spread !== null && rs.spread !== undefined
-                  ? rs.spread + ' ' + ('coopDashboard.pts' | translate)
-                  : '–'
-              }}
-            </span>
-          </div>
-          <div class="spread__gauge" role="img" [attr.aria-label]="'coopDashboard.Rate spread' | translate">
-            <i class="spread__allowed" [style.width.%]="gauge.cap"></i>
-            <i class="spread__fill" [style.width.%]="gauge.value"></i>
-            <i class="spread__cap" [style.left.%]="gauge.cap"></i>
-          </div>
-          <div class="spread__foot">
-            <span>
-              {{
-                'coopDashboard.lending minus deposits'
-                  | translate: { lending: percent(rs.lendingRate, 2), deposit: percent(rs.depositRate, 2) }
-              }}
-            </span>
-            <span class="spread__status">
-              <fa-icon [icon]="rs.withinCap ? 'check-circle' : 'exclamation-circle'"></fa-icon>
-              {{ (rs.withinCap ? 'coopDashboard.within cap' : 'coopDashboard.over cap') | translate: { cap: rs.cap } }}
-            </span>
-          </div>
-        </div>
-        <div class="lines">
-          @for (type of ['INCOME', 'EXPENSE']; track type) {
-            <h4>{{ (type === 'INCOME' ? 'coopDashboard.Income' : 'coopDashboard.Expenses') | translate }}</h4>
-            @for (l of incomeLines(inc, $any(type)); track l.glCode) {
-              <div class="line">
-                <span class="line__name">{{ l.name }}</span>
-                <span class="line__amount">{{ short(l.amount) }}</span>
-                <span class="line__bar line__bar--{{ type }}">
-                  <i [style.width.%]="lineShare(l.amount, type === 'INCOME' ? inc.income : inc.expense)"></i>
-                </span>
-              </div>
-            }
-          }
-        </div>
-      } @else {
-        <ng-container *ngTemplateOutlet="pending; context: { name: 'income', tall: true }"></ng-container>
       }
     </mat-card>
   </div>

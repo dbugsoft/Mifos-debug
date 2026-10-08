@@ -107,6 +107,13 @@ export class ClientGeneralStepComponent implements OnInit {
   get isOrganisation(): boolean {
     return this.createClientForm?.value?.legalFormId === LegalFormId.ENTITY;
   }
+
+  /** A click on the greyed-out Next turns every missing required field red, so it is clear what blocks the step. */
+  showMissingFields(): void {
+    if (this.valid) return;
+    this.createClientForm.markAllAsTouched();
+    this.citizenship?.showErrors();
+  }
   /** Create Client Form */
   createClientForm: FormGroup;
 

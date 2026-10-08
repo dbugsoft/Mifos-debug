@@ -513,6 +513,15 @@ input:-webkit-autofill:active {
     font-family: Inter, 'Noto Sans Devanagari', sans-serif !important;
     font-size: 14px !important;
   }
+
+  // Required fields show a red asterisk, so it is clear what blocks Next / Submit
+  .mat-mdc-form-field-required-marker {
+    color: var(--mat-form-field-error-text-color, #f44336);
+  }
+
+  .mdc-text-field--disabled .mat-mdc-form-field-required-marker {
+    color: inherit;
+  }
 }
 
 // NOTE: this is a GLOBAL stylesheet (see angular.json `styles`). `::ng-deep`
