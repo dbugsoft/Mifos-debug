@@ -17,6 +17,7 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { ComplianceService } from '../compliance.service';
 import { RiskService } from '../risk/risk.service';
 import { EddSummary, RiskSummary } from '../risk/risk.models';
+import { AlertSummary, CaseSummary, CasesService } from '../cases/cases.service';
 import { AmlSettingsView, ComplianceAccess, LedgerStatus, TtrItem, TtrSummary, isoDate } from '../compliance.models';
 import { DueChipComponent } from '../due-chip/due-chip.component';
 
@@ -41,6 +42,7 @@ import { DueChipComponent } from '../due-chip/due-chip.component';
 export class ComplianceHomeComponent implements OnInit {
   private compliance = inject(ComplianceService);
   private risk = inject(RiskService);
+  private casesService = inject(CasesService);
   private destroyRef = inject(DestroyRef);
 
   readonly loading = signal(true);
@@ -51,6 +53,8 @@ export class ComplianceHomeComponent implements OnInit {
   readonly ledger = signal<LedgerStatus | null>(null);
   readonly riskSummary = signal<RiskSummary | null>(null);
   readonly eddSummary = signal<EddSummary | null>(null);
+  readonly alertSummary = signal<AlertSummary | null>(null);
+  readonly caseSummary = signal<CaseSummary | null>(null);
 
   readonly deadlineColumns = [
     'dueOn',
@@ -86,6 +90,12 @@ export class ComplianceHomeComponent implements OnInit {
               : of(null),
             edd: can('READ_AMLCOMPLIANCE', 'READ_AMLSUMMARY')
               ? this.risk.eddSummary().pipe(catchError(() => of(null)))
+              : of(null),
+            alerts: can('READ_AMLCOMPLIANCE', 'READ_AMLSUMMARY')
+              ? this.casesService.alertSummary().pipe(catchError(() => of(null)))
+              : of(null),
+            cases: can('READ_AMLCOMPLIANCE', 'READ_AMLSUMMARY', 'READ_AMLDECISIONS')
+              ? this.casesService.caseSummary().pipe(catchError(() => of(null)))
               : of(null)
           });
         }),
@@ -98,6 +108,8 @@ export class ComplianceHomeComponent implements OnInit {
         this.ledger.set(data.ledger);
         this.riskSummary.set(data.risk);
         this.eddSummary.set(data.edd);
+        this.alertSummary.set(data.alerts);
+        this.caseSummary.set(data.cases);
         this.loading.set(false);
       });
   }

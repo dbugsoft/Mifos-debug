@@ -162,6 +162,30 @@ const routes: Routes = [
           }
         },
         {
+          path: 'alerts',
+          loadComponent: () =>
+            import('./compliance/cases/alert-list/alert-list.component').then((m) => m.AlertListComponent),
+          data: { title: 'Alerts', breadcrumb: 'Alerts' }
+        },
+        {
+          path: 'alerts/:id',
+          loadComponent: () =>
+            import('./compliance/cases/alert-detail/alert-detail.component').then((m) => m.AlertDetailComponent),
+          data: { title: 'Alert', breadcrumb: 'Alert', routeParamBreadcrumb: false }
+        },
+        {
+          path: 'cases',
+          loadComponent: () =>
+            import('./compliance/cases/case-list/case-list.component').then((m) => m.CaseListComponent),
+          data: { title: 'Cases', breadcrumb: 'Cases' }
+        },
+        {
+          path: 'cases/:id',
+          loadComponent: () =>
+            import('./compliance/cases/case-detail/case-detail.component').then((m) => m.CaseDetailComponent),
+          data: { title: 'Case', breadcrumb: 'Case', routeParamBreadcrumb: false }
+        },
+        {
           path: 'risk-tables',
           loadComponent: () =>
             import('./compliance/pep/risk-tables/risk-tables.component').then((m) => m.RiskTablesComponent),

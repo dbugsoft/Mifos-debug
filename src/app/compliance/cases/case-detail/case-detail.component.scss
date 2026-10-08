@@ -1,0 +1,88 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+@use '../../compliance' as compliance;
+
+@include compliance.page;
+
+.head {
+  padding-top: 16px;
+
+  .title {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    align-items: center;
+  }
+
+  .name {
+    margin: 0;
+    font-size: 1.25rem;
+  }
+
+  .summary {
+    margin: 8px 0 12px;
+  }
+}
+
+.sub {
+  display: block;
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.frame-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.notice ul {
+  margin: 4px 0 0;
+  padding-left: 18px;
+}
+
+.add-note {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: center;
+  margin-bottom: 8px;
+
+  .full {
+    flex: 1;
+    min-width: 220px;
+  }
+}
+
+.plain-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    padding: 8px 0;
+    border-bottom: 1px solid rgb(127 127 127 / 15%);
+  }
+
+  li.with-action {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
