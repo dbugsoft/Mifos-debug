@@ -86,7 +86,7 @@
                   <td>{{ a.submittedOn | dateFormat }}</td>
                   <td>
                     @if (status() === 'PENDING') {
-                      @if (a.daysRemaining != null) {
+                      @if (a.daysRemaining !== undefined && a.daysRemaining !== null) {
                         <mifosx-membership-deadline [application]="a"></mifosx-membership-deadline>
                       } @else {
                         <span class="waiting">{{ 'membership.Waiting' | translate }}</span>
