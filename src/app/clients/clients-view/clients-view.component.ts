@@ -67,6 +67,7 @@ import {
 } from '../membership/membership-decision-dialog/membership-decision-dialog.component';
 import { openApplyDialog, reloadMemberPage } from '../membership/membership-tab/membership-tab.component';
 import { ClientActionNotifierService } from './client-actions/client-action-notifier.service';
+import { KymService } from '../kym/kym.service';
 
 @Component({
   selector: 'mifosx-clients-view',
@@ -217,6 +218,7 @@ export class ClientsViewComponent implements OnInit {
 
   /** Every member has a Membership tab for users who may read memberships, with or without an application on record. */
   readonly canReadMembership = this.membershipService.canRead();
+  readonly canReadKym = inject(KymService).canRead();
 
   /** Approve and Refuse are offered, unless "a different person must approve" is on and this user entered it. */
   get canDecideMembership(): boolean {

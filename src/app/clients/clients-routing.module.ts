@@ -28,6 +28,7 @@ import { PersonalDataTabComponent } from './clients-view/personal-data-tab/perso
 import { ClientActionsComponent } from './clients-view/client-actions/client-actions.component';
 import { ClientMembershipResolver, MembershipTemplateResolver } from './membership/membership.resolvers';
 import { MembershipTabComponent } from './membership/membership-tab/membership-tab.component';
+import { KymTabComponent } from './kym/kym-tab/kym-tab.component';
 import { MembershipApplicationsComponent } from './membership/membership-applications/membership-applications.component';
 import { ViewChargeComponent } from './clients-view/charges/view-charge/view-charge.component';
 import { ClientPayChargesComponent } from './clients-view/charges/client-pay-charges/client-pay-charges.component';
@@ -129,6 +130,12 @@ const routes: Routes = [
               resolve: {
                 clientAccountsData: ClientAccountsResolver
               }
+            },
+            {
+              // The member's KYM (fineract-dbug #123, ADR 0039): its own component; the tab shows only with READ_KYM.
+              path: 'kym',
+              component: KymTabComponent,
+              data: { title: 'KYM', breadcrumb: 'KYM', routeParamBreadcrumb: false }
             },
             {
               path: 'personal-data',
