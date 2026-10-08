@@ -5891,7 +5891,8 @@
       "identities": "Identities",
       "address": "Address",
       "family-members": "Family members",
-      "documents": "Documents"
+      "documents": "Documents",
+      "edit": "Edit member"
     },
     "Family and occupation": "Family and occupation",
     "Living and membership": "Living and membership",
@@ -5942,7 +5943,20 @@
       "otherCoopMember": "Member of another cooperative",
       "familyOtherCoopMember": "A family member belongs to another cooperative",
       "familyInThisCoop": "Family members here",
-      "pepDeclared": "High public position"
+      "pepDeclared": "High public position",
+      "organisation": {
+        "orgType": "Type of organisation",
+        "registrationDate": "Registration date",
+        "registrationOffice": "Registered at",
+        "mainObjective": "Main objective",
+        "workingArea": "Working area",
+        "branchCount": "Branches",
+        "branchLocations": "Where the branches are",
+        "expectedYearlyTransactions": "Expected yearly transactions",
+        "panVatNo": "PAN or VAT number",
+        "otherDetails": "Other details",
+        "person": "Linked person"
+      }
     },
     "marital": {
       "MARRIED": "Married",
@@ -6098,6 +6112,134 @@
       "voterCardCopy": "A copy of the voter card",
       "passportCopy": "A copy of the passport",
       "recommenders": "Two members who recommend the applicant"
+    },
+    "list": {
+      "Member KYM": "Member KYM",
+      "lead": {
+        "INCOMPLETE": "Members whose KYM still lacks something. Open a member to complete it with them present.",
+        "COMPLETE": "Members whose KYM is complete and waits for a second person to verify it.",
+        "REVIEW_DUE": "Members whose verified KYM is due for its review.",
+        "BLOCKED": "Members the KYM rule would stop from taking money out once the cooperative switches it on."
+      },
+      "Search": "Search by name or account number",
+      "Office": "Office",
+      "All my offices": "All my offices",
+      "tab": {
+        "INCOMPLETE": "Incomplete",
+        "COMPLETE": "Waiting to be verified",
+        "REVIEW_DUE": "Review due",
+        "BLOCKED": "Would be stopped"
+      },
+      "SNo": "S.No.",
+      "Member": "Member",
+      "Status": "Status",
+      "What is missing": "What is missing",
+      "Organisation": "Organisation",
+      "reviewWasDue": "Review was due on {{date}}",
+      "empty": {
+        "INCOMPLETE": "Every member in these offices has a complete KYM.",
+        "COMPLETE": "No KYM is waiting to be verified.",
+        "REVIEW_DUE": "No KYM is due for review.",
+        "BLOCKED": "Nobody would be stopped."
+      },
+      "Show more": "Show more",
+      "andMore": "{{count}} more"
+    },
+    "chip": {
+      "title": "Open the KYM tab",
+      "INCOMPLETE": "KYM incomplete",
+      "COMPLETE": "KYM complete",
+      "VERIFIED": "KYM verified",
+      "REVIEW_DUE": "KYM review due"
+    },
+    "org": {
+      "missing": {
+        "orgType": "Type of organisation",
+        "name": "Name of the organisation",
+        "registrationNo": "Registration number",
+        "registrationDate": "Registration date",
+        "registrationOffice": "Office where it was registered",
+        "renewalDate": "Renewal date",
+        "headOffice": "Head office address",
+        "mainObjective": "Main objective",
+        "businessType": "Type of business or transactions",
+        "workingArea": "Working area",
+        "branchCount": "Number of branches (zero if none)",
+        "branchLocations": "Where the branches are",
+        "byeLaws": "Bye-laws or statute, or a letter from someone authorised to sign",
+        "expectedTransactions": "Expected yearly transactions (Rs)",
+        "financialStatements": "Last fiscal year's financial statements",
+        "taxClearance": "Tax clearance or tax return for the last fiscal year",
+        "boardMembers": "The board members",
+        "chiefExecutive": "The chief executive",
+        "accountOperators": "The people who operate the account",
+        "personKym": "A linked person's own KYM is not complete",
+        "panVat": "PAN or VAT number",
+        "boardDecision": "The board's decision to join"
+      },
+      "The organisation": "The organisation",
+      "Update the organisation": "Update the organisation's KYM",
+      "editLead": "Name, registration number, renewal date and type of business are changed with Edit member. The head office is the address.",
+      "field": {
+        "orgType": "Type of organisation",
+        "panVatNo": "PAN or VAT number",
+        "registrationDate": "Registration date",
+        "registrationOffice": "Office where it was registered",
+        "mainObjective": "Main objective",
+        "workingArea": "Working area",
+        "branchCount": "Number of branches",
+        "branchLocations": "Where the branches are",
+        "expectedYearlyTransactions": "Expected yearly transactions (Rs)",
+        "otherDetails": "Other details (optional)"
+      },
+      "type": {
+        "COOPERATIVE": "Cooperative",
+        "COMPANY": "Company",
+        "GROUP": "Group",
+        "INSTITUTION": "Institution",
+        "OTHER": "Other"
+      },
+      "inPersonLabel": "Someone authorised to act for the organisation is here and gave these details",
+      "People": "Board, chief executive and account operators",
+      "peopleHint": "Each person needs their own complete KYM. They do not have to be members.",
+      "Add a person": "Add a person",
+      "personLead": "Pick the person from the clients of this cooperative and say what they are in the organisation.",
+      "Find the person": "Find the person",
+      "Role": "Role",
+      "Title": "Title (optional)",
+      "titleHint": "For example Chairperson, Secretary",
+      "notFoundHint": "Not found? Add them as a client first, fill in their KYM, then come back.",
+      "Add": "Add",
+      "role": {
+        "BOARD_MEMBER": "Board member",
+        "CHIEF_EXECUTIVE": "Chief executive",
+        "ACCOUNT_OPERATOR": "Account operator"
+      },
+      "endTitle": "End {{name}} as {{role}}",
+      "See the people": "See the people",
+      "Person": "Person",
+      "Their KYM": "Their KYM",
+      "noPeople": "Nobody is linked yet.",
+      "ownersHint": "Name anyone who ultimately owns, controls or benefits from the organisation, when known."
+    },
+    "doc": {
+      "title": "Upload a document",
+      "Which": "Which document",
+      "name": {
+        "thumbprint-right": "Right thumbprint",
+        "thumbprint-left": "Left thumbprint",
+        "guardian-thumbprint-right": "Guardian's right thumbprint",
+        "guardian-thumbprint-left": "Guardian's left thumbprint",
+        "bye-laws": "Bye-laws or statute",
+        "authorised-letter": "Letter from someone authorised to sign",
+        "financial-statements": "Financial statements",
+        "tax-clearance": "Tax clearance or tax return",
+        "board-decision": "Board's decision to join"
+      },
+      "Choose a file": "Choose a file",
+      "noFile": "No file chosen (a scan or photo, or a PDF)",
+      "Description": "Description (optional)",
+      "Upload": "Upload"
     }
   }
 }

@@ -68,6 +68,7 @@ import {
 import { openApplyDialog, reloadMemberPage } from '../membership/membership-tab/membership-tab.component';
 import { ClientActionNotifierService } from './client-actions/client-action-notifier.service';
 import { KymService } from '../kym/kym.service';
+import { KymChipComponent } from '../kym/kym-chip/kym-chip.component';
 
 @Component({
   selector: 'mifosx-clients-view',
@@ -96,6 +97,7 @@ import { KymService } from '../kym/kym.service';
     StatusLookupPipe,
     DateFormatPipe,
     MembershipDeadlineComponent,
+    KymChipComponent,
     AdToBsPipe,
     MatDivider
   ],

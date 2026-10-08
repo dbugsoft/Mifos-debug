@@ -51,6 +51,7 @@ import { ExternalIdentifierComponent } from '../shared/external-identifier/exter
 import { StatusLookupPipe } from '../pipes/status-lookup.pipe';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { MembershipService } from './membership/membership.service';
+import { KymService } from './kym/kym.service';
 
 export const DEBOUNCE_MS = 500;
 
@@ -90,6 +91,8 @@ export class ClientsComponent implements OnInit, OnDestroy {
   private membershipService = inject(MembershipService);
   /** With the share-first rule on, a new member is a membership application (fineract-dbug ADR 0023) */
   readonly shareFirstRule = signal<boolean | null>(null);
+  /** The incomplete-KYM list (fineract-dbug #190) */
+  readonly canReadKym = inject(KymService).canRead();
 
   private searchInput$ = new Subject<string>();
   private clientsRequestSub: Subscription | null = null;

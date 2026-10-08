@@ -29,6 +29,7 @@ import { ClientActionsComponent } from './clients-view/client-actions/client-act
 import { ClientMembershipResolver, MembershipTemplateResolver } from './membership/membership.resolvers';
 import { MembershipTabComponent } from './membership/membership-tab/membership-tab.component';
 import { KymTabComponent } from './kym/kym-tab/kym-tab.component';
+import { KymListComponent } from './kym/kym-list/kym-list.component';
 import { MembershipApplicationsComponent } from './membership/membership-applications/membership-applications.component';
 import { ViewChargeComponent } from './clients-view/charges/view-charge/view-charge.component';
 import { ClientPayChargesComponent } from './clients-view/charges/client-pay-charges/client-pay-charges.component';
@@ -96,6 +97,11 @@ const routes: Routes = [
           resolve: {
             membershipTemplate: MembershipTemplateResolver
           }
+        },
+        {
+          path: 'kym',
+          data: { title: 'Member KYM', breadcrumb: 'Member KYM', routeParamBreadcrumb: false },
+          component: KymListComponent
         },
         {
           path: ':clientId',
