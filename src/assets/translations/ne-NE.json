@@ -5827,6 +5827,19 @@
       "LOAN": "ऋण",
       "SHARE": "सेयर"
     },
+    "sof": {
+      "Where does this money come from?": "यो पैसा कहाँबाट आएको हो?",
+      "Explanation": "रु {{line}} वा सोभन्दा बढीको कारोबारमा सदस्यले पैसाको स्रोत खुलाउनुपर्छ। सोधेर यहाँ लेख्नुहोस्; यो कारोबारसँगै सुरक्षित रहन्छ।",
+      "Source of the money": "पैसाको स्रोत",
+      "Details": "विवरण",
+      "Who brought the money": "पैसा कसले ल्याएको",
+      "The member": "सदस्य आफैँ",
+      "Someone else": "अरू कसैले",
+      "Their name": "उहाँको नाम",
+      "Relationship to the member": "सदस्यसँगको नाता",
+      "Could not save": "स्रोतको विवरण सुरक्षित हुन सकेन। विवरण जाँचेर फेरि प्रयास गर्नुहोस्।",
+      "Save and post": "सुरक्षित गरी कारोबार गर्नुहोस्"
+    },
     "kind": {
       "DEPOSIT": "जम्मा",
       "WITHDRAWAL": "झिकेको",

@@ -5831,6 +5831,19 @@
       "LOAN": "Loan",
       "SHARE": "Shares"
     },
+    "sof": {
+      "Where does this money come from?": "Where does this money come from?",
+      "Explanation": "Amounts of Rs {{line}} or more need the member to say where the money comes from. Ask them and write it here; it is kept with the transaction.",
+      "Source of the money": "Source of the money",
+      "Details": "Details",
+      "Who brought the money": "Who brought the money",
+      "The member": "The member",
+      "Someone else": "Someone else",
+      "Their name": "Their name",
+      "Relationship to the member": "Relationship to the member",
+      "Could not save": "The declaration could not be saved. Check the details and try again.",
+      "Save and post": "Save and post"
+    },
     "kind": {
       "DEPOSIT": "Deposit",
       "WITHDRAWAL": "Withdrawal",
