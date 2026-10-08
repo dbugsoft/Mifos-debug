@@ -1,0 +1,248 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
+import { MatIcon } from '@angular/material/icon';
+import { TranslateService } from '@ngx-translate/core';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { FormatNumberPipe } from 'app/pipes/format-number.pipe';
+import { InputDialogComponent, InputDialogData } from 'app/compliance/input-dialog/input-dialog.component';
+import { CodeOption, KymService } from '../kym.service';
+import { FIX_TAB, KymHistoryRow, KymMissing, KymView } from '../kym.models';
+import { KymEditDialogComponent, KymEditDialogData } from '../kym-edit-dialog/kym-edit-dialog.component';
+import { KymOwnerDialogComponent } from '../kym-owner-dialog/kym-owner-dialog.component';
+
+/**
+ * A member's KYM (fineract-dbug #123, #124, #199; ADR 0039): its status, what is still missing (with the tab where each
+ * thing is put right, because much of it is what Fineract already keeps), the form's own answers, the beneficial
+ * owners, and every change. Staff with UPDATE_KYM change it with the member present; a second person with VERIFY_KYM
+ * verifies it.
+ */
+@Component({
+  selector: 'mifosx-kym-tab',
+  templateUrl: './kym-tab.component.html',
+  styleUrls: ['./kym-tab.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    RouterLink,
+    MatIcon,
+    FormatNumberPipe
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
+})
+export class KymTabComponent {
+  private route = inject(ActivatedRoute);
+  private kymService = inject(KymService);
+  private dialog = inject(MatDialog);
+  private translate = inject(TranslateService);
+  private destroyRef = inject(DestroyRef);
+
+  /** The member in the route: the tab is reused when going from one member's KYM to another's. */
+  clientId = 0;
+  readonly canRead = this.kymService.canRead();
+  readonly canUpdate = this.kymService.canUpdate();
+  readonly canVerify = this.kymService.canVerify();
+
+  readonly kym = signal<KymView | null>(null);
+  readonly failed = signal(false);
+  readonly busy = signal(false);
+  readonly history = signal<KymHistoryRow[] | null>(null);
+  readonly professions = signal<CodeOption[]>([]);
+
+  /** The items fixed on other tabs, and those fixed on this tab's form, kept apart so each gets one clear action. */
+  readonly elsewhere = computed(() =>
+    (this.kym()?.missing ?? []).filter((m) => FIX_TAB[m.item] && FIX_TAB[m.item] !== 'owners')
+  );
+  readonly onForm = computed(() =>
+    (this.kym()?.missing ?? []).filter((m) => !FIX_TAB[m.item] || FIX_TAB[m.item] === 'owners')
+  );
+  readonly occupation = computed(() => {
+    const id = this.kym()?.values.occupationId;
+    return id == null ? null : (this.professions().find((p) => p.id === id)?.name ?? null);
+  });
+  readonly currentOwners = computed(() => (this.kym()?.values.beneficialOwners ?? []).filter((o) => !o.endedAt));
+
+  constructor() {
+    if (this.canRead) {
+      this.route.parent?.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
+        this.clientId = Number(params.get('clientId'));
+        this.kym.set(null);
+        this.history.set(null);
+        this.load();
+      });
+      this.kymService
+        .professions()
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe((p) => this.professions.set(p));
+    }
+  }
+
+  load(): void {
+    this.kymService
+      .get(this.clientId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (k) => {
+          this.kym.set(k);
+          this.failed.set(false);
+          if (this.history()) {
+            this.loadHistory();
+          }
+        },
+        error: () => this.failed.set(true)
+      });
+  }
+
+  loadHistory(): void {
+    this.kymService
+      .history(this.clientId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((h) => this.history.set(h));
+  }
+
+  /** The translated words for a missing item, or the server's own words. */
+  missingText(m: KymMissing): string {
+    const key = 'kym.missing.' + m.item;
+    const t = this.translate.instant(key);
+    return t && t !== key ? t : m.message;
+  }
+
+  /** Whether a value was given: the API leaves out or nulls what nobody answered. */
+  has(v: unknown): boolean {
+    return v !== null && v !== undefined;
+  }
+
+  yesNo(v: boolean | null | undefined): string {
+    return !this.has(v) ? 'kym.Not answered' : v ? 'kym.Yes' : 'kym.No';
+  }
+
+  /** A history row's field in words: the form's label when there is one, else the field's own name. */
+  fieldName(field: string): string {
+    const key = 'kym.field.' + field;
+    const t = this.translate.instant(key);
+    return t && t !== key ? t : field;
+  }
+
+  /** A history value in words where it is one of the form's choices or a yes/no. */
+  valueText(field: string, value: string | null): string {
+    if (value === null || value === undefined) {
+      return '—';
+    }
+    const group: Record<string, string> = {
+      maritalStatus: 'marital',
+      familyType: 'familyType',
+      incomeBand: 'band',
+      workingAreaResidence: 'residence'
+    };
+    const key = group[field]
+      ? `kym.${group[field]}.${value}`
+      : value === 'true'
+        ? 'kym.Yes'
+        : value === 'false'
+          ? 'kym.No'
+          : null;
+    if (!key) {
+      return value;
+    }
+    const t = this.translate.instant(key);
+    return t && t !== key ? t : value;
+  }
+
+  fixTab(m: KymMissing): string {
+    return FIX_TAB[m.item];
+  }
+
+  edit(focus?: string): void {
+    const k = this.kym();
+    if (!k) {
+      return;
+    }
+    this.dialog
+      .open<KymEditDialogComponent, KymEditDialogData, KymView>(KymEditDialogComponent, {
+        data: { clientId: this.clientId, kym: k, professions: this.professions(), focus },
+        width: '760px',
+        maxWidth: '96vw',
+        autoFocus: false
+      })
+      .afterClosed()
+      .subscribe((updated) => updated && this.kym.set(updated));
+  }
+
+  addOwner(): void {
+    this.dialog
+      .open(KymOwnerDialogComponent, {
+        data: { clientId: this.clientId },
+        width: '640px',
+        maxWidth: '96vw',
+        autoFocus: false
+      })
+      .afterClosed()
+      .subscribe((updated: KymView | undefined) => updated && this.kym.set(updated));
+  }
+
+  endOwner(ownerId: number, name: string): void {
+    this.dialog
+      .open<InputDialogComponent, InputDialogData, { reason: string }>(InputDialogComponent, {
+        data: {
+          title: this.translate.instant('kym.endOwnerTitle', { name }),
+          fields: [{ name: 'reason', label: 'kym.Reason', type: 'textarea', required: true, maxLength: 500 }],
+          confirm: 'kym.End'
+        }
+      })
+      .afterClosed()
+      .subscribe((r) => {
+        if (r?.reason) {
+          this.run(this.kymService.endOwner(this.clientId, ownerId, r.reason));
+        }
+      });
+  }
+
+  verify(): void {
+    this.run(this.kymService.verify(this.clientId));
+  }
+
+  simplified(): void {
+    const k = this.kym();
+    if (k?.level === 'SIMPLIFIED') {
+      this.run(this.kymService.level(this.clientId, 'FULL'));
+      return;
+    }
+    this.dialog
+      .open<InputDialogComponent, InputDialogData, { reason: string }>(InputDialogComponent, {
+        data: {
+          title: 'kym.simplifiedTitle',
+          message: 'kym.simplifiedLead',
+          fields: [{ name: 'reason', label: 'kym.Reason', type: 'textarea', required: true, maxLength: 500 }],
+          confirm: 'kym.Mark simplified'
+        }
+      })
+      .afterClosed()
+      .subscribe((r) => {
+        if (r?.reason) {
+          this.run(this.kymService.level(this.clientId, 'SIMPLIFIED', r.reason));
+        }
+      });
+  }
+
+  private run(call: ReturnType<KymService['verify']>): void {
+    this.busy.set(true);
+    call.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (k) => {
+        this.kym.set(k);
+        this.busy.set(false);
+        if (this.history()) {
+          this.loadHistory();
+        }
+      },
+      error: () => this.busy.set(false)
+    });
+  }
+}

@@ -429,6 +429,11 @@
           {{ 'membership.Membership' | translate }}
         </a>
       }
+      @if (canReadKym) {
+        <a mat-tab-link [routerLink]="['./kym']" routerLinkActive #kym="routerLinkActive" [active]="kym.isActive">
+          {{ 'kym.KYM' | translate }}
+        </a>
+      }
       <a
         mat-tab-link
         [routerLink]="['./personal-data']"

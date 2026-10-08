@@ -1,0 +1,121 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+.lead,
+.hint {
+  margin: 0 0 8px;
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 0.875rem;
+}
+
+h4 {
+  margin: 20px 0 10px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgb(127 127 127 / 25%);
+  font-size: 0.95rem;
+  font-weight: 600;
+  scroll-margin-top: 8px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 16px;
+
+  &.three {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.full {
+  width: 100%;
+}
+
+mat-form-field {
+  min-width: 0;
+}
+
+.yes-no {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  align-items: center;
+  margin: 4px 0 12px;
+
+  .q {
+    flex-basis: 100%;
+    font-size: 0.875rem;
+  }
+}
+
+.list-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 12px;
+  align-items: flex-start;
+
+  mat-form-field {
+    flex: 1 1 160px;
+  }
+
+  .narrow {
+    flex: 0 1 140px;
+  }
+
+  .wide {
+    flex: 2 1 220px;
+  }
+
+  button {
+    margin-top: 8px;
+  }
+}
+
+.person {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 12px;
+  align-items: center;
+
+  > span {
+    flex: 1 1 200px;
+    font-weight: 500;
+  }
+
+  .narrow {
+    flex: 0 1 160px;
+  }
+}
+
+mat-checkbox {
+  display: block;
+  margin: 4px 0 8px;
+}
+
+.confirm {
+  margin-top: 20px;
+  padding: 12px 16px;
+  border: 1px solid #f0d08a;
+  border-radius: 8px;
+  background: #fff4dc;
+
+  mat-checkbox {
+    font-weight: 600;
+  }
+}
+
+button mat-icon {
+  margin-right: 4px;
+}
+
+@media (width <= 600px) {
+  .row,
+  .row.three {
+    grid-template-columns: 1fr;
+  }
+}
