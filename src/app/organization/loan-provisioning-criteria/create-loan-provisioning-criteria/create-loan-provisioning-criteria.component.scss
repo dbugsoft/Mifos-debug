@@ -5,66 +5,268 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-
 .container {
-  padding: 0.5rem;
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
+  padding: 24px;
+  box-sizing: border-box;
 }
 
-.layout-row {
+.container > mat-card {
+  padding: 20px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow:
+    0 2px 8px rgb(0 0 0 / 5%),
+    0 8px 24px rgb(0 0 0 / 6%);
+}
+
+form {
+  width: 100%;
+}
+
+.layout-row.gap-2percent {
   display: flex;
-  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 18px 2%;
+  align-items: flex-start;
 }
 
-mat-card {
-  padding: 1rem;
-  box-shadow: 0 2px 8px rgb(0 0 0 / 10%) !important;
-  border-radius: 8px;
+.layout-row.gap-2percent .flex-fill {
+  flex: 1 1 48%;
+  min-width: 0;
+}
 
-  .layout-row {
-    margin-bottom: 0.5rem;
-  }
+mat-form-field {
+  width: 100%;
+}
+
+mat-label {
+  font-size: 14px;
+}
+
+input,
+mat-select {
+  font-size: 14px;
+}
+
+mat-error {
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+mat-hint {
+  display: block;
+  margin: 0 0 8px;
+  color: #475569;
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 .mat-elevation-z1 {
-  padding: 1rem;
-  margin-top: 0.5rem;
-  border-radius: 4px;
+  width: 100%;
+  margin-top: 18px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  overflow-x: auto;
+  background: #fff;
+  box-shadow: none;
 }
 
 table {
   width: 100%;
-
-  th {
-    font-weight: 600;
-  }
+  min-width: 900px;
+  border-collapse: collapse;
+  background: #fff;
 }
 
-.m-t-20 {
-  margin-top: 2rem;
+th.mat-mdc-header-cell,
+td.mat-mdc-cell {
+  padding: 12px 14px;
+  font-size: 14px;
+  white-space: nowrap;
 }
 
-.layout-align-center {
-  align-items: center;
+th.mat-mdc-header-cell {
+  background: #f8fafc;
+  color: #334155;
+  font-weight: 600;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+td.mat-mdc-cell {
+  color: #1f2937;
+  border-bottom-color: #e2e8f0;
+}
+
+tr.mat-mdc-row:hover {
+  background: #f8fafc;
+}
+
+td.mat-mdc-cell:last-child,
+th.mat-mdc-header-cell:last-child {
+  text-align: center;
+}
+
+td button {
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+td button:hover {
+  background: #f1f5f9;
+}
+
+fa-icon {
+  color: #000;
+}
+
+.m-t-20.layout-row {
+  display: flex;
   justify-content: center;
+  align-items: center;
+  gap: 20px;
 }
 
-@media (width <= 768px) {
+.m-t-20.layout-row button {
+  min-width: 100px;
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.m-t-20.layout-row button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.m-t-20.layout-row [type='button'] {
+  background: #f1f1f1;
+  color: #000;
+}
+
+.m-t-20.layout-row button:disabled {
+  cursor: not-allowed;
+}
+
+/* Tablet */
+@media (width <= 900px) {
   .container {
-    padding: 0.5rem;
+    padding: 18px;
   }
 
-  mat-card {
-    padding: 1rem;
+  .container > mat-card {
+    padding: 16px;
   }
 
-  .layout-row {
+  .layout-row.gap-2percent .flex-fill {
+    flex: 1 1 48%;
+  }
+
+  table {
+    min-width: 850px;
+  }
+}
+
+/* Mobile */
+@media (width <= 600px) {
+  .container {
+    padding: 10px;
+  }
+
+  .container > mat-card {
+    padding: 12px;
+    border-radius: 12px;
+  }
+
+  .layout-row.gap-2percent {
     flex-direction: column;
+    gap: 10px;
   }
 
-  .gap-20px {
-    flex-direction: column;
+  .layout-row.gap-2percent .flex-fill {
     width: 100%;
+    flex: 1 1 100%;
+  }
+
+  mat-label {
+    font-size: 13px;
+  }
+
+  input,
+  mat-select {
+    font-size: 13px;
+  }
+
+  mat-error {
+    font-size: 11px;
+  }
+
+  mat-hint {
+    font-size: 12px;
+  }
+
+  .mat-elevation-z1 {
+    margin-top: 14px;
+    border-radius: 8px;
+  }
+
+  table {
+    min-width: 850px;
+  }
+
+  th.mat-mdc-header-cell,
+  td.mat-mdc-cell {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
+  td button {
+    min-height: 40px;
+  }
+
+  .m-t-20.layout-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .m-t-20.layout-row button {
+    width: 100%;
+    min-height: 44px;
+  }
+}
+
+/* Small mobile */
+@media (width <= 400px) {
+  .container {
+    padding: 6px;
+  }
+
+  .container > mat-card {
+    padding: 10px;
+  }
+
+  table {
+    min-width: 820px;
+  }
+
+  th.mat-mdc-header-cell,
+  td.mat-mdc-cell {
+    padding: 9px 10px;
+    font-size: 12px;
+  }
+
+  td button {
+    font-size: 12px;
   }
 }

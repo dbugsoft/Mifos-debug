@@ -6,24 +6,100 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+.container > mat-card {
+  border-radius: 16px;
+  box-shadow:
+    0 2px 8px rgb(0 0 0 / 5%),
+    0 8px 24px rgb(0 0 0 / 6%);
+}
+
+.criteria-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 16px;
+  padding-bottom: 4px;
+}
+
 .criteria-title {
-  margin-bottom: 0;
-  display: inline;
-  vertical-align: middle;
+  margin: 0;
+  font-size: 1.375rem;
+  font-weight: 700;
+  color: #1f2937;
 }
 
 .loan-product-label {
-  margin-left: 24px;
-  font-size: 1.1em;
-  vertical-align: middle;
+  font-size: 0.9rem;
+  color: #64748b;
+
+  strong {
+    color: #475569;
+  }
 }
 
 table {
   width: 100%;
 }
 
+.table-wrap {
+  overflow-x: auto;
+}
+
 .mat-elevation-z1 {
-  margin: 1em 0 1.5em;
+  margin: 1em 0 0.5em;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+th.mat-header-cell {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #64748b;
+  background: #f8fafc;
+}
+
+td.mat-cell {
+  font-size: 14px;
+  color: #1f2937;
+}
+
+.numeric-col {
+  text-align: right;
+}
+
+// Risk-category chips, colour-coded by severity - a common convention for
+// provisioning categories (worse risk = warmer colour).
+.category-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  background: #e2e8f0;
+  color: #475569;
+
+  &[data-category='STANDARD'] {
+    background: #dcfce7;
+    color: #15803d;
+  }
+
+  &[data-category='SUB-STANDARD'] {
+    background: #fef3c7;
+    color: #b45309;
+  }
+
+  &[data-category='DOUBTFUL'] {
+    background: #ffedd5;
+    color: #c2410c;
+  }
+
+  &[data-category='LOSS'] {
+    background: #fee2e2;
+    color: #b91c1c;
+  }
 }
 
 h2,
@@ -33,14 +109,32 @@ h4 {
   font-weight: 500;
 }
 
-span {
-  margin: 0.5em 0;
-}
-
 mat-divider {
-  margin: 0 0 0.5em;
+  margin: 8px 0 0.5em;
 }
 
 .loanProduct {
   padding: 10px 0;
+}
+
+/* Edit/Delete action buttons */
+.layout-row.align-end button {
+  border-radius: 8px;
+  transition: transform 0.15s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+}
+
+@media (width <=768px) {
+  .criteria-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .criteria-title {
+    font-size: 1.2rem;
+  }
 }

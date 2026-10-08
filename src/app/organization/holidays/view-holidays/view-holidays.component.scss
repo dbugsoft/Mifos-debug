@@ -5,18 +5,226 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
+:host {
+  display: block;
+  width: 100%;
+}
+
+/* =========================
+   Layout
+   ========================= */
 
 .container {
-  max-width: 37rem;
+  width: 100%;
+  box-sizing: border-box;
+}
 
-  .content {
-    div {
-      margin: 1rem 0;
-      overflow-wrap: break-word;
+.m-b-20 {
+  margin-bottom: 20px;
+}
 
-      &.header {
-        font-weight: 500;
-      }
-    }
+.layout-row {
+  display: flex;
+  align-items: center;
+}
+
+.align-end {
+  align-items: flex-end;
+}
+
+.gap-2px {
+  gap: 8px;
+}
+
+/* =========================
+   Action Buttons
+   ========================= */
+
+.container.layout-row {
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.container.layout-row button {
+  min-height: 42px;
+  padding: 0 18px;
+  border-radius: 7px;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: none;
+  transition:
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.container.layout-row button:hover {
+  box-shadow: 0 3px 10px rgb(0 0 0 / 12%);
+  transform: translateY(-1px);
+}
+
+.container.layout-row fa-icon {
+  margin-right: 8px;
+  font-size: 14px;
+}
+
+/* =========================
+   Holiday Card
+   ========================= */
+
+mat-card {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 6%);
+  overflow: hidden;
+}
+
+mat-card-content {
+  padding: 24px;
+}
+
+/* =========================
+   Field Grid
+   ========================= */
+
+.field-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.field-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 72px;
+  padding: 15px 17px;
+  box-sizing: border-box;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fafbfc;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.field-card:hover {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+}
+
+/* =========================
+   Field Label
+   ========================= */
+
+.field-label {
+  margin-bottom: 6px;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* =========================
+   Field Value
+   ========================= */
+
+.field-value {
+  color: #1e293b;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.wrap-content {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+/* =========================
+   Tablet
+   ========================= */
+
+@media (width <= 900px) {
+  mat-card-content {
+    padding: 20px;
+  }
+
+  .field-grid {
+    gap: 12px;
+  }
+
+  .field-card {
+    padding: 14px 15px;
+  }
+}
+
+/* =========================
+   Mobile
+   ========================= */
+
+@media (width <= 600px) {
+  .container.layout-row {
+    justify-content: stretch;
+    align-items: stretch;
+  }
+
+  .container.layout-row > span,
+  .container.layout-row > button {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+
+  .container.layout-row button {
+    min-height: 42px;
+  }
+
+  mat-card {
+    border-radius: 8px;
+  }
+
+  mat-card-content {
+    padding: 14px;
+  }
+
+  .field-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .field-card {
+    min-height: 68px;
+    padding: 13px 14px;
+  }
+
+  .field-label {
+    font-size: 11px;
+  }
+
+  .field-value {
+    font-size: 13px;
+  }
+}
+
+/* =========================
+   Small Mobile
+   ========================= */
+
+@media (width <= 400px) {
+  mat-card-content {
+    padding: 10px;
+  }
+
+  .field-card {
+    padding: 12px;
+  }
+
+  .container.layout-row button {
+    font-size: 13px;
   }
 }

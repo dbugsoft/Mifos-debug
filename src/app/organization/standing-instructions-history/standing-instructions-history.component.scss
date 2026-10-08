@@ -7,7 +7,22 @@
  */
 
 .input {
-  max-width: 37rem;
+  max-width: 70rem;
+  margin-top: 24px;
+
+  .layout-column {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0 20px;
+  }
+
+  @media (width <=768px) {
+    margin-top: 16px;
+
+    .layout-column {
+      grid-template-columns: 1fr;
+    }
+  }
 }
 
 .output {

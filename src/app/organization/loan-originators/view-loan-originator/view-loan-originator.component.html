@@ -16,45 +16,34 @@
 <div class="container">
   <mat-card>
     <mat-card-content>
-      <div class="layout-row-wrap">
-        <div class="flex-50 mat-body-strong">
-          {{ 'labels.inputs.Name' | translate }}
+      <div class="field-grid">
+        <div class="field-card">
+          <span class="field-label">{{ 'labels.inputs.Name' | translate }}</span>
+          <span class="field-value wrap-content">{{ loanOriginatorData.name }}</span>
         </div>
 
-        <div class="flex-50 wrap-content">
-          {{ loanOriginatorData.name }}
+        <div class="field-card">
+          <span class="field-label">{{ 'labels.inputs.External Id' | translate }}</span>
+          <span class="field-value wrap-content">{{ loanOriginatorData.externalId }}</span>
         </div>
 
-        <div class="flex-50 mat-body-strong">
-          {{ 'labels.inputs.External Id' | translate }}
+        <div class="field-card">
+          <span class="field-label">{{ 'labels.inputs.Status' | translate }}</span>
+          <span class="field-value">
+            <span class="badge" [class.badge-on]="loanOriginatorData.status === 'ACTIVE'">
+              {{ loanOriginatorData.status }}
+            </span>
+          </span>
         </div>
 
-        <div class="flex-50 wrap-content">
-          {{ loanOriginatorData.externalId }}
+        <div class="field-card">
+          <span class="field-label">{{ 'labels.inputs.Originator Type' | translate }}</span>
+          <span class="field-value">{{ loanOriginatorData.originatorType?.name }}</span>
         </div>
 
-        <div class="flex-50 mat-body-strong">
-          {{ 'labels.inputs.Status' | translate }}
-        </div>
-
-        <div class="flex-50">
-          {{ loanOriginatorData.status }}
-        </div>
-
-        <div class="flex-50 mat-body-strong">
-          {{ 'labels.inputs.Originator Type' | translate }}
-        </div>
-
-        <div class="flex-50">
-          {{ loanOriginatorData.originatorType?.name }}
-        </div>
-
-        <div class="flex-50 mat-body-strong">
-          {{ 'labels.inputs.Channel Type' | translate }}
-        </div>
-
-        <div class="flex-50">
-          {{ loanOriginatorData.channelType?.name }}
+        <div class="field-card">
+          <span class="field-label">{{ 'labels.inputs.Channel Type' | translate }}</span>
+          <span class="field-value">{{ loanOriginatorData.channelType?.name }}</span>
         </div>
       </div>
     </mat-card-content>

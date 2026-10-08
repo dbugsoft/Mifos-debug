@@ -89,11 +89,6 @@ export class LoanProducts {
     delete loanProduct.allowAttributeConfiguration;
     delete loanProduct.advancedAccountingRules;
 
-    // In Fineract, the POST and PUT endpoints for /v1/loanproducts have a typo in the field
-    // allowPartialPeriodInterestCalculation. Until that is fixed, we need to replace the field name in the payload.
-    loanProduct.allowPartialPeriodInterestCalculation = loanProduct.allowPartialPeriodInterestCalculation;
-    delete loanProduct.allowPartialPeriodInterestCalculation;
-
     // Set Default values If they were not set
     if (this.loanProductService.isLoanProduct) {
       itemsByDefault.forEach((config: GlobalConfiguration) => {

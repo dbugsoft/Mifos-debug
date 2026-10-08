@@ -6,6 +6,295 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+/* =========================================
+   Create Holiday
+   ========================================= */
+
 .container {
-  max-width: 37rem;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+/* Main card */
+.container > mat-card {
+  padding: 20px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow:
+    0 2px 8px rgb(0 0 0 / 5%),
+    0 8px 24px rgb(0 0 0 / 6%);
+}
+
+/* =========================================
+   Form layout
+   ========================================= */
+
+.layout-column {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 20px;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+mat-form-field input,
+mat-form-field mat-select {
+  font-size: 14px;
+}
+
+mat-label {
+  font-size: 14px;
+}
+
+mat-error {
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+/* =========================================
+   Applicable offices
+   ========================================= */
+
+.layout-column > label {
+  grid-column: 1 / -1;
+  margin-top: 4px;
+  margin-bottom: -10px;
+  color: #334155;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Office tree */
+.layout-column > mat-tree {
+  grid-column: 1 / -1;
+  width: 100%;
+  max-height: 320px;
+  overflow-y: auto;
+  padding: 10px 12px;
+  box-sizing: border-box;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #fafafa;
+}
+
+/* Tree nodes */
+mat-tree-node {
+  min-height: 44px;
+  color: #334155;
+  font-size: 14px;
+}
+
+/* Tree toggle */
+mat-tree-node [mat-icon-button] {
+  width: 36px;
+  height: 36px;
+  margin-right: 4px;
+}
+
+/* Tree icons */
+mat-tree-node mat-icon {
+  color: #000;
+  font-size: 20px;
+}
+
+/* Checkbox */
+mat-tree-node mat-checkbox {
+  font-size: 13px;
+}
+
+::ng-deep .mat-mdc-checkbox {
+  --mdc-checkbox-selected-checkmark-color: #fff;
+}
+
+/* Hover on tree node */
+mat-tree-node:hover {
+  background: #f1f5f9;
+  border-radius: 6px;
+}
+
+/* =========================================
+   Form actions
+   ========================================= */
+
+mat-card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 20px 4px 4px;
+  margin: 0;
+  border-top: 1px solid #e7eaf0;
+}
+
+mat-card-actions button {
+  min-width: 100px;
+  min-height: 40px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+}
+
+/* Cancel button */
+mat-card-actions [type='button'] {
+  background: #f1f1f1;
+  color: #000;
+}
+
+/* =========================================
+   Scrollbar for office tree
+   ========================================= */
+
+.layout-column > mat-tree::-webkit-scrollbar {
+  width: 6px;
+}
+
+.layout-column > mat-tree::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.layout-column > mat-tree::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+/* =========================================
+   Tablet
+   ========================================= */
+
+@media (width <= 768px) {
+  .container {
+    padding: 18px;
+  }
+
+  .container > mat-card {
+    padding: 16px;
+    border-radius: 14px;
+  }
+
+  .layout-column {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .layout-column > label,
+  .layout-column > mat-tree {
+    grid-column: 1;
+  }
+
+  .layout-column > label {
+    margin-bottom: -8px;
+  }
+
+  mat-card-actions {
+    padding-top: 16px;
+  }
+}
+
+/* =========================================
+   Mobile
+   ========================================= */
+
+@media (width <= 600px) {
+  .container {
+    padding: 10px;
+  }
+
+  .container > mat-card {
+    padding: 12px;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgb(0 0 0 / 5%);
+  }
+
+  mat-card-content {
+    padding: 4px 0;
+  }
+
+  .layout-column {
+    gap: 10px;
+  }
+
+  mat-label {
+    font-size: 13px;
+  }
+
+  mat-form-field input,
+  mat-form-field mat-select {
+    font-size: 13px;
+  }
+
+  mat-error {
+    font-size: 11px;
+  }
+
+  /* Office tree */
+  .layout-column > mat-tree {
+    max-height: 280px;
+    padding: 8px;
+  }
+
+  mat-tree-node {
+    min-height: 42px;
+    font-size: 13px;
+  }
+
+  mat-tree-node [mat-icon-button] {
+    width: 32px;
+    height: 32px;
+  }
+
+  mat-tree-node mat-icon {
+    font-size: 18px;
+  }
+
+  /* Buttons */
+  mat-card-actions {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+    padding: 16px 0 0;
+  }
+
+  mat-card-actions button {
+    width: 100%;
+    min-height: 44px;
+  }
+}
+
+/* =========================================
+   Small mobile
+   ========================================= */
+
+@media (width <= 400px) {
+  .container {
+    padding: 6px;
+  }
+
+  .container > mat-card {
+    padding: 10px;
+  }
+
+  .layout-column > mat-tree {
+    padding: 6px;
+  }
+
+  mat-tree-node {
+    font-size: 12px;
+  }
+
+  mat-tree-node mat-checkbox {
+    font-size: 12px;
+  }
 }

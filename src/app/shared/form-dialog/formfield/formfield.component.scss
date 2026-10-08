@@ -5,3 +5,18 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
+
+// The floated label (field focused/filled) was rendering at a very low
+// opacity in some states, making it nearly invisible against the field's
+// own border. Forcing full opacity and a clearly visible colour - primary
+// blue while focused, matching the border, and a solid dark grey otherwise -
+// keeps the label legible regardless of that transition state.
+::ng-deep .mdc-floating-label {
+  opacity: 1 !important;
+  color: #334155;
+}
+
+::ng-deep .mat-form-field-appearance-outline.mat-focused .mdc-floating-label,
+::ng-deep .mat-mdc-form-field.mat-focused .mdc-floating-label {
+  color: var(--md-sys-color-primary, #1074b9) !important;
+}
