@@ -14,6 +14,7 @@ import { Router, RouterLink } from '@angular/router';
 import { CoopAuthService } from '../../services/coop-auth.service';
 import { CoopPasswordChecklistComponent } from '../../shared/coop-password-checklist/coop-password-checklist.component';
 import { coopPasswordValidator } from '../../utils/coop-password-policy';
+import { AuthLayoutComponent } from '../../auth-layout/auth-layout.component';
 
 @Component({
   selector: 'mifosx-coop-registration',
@@ -21,7 +22,8 @@ import { coopPasswordValidator } from '../../utils/coop-password-policy';
   imports: [
     ReactiveFormsModule,
     RouterLink,
-    CoopPasswordChecklistComponent
+    CoopPasswordChecklistComponent,
+    AuthLayoutComponent
   ],
   templateUrl: './coop-registration.component.html',
   styleUrls: [

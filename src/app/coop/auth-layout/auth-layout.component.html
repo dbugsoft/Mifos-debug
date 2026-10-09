@@ -45,7 +45,7 @@
   <!-- RIGHT LOGIN / REGISTRATION PANEL -->
   <div class="login-panel">
     <div class="login-card-container">
-      <div class="login-card">
+      <div class="login-card" [style.--card-max-width]="cardMaxWidth">
         <!-- DEBUGSOFT LOGO -->
         <div class="logo-section">
           <img [src]="logoPath" (error)="onLogoError()" alt="Debugsoft Logo" class="logo-image" />
