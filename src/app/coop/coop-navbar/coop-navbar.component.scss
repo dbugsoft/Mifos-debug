@@ -51,9 +51,9 @@
   justify-content: center;
   flex-shrink: 0;
   border-radius: 11px;
-  background: linear-gradient(135deg, #1074b9 0%, #0d5d94 100%);
+  background: linear-gradient(135deg, #2460b9 0%, #0d5d94 100%);
   font-size: 20px;
-  box-shadow: 0 3px 8px rgb(16 116 185 / 28%);
+  box-shadow: 0 3px 8px rgb(36 96 185 / 28%);
 }
 
 .page-header h1 {
@@ -98,11 +98,11 @@
 }
 
 .navbar-links a:hover {
-  color: #1074b9;
+  color: #2460b9;
 }
 
 .navbar-links a.active {
-  color: #1074b9;
+  color: #2460b9;
 }
 
 .navbar-links a.active::after {
@@ -113,7 +113,7 @@
   bottom: 0;
   height: 3px;
   border-radius: 3px 3px 0 0;
-  background: #1074b9;
+  background: #2460b9;
 }
 
 /* =========================================================
@@ -124,11 +124,11 @@
   min-width: 82px;
   height: 36px;
   border-radius: 7px !important;
-  background: #1074b9 !important;
+  background: #2460b9 !important;
   color: #fff !important;
   font-size: 12px !important;
   font-weight: 600 !important;
-  box-shadow: 0 3px 9px rgb(16 116 185 / 28%) !important;
+  box-shadow: 0 3px 9px rgb(36 96 185 / 28%) !important;
   transition:
     background 0.15s ease,
     transform 0.15s ease;

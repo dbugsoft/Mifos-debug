@@ -20,10 +20,8 @@ import {
   TemplateRef,
   AfterContentChecked,
   ChangeDetectorRef,
-  DestroyRef,
   inject
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSidenav } from '@angular/material/sidenav';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
@@ -52,11 +50,14 @@ import { MatIcon } from '@angular/material/icon';
 import { NotificationsTrayComponent as NotificationsTrayComponent_1 } from '../../../shared/notifications-tray/notifications-tray.component';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { DocumentationLinksService } from 'app/shared/services/documentation-links.service';
-import { ComplianceService } from 'app/compliance/compliance.service';
+import { SettingsService } from 'app/settings/settings.service';
+import { KeyboardShortcutsDialogComponent } from 'app/shared/keyboard-shortcuts-dialog/keyboard-shortcuts-dialog.component';
 
 /**
  * Toolbar component.
  */
+// import { ThemeToggleComponent } from 'app/shared/theme-toggle/theme-toggle.component';
+
 @Component({
   selector: 'mifosx-toolbar',
   templateUrl: './toolbar.component.html',
@@ -74,6 +75,7 @@ import { ComplianceService } from 'app/compliance/compliance.service';
     NotificationsTrayComponent_1,
     MatMenu,
     MatMenuItem
+    // ThemeToggleComponent: theme switcher hidden for now
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -82,18 +84,16 @@ export class ToolbarComponent implements OnInit, AfterViewInit, AfterContentChec
   private router = inject(Router);
   private authenticationService = inject(AuthenticationService);
   private popoverService = inject(PopoverService);
-  private configurationWizardService = inject(ConfigurationWizardService);
+  configurationWizardService = inject(ConfigurationWizardService);
+  private settingsService = inject(SettingsService);
   private dialog = inject(MatDialog);
   private changeDetector = inject(ChangeDetectorRef);
   private documentationLinks = inject(DocumentationLinksService);
-  private destroyRef = inject(DestroyRef);
-  /** Compliance (fineract-dbug ADR 0036): the menu shows only for roles given the compliance permissions by name. */
-  readonly compliance = inject(ComplianceService);
 
-  /* Reference of institution */
-  @ViewChild('institution') institution: ElementRef<any>;
-  /* Template for popover on institution */
-  @ViewChild('templateInstitution') templateInstitution: TemplateRef<any>;
+  /* Reference of global search */
+  @ViewChild('globalSearch') globalSearch: ElementRef<any>;
+  /* Template for popover on global search */
+  @ViewChild('templateGlobalSearch') templateGlobalSearch: TemplateRef<any>;
   /* Reference of appMenu */
   @ViewChild('appMenu') appMenu: ElementRef<any>;
   /* Template for popover on appMenu */
@@ -105,25 +105,23 @@ export class ToolbarComponent implements OnInit, AfterViewInit, AfterContentChec
     .observe(Breakpoints.Handset)
     .pipe(map((result) => result.matches));
 
-  /** Sets the initial state of sidenav as collapsed. Not collapsed if false. */
-  sidenavCollapsed = true;
+  /** Whether the sidenav shows icons only. */
+  @Input() sidenavCollapsed: boolean;
+
+  /** Username of authenticated user. */
+  username: string;
 
   /** Instance of sidenav. */
   @Input() sidenav: MatSidenav;
   /** Sidenav collapse event. */
   @Output() collapse = new EventEmitter<boolean>();
 
-  /**
-   * Subscribes to breakpoint for handset.
-   */
   ngOnInit() {
-    // asked afresh at each sign-in: the shell, and with it this toolbar, is created after signing in
-    this.compliance.loadAccess(true).pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
-    this.isHandset$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((isHandset) => {
-      if (isHandset && this.sidenavCollapsed) {
-        this.toggleSidenavCollapse(false);
-      }
-    });
+    this.username = this.authenticationService.getCredentials()?.username;
+  }
+
+  get tenantIdentifier(): string {
+    return this.settingsService.tenantIdentifier || 'default';
   }
 
   ngAfterContentChecked(): void {
@@ -140,9 +138,15 @@ export class ToolbarComponent implements OnInit, AfterViewInit, AfterContentChec
   /**
    * Toggles the current collapsed state of sidenav.
    */
-  toggleSidenavCollapse(sidenavCollapsed?: boolean) {
-    this.sidenavCollapsed = sidenavCollapsed || !this.sidenavCollapsed;
-    this.collapse.emit(this.sidenavCollapsed);
+  toggleSidenavCollapse() {
+    this.collapse.emit(!this.sidenavCollapsed);
+  }
+
+  /**
+   * Opens Keyboard shortcuts dialog.
+   */
+  showKeyboardShortcuts() {
+    this.dialog.open(KeyboardShortcutsDialogComponent);
   }
 
   /**
@@ -244,11 +248,12 @@ export class ToolbarComponent implements OnInit, AfterViewInit, AfterContentChec
   ngAfterViewInit() {
     if (this.configurationWizardService.showToolbar) {
       setTimeout(() => {
-        this.showPopover(this.templateInstitution, this.institution.nativeElement);
+        this.showPopover(this.templateGlobalSearch, this.globalSearch.nativeElement);
       });
     }
 
-    if (this.configurationWizardService.showSideNav || this.configurationWizardService.showSideNavChartofAccounts) {
+    // The sidenav step points at the brand, which shows only when expanded.
+    if (this.configurationWizardService.showSideNav && this.sidenavCollapsed) {
       this.toggleSidenavCollapse();
     }
 

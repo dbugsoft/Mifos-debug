@@ -7,26 +7,39 @@
 -->
 
 <!-- Application Shell -->
+@let isHandset = isHandset$ | async;
+<!-- The handset drawer always opens in full. -->
+@let compact = sidenavCollapsed && !isHandset;
 <mat-sidenav-container id="mifosx-shell-container" autosize>
   <!-- Sidenav -->
   <mat-sidenav
     #sidenav
     class="sidebar-panel"
     [ngClass]="{
-      'sidebar-full': !sidenavCollapsed,
-      'sidebar-compact': sidenavCollapsed
+      'sidebar-full': !compact,
+      'sidebar-compact': compact
     }"
-    [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
-    [mode]="(isHandset$ | async) ? 'over' : 'side'"
-    [opened]="(isHandset$ | async) === false"
+    [attr.role]="isHandset ? 'dialog' : 'navigation'"
+    [mode]="isHandset ? 'over' : 'side'"
+    [opened]="isHandset === false"
+    (openedChange)="$event && sidenavMenu.revealActive()"
   >
-    <mifosx-sidenav [sidenavCollapsed]="sidenavCollapsed"></mifosx-sidenav>
+    <mifosx-sidenav
+      #sidenavMenu
+      [sidenavCollapsed]="compact"
+      [overlay]="!!isHandset"
+      (navigate)="isHandset && sidenav.close()"
+    ></mifosx-sidenav>
   </mat-sidenav>
 
   <!-- Content -->
   <mat-sidenav-content class="sidenav">
     <!-- Toolbar -->
-    <mifosx-toolbar [sidenav]="sidenav" (collapse)="toggleCollapse($event)"></mifosx-toolbar>
+    <mifosx-toolbar
+      [sidenav]="sidenav"
+      [sidenavCollapsed]="sidenavCollapsed"
+      (collapse)="toggleCollapse($event)"
+    ></mifosx-toolbar>
     <!-- Progress Bar -->
     @if (progressBarMode !== 'none') {
       <div>
