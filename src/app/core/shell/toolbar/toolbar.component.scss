@@ -6,115 +6,124 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#mifosx-toolbar {
-  position: relative;
-  box-shadow:
-    0 3px 1px -2px rgb(0 0 0 / 20%),
-    0 2px 2px 0 rgb(0 0 0 / 14%),
-    0 1px 5px 0 rgb(0 0 0 / 12%);
+:host {
+  --header-bg: var(--md-sys-color-surface, #fff);
+  --header-accent: var(--md-sys-color-primary, #2460b9);
+  --header-text: var(--md-sys-color-on-surface, #303135);
+  // One neutral colour for every action icon; brand blue is kept for the app name.
+  --header-icon: #475569;
+}
 
-  .tab-nav-bar {
+:host-context(.dark-theme) {
+  --header-accent: #5ba2ec;
+  --header-icon: #cbd5e1;
+}
+
+// Sidebar toggle | centred app name | actions.
+#mifosx-toolbar {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 8px;
+  height: 64px;
+  padding: 0 16px;
+  background: var(--header-bg);
+  color: var(--header-text);
+  border-bottom: 1px solid rgb(127 127 127 / 20%);
+
+  @media (width <= 599px) {
+    height: 56px;
+    padding: 0 8px;
+  }
+}
+
+.toolbar-start {
+  display: flex;
+  align-items: center;
+  color: var(--header-icon);
+}
+
+.app-title {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--header-accent);
+  font-size: 1.125rem;
+  font-weight: 600;
+  white-space: nowrap;
+  // The full name is long: on a narrow screen it trails off rather than pushing the search and menus out.
+  text-overflow: ellipsis;
+}
+
+.toolbar-end {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  // One even gap between items; each item is 40px high and centred.
+  gap: 4px;
+  color: var(--header-icon);
+
+  > div {
     display: flex;
     align-items: center;
-    padding: 0 1rem;
   }
 
-  .tab-link {
-    min-width: auto;
-    padding: 15px 1rem;
-    text-decoration: none;
-    font-weight: 500;
-    font-size: 14px;
-    color: rgb(255 255 255 / 70%);
+  // Search, theme and notifications each set their own icon colour (blue, default, black) and margins
+  // (5px either side, 4px left): align them.
+  ::ng-deep {
+    .search-toggle,
+    .mat-mdc-icon-button {
+      --mat-icon-button-state-layer-size: 40px;
 
-    &:hover {
-      color: #fff;
+      width: 40px;
+      height: 40px;
+      margin: 0 !important;
+      padding: 8px;
+      color: var(--header-icon);
     }
 
-    cursor: pointer;
-  }
-
-  .search-bar {
-    .search {
-      max-width: 400px;
-      width: 100%;
-      font-size: 1rem;
+    mat-icon,
+    fa-icon,
+    mifosx-m3-icon {
+      color: inherit;
     }
   }
+}
 
-  .language {
-    min-width: 80px;
-    width: 80px;
-    font-size: 0.875rem;
-    margin-top: 0.375rem;
+.account-button {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 4px;
+  height: 40px;
+  padding: 0 4px 0 6px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--header-icon);
+  cursor: pointer;
+
+  &:hover {
+    background: rgb(127 127 127 / 12%);
   }
 
-  .img-button {
-    img {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-    }
-  }
-
-  .ml-1 {
-    margin-left: 1rem;
-  }
-
-  .mr-1 {
-    margin-right: 1rem;
+  .account-icon {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    font-size: 28px;
   }
 }
 
-// Show language icon button only on small screens (when full selector is hidden)
-.show-lt-md {
-  display: none;
-}
+// Signed-in user at the top of the account menu.
+.account-header {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 16px 12px;
+  border-bottom: 1px solid rgb(127 127 127 / 20%);
+  margin-bottom: 4px;
 
-@media (width <= 768px) {
-  .show-lt-md {
-    display: inline-flex;
+  span {
+    font-size: 0.75rem;
+    opacity: 0.7;
   }
-}
-
-.toolbar-spacer {
-  flex: 1 1 auto;
-}
-
-.white-text-language ::ng-deep mifosx-language-selector {
-  color: white !important;
-  /* stylelint-disable-next-line selector-max-universal */
-  * {
-    background-color: transparent !important;
-    color: white !important;
-  }
-}
-
-.white-text-search ::ng-deep mifosx-search-tool {
-  color: white !important;
-
-  // Target only Material form-field internals — leave custom elements free to set their own backgrounds
-  /* stylelint-disable selector-class-pattern */
-  .mat-mdc-text-field-wrapper,
-  .mat-mdc-form-field-flex,
-  .mat-mdc-form-field-infix,
-  .mat-mdc-floating-label,
-  .mdc-text-field,
-  mat-label,
-  input {
-    background-color: transparent !important;
-    color: white !important;
-    margin-bottom: 0;
-  }
-
-  .mat-mdc-select-value,
-  .mat-mdc-select-arrow,
-  .mat-mdc-select-trigger {
-    color: white !important;
-  }
-  /* stylelint-enable selector-class-pattern */
-}
-
-.white-text-language {
-  margin-top: 27px;
 }

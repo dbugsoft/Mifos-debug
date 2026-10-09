@@ -8,47 +8,38 @@
 
 /** Angular Imports */
 import {
+  AfterViewInit,
   ChangeDetectionStrategy,
   Component,
-  OnInit,
-  Input,
-  TemplateRef,
+  DestroyRef,
   ElementRef,
+  EventEmitter,
+  Input,
+  Output,
+  TemplateRef,
   ViewChild,
-  AfterViewInit,
   inject
 } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
-
-/** Custom Components */
-import { KeyboardShortcutsDialogComponent } from 'app/shared/keyboard-shortcuts-dialog/keyboard-shortcuts-dialog.component';
+import { NgTemplateOutlet } from '@angular/common';
+import { NavigationEnd, Router, RouterLinkActive } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { filter } from 'rxjs/operators';
+import { MatIcon } from '@angular/material/icon';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 
 /** Custom Services */
-import { AuthenticationService } from '../../authentication/authentication.service';
 import { PopoverService } from '../../../configuration-wizard/popover/popover.service';
 import { ConfigurationWizardService } from '../../../configuration-wizard/configuration-wizard.service';
-import { DocumentationLinksService } from 'app/shared/services/documentation-links.service';
 
 /** Custom Imports */
-import { frequentActivities } from './frequent-activities';
-import { SettingsService } from 'app/settings/settings.service';
-import { NgClass } from '@angular/common';
-import { MatIconButton, MatButton } from '@angular/material/button';
-import { MatTooltip } from '@angular/material/tooltip';
-import { FaIconComponent } from '@fortawesome/angular-fontawesome';
-import { MatDivider } from '@angular/material/divider';
-import { MatNavList, MatListItem } from '@angular/material/list';
-import { MatIcon } from '@angular/material/icon';
-import { MatLine } from '@angular/material/grid-list';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
-import { remittanceConfig } from '../../../remittances/remittance.config';
+import { NavModule, modulePermission, navSections } from './nav-items';
 import { ComplianceService } from 'app/compliance/compliance.service';
 
-import { catchError, finalize, of, take } from 'rxjs';
-
 /**
- * Sidenav component.
+ * Sidenav component: brand, Home and the module menus. Expanded, a module's pages open in
+ * place; collapsed, only icons show and a module's pages open in a menu beside it.
  */
 @Component({
   selector: 'mifosx-sidenav',
@@ -56,206 +47,82 @@ import { catchError, finalize, of, take } from 'rxjs';
   styleUrls: ['./sidenav.component.scss'],
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
-    NgClass,
-    MatIconButton,
-    MatTooltip,
-    FaIconComponent,
-    MatDivider,
-    MatNavList,
-    MatListItem,
+    NgTemplateOutlet,
     RouterLinkActive,
     MatIcon,
-    MatLine
+    MatTooltip,
+    MatMenu,
+    MatMenuItem,
+    MatMenuTrigger
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SidenavComponent implements OnInit, AfterViewInit {
-  /** Compliance (fineract-dbug ADR 0036): on phones the top bar hides its links, so the menu offers it too. */
-  readonly compliance = inject(ComplianceService);
-
+export class SidenavComponent implements AfterViewInit {
   private router = inject(Router);
-  dialog = inject(MatDialog);
-  private authenticationService = inject(AuthenticationService);
-  private settingsService = inject(SettingsService);
-  private configurationWizardService = inject(ConfigurationWizardService);
+  configurationWizardService = inject(ConfigurationWizardService);
   private popoverService = inject(PopoverService);
-  private documentationLinks = inject(DocumentationLinksService);
+  private host = inject<ElementRef<HTMLElement>>(ElementRef);
+  private destroyRef = inject(DestroyRef);
+  readonly compliance = inject(ComplianceService);
 
   /** True if sidenav is in collapsed state. */
   @Input() sidenavCollapsed: boolean;
-  /** Tooltip position */
-  tooltipPosition = 'after';
-  /** Username of authenticated user. */
-  username: string;
-  /** Array of all user activities */
-  userActivity: string[];
-  /** Mapped Activites */
-  mappedActivities: any[] = [];
-  /** Collection of possible frequent activities */
-  frequentActivities: any[] = frequentActivities;
-  /** Whether remittance feature is enabled */
-  mifosRemittanceEnabled = remittanceConfig.isRemittanceEnabled;
+  /** Shown as an overlay (phones, small tablets): it covers the toolbar's toggle, so it needs its own close. */
+  @Input() overlay = false;
+  /** Emits when a link is followed, so the handset drawer can close. */
+  @Output() navigate = new EventEmitter<void>();
 
-  /* Refernce of logo */
+  readonly sections = navSections;
+  readonly modulePermission = modulePermission;
+  /** Labels of the open modules; several can be open at once. */
+  openModules = new Set<string>();
+
+  /* Reference of the brand */
   @ViewChild('logo') logo: ElementRef<any>;
-  /* Template for popover on logo */
+  /* Template for popover on the brand */
   @ViewChild('templateLogo') templateLogo: TemplateRef<any>;
-  /* Refernce of chart of accounts */
-  @ViewChild('chartOfAccounts') chartOfAccounts: ElementRef<any>;
-  /* Template for popover on chart of accounts */
-  @ViewChild('templateChartOfAccounts') templateChartOfAccounts: TemplateRef<any>;
 
-  /**
-   * @param {Router} router Router for navigation.
-   * @param {MatDialog} dialog Mat Dialog
-   * @param {AuthenticationService} authenticationService Authentication Service.
-   * @param {SettingsService} settingsService Settings Service.
-   * @param {ConfigurationWizardService} configurationWizardService ConfigurationWizard Service.
-   * @param {PopoverService} popoverService PopoverService.
-   */
-  constructor() {
-    this.userActivity = JSON.parse(localStorage.getItem('mifosXLocation'));
-  }
-
-  /**
-   * Sets the username of the authenticated user.
-   */
-  ngOnInit() {
-    const credentials = this.authenticationService.getCredentials();
-    this.username = credentials.username;
-    this.setMappedAcitivites();
-  }
-
-  /**
-   * Logs out the authenticated user and redirects to login page.
-   * Uses unified AuthenticationService which handles both OAuth2 and OIDC logout.
-   */
-  logout() {
-    this.authenticationService
-      .logout()
-      .pipe(
-        take(1),
-        catchError(() => of(void 0)),
-        finalize(() => this.router.navigate(['/login'], { replaceUrl: true }))
-      )
-      .subscribe();
-  }
-
-  /**
-   * Opens Mifos JIRA Wiki page.
-   */
-  help() {
-    this.documentationLinks.open('userManual');
-  }
-
-  /**
-   * Opens Keyboard shortcuts dialog.
-   */
-  showKeyboardShortcuts() {
-    const dialogRef = this.dialog.open(KeyboardShortcutsDialogComponent);
-    dialogRef.afterClosed().subscribe((response: any) => {});
-  }
-
-  /**
-   * Returns top three frequent activities.
-   */
-  getFrequentActivities() {
-    const frequencyCounts: any = {};
-    let index = this.userActivity?.length;
-    while (index) {
-      const activity = this.userActivity[--index];
-      frequencyCounts[activity] = (frequencyCounts[activity] || 0) + 1;
-    }
-    const frequencyCountsArray = Object.entries(frequencyCounts);
-    const topThreeFrequentActivities = frequencyCountsArray
-      .sort((a: any, b: any) => b[1] - a[1])
-      .map((entry: any[]) => entry[0])
-      .filter(
-        (activity: string) => ![
-            '/',
-            '/login',
-            '/home',
-            '/dashboard'
-          ].includes(activity)
-      )
-      .slice(0, 3);
-    return topThreeFrequentActivities;
-  }
-
-  /**
-   * Maps frequently accessed urls to button objects.
-   */
-  setMappedAcitivites() {
-    const activities: string[] = this.getFrequentActivities();
-    activities.forEach((activity: string) => {
-      if (activity.includes('/clients')) {
-        this.pushActivity('/clients');
-      } else if (activity.includes('/groups')) {
-        this.pushActivity('/groups');
-      } else if (activity.includes('/centers')) {
-        this.pushActivity('/centers');
-      } else if (activity.includes('/accounting')) {
-        this.pushActivity('/accounting');
-      } else if (activity.includes('/reports')) {
-        this.pushActivity('/reports');
-      } else if (activity.includes('/appusers')) {
-        this.pushActivity('/appusers');
-      } else if (activity.includes('/organization')) {
-        this.pushActivity('/organization');
-      } else if (activity.includes('/system')) {
-        this.pushActivity('/system');
-      } else if (activity.includes('/products')) {
-        this.pushActivity('/products');
-      } else if (activity.includes('/templates')) {
-        this.pushActivity('/templates');
-      }
-    });
-    this.mappedActivities.reverse();
-  }
-
-  /**
-   * Pushes activity to mapped activities
-   * @param {string} path Activity Path
-   */
-  pushActivity(path: string) {
-    const activity = this.frequentActivities.find((entry: any) => entry.path === path);
-    if (!this.mappedActivities.includes(activity)) {
-      this.mappedActivities.push(activity);
+  /** Opens or closes a module's pages. */
+  toggle(item: NavModule) {
+    if (!this.openModules.delete(item.label)) {
+      this.openModules.add(item.label);
     }
   }
 
   /**
-   * Popover function
-   * @param template TemplateRef<any>.
-   * @param target HTMLElement | ElementRef<any>.
-   * @param position String.
-   * @param backdrop Boolean.
+   * Scrolls the current page's link into view, once its module has opened and the list has rendered.
+   * Called on load, after each navigation, and by the shell when the overlay sidebar opens.
    */
-  showPopover(
-    template: TemplateRef<any>,
-    target: HTMLElement | ElementRef<any>,
-    position: string,
-    backdrop: boolean
-  ): void {
-    if (!target) {
-      return;
+  revealActive() {
+    setTimeout(() =>
+      this.host.nativeElement
+        .querySelector('.page.active, a.row.active, .module.active > .row')
+        ?.scrollIntoView({ block: 'nearest' })
+    );
+  }
+
+  /** Opens the module holding the current page, as its pages become active. */
+  onActiveChange(item: NavModule, active: boolean) {
+    if (active) {
+      this.openModules.add(item.label);
     }
-    setTimeout(() => this.popoverService.open(template, target, position, backdrop, {}), 200);
   }
 
   /**
-   * To show popovers
+   * To show the configuration wizard popover.
    */
   ngAfterViewInit() {
+    // asked afresh at each sign-in: the shell, and with it this sidebar, is created after signing in
+    this.compliance.loadAccess(true).pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
+    this.revealActive();
+    this.router.events
+      .pipe(
+        filter((event) => event instanceof NavigationEnd),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe(() => this.revealActive());
     if (this.configurationWizardService.showSideNav && this.logo) {
-      setTimeout(() => {
-        this.showPopover(this.templateLogo, this.logo.nativeElement, 'bottom', true);
-      });
-    }
-    if (this.configurationWizardService.showSideNavChartofAccounts && this.chartOfAccounts) {
-      setTimeout(() => {
-        this.showPopover(this.templateChartOfAccounts, this.chartOfAccounts.nativeElement, 'top', true);
-      });
+      setTimeout(() => this.popoverService.open(this.templateLogo, this.logo.nativeElement, 'bottom', true, {}), 200);
     }
   }
 
@@ -264,11 +131,8 @@ export class SidenavComponent implements OnInit, AfterViewInit {
    */
   nextStep() {
     this.configurationWizardService.showSideNav = false;
-    this.configurationWizardService.showSideNavChartofAccounts = false;
     this.configurationWizardService.showBreadcrumbs = true;
-    this.router.routeReuseStrategy.shouldReuseRoute = () => false;
-    this.router.onSameUrlNavigation = 'reload';
-    this.router.navigate(['/home']);
+    this.reloadHome();
   }
 
   /**
@@ -276,17 +140,13 @@ export class SidenavComponent implements OnInit, AfterViewInit {
    */
   previousStep() {
     this.configurationWizardService.showSideNav = false;
-    this.configurationWizardService.showSideNavChartofAccounts = false;
     this.configurationWizardService.showToolbarAdmin = true;
+    this.reloadHome();
+  }
+
+  private reloadHome() {
     this.router.routeReuseStrategy.shouldReuseRoute = () => false;
     this.router.onSameUrlNavigation = 'reload';
     this.router.navigate(['/home']);
-  }
-
-  get tenantIdentifier(): string {
-    if (!this.settingsService.tenantIdentifier || this.settingsService.tenantIdentifier === '') {
-      return 'default';
-    }
-    return this.settingsService.tenantIdentifier;
   }
 }

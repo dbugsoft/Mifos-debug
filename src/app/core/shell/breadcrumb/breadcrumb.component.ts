@@ -79,6 +79,12 @@ const routeParentBreadcrumb = 'parentBreadcrumb';
  * Example- hideBreadcrumbTrail: true
  */
 const routeHideBreadcrumbTrail = 'hideBreadcrumbTrail';
+/**
+ * Route data property to hide the "Back to ..." link, for pages reached from the sidebar.
+ *
+ * Example- hideBackLink: true
+ */
+const routeHideBackLink = 'hideBackLink';
 
 /**
  * Generate breadcrumbs dynamically via route configuration.
@@ -261,7 +267,11 @@ export class BreadcrumbComponent implements AfterViewInit {
             const breadcrumb: Breadcrumb = {
               label: breadcrumbLabel,
               url: url,
-              hostsPage: !!(route.routeConfig?.component || route.routeConfig?.loadComponent)
+              // The view may sit on the route itself (members) or on its empty-path child (groups, centers).
+              hostsPage: [
+                route,
+                route.firstChild?.routeConfig?.path === '' ? route.firstChild : null
+              ].some((hosting) => !!(hosting?.routeConfig?.component || hosting?.routeConfig?.loadComponent))
             };
 
             const parentBreadcrumb: Breadcrumb | undefined = route.routeConfig?.data?.[routeParentBreadcrumb];
@@ -276,6 +286,9 @@ export class BreadcrumbComponent implements AfterViewInit {
         }
         this.hideTrail = !!(currentRoute?.snapshot?.data && currentRoute.snapshot.data[routeHideBreadcrumbTrail]);
         this.setBackLink();
+        if (currentRoute?.snapshot?.data?.[routeHideBackLink]) {
+          this.backUrl = null;
+        }
         this.cdr.markForCheck();
       });
   }

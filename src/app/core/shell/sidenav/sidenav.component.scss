@@ -6,185 +6,245 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-.sidebar-full,
-.sidebar-compact {
-  .navigation-panel {
-    width: 100%;
-    height: 100%;
-    padding-top: 20%;
-    overflow-x: hidden;
-  }
+:host {
+  // Same blue as the login page and the menu cards (card-menu.component.scss).
+  --nav-bg: #2460b9;
+  --nav-text: rgb(255 255 255 / 88%);
+  --nav-muted: rgb(255 255 255 / 60%);
+  --nav-border: rgb(255 255 255 / 12%);
+  --nav-hover: rgb(255 255 255 / 8%);
+  --nav-active: rgb(255 255 255 / 18%);
 
-  img {
-    max-width: 100%;
-  }
+  display: block;
+  height: 100%;
+}
 
-  .app-brand {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    max-width: 15rem;
-    z-index: 9999;
-    cursor: pointer;
+.sidebar {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--nav-bg);
+  color: var(--nav-text);
+  overflow: hidden;
+}
 
-    .app-logo {
-      width: auto;
-      height: 42px;
-      margin-right: 8px;
-    }
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-bottom: 1px solid var(--nav-border);
+  text-decoration: none;
+  flex-shrink: 0;
+}
 
-    .app-logo-text {
-      width: auto;
-      height: auto;
-      font-size: 2rem;
-      font-weight: normal;
-    }
-  }
+// Overlay mode only: closes the sidebar, top right beside the logo.
+.close-button {
+  position: absolute;
+  top: 20px;
+  right: 12px;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
 
-  .app-user {
-    text-align: center;
-    width: 100%;
-    padding: 1rem 0 0.4rem;
-
-    .app-user-photo {
-      width: 72px;
-      margin: 0 auto 8px;
-      height: 72px;
-      /* stylelint-disable-next-line color-function-notation */
-      border: 1px solid hsla(210deg, 8%, 51%, 13%);
-      padding: 4px;
-      border-radius: 50%;
-    }
-
-    img {
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-    }
-
-    .app-user-name {
-      display: block;
-      font-size: 0.875rem;
-      font-weight: 300;
-      margin-left: -2px;
-    }
-
-    .app-user-controls {
-      .mat-icon-button {
-        .xs-button {
-          height: 20px;
-          width: 20px;
-          line-height: 20px;
-          margin: 5px;
-        }
-      }
-
-      .text-muted {
-        color: rgba(0 0 0 / 54%);
-      }
-    }
-  }
-
-  .nav-item-sep {
-    span {
-      padding: 16px 0 0 16px;
-      display: block;
-      font-size: 12px;
-    }
-  }
-
-  .app-sidenav {
-    .icon-menu {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-evenly;
-
-      .mat-divider {
-        margin: 0 -24px;
-      }
-
-      .icon-menu-title {
-        padding-left: 0;
-        margin-left: -8px;
-      }
-
-      .icon-menu-item {
-        display: inline-block;
-
-        button {
-          min-width: auto;
-          margin: 4px;
-        }
-      }
-    }
-
-    .nav-item-sep {
-      padding: 0;
-      margin: 1rem 0;
-    }
-
-    .mat-nav-list {
-      margin: 0;
-      padding: 0;
-      list-style: none;
-
-      .mat-list-item {
-        .mat-list-icon {
-          height: 30px;
-          font-size: 22px;
-        }
-      }
-    }
+  &:hover {
+    background: var(--nav-hover);
   }
 }
 
-.sidebar-compact {
-  .app-brand {
-    .app-logo {
-      margin: auto;
-    }
+.brand-image {
+  display: block;
+  box-sizing: border-box;
+  height: 48px;
+  width: auto;
+  max-width: 100%;
+  padding: 4px 8px;
+  // The logo has a white background, so it sits on a white plate.
+  border-radius: 8px;
+  background: #fff;
+  object-fit: contain;
+}
 
-    .app-logo-text {
-      display: none;
-    }
+.menu {
+  flex: 1;
+  overflow: hidden auto;
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  scrollbar-width: thin;
+  scrollbar-color: rgb(255 255 255 / 25%) transparent;
+}
+
+.section {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  // Every module hidden by permissions: drop the heading too.
+  &:not(:has(.module)) {
+    display: none;
+  }
+}
+
+.heading {
+  padding: 0 12px 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--nav-muted);
+}
+
+.row,
+.page {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 40px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--nav-text);
+  font: inherit;
+  font-size: 0.9rem;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--nav-hover);
+    color: #fff;
   }
 
-  .app-user {
+  &:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: -2px;
+  }
+
+  mat-icon {
+    flex-shrink: 0;
+    // The light theme gives icons a dark colour; on the blue sidebar they follow the row's white text.
+    color: inherit;
+    font-size: 21px;
+    width: 21px;
+    height: 21px;
+  }
+}
+
+.label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// Single-link module or Home on its page; group module holding the page.
+.row.active,
+.module.active > .row {
+  background: var(--nav-active);
+  color: #fff;
+  font-weight: 600;
+}
+
+.module.open > .row {
+  color: #fff;
+}
+
+.chevron {
+  color: var(--nav-muted);
+  transition: transform 0.2s;
+
+  .open > .row > & {
+    transform: rotate(180deg);
+  }
+}
+
+.pages {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 2px 0;
+
+  // display: flex would otherwise beat the [hidden] attribute and keep every module open
+  &[hidden] {
+    display: none;
+  }
+}
+
+.page {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0;
+  min-height: 30px;
+  padding-block: 4px;
+  padding-left: 45px;
+  font-size: 0.85rem;
+  line-height: 1.3;
+
+  &.active {
+    background: var(--nav-active);
+    color: #fff;
+    font-weight: 600;
+  }
+}
+
+.collapsed {
+  .brand {
+    justify-content: center;
+    padding: 16px 8px;
+  }
+
+  // Icon-only width: the logo shrinks to fit.
+  .brand-image {
+    height: auto;
+    padding: 4px;
+  }
+
+  .row {
+    justify-content: center;
+    padding: 0;
+  }
+
+  .label,
+  .chevron {
     display: none;
   }
 
-  .app-sidenav {
-    .nav-item-sep {
-      span {
-        display: none;
-      }
-    }
-
-    .icon-menu {
-      padding: 8px 0 0;
-      width: 4rem;
-
-      .nav-item-sep {
-        display: none;
-      }
-
-      span {
-        display: none;
-      }
-    }
+  .heading {
+    height: 0;
+    padding: 0;
+    margin: 0 8px 8px;
+    overflow: hidden;
+    border-top: 1px solid var(--nav-border);
   }
 }
 
-.sidebar-full {
-  .navigation-panel {
-    padding-top: 5%;
+// Collapsed-sidebar menu of a module's pages (rendered in the overlay).
+::ng-deep .sidenav-flyout {
+  min-width: 220px;
+
+  .flyout-title {
+    padding: 8px 16px;
+    font-weight: 700;
+    color: var(--md-sys-color-primary, #2460b9);
   }
 
-  .app-sidenav {
-    .icon-menu {
-      flex-direction: row;
-    }
+  .active {
+    font-weight: 600;
+    color: var(--md-sys-color-primary, #2460b9);
   }
 }
