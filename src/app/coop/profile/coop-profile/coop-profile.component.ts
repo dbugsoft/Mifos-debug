@@ -31,9 +31,11 @@ import { CoopAuthService } from '../../services/coop-auth.service';
 import { CoopTokenService } from '../../services/coop-token.service';
 
 import { CoopLocation, CoopProfile, CoopProfileService } from '../../services/coop-profile.service';
+import { CoopDocumentService } from '../../services/coop-document.service';
 import { CoopNavbarComponent } from '../../coop-navbar/coop-navbar.component';
 import { CoopSystemStatusComponent } from '../coop-system-status/coop-system-status.component';
 import { locationsQueryOptions, profileQueryOptions } from '../../queries/coop-profile.queries';
+import { myDocumentsQueryOptions } from '../../queries/coop-document.queries';
 import { coopQueryKeys } from '../../queries/coop-query-keys';
 import { extractCoopErrorMessage } from '../../queries/coop-error.util';
 
@@ -67,6 +69,8 @@ export class CoopProfileComponent {
 
   private coopProfileService = inject(CoopProfileService);
 
+  private documentService = inject(CoopDocumentService);
+
   private router = inject(Router);
 
   private coopAuthService = inject(CoopAuthService);
@@ -82,6 +86,16 @@ export class CoopProfileComponent {
   private profileQuery = injectQuery(() => profileQueryOptions(this.coopProfileService));
 
   private locationsQuery = injectQuery(() => locationsQueryOptions(this.coopProfileService));
+
+  /**
+   * The applicant's own uploaded documents - whether this is
+   * non-empty is what `hasSubmittedDocuments` below is derived from.
+   * Using a query here (rather than a one-off subscribe) means a
+   * transient failure on the very first load after login is retried
+   * automatically instead of leaving `hasSubmittedDocuments` stuck at
+   * `false` until the user happens to revisit the Documents step.
+   */
+  private documentsQuery = injectQuery(() => myDocumentsQueryOptions(this.documentService));
 
   private createProfileMutation = injectMutation(() => ({
     mutationFn: (profile: CoopProfile) => firstValueFrom(this.coopProfileService.createProfile(profile)),
@@ -164,6 +178,23 @@ export class CoopProfileComponent {
   isEditMode = false;
   isActive = false;
   profileStatus = '';
+
+  /**
+   * True once the applicant has uploaded at least one document in the
+   * Documents step - the signal that the two-step registration was
+   * actually completed, not just the General Information step. The
+   * backend already creates a PENDING record as soon as General
+   * Information is saved (see `onNextClick`/`onSubmit`), so without
+   * this check, clicking Next then Back would surface "PENDING"
+   * before the user has finished the form at all. Read directly off
+   * `documentsQuery` (rather than copied into a field by an effect)
+   * so it reflects the query's own retry/refetch results the moment
+   * they land, including on the very first load after login.
+   */
+  get hasSubmittedDocuments(): boolean {
+    return (this.documentsQuery.data()?.length ?? 0) > 0;
+  }
+
   private originalProfile: CoopProfile | null = null;
   // =====================================================
   // LOCATION DATA

@@ -63,6 +63,16 @@ export const coopQueryKeys = {
       'documentTypes'
     ] as const,
 
+  // The signed-in applicant's own uploaded documents (the public
+  // endpoint, distinct from admin.documents(appUserId) above) - used
+  // to tell whether the whole two-step registration (General
+  // Information + Documents) has actually been completed, not just
+  // the profile record created.
+  documents: () => [
+      ...coopQueryKeys.root(),
+      'documents'
+    ] as const,
+
   admin: {
     root: () => [
         ...coopQueryKeys.root(),

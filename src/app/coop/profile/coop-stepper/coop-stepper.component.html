@@ -58,7 +58,10 @@
 
       <!-- Profile status -->
 
-      <span class="status-badge" *ngIf="currentStepIndex === 0 && profileComponent?.profileStatus">
+      <span
+        class="status-badge"
+        *ngIf="currentStepIndex === 0 && profileComponent?.profileStatus && profileComponent?.hasSubmittedDocuments"
+      >
         {{ profileComponent?.profileStatus }}
       </span>
     </div>

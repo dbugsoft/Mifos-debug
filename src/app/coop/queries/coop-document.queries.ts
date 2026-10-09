@@ -38,6 +38,18 @@ const ADMIN_DOCUMENTS_STALE_TIME_MS = 30_000;
 // browser session, same as DOCUMENT_TYPES_STALE_TIME_MS above.
 const DOCUMENT_THUMBNAIL_STALE_TIME_MS = Infinity;
 
+// The applicant's own uploaded documents, same treatment as
+// PROFILE_STALE_TIME_MS in coop-profile.queries.ts.
+const MY_DOCUMENTS_STALE_TIME_MS = 60_000;
+
+export function myDocumentsQueryOptions(documentService: CoopDocumentService) {
+  return queryOptions({
+    queryKey: coopQueryKeys.documents(),
+    queryFn: () => firstValueFrom(documentService.getUploadedDocuments()),
+    staleTime: MY_DOCUMENTS_STALE_TIME_MS
+  });
+}
+
 export function documentTypesQueryOptions(documentService: CoopDocumentService) {
   return queryOptions({
     queryKey: coopQueryKeys.documentTypes(),

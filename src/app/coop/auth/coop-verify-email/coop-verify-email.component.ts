@@ -10,7 +10,11 @@ import { Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { Router } from '@angular/router';
+import { timeout } from 'rxjs';
 import { CoopAuthService } from '../../services/coop-auth.service';
+
+/** Caps how long the "Verifying..." state can show for a wrong/slow OTP response. */
+const VERIFY_TIMEOUT_MS = 1000;
 
 @Component({
   selector: 'mifosx-coop-verify-email',
@@ -83,8 +87,6 @@ export class CoopVerifyEmailComponent {
 
     console.log('Verifying user:', this.userId);
 
-    console.log('OTP:', otp);
-
     this.isSubmitting = true;
 
     /* =========================
@@ -96,6 +98,7 @@ export class CoopVerifyEmailComponent {
         userId: this.userId,
         otp: otp
       })
+      .pipe(timeout(VERIFY_TIMEOUT_MS))
       .subscribe({
         /* =========================
          SUCCESS
@@ -115,7 +118,7 @@ export class CoopVerifyEmailComponent {
 
           console.log('Verification userId removed from localStorage.');
 
-          this.successMessage = response?.message || 'Email verified successfully. You can now log in.';
+          this.successMessage = response?.message ?? '';
 
           /* =========================
            REDIRECT TO LOGIN
@@ -139,12 +142,34 @@ export class CoopVerifyEmailComponent {
 
           this.isSubmitting = false;
 
-          this.errorMessage =
-            error?.error?.message ||
-            error?.error?.error ||
-            error?.error?.defaultUserMessage ||
-            'Invalid OTP. Please try again.';
+          // Show the exact error message returned by the backend.
+          this.errorMessage = error?.error?.error ?? '';
         }
       });
   }
+}
+
+/**
+ * Reads the OTP attempts-remaining count off a failed verify-email
+ * response, trying every field name the backend might use for it.
+ * Returns `null` when none is present, so the error message falls
+ * back to a plain message instead of showing a wrong/missing number.
+ */
+function extractAttemptsRemaining(error: unknown): number | null {
+  const body = (error as { error?: Record<string, unknown> })?.error;
+
+  if (!body) {
+    return null;
+  }
+
+  const candidates = [
+    body.attemptsRemaining,
+    body.remainingAttempts,
+    body.attempts_remaining,
+    body.remaining_attempts
+  ];
+
+  const value = candidates.find((candidate) => typeof candidate === 'number' && Number.isFinite(candidate));
+
+  return typeof value === 'number' ? value : null;
 }

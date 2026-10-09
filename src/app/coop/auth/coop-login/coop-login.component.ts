@@ -12,6 +12,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CoopAuthService } from '../../services/coop-auth.service';
 import { CoopTokenService } from '../../services/coop-token.service';
 import { MatIconModule } from '@angular/material/icon';
+import { AuthLayoutComponent } from '../../auth-layout/auth-layout.component';
 
 /** Used when a 429 carries neither a Retry-After header nor retryAfterMinutes. */
 const DEFAULT_LOCKOUT_SECONDS = 15 * 60;
@@ -22,7 +23,8 @@ const DEFAULT_LOCKOUT_SECONDS = 15 * 60;
   imports: [
     ReactiveFormsModule,
     RouterLink,
-    MatIconModule
+    MatIconModule,
+    AuthLayoutComponent
   ],
   templateUrl: './coop-login.component.html',
   styleUrl: './coop-login.component.scss'

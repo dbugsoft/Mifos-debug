@@ -9,8 +9,10 @@
 .verify-container {
   min-height: 100vh;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
+  gap: 16px;
   padding: 24px;
   background: #f5f8fb;
 }
@@ -19,7 +21,8 @@
   width: 100%;
   max-width: 450px;
   padding: 40px;
-  background: white;
+  box-sizing: border-box;
+  background: #fff;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgb(0 0 0 / 8%);
 }
@@ -28,6 +31,7 @@
   margin: 0 0 12px;
   text-align: center;
   color: #1074b9;
+  font-size: 1.5rem;
 }
 
 .description {
@@ -56,6 +60,7 @@
   border-radius: 6px;
   font-size: 16px;
   outline: none;
+  transition: border-color 0.15s ease;
 }
 
 .form-group input:focus {
@@ -68,20 +73,71 @@
   font-size: 13px;
 }
 
+/* Error, shown inside the card */
 .error-message {
-  margin-bottom: 16px;
-  padding: 12px;
-  border-radius: 6px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding: 12px 14px;
+  border: 1px solid #f5c6c6;
+  border-radius: 8px;
   background: #fdeaea;
   color: #c62828;
+  font-size: 14px;
+  line-height: 1.4;
 }
 
-.success-message {
-  margin-bottom: 16px;
-  padding: 12px;
-  border-radius: 6px;
+/* Success, shown as a toast just above the card */
+.success-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 450px;
+  padding: 14px 16px;
+  box-sizing: border-box;
+  border: 1px solid #a5d6a7;
+  border-radius: 8px;
   background: #e8f5e9;
   color: #2e7d32;
+  font-weight: 500;
+  box-shadow: 0 4px 14px rgb(46 125 50 / 16%);
+  animation: banner-in 0.2s ease-out;
+}
+
+@keyframes banner-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.message-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: currentcolor;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.error-message .message-icon {
+  background: #c62828;
+}
+
+.success-banner .message-icon {
+  background: #2e7d32;
 }
 
 button {
@@ -90,10 +146,11 @@ button {
   border: none;
   border-radius: 6px;
   background: #1074b9;
-  color: white;
+  color: #fff;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
+  transition: background-color 0.15s ease;
 }
 
 button:hover:not(:disabled) {
@@ -103,4 +160,38 @@ button:hover:not(:disabled) {
 button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+/* Tablet */
+@media (width <=600px) {
+  .verify-container {
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .verify-card {
+    padding: 24px;
+    border-radius: 10px;
+  }
+
+  .success-banner {
+    padding: 12px 14px;
+    border-radius: 10px;
+  }
+}
+
+/* Small mobile */
+@media (width <=400px) {
+  .verify-card {
+    padding: 18px;
+  }
+
+  .verify-card h1 {
+    font-size: 1.3rem;
+  }
+
+  .description {
+    margin-bottom: 20px;
+    font-size: 14px;
+  }
 }

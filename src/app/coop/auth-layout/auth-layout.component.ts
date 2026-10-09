@@ -48,6 +48,13 @@ export class AuthLayoutComponent {
     }
   ];
 
+  /**
+   * The projected card's own max-width - registration needs more
+   * room than login (password checklist, extra fields), so this is
+   * overridable per page instead of hardcoded in the stylesheet.
+   */
+  @Input() cardMaxWidth = '440px';
+
   onLogoError(): void {
     this.logoPath = 'assets/images/debug-bg.png';
   }
