@@ -1,1 +1,0 @@
-import{w as i}from"./chunk-FB4AY3J2.js";import{V as e,Z as r}from"./chunk-UGI3N4VO.js";var m=(()=>{class t{constructor(){this.systemService=r(i)}resolve(){return this.systemService.getConfigurations()}static{this.\u0275fac=function(o){return new(o||t)}}static{this.\u0275prov=e({token:t,factory:t.\u0275fac,providedIn:"root"})}}return t})();export{m as a};
