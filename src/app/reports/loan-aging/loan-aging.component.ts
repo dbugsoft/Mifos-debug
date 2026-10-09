@@ -25,6 +25,7 @@ import { MatTableModule } from '@angular/material/table';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { TranslateService } from '@ngx-translate/core';
 import { Chart, registerables } from 'chart.js';
+import { applyChartTheme } from 'app/shared/utils/chart-theme.util';
 import { OrganizationService } from 'app/organization/organization.service';
 import { FormatNumberPipe } from 'app/pipes/format-number.pipe';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
@@ -201,6 +202,7 @@ export class LoanAgingComponent implements OnDestroy {
     this.chart?.destroy();
     const style = getComputedStyle(canvas);
     const color = (token: string, fallback: string) => style.getPropertyValue(token).trim() || fallback;
+    applyChartTheme();
     this.chart = new Chart(canvas, {
       type: 'bar',
       data: {
@@ -209,7 +211,7 @@ export class LoanAgingComponent implements OnDestroy {
           {
             label: this.translate.instant('loanAging.Outstanding'),
             data: report.bucketTotals.map((c) => c.outstanding),
-            backgroundColor: color('--mat-sys-primary', '#1074b9')
+            backgroundColor: color('--mat-sys-primary', '#2460b9')
           },
           {
             label: this.translate.instant('loanAging.Overdue'),

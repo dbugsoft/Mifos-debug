@@ -7,7 +7,16 @@
  */
 
 /** Angular Imports */
-import { ChangeDetectionStrategy, Component, OnInit, OnDestroy, ViewChild, inject, DestroyRef } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  OnInit,
+  OnDestroy,
+  ViewChild,
+  inject,
+  DestroyRef
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
@@ -46,6 +55,7 @@ import { SelectBase } from 'app/shared/form-dialog/formfield/model/select-base';
 import { SettingsService } from 'app/settings/settings.service';
 import { Dates } from 'app/core/utils/dates';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { NepaliDateInputComponent } from 'app/shared/nepali-date-input/nepali-date-input.component';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { OrganizationService } from 'app/organization/organization.service';
 
@@ -59,6 +69,7 @@ import { OrganizationService } from 'app/organization/organization.service';
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
     FaIconComponent,
+    NepaliDateInputComponent,
     MatTable,
     MatSort,
     MatColumnDef,
@@ -86,6 +97,8 @@ export class IndividualCollectionSheetComponent implements OnInit, OnDestroy {
   private settingsService = inject(SettingsService);
   private dataReloadService = inject(DataReloadService);
   private destroyRef = inject(DestroyRef);
+  /** OnPush: data arrives over HTTP, so each response marks the view for a redraw. */
+  private cdr = inject(ChangeDetectorRef);
 
   officesData: any;
   loanOfficerData: any = [];
@@ -218,6 +231,7 @@ export class IndividualCollectionSheetComponent implements OnInit, OnDestroy {
       )
       .subscribe((response: any) => {
         this.loanOfficerData = response;
+        this.cdr.markForCheck();
       });
   }
 
@@ -414,8 +428,10 @@ export class IndividualCollectionSheetComponent implements OnInit, OnDestroy {
         this.noData = true;
         setTimeout(() => {
           this.noData = false;
+          this.cdr.markForCheck();
         }, 3000);
       }
+      this.cdr.markForCheck();
     });
   }
 

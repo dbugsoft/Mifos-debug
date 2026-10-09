@@ -13,10 +13,17 @@
 // keeps the label legible regardless of that transition state.
 ::ng-deep .mdc-floating-label {
   opacity: 1 !important;
-  color: #334155;
+  color: var(--dk-text-2, #334155);
 }
 
 ::ng-deep .mat-form-field-appearance-outline.mat-focused .mdc-floating-label,
 ::ng-deep .mat-mdc-form-field.mat-focused .mdc-floating-label {
-  color: var(--md-sys-color-primary, #1074b9) !important;
+  color: var(--md-sys-color-primary, var(--dk-primary, #1074b9)) !important;
+}
+
+// BS/AD date: the date, calendar, BS/AD switch and the other calendar's date need 400px, or the dates overlap.
+// As wide as the other fields.
+.bs-date {
+  display: block;
+  width: 100%;
 }

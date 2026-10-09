@@ -6,14 +6,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { HttpErrorResponse, HttpHandler, HttpRequest } from '@angular/common/http';
+import { HttpContext, HttpErrorResponse, HttpHandler, HttpRequest } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { throwError } from 'rxjs';
 
 import { AlertService } from '../alert/alert.service';
 import { PasswordRenewalService } from '../authentication/password-renewal.service';
-import { ErrorHandlerInterceptor } from './error-handler.interceptor';
+import { ErrorHandlerInterceptor, SILENT_ERRORS } from './error-handler.interceptor';
 
 describe('ErrorHandlerInterceptor', () => {
   const url = 'https://10.0.0.5/fineract-provider/api/v1/clients/16/images';
@@ -45,6 +45,17 @@ describe('ErrorHandlerInterceptor', () => {
     });
     TestBed.inject(TranslateService).use('en');
     interceptor = TestBed.inject(ErrorHandlerInterceptor);
+  });
+
+  it('raises no alert for a request marked SILENT_ERRORS, but still fails it', () => {
+    const handler: HttpHandler = {
+      handle: () => throwError(() => new HttpErrorResponse({ status: 404, url, statusText: 'x' }))
+    };
+    const request = new HttpRequest('GET', url, { context: new HttpContext().set(SILENT_ERRORS, true) });
+    const failed = jest.fn();
+    interceptor.intercept(request, handler).subscribe({ error: failed });
+    expect(alert).not.toHaveBeenCalled();
+    expect(failed).toHaveBeenCalled();
   });
 
   it('titles a Fineract 413 as file too large and interpolates the limit', () => {

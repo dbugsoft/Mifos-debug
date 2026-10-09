@@ -6,23 +6,31 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-.container {
-  .action-button {
-    margin-left: auto;
-  }
+@use '../../../shared/styles/list-layout' as *;
 
-  .search-button {
-    min-width: 30px;
-    margin: 4px;
+// Same frameless look as the Users and Templates lists.
+.container {
+  padding: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.list-toolbar {
+  margin-bottom: 16px;
+
+  .search-field {
+    --mat-form-field-container-height: 36px;
+    --mat-form-field-container-vertical-padding: 6px;
   }
 }
 
-table {
-  tr.select-row:hover {
-    cursor: pointer;
+.members-table {
+  th.mat-mdc-header-cell,
+  td.mat-mdc-cell {
+    padding: 8px 16px;
   }
 
-  tr:nth-child(odd).td {
-    color: black;
+  th.mat-mdc-header-cell + th.mat-mdc-header-cell {
+    border-left: 1px solid rgb(255 255 255 / 35%);
   }
 }

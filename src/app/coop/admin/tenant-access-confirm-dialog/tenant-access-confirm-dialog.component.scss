@@ -12,7 +12,7 @@
 
 .intro {
   margin: 0 0 12px;
-  color: #45525c;
+  color: var(--dk-text-2, #45525c);
   font-size: 13px;
   line-height: 1.6;
 }
@@ -20,7 +20,7 @@
 .points {
   margin: 0 0 18px;
   padding-left: 20px;
-  color: #172b3a;
+  color: var(--dk-text, #172b3a);
   font-size: 13px;
   line-height: 1.7;
 }
@@ -35,20 +35,20 @@
 
 .type-hint {
   margin: 0 0 8px;
-  color: #45525c;
+  color: var(--dk-text-2, #45525c);
   font-size: 12.5px;
 }
 
 .type-hint code {
   padding: 2px 6px;
   border-radius: 5px;
-  background: #f1f5f9;
+  background: var(--dk-surface-2, #f1f5f9);
   font-family: SFMono-Regular, Consolas, 'Liberation Mono', monospace;
   font-size: 12px;
 }
 
 .confirm-button {
-  background: #1074b9 !important;
+  background: var(--dk-fill, #2460b9) !important;
   color: #fff !important;
   font-weight: 700 !important;
 }

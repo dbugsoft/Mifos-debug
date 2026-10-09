@@ -114,7 +114,7 @@
 }
 
 .status {
-  color: black;
+  color: var(--dk-text, black);
 }
 
 .field-name {
@@ -166,7 +166,7 @@
   height: 12px;
   margin-bottom: 39px;
   border-radius: 6px;
-  background: #f1f5f9;
+  background: var(--dk-surface-2, #f1f5f9);
 }
 
 // Clean, centered empty state in place of the default left-aligned global
@@ -179,8 +179,8 @@
   gap: 8px;
   padding: 40px 16px;
   margin: 0;
-  background: #f8fafc;
-  border: 1px dashed #cbd5e1;
+  background: var(--dk-surface-2, #f8fafc);
+  border: 1px dashed var(--dk-border, #cbd5e1);
   border-radius: 12px;
   text-align: center;
 
@@ -192,12 +192,12 @@
     padding: 0;
     font-size: 15px;
     font-weight: 500;
-    color: #64748b;
+    color: var(--dk-text-muted, #64748b);
   }
 
   .alert-check {
     font-size: 1.75rem;
     margin-right: 0;
-    color: #94a3b8;
+    color: var(--dk-text-muted, #94a3b8);
   }
 }

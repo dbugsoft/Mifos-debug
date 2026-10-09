@@ -7,417 +7,165 @@
  */
 
 // ===== Colors =====
-$brand-blue: #1074b9;
-$brand-blue-dark: #0a5a8f;
+// Blue of the Emblem of Nepal; the welcome panel and the footer share it
+$brand-blue: #2460b9;
 $text-dark: #1e293b;
 $text-muted: #64748b;
-$input-bg: #f1f5f9;
-$input-border: #e2e8f0;
 
-// ===== Main Wrapper =====
+// ===== Page =====
 .login-wrapper {
   display: flex;
+  flex-direction: column;
   min-height: 100vh;
-  height: 100%;
-  width: 100%;
-  overflow-x: hidden;
+  background: var(--dk-surface, #fff);
 }
 
-// ===== Hero Panel (Left Side) =====
-.hero-panel {
-  flex: 0 0 50%;
-  position: relative;
+.login-stage {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+}
+
+// ===== Card: blue welcome half + white form half =====
+.login-shell {
+  display: flex;
+  width: 100%;
+  max-width: 832px;
+  border-radius: 12px;
   overflow: hidden;
-  background:
-    linear-gradient(150deg, rgb(8 60 120 / 90%) 0%, rgb(14 90 160 / 85%) 40%, rgb(16 116 185 / 80%) 100%),
-    url('/assets/images/hero.jpg') center / cover no-repeat;
+  box-shadow: 0 8px 32px rgb(15 23 42 / 12%);
+  animation: fade-in-up 0.4s ease-out;
 }
 
-.hero-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image:
-    radial-gradient(circle at 20% 80%, rgb(255 255 255 / 5%) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgb(255 255 255 / 4%) 0%, transparent 40%);
-  z-index: 0;
-}
-
-// ===== Hero Content =====
-.hero-content {
-  position: relative;
-  z-index: 1;
-  height: 100%;
+.hero-panel {
+  flex: 1 1 50%;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 3.5rem;
+  padding: 40px;
+  background: var(--dk-fill, #{$brand-blue});
+  color: #fff;
 }
 
 .hero-title {
-  font-size: 2.5rem;
+  margin: 0;
+  font-size: 1.5rem;
   font-weight: 700;
-  color: #fff;
-  margin: 0 0 1rem;
-  line-height: 1.15;
+  text-align: center;
+}
+
+.hero-full-name {
+  margin: 8px 0 0;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: rgb(255 255 255 / 85%);
+  text-align: center;
+}
+
+.hero-divider {
+  width: 100%;
+  margin: 16px 0 24px;
+  border: 0;
+  border-top: 1px solid rgb(255 255 255 / 30%);
 }
 
 .hero-subtitle {
-  font-size: 1rem;
-  font-weight: 400;
-  line-height: 1.7;
-  color: rgb(255 255 255 / 65%);
-  margin: 0 0 3rem;
-  max-width: 440px;
-}
-
-// ===== Feature Items =====
-.hero-features {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  margin-top: auto;
-}
-
-.feature-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.875rem;
-}
-
-.feature-check {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: rgb(74 222 128 / 20%);
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-
-.check-mark {
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: #4ade80;
-  line-height: 1;
-}
-
-.feature-text {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-
-  strong {
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: #fff;
-  }
-
-  span {
-    font-size: 0.825rem;
-    color: rgb(255 255 255 / 55%);
-    line-height: 1.4;
-  }
-}
-
-// ===== Login Panel (Right Side) =====
-.login-panel {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  background: #fff;
-  position: relative;
-  min-height: 100vh;
-  overflow: hidden auto;
-}
-
-// ===== Language Selector (absolute top-right of login panel) =====
-.login-lang-selector {
-  position: absolute;
-  top: 0.1rem;
-  right: 0.1rem;
-  z-index: 10;
-
-  ::ng-deep mifosx-language-selector {
-    width: 130px;
-  }
-}
-
-// ===== Login Card =====
-.login-card-container {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem 3rem;
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.8;
+  color: rgb(255 255 255 / 90%);
 }
 
 .login-card {
-  width: 100%;
-  max-width: 440px;
+  flex: 1 1 50%;
+  padding: 32px 40px;
+  background: var(--dk-surface, #fff);
 }
 
-.logo-section {
-  margin-bottom: 1.25rem;
+// Sits above the card, at the top-right of the page
+.login-lang-selector {
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px 16px 0;
+  color: var(--dk-text-muted, #{$text-muted});
 }
 
-.logo-image {
-  height: 64px;
-  width: auto;
-  display: block;
+.card-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  background: var(--dk-fill, #{$brand-blue});
+  color: #fff;
+
+  // m3-icon reads its colour from this variable, not from `color`
+  --md-icon-prefix-label-text-color: #fff;
+}
+
+.card-title {
+  margin: 0 0 4px;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--dk-primary, #{$brand-blue});
+  text-align: center;
 }
 
 .card-subtitle {
-  font-size: 0.9rem;
-  color: $text-muted;
-  margin: 0 0 2rem;
-  line-height: 1.5;
+  margin: 0 0 24px;
+  font-size: 0.85rem;
+  color: var(--dk-text-muted, #{$text-muted});
+  text-align: center;
 }
 
-// ===== Tenant Section =====
 .tenant-section {
-  margin-bottom: 1rem;
   width: 100%;
-
-  ::ng-deep mifosx-tenant-selector {
-    display: block;
-    width: 100%;
-
-    #tenant-selector {
-      width: 100%;
-
-      .mat-mdc-form-field-icon-prefix {
-        padding: 0 0.75rem 0 0.5rem;
-      }
-    }
-  }
+  margin-bottom: 16px;
 }
 
-// ===== Override form field styles for clean rounded inputs =====
-::ng-deep {
-  .login-card {
-    // Field container - rounded gray bg, no underline
-    .mat-mdc-text-field-wrapper {
-      background: $input-bg !important;
-      border-radius: 10px !important;
-      border: 1px solid $input-border !important;
-      transition: border-color 0.2s ease;
-    }
-
-    .mat-focused .mat-mdc-text-field-wrapper {
-      border-color: $brand-blue !important;
-    }
-
-    // Remove underline completely
-    .mdc-line-ripple::before,
-    .mdc-line-ripple::after {
-      border-bottom: none !important;
-    }
-
-    .mat-mdc-form-field-focus-overlay {
-      display: none !important;
-    }
-
-    // Labels
-    .mat-mdc-floating-label {
-      color: $text-muted !important;
-    }
-
-    // Input text
-    .mat-mdc-input-element {
-      color: $text-dark !important;
-      caret-color: $brand-blue;
-
-      &::placeholder {
-        color: #94a3b8 !important;
-      }
-    }
-
-    // Prefix icons
-    .mat-mdc-form-field-icon-prefix {
-      color: $text-muted !important;
-
-      mifosx-m3-icon,
-      mat-icon {
-        color: $text-muted !important;
-      }
-    }
-
-    // Suffix icons
-    .mat-mdc-form-field-icon-suffix {
-      button,
-      mifosx-m3-icon,
-      mat-icon {
-        color: $text-muted !important;
-      }
-    }
-
-    // Error messages
-    .mat-mdc-form-field-error {
-      color: #dc2626 !important;
-    }
-
-    // Select
-    .mat-mdc-select {
-      color: $text-dark !important;
-    }
-
-    .mat-mdc-select-arrow {
-      color: $text-muted !important;
-    }
-
-    // Submit button - blue filled
-    .login-submit-button {
-      md-filled-button,
-      [mat-raised-button] {
-        --md-filled-button-container-color: #{$brand-blue} !important;
-        --md-filled-button-label-text-color: #fff !important;
-
-        background: $brand-blue !important;
-        color: #fff !important;
-        border-radius: 10px !important;
-        font-weight: 600 !important;
-        font-size: 0.95rem !important;
-      }
-    }
-
-    // Progress bar
-    .login-progress {
-      .mdc-linear-progress__bar-inner {
-        border-color: $brand-blue !important;
-      }
-    }
-  }
-}
-
-// ===== Form Section =====
 .form-section {
   width: 100%;
 }
 
-// ===== Resources Section =====
-.resources-section {
-  margin-top: 1.5rem;
-  padding-top: 1.25rem;
-  border-top: 1px solid $input-border;
-
-  .resources-title {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: $text-muted;
-    margin: 0 0 0.75rem;
-  }
-
-  .resources-links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem 1rem;
-
-    a {
-      font-size: 0.825rem;
-      color: $brand-blue;
-      text-decoration: none;
-      font-weight: 500;
-
-      &:hover {
-        text-decoration: underline;
-      }
-    }
-  }
-}
-
-/* stylelint-disable-next-line media-feature-range-notation -- Safari compatibility */
-@media (max-width: 1024px) {
-  .resources-section {
-    display: none;
-  }
-}
-
-// ===== Footer =====
+// ===== Footer band =====
 .login-footer {
-  text-align: center;
-  padding: 1rem;
-  margin-top: auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 24px 96px;
+  background: var(--dk-fill, #{$brand-blue});
+  color: rgb(255 255 255 / 85%);
   font-size: 0.8rem;
-  color: $text-muted;
-  border-top: 1px solid $input-border;
 
   a {
-    color: $brand-blue;
-    text-decoration: none;
-    font-weight: 500;
-
-    &:hover {
-      text-decoration: underline;
-    }
+    color: #fff;
+    font-weight: 600;
   }
-}
-
-// ===== Version Info =====
-.login-version-info {
-  margin-bottom: 1rem;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-}
-
-.version-info-container {
-  width: 100%;
-  background: $input-bg;
-  border-radius: 10px;
-  padding: 0.75rem 1rem;
-  border: 1px solid $input-border;
-}
-
-.version-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.4rem 0;
-  border-bottom: 1px solid $input-border;
-
-  &:last-child {
-    border-bottom: none;
-  }
-}
-
-.version-label {
-  font-weight: 500;
-  font-size: 0.75rem;
-  color: $text-muted;
-}
-
-.version-value {
-  font-weight: 400;
-  font-size: 0.75rem;
-  color: $text-dark;
-  text-align: right;
-  word-break: break-word;
-  max-width: 60%;
 }
 
 // ===== Dark Mode =====
 :host-context(.dark-theme),
 :host-context([data-theme='dark']) {
-  .login-panel {
+  .login-wrapper {
+    background: #121212;
+  }
+
+  .login-card {
     background: #1e1e1e;
   }
 
   .card-title {
-    color: #e2e2e5;
+    color: var(--dk-primary, #9ecaff);
   }
 
-  .card-subtitle {
-    color: #a0a0a0;
-  }
-
-  .login-footer {
-    color: #a0a0a0;
-    border-top-color: #333;
+  .card-subtitle,
+  .login-lang-selector {
+    color: var(--dk-text-muted, #a0a0a0);
   }
 }
 
@@ -425,7 +173,7 @@ $input-border: #e2e8f0;
 @keyframes fade-in-up {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(16px);
   }
 
   to {
@@ -434,78 +182,33 @@ $input-border: #e2e8f0;
   }
 }
 
-// ===== Responsive =====
-
-/* stylelint-disable-next-line media-feature-range-notation -- Safari compatibility */
-@media (max-width: 1024px) {
-  .hero-panel {
-    display: none;
-  }
-
-  .login-panel {
-    flex: 1;
-    width: 100%;
-  }
-
-  .login-card-container {
-    padding: 2rem;
-  }
-
-  .login-card {
-    max-width: 440px;
-    margin: 0 auto;
+@media (prefers-reduced-motion: reduce) {
+  .login-shell {
+    animation: none;
   }
 }
 
+// ===== Responsive =====
+
 /* stylelint-disable-next-line media-feature-range-notation -- Safari compatibility */
 @media (max-width: 768px) {
-  .login-wrapper {
+  // Stack the welcome panel above the form rather than hiding it
+  .login-shell {
     flex-direction: column;
   }
 
   .hero-panel {
-    display: none;
-  }
-
-  .login-card-container {
-    padding: 1.5rem 1rem;
+    padding: 24px 16px;
   }
 
   .login-card {
-    max-width: 100%;
+    padding: 24px 16px;
   }
 
   .login-footer {
-    padding: 0.75rem;
-  }
-}
-
-/* stylelint-disable-next-line media-feature-range-notation -- Safari compatibility */
-@media (max-width: 480px) {
-  .login-card-container {
-    padding: 1rem 0.75rem;
-  }
-
-  .card-subtitle {
-    margin-bottom: 1.25rem;
-  }
-
-  .login-footer {
-    padding: 0.5rem;
-  }
-}
-
-// ===== Utilities =====
-.hide-lt-md {
-  /* stylelint-disable-next-line media-feature-range-notation -- Safari compatibility */
-  @media (max-width: 768px) {
-    display: none !important;
-  }
-}
-
-.hide-lt-lg {
-  /* stylelint-disable-next-line media-feature-range-notation -- Safari compatibility */
-  @media (max-width: 1024px) {
-    display: none !important;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px;
+    text-align: center;
   }
 }

@@ -185,8 +185,8 @@
   margin-left: 6px;
   padding: 1px 8px;
   border-radius: 10px;
-  background: #fff3e0;
-  color: #e65100;
+  background: var(--dk-warning-soft, #fff3e0);
+  color: var(--dk-warning, #e65100);
   font-size: 11px;
   font-weight: 600;
 }
@@ -222,7 +222,7 @@
     cursor: pointer;
 
     &.open {
-      background: color-mix(in srgb, var(--md-sys-color-primary, #1074b9) 6%, transparent);
+      background: color-mix(in srgb, var(--md-sys-color-primary, var(--dk-fill, #2460b9)) 6%, transparent);
 
       td {
         border-bottom-color: transparent;
@@ -242,7 +242,7 @@
     &.open td {
       padding: 4px 16px 16px;
       border-bottom-width: 1px;
-      background: color-mix(in srgb, var(--md-sys-color-primary, #1074b9) 6%, transparent);
+      background: color-mix(in srgb, var(--md-sys-color-primary, var(--dk-fill, #2460b9)) 6%, transparent);
     }
   }
 
@@ -254,14 +254,14 @@
   .expand-icon {
     width: 14px;
     margin-right: 8px;
-    color: var(--md-sys-color-primary, #1074b9);
+    color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
     font-size: 0.75rem;
   }
 
   // Delete in red, beside Edit in blue.
   .account-action-button.delete-button {
     --mat-button-protected-container-color: rgb(211 47 47 / 10%);
-    --mat-button-protected-label-text-color: #d32f2f;
+    --mat-button-protected-label-text-color: var(--dk-danger, #d32f2f);
   }
 }
 
@@ -271,7 +271,7 @@
   .documents-label {
     display: block;
     margin-bottom: 8px;
-    color: rgb(127 127 127);
+    color: var(--dk-text-muted, rgb(127 127 127));
     font-size: 0.875rem;
   }
 }

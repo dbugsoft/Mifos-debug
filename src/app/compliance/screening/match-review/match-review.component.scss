@@ -25,9 +25,9 @@
 }
 
 .notice.bad {
-  border-color: #f1b8b3;
-  background: #fdeceb;
-  color: #6d150f;
+  border-color: var(--dk-danger-border, #f1b8b3);
+  background: var(--dk-danger-soft, #fdeceb);
+  color: var(--dk-danger, #6d150f);
 }
 
 .pair,
@@ -65,10 +65,10 @@
   .score {
     font-size: 1.75rem;
     font-weight: 700;
-    color: #7a4a00;
+    color: var(--dk-warning, #7a4a00);
 
     &.likely {
-      color: #9f1f17;
+      color: var(--dk-danger, #9f1f17);
     }
   }
 
@@ -89,7 +89,7 @@
   padding: 16px;
   border: 1px solid rgb(127 127 127 / 35%);
   border-radius: 8px;
-  background: var(--mat-sys-surface, #fff);
+  background: var(--mat-sys-surface, var(--dk-surface, #fff));
 
   h3 {
     margin: 0;
@@ -108,8 +108,8 @@
   }
 
   &.danger {
-    border-color: #e7a29b;
-    background: #fffafa;
+    border-color: var(--dk-danger, #e7a29b);
+    background: var(--dk-surface, #fffafa);
   }
 }
 

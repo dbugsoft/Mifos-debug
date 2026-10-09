@@ -13,7 +13,7 @@
   min-height: 100vh;
   padding: 24px 16px;
   box-sizing: border-box;
-  background: #f5f8fa;
+  background: var(--dk-surface-2, #f5f8fa);
 }
 
 .card {
@@ -21,27 +21,27 @@
   max-width: 520px;
   padding: 32px;
   box-sizing: border-box;
-  border: 1px solid #e2e8ed;
+  border: 1px solid var(--dk-border, #e2e8ed);
   border-radius: 16px;
-  background: #fff;
+  background: var(--dk-surface, #fff);
   box-shadow: 0 4px 20px rgb(0 0 0 / 6%);
 }
 
 h1 {
   margin: 0 0 12px;
-  color: #172b3a;
+  color: var(--dk-text, #172b3a);
   font-size: 20px;
   font-weight: 700;
 }
 
 p {
   margin: 0 0 10px;
-  color: #45525c;
+  color: var(--dk-text-2, #45525c);
   font-size: 14px;
   line-height: 1.6;
 }
 
 .muted {
-  color: #7d8b95;
+  color: var(--dk-text-muted, #7d8b95);
   font-size: 13px;
 }

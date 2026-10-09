@@ -91,7 +91,7 @@ export interface KymPersonDialogData {
         margin-bottom: 16px;
         padding: 8px 12px;
         border-radius: 6px;
-        background: rgb(16 116 185 / 6%);
+        background: rgb(36 96 185 / 6%);
       }
       .row {
         display: grid;

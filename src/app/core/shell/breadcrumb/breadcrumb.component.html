@@ -16,7 +16,7 @@
     }
     <div class="title-row">
       <span #breadcrumb class="breadcrumb-title">
-        {{ getTranslate(breadcrumbs[breadcrumbs?.length - 1].label) }}
+        {{ breadcrumbs[breadcrumbs?.length - 1].title || getTranslate(breadcrumbs[breadcrumbs?.length - 1].label) }}
       </span>
     </div>
 

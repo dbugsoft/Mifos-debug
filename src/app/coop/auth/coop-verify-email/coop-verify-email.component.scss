@@ -14,7 +14,7 @@
   justify-content: center;
   gap: 16px;
   padding: 24px;
-  background: #f5f8fb;
+  background: var(--dk-surface-2, #f5f8fb);
 }
 
 .verify-card {
@@ -22,7 +22,7 @@
   max-width: 450px;
   padding: 40px;
   box-sizing: border-box;
-  background: #fff;
+  background: var(--dk-surface, #fff);
   border-radius: 12px;
   box-shadow: 0 4px 20px rgb(0 0 0 / 8%);
 }
@@ -30,14 +30,14 @@
 .verify-card h1 {
   margin: 0 0 12px;
   text-align: center;
-  color: #1074b9;
+  color: var(--dk-primary, #1074b9);
   font-size: 1.5rem;
 }
 
 .description {
   margin-bottom: 30px;
   text-align: center;
-  color: #666;
+  color: var(--dk-text-2, #666);
   line-height: 1.5;
 }
 
@@ -49,14 +49,14 @@
   display: block;
   margin-bottom: 8px;
   font-weight: 600;
-  color: #333;
+  color: var(--dk-text, #333);
 }
 
 .form-group input {
   width: 100%;
   box-sizing: border-box;
   padding: 12px 14px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--dk-border, #ccc);
   border-radius: 6px;
   font-size: 16px;
   outline: none;
@@ -64,12 +64,12 @@
 }
 
 .form-group input:focus {
-  border-color: #1074b9;
+  border-color: var(--dk-primary, #2460b9);
 }
 
 .error-text {
   margin-top: 6px;
-  color: #d32f2f;
+  color: var(--dk-danger, #d32f2f);
   font-size: 13px;
 }
 
@@ -82,8 +82,8 @@
   padding: 12px 14px;
   border: 1px solid #f5c6c6;
   border-radius: 8px;
-  background: #fdeaea;
-  color: #c62828;
+  background: var(--dk-danger-soft, #fdeaea);
+  color: var(--dk-danger, #c62828);
   font-size: 14px;
   line-height: 1.4;
 }
@@ -99,8 +99,8 @@
   box-sizing: border-box;
   border: 1px solid #a5d6a7;
   border-radius: 8px;
-  background: #e8f5e9;
-  color: #2e7d32;
+  background: var(--dk-success-soft, #e8f5e9);
+  color: var(--dk-success, #2e7d32);
   font-weight: 500;
   box-shadow: 0 4px 14px rgb(46 125 50 / 16%);
   animation: banner-in 0.2s ease-out;
@@ -133,11 +133,11 @@
 }
 
 .error-message .message-icon {
-  background: #c62828;
+  background: var(--dk-danger, #c62828);
 }
 
 .success-banner .message-icon {
-  background: #2e7d32;
+  background: var(--dk-success, #2e7d32);
 }
 
 button {
@@ -145,7 +145,7 @@ button {
   padding: 13px;
   border: none;
   border-radius: 6px;
-  background: #1074b9;
+  background: var(--dk-fill, #1074b9);
   color: #fff;
   font-size: 16px;
   font-weight: 600;
@@ -154,7 +154,7 @@ button {
 }
 
 button:hover:not(:disabled) {
-  background: #0d609b;
+  background: var(--dk-fill, #0d609b);
 }
 
 button:disabled {

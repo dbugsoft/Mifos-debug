@@ -6,8 +6,9 @@
   file, You can obtain one at http://mozilla.org/MPL/2.0/.
 -->
 
-<mat-card class="product-card">
-  <mat-card-content>
+<div class="product-view">
+  <!-- Tabs only earn their space when there is more than the General tab. -->
+  @if (recurringDepositDatatables?.length) {
     <nav mat-tab-nav-bar class="navigation-tabs" [tabPanel]="tabPanel">
       <a
         mat-tab-link
@@ -35,5 +36,7 @@
     <mat-tab-nav-panel #tabPanel>
       <router-outlet></router-outlet>
     </mat-tab-nav-panel>
-  </mat-card-content>
-</mat-card>
+  } @else {
+    <router-outlet></router-outlet>
+  }
+</div>

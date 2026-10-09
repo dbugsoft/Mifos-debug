@@ -245,40 +245,35 @@ const routes: Routes = [
             },
             {
               path: ':productId',
-              data: { title: 'View Saving Product', breadcrumb: 'productId', routeParamBreadcrumb: 'productId' },
+              component: ViewSavingProductComponent,
               resolve: {
                 savingProductDatatables: SavingProductDatatablesResolver
               },
+              data: { title: 'View Saving Product', breadcrumb: 'productId', routeParamBreadcrumb: 'productId' },
               children: [
                 {
                   path: '',
-                  component: ViewSavingProductComponent,
+                  redirectTo: 'general',
+                  pathMatch: 'full'
+                },
+                {
+                  path: 'general',
+                  data: { title: 'General', breadcrumb: 'General', routeParamBreadcrumb: false },
+                  component: SavingProductGeneralTabComponent,
+                  resolve: {
+                    savingProduct: SavingProductResolver
+                  }
+                },
+                {
+                  path: 'datatables',
                   children: [
                     {
-                      path: '',
-                      redirectTo: 'general',
-                      pathMatch: 'full'
-                    },
-                    {
-                      path: 'general',
-                      data: { title: 'General', breadcrumb: 'General', routeParamBreadcrumb: false },
-                      component: SavingProductGeneralTabComponent,
+                      path: ':datatableName',
+                      component: SavingProductDatatableTabComponent,
+                      data: { title: 'Data Table View', routeParamBreadcrumb: 'datatableName' },
                       resolve: {
-                        savingProduct: SavingProductResolver
+                        savingProductDatatable: SavingProductDatatableResolver
                       }
-                    },
-                    {
-                      path: 'datatables',
-                      children: [
-                        {
-                          path: ':datatableName',
-                          component: SavingProductDatatableTabComponent,
-                          data: { title: 'Data Table View', routeParamBreadcrumb: 'datatableName' },
-                          resolve: {
-                            savingProductDatatable: SavingProductDatatableResolver
-                          }
-                        }
-                      ]
                     }
                   ]
                 },
@@ -522,7 +517,10 @@ const routes: Routes = [
                 },
                 {
                   path: ':rangeId',
-                  data: { title: 'View Delinquency Range', routeParamBreadcrumb: 'id' },
+                  data: { title: 'View Delinquency Range', routeResolveBreadcrumb: [
+                      'delinquencyRange',
+                      'classification'
+                    ] },
                   resolve: {
                     delinquencyRange: DelinquencyRangeComponentsResolver
                   },
@@ -536,7 +534,7 @@ const routes: Routes = [
                     },
                     {
                       path: 'edit',
-                      data: { title: 'Edit Delinquency Range', breadcrumb: 'Edit', routeParamBreadcrumb: false },
+                      data: { title: 'Edit Delinquency Range', breadcrumb: 'Edit', routeResolveBreadcrumb: false },
                       component: EditRangeComponent,
                       resolve: {
                         delinquencyRange: DelinquencyRangeComponentsResolver
@@ -567,7 +565,10 @@ const routes: Routes = [
                 },
                 {
                   path: ':bucketId',
-                  data: { title: 'View Delinquency Bucket', routeParamBreadcrumb: 'id' },
+                  data: { title: 'View Delinquency Bucket', routeResolveBreadcrumb: [
+                      'delinquencyBucket',
+                      'name'
+                    ] },
                   resolve: {
                     delinquencyBucket: DelinquencyBucketComponentsResolver
                   },
@@ -581,7 +582,7 @@ const routes: Routes = [
                     },
                     {
                       path: 'edit',
-                      data: { title: 'Edit Delinquency Bucket', breadcrumb: 'Edit', routeParamBreadcrumb: false },
+                      data: { title: 'Edit Delinquency Bucket', breadcrumb: 'Edit', routeResolveBreadcrumb: false },
                       component: EditBucketComponent,
                       resolve: {
                         delinquencyBucket: DelinquencyBucketComponentsResolver,
@@ -708,6 +709,7 @@ const routes: Routes = [
                     {
                       path: ':datatableName',
                       component: FixedDepositDatatableTabComponent,
+                      data: { title: 'Data Table View', routeParamBreadcrumb: 'datatableName' },
                       resolve: {
                         fixedDepositDatatable: SavingProductDatatableResolver
                       }
@@ -716,7 +718,7 @@ const routes: Routes = [
                 },
                 {
                   path: 'edit',
-                  data: { title: 'Edit Fixed Deposit Product', breadcrumb: 'edit', routeParamBreadcrumb: false },
+                  data: { title: 'Edit Fixed Deposit Product', breadcrumb: 'Edit', routeParamBreadcrumb: false },
                   component: EditFixedDepositProductComponent,
                   resolve: {
                     fixedDepositProductAndTemplate: FixedDepositProductAndTemplateResolver

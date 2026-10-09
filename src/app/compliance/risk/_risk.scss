@@ -14,7 +14,7 @@
 
     th {
       padding: 12px 14px;
-      background: var(--md-sys-color-primary, #1074b9);
+      background: var(--md-sys-color-primary, var(--dk-fill, #1074b9));
       color: #fff;
       font-weight: 600;
       text-align: left;
@@ -43,7 +43,7 @@
 
     tr.row:hover td,
     tr.row:focus td {
-      background: rgb(16 116 185 / 6%);
+      background: rgb(var(--dk-tint-rgb, 16 116 185) / 6%);
       outline: none;
     }
   }

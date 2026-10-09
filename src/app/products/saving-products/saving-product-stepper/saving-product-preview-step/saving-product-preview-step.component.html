@@ -6,10 +6,10 @@
   file, You can obtain one at http://mozilla.org/MPL/2.0/.
 -->
 
-<div class="responsive-column">
-  <h2 class="mat-h2 flex-100">{{ savingProduct.name }}</h2>
-
-  <mat-divider class="flex-100"></mat-divider>
+<div class="tab-container">
+  <h2 class="mat-h2 flex-100">
+    <strong>{{ 'labels.inputs.Savings Product' | translate }} : </strong>{{ savingProduct.name }}
+  </h2>
   <h3 class="mat-h3 flex-100">{{ 'labels.inputs.Details' | translate }}</h3>
 
   <mat-divider class="flex-100"></mat-divider>
@@ -185,11 +185,15 @@
   </div>
 
   @if (savingProduct.isDormancyTrackingActive) {
-    <div class="layout-row-wrap responsive-column flex-100">
+    <div class="flex-100 layout-row">
       <span class="flex-40">{{ 'labels.inputs.Number of Days to Inactive sub-status' | translate }}:</span>
       <span class="flex-60">{{ savingProduct.daysToInactive }}</span>
+    </div>
+    <div class="flex-100 layout-row">
       <span class="flex-40">{{ 'labels.inputs.Number of Days to Dormant sub-status' | translate }}:</span>
       <span class="flex-60">{{ savingProduct.daysToDormancy }}</span>
+    </div>
+    <div class="flex-100 layout-row">
       <span class="flex-40">{{ 'labels.inputs.Number of Days to Escheat' | translate }}:</span>
       <span class="flex-60">{{ savingProduct.daysToEscheat }}</span>
     </div>

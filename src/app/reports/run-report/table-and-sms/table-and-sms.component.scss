@@ -22,18 +22,18 @@
     font-size: 64px;
     width: 64px;
     height: 64px;
-    color: rgb(0 0 0 / 38%);
+    color: rgb(var(--dk-ink-rgb, 0 0 0) / 38%);
     margin-bottom: 16px;
   }
 
   &__message {
     font-size: 16px;
-    color: rgb(0 0 0 / 60%);
+    color: rgb(var(--dk-ink-rgb, 0 0 0) / 60%);
     margin: 0;
   }
 
   &--error .empty-state__icon {
-    color: #f44336;
+    color: var(--dk-danger, #f44336);
   }
 }
 

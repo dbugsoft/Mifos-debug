@@ -25,7 +25,7 @@
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  background: linear-gradient(180deg, #f8fbfd 0%, #f3f7fa 100%);
+  background: linear-gradient(180deg, var(--dk-surface-2, #f8fbfd) 0%, var(--dk-surface-2, #f3f7fa) 100%);
 }
 
 /* =========================================================
@@ -39,8 +39,8 @@
   align-items: center;
   padding: 14px 30px;
   box-sizing: border-box;
-  background: linear-gradient(180deg, #fff 0%, #fbfdff 100%);
-  border-bottom: 1px solid #e3e8ec;
+  background: linear-gradient(180deg, var(--dk-surface, #fff) 0%, var(--dk-surface, #fbfdff) 100%);
+  border-bottom: 1px solid var(--dk-border, #e3e8ec);
   box-shadow: 0 2px 10px rgb(16 42 67 / 6%);
   flex-shrink: 0;
   position: relative;
@@ -70,10 +70,10 @@
   align-items: center;
   justify-content: center;
   border-radius: 11px;
-  background: linear-gradient(135deg, #1074b9 0%, #0d5d94 100%);
+  background: linear-gradient(135deg, var(--dk-fill, #2460b9) 0%, var(--dk-fill, #0d5d94) 100%);
   color: #fff;
   font-size: 20px;
-  box-shadow: 0 3px 8px rgb(16 116 185 / 28%);
+  box-shadow: 0 3px 8px rgb(36 96 185 / 28%);
 }
 
 /* =========================================================
@@ -87,7 +87,7 @@
 .eyebrow {
   display: block;
   margin-bottom: 2px;
-  color: #1074b9;
+  color: var(--dk-primary, #2460b9);
   font-size: 9px;
   font-weight: 700;
   letter-spacing: 1.2px;
@@ -96,7 +96,7 @@
 
 .navbar-text h1 {
   margin: 0;
-  color: #172b3a;
+  color: var(--dk-text, #172b3a);
   font-size: 20px;
   font-weight: 700;
   line-height: 1.25;
@@ -104,7 +104,7 @@
 
 .navbar-text p {
   margin: 3px 0 0;
-  color: #75838e;
+  color: var(--dk-text-muted, #75838e);
   font-size: 11px;
   font-weight: 400;
   line-height: 1.4;
@@ -137,7 +137,7 @@
   align-items: center;
   min-height: 42px;
   padding: 0 2px;
-  color: #667783;
+  color: var(--dk-text-muted, #667783);
   font-size: 13px;
   font-weight: 600;
   text-decoration: none;
@@ -147,7 +147,7 @@
 }
 
 .nav-link:hover {
-  color: #1074b9;
+  color: var(--dk-primary, #2460b9);
   transform: translateY(-1px);
 }
 
@@ -163,7 +163,7 @@
   bottom: 0;
   height: 2px;
   border-radius: 2px;
-  background: #1074b9;
+  background: var(--dk-fill, #2460b9);
   transform: scaleX(0);
   transform-origin: center;
   transition: transform 0.18s ease;
@@ -182,12 +182,12 @@
   height: 36px;
   padding: 0 18px;
   border-radius: 7px !important;
-  background: #1074b9 !important;
+  background: var(--dk-fill, #2460b9) !important;
   color: #fff !important;
   font-size: 12px !important;
   font-weight: 600 !important;
   line-height: 36px !important;
-  box-shadow: 0 3px 9px rgb(16 116 185 / 28%) !important;
+  box-shadow: 0 3px 9px rgb(36 96 185 / 28%) !important;
   transition:
     background 0.15s ease,
     transform 0.15s ease,
@@ -195,9 +195,9 @@
 }
 
 .logout-button:hover {
-  background: #0c639e !important;
+  background: var(--dk-fill, #0c639e) !important;
   transform: translateY(-1px);
-  box-shadow: 0 5px 12px rgb(16 116 185 / 32%) !important;
+  box-shadow: 0 5px 12px rgb(36 96 185 / 32%) !important;
 }
 
 /* =========================================================
@@ -226,8 +226,8 @@
   padding: 56px 64px;
   box-sizing: border-box;
   text-align: center;
-  background: #fff;
-  border: 1px solid #e5ebef;
+  background: var(--dk-surface, #fff);
+  border: 1px solid var(--dk-border, #e5ebef);
   border-radius: 18px;
   box-shadow: 0 12px 35px rgb(16 42 67 / 8%);
 }
@@ -244,7 +244,7 @@
   justify-content: center;
   margin-bottom: 28px;
   border-radius: 50%;
-  background: #ecf9f1;
+  background: var(--dk-success-soft, #ecf9f1);
 }
 
 /* =========================================================
@@ -287,7 +287,7 @@
 .success-label {
   display: inline-block;
   margin-bottom: 12px;
-  color: #24955f;
+  color: var(--dk-success, #24955f);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.4px;
@@ -301,7 +301,7 @@
 .success-message h2 {
   max-width: 600px;
   margin: 0 auto;
-  color: #172b3a;
+  color: var(--dk-text, #172b3a);
   font-size: 25px;
   font-weight: 700;
   line-height: 1.38;
@@ -315,7 +315,7 @@
 .success-message p {
   max-width: 570px;
   margin: 18px auto 0;
-  color: #697984;
+  color: var(--dk-text-muted, #697984);
   font-size: 14px;
   font-weight: 400;
   line-height: 1.75;
@@ -327,7 +327,7 @@
 
 .success-message .stay-tuned {
   margin-top: 12px;
-  color: #172b3a;
+  color: var(--dk-text, #172b3a);
   font-size: 14px;
   font-weight: 600;
 }

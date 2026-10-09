@@ -30,33 +30,33 @@ table {
 }
 
 h2.no-m {
-  color: #1f2937;
+  color: var(--dk-text, #1f2937);
   font-size: 1.15rem;
   font-weight: 600;
 }
 
 .success {
-  color: #32cd32;
+  color: var(--dk-success, #32cd32);
 }
 
 .fail {
-  color: #f44366;
+  color: var(--dk-danger, #f44366);
 }
 
 .currently-running {
-  color: #32cd32;
+  color: var(--dk-success, #32cd32);
 }
 
 .not-currently-running {
-  color: #f44366;
+  color: var(--dk-danger, #f44366);
 }
 
 .errorlog {
-  color: #ffa726;
+  color: var(--dk-warning, #ffa726);
 }
 
 .job-error {
-  background-color: #f7dbb7;
+  background-color: var(--dk-warning-soft, #f7dbb7);
 }
 
 .suspend {
@@ -86,7 +86,7 @@ h2.no-m {
 }
 
 .mat-mdc-header-row {
-  background-color: #1074b9;
+  background-color: var(--dk-fill, #1074b9);
 }
 
 .mat-mdc-header-cell {

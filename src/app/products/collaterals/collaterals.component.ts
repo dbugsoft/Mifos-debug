@@ -25,6 +25,7 @@ import {
 } from '@angular/material/table';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { MatIcon } from '@angular/material/icon';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 @Component({
@@ -33,6 +34,7 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
   styleUrls: ['./collaterals.component.scss'],
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
+    MatIcon,
     FaIconComponent,
     MatTable,
     MatSort,

@@ -15,7 +15,7 @@
 }
 
 .reset-password-error {
-  color: #f44336;
+  color: var(--dk-danger, #f44336);
   font-size: 80%;
   margin: 0;
 }

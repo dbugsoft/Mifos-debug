@@ -7,11 +7,12 @@
  */
 
 // ===== Colors =====
-$brand-blue: #1074b9;
+$brand-blue: #2460b9;
 $text-dark: #1e293b;
 $text-muted: #64748b;
 $input-bg: #f1f5f9;
 $input-border: #e2e8f0;
+$input-fill: #eef3fc;
 
 // ===== Main Form Container =====
 #login-form {
@@ -35,9 +36,9 @@ $input-border: #e2e8f0;
       margin-bottom: 0;
 
       .mat-mdc-text-field-wrapper {
-        background: $input-bg;
+        background: var(--dk-surface, #fff);
         border-radius: 10px;
-        border: 1px solid $input-border;
+        border: 1px solid var(--dk-border, #{$input-border});
       }
 
       .mat-mdc-form-field-focus-overlay {
@@ -52,17 +53,17 @@ $input-border: #e2e8f0;
       .mat-mdc-select {
         font-size: 0.95rem;
         font-weight: 400;
-        color: $text-dark;
+        color: var(--dk-text, #{$text-dark});
       }
 
       .mat-mdc-floating-label {
         font-size: 0.95rem;
-        color: $text-muted;
+        color: var(--dk-text-muted, #{$text-muted});
       }
 
       .mat-mdc-form-field-icon-prefix {
         padding: 0 0.75rem 0 0.5rem;
-        color: $text-muted;
+        color: var(--dk-text-muted, #{$text-muted});
       }
     }
 
@@ -79,14 +80,20 @@ $input-border: #e2e8f0;
 
   ::ng-deep {
     .mat-mdc-text-field-wrapper {
-      background: transparent !important;
-      border-radius: 10px !important;
-      border: 1px solid $input-border !important;
-      transition: border-color 0.2s ease;
+      background: var(--dk-primary-soft, #{$input-fill}) !important;
+      border-radius: 6px !important;
+      border: 1px solid transparent !important;
+      transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
     }
 
+    // 2px focus border drawn as a shadow so the field does not shift, plus a soft ring
     &.mat-focused .mat-mdc-text-field-wrapper {
-      border-color: $brand-blue !important;
+      border-color: var(--dk-primary, #{$brand-blue}) !important;
+      box-shadow:
+        0 0 0 1px $brand-blue,
+        0 0 0 5px rgb(36 96 185 / 12%);
     }
 
     .mat-mdc-form-field-focus-overlay {
@@ -101,29 +108,36 @@ $input-border: #e2e8f0;
     .mat-mdc-input-element {
       font-size: 0.95rem;
       font-weight: 400;
-      color: $text-dark;
-      padding: 0.875rem 0;
+      color: var(--dk-text, #{$text-dark});
+      padding: 0.375rem 0;
       margin-left: 0;
 
       &::placeholder {
-        color: #94a3b8;
+        color: var(--dk-text-muted, #94a3b8);
         opacity: 1;
+      }
+
+      // main.scss paints autofilled inputs white; keep the field's own fill instead
+      &:-webkit-autofill,
+      &:-webkit-autofill:hover,
+      &:-webkit-autofill:focus {
+        box-shadow: 0 0 0 1000px $input-fill inset !important;
       }
     }
 
     .mat-mdc-floating-label {
       font-size: 0.95rem;
-      color: $text-muted;
+      color: var(--dk-text-muted, #{$text-muted});
       left: 0 !important;
     }
 
     .mat-mdc-form-field-icon-prefix {
       padding: 0 0.75rem 0 0.5rem;
-      color: $text-muted;
+      color: var(--dk-text-muted, #{$text-muted});
 
       mifosx-m3-icon,
       mat-icon {
-        color: $text-muted;
+        color: var(--dk-text-muted, #{$text-muted});
       }
     }
 
@@ -135,25 +149,26 @@ $input-border: #e2e8f0;
       button {
         background: transparent;
         border: none;
-        color: $text-muted;
+        color: var(--dk-text-muted, #{$text-muted});
         transition: color 0.2s ease;
 
         &:hover {
-          color: $text-dark;
+          color: var(--dk-text, #{$text-dark});
         }
       }
     }
 
     &.mat-form-field-invalid {
       .mat-mdc-text-field-wrapper {
-        border-color: #dc2626 !important;
+        border-color: var(--dk-danger, #dc2626) !important;
+        box-shadow: none;
       }
     }
 
     .mat-mdc-form-field-error {
       font-size: 0.75rem;
       margin-top: 0.25rem;
-      color: #dc2626;
+      color: var(--dk-danger, #dc2626);
     }
   }
 }
@@ -166,7 +181,7 @@ $input-border: #e2e8f0;
 
   ::ng-deep {
     .mdc-linear-progress__bar-inner {
-      border-color: $brand-blue;
+      border-color: var(--dk-primary, #{$brand-blue});
     }
   }
 }
@@ -183,9 +198,28 @@ $input-border: #e2e8f0;
     letter-spacing: 0.02em;
 
     --md-filled-button-container-color: #{$brand-blue};
-    --md-filled-button-label-text-color: #fff;
+    --md-filled-button-container-shape: 6px;
+    --md-filled-button-label-text-color: var(--dk-surface, #fff);
+    --md-filled-button-hover-label-text-color: var(--dk-surface, #fff);
+    --md-filled-button-focus-label-text-color: var(--dk-surface, #fff);
+    --md-filled-button-pressed-label-text-color: var(--dk-surface, #fff);
 
-    border-radius: 10px;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgb(36 96 185 / 25%);
+    transition:
+      box-shadow 0.2s ease,
+      opacity 0.2s ease;
+
+    /* stylelint-disable-next-line selector-no-qualifying-type -- md-filled-button reflects disabled as an attribute */
+    &:hover:not([disabled]) {
+      box-shadow: 0 6px 16px rgb(36 96 185 / 35%);
+    }
+
+    /* stylelint-disable-next-line selector-no-qualifying-type -- md-filled-button reflects disabled as an attribute */
+    &[disabled] {
+      opacity: 0.5;
+      box-shadow: none;
+    }
   }
 
   .button-spinner {
@@ -212,7 +246,7 @@ $input-border: #e2e8f0;
 
 .oidc-description {
   font-size: 0.95rem;
-  color: $text-muted;
+  color: var(--dk-text-muted, #{$text-muted});
   margin: 0;
   line-height: 1.5;
 }
@@ -229,19 +263,19 @@ $input-border: #e2e8f0;
   align-items: center;
   gap: 1rem;
   padding: 2rem;
-  background: #dbeafe;
+  background: var(--dk-primary-soft, #dbeafe);
   border-radius: 12px;
 
   .success-icon {
     font-size: 3rem;
-    color: $brand-blue;
+    color: var(--dk-primary, #{$brand-blue});
   }
 
   h3 {
     margin: 0;
     font-size: 1.25rem;
     font-weight: 600;
-    color: $text-dark;
+    color: var(--dk-text, #{$text-dark});
   }
 }
 
@@ -258,9 +292,9 @@ $input-border: #e2e8f0;
 
 .protected-data {
   padding: 1rem;
-  background: $input-bg;
+  background: var(--dk-surface-2, #{$input-bg});
   border-radius: 12px;
-  border: 1px solid $input-border;
+  border: 1px solid var(--dk-border, #{$input-border});
   max-height: 300px;
   overflow: auto;
 
@@ -268,7 +302,7 @@ $input-border: #e2e8f0;
     margin: 0;
     font-size: 0.875rem;
     font-family: 'Courier New', monospace;
-    color: $text-dark;
+    color: var(--dk-text, #{$text-dark});
     white-space: pre-wrap;
     overflow-wrap: break-word;
   }
@@ -309,6 +343,14 @@ $input-border: #e2e8f0;
       .mat-mdc-input-element {
         color: #e2e2e5;
 
+        &:-webkit-autofill,
+        &:-webkit-autofill:hover,
+        &:-webkit-autofill:focus {
+          box-shadow: 0 0 0 1000px #1e1e1e inset !important;
+          /* stylelint-disable-next-line property-no-vendor-prefix */
+          -webkit-text-fill-color: #e2e2e5 !important;
+        }
+
         &::placeholder {
           color: #888;
         }
@@ -334,14 +376,14 @@ $input-border: #e2e8f0;
   }
 
   .welcome-message {
-    background: #003a6b;
+    background: #393939;
 
     .success-icon {
-      color: #5ba2ec;
+      color: #e0e0e0;
     }
 
     h3 {
-      color: #d1e4ff;
+      color: #e2e2e2;
     }
   }
 
@@ -355,7 +397,7 @@ $input-border: #e2e8f0;
   }
 
   .text-link {
-    color: #9ecaff;
+    color: #e0e0e0;
   }
 
   .sign-in-notice {
@@ -395,7 +437,7 @@ $input-border: #e2e8f0;
     ::ng-deep {
       .mat-mdc-input-element {
         font-size: 0.9rem;
-        padding: 0.65rem 0.5rem;
+        padding: 0.375rem 0;
       }
 
       .mat-mdc-floating-label {
@@ -449,7 +491,7 @@ $input-border: #e2e8f0;
   font: inherit;
   font-size: 0.875rem;
   font-weight: 500;
-  color: $brand-blue;
+  color: var(--dk-primary, #{$brand-blue});
   cursor: pointer;
 
   &:hover:not(:disabled) {
@@ -467,13 +509,13 @@ $input-border: #e2e8f0;
   gap: 0.75rem;
   padding: 0.875rem 1rem;
   border-radius: 10px;
-  border: 1px solid #fecaca;
-  background: #fef2f2;
-  color: $text-dark;
+  border: 1px solid var(--dk-danger-border, #fecaca);
+  background: var(--dk-danger-soft, #fef2f2);
+  color: var(--dk-text, #{$text-dark});
   animation: slide-in 0.3s ease-out;
 
   mifosx-m3-icon {
-    color: #dc2626;
+    color: var(--dk-danger, #dc2626);
   }
 
   strong {
@@ -486,6 +528,6 @@ $input-border: #e2e8f0;
     margin: 0.25rem 0 0.5rem;
     font-size: 0.85rem;
     line-height: 1.4;
-    color: $text-muted;
+    color: var(--dk-text-muted, #{$text-muted});
   }
 }

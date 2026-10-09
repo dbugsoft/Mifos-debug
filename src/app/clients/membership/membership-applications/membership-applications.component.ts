@@ -10,6 +10,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, injec
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MatTabLink, MatTabNav, MatTabNavPanel } from '@angular/material/tabs';
+import { MatIcon } from '@angular/material/icon';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { FormatNumberPipe } from 'app/pipes/format-number.pipe';
@@ -32,6 +33,7 @@ import { MembershipDeadlineComponent } from '../membership-deadline/membership-d
     MatTabLink,
     MatTabNavPanel,
     FaIconComponent,
+    MatIcon,
     FormatNumberPipe,
     MembershipDeadlineComponent
   ],

@@ -6,13 +6,36 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-table {
-  width: 100%;
+@use '../shared/styles/list-layout' as *;
 
-  .select-row:hover {
-    cursor: pointer;
+// Same frameless look as the Centers, Members and Groups lists.
+.container {
+  padding: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.list-toolbar {
+  margin-bottom: 16px;
+
+  .search-field {
+    --mat-form-field-container-height: 36px;
+    --mat-form-field-container-vertical-padding: 6px;
+  }
+}
+
+.members-table {
+  th.mat-mdc-header-cell,
+  td.mat-mdc-cell {
+    padding: 8px 16px;
   }
 
+  th.mat-mdc-header-cell + th.mat-mdc-header-cell {
+    border-left: 1px solid rgb(255 255 255 / 35%);
+  }
+}
+
+table {
   .self-service-indicator {
     display: inline-block;
     width: 16px;
@@ -25,12 +48,12 @@ table {
 
   .self-service-true {
     background-color: #43a047;
-    border: 1px solid #388e3c;
+    border: 1px solid var(--dk-success, #388e3c);
   }
 
   .self-service-false {
     background-color: #e53935;
-    border: 1px solid #b71c1c;
+    border: 1px solid var(--dk-danger, #b71c1c);
   }
 
   // Sign-in state next to the login name (fineract-dbug ADR 0019)

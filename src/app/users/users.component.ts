@@ -22,6 +22,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MatPaginator } from '@angular/material/paginator';
+import { MatIcon } from '@angular/material/icon';
 import { MatSort, MatSortHeader } from '@angular/material/sort';
 import {
   MatTableDataSource,
@@ -69,7 +70,8 @@ import { LoginStatus, StaffLoginService } from './staff-login.service';
     MatHeaderRow,
     MatRowDef,
     MatRow,
-    MatPaginator
+    MatPaginator,
+    MatIcon
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })

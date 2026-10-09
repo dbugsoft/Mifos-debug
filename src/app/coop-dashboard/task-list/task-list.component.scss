@@ -9,14 +9,14 @@
 :host {
   display: block;
 
-  --viz-ink: #1f2124;
-  --viz-ink-2: #52545a;
-  --viz-muted: #7b7e86;
-  --viz-grid: #e6e7eb;
-  --coop-accent: #1074b9;
-  --coop-accent-soft: rgb(16 116 185 / 10%);
-  --coop-hover: rgb(16 116 185 / 6%);
-  --coop-bad-ink: #c62828;
+  --viz-ink: var(--dk-text, #1f2124);
+  --viz-ink-2: var(--dk-text-2, #52545a);
+  --viz-muted: var(--dk-text-muted, #7b7e86);
+  --viz-grid: var(--dk-border, #e6e7eb);
+  --coop-accent: var(--dk-primary, #2460b9);
+  --coop-accent-soft: rgb(var(--dk-tint-rgb, 36 96 185) / 10%);
+  --coop-hover: rgb(var(--dk-tint-rgb, 36 96 185) / 6%);
+  --coop-bad-ink: var(--dk-danger, #c62828);
   --coop-bad-soft: rgb(208 59 59 / 11%);
 }
 
@@ -25,8 +25,8 @@
   --viz-ink-2: #c4c6d0;
   --viz-muted: #9a9ca4;
   --viz-grid: #55575d;
-  --coop-accent: #5ba2ec;
-  --coop-accent-soft: rgb(91 162 236 / 16%);
+  --coop-accent: #e0e0e0;
+  --coop-accent-soft: rgb(158 158 158 / 16%);
   --coop-hover: rgb(255 255 255 / 6%);
   --coop-bad-ink: #ff8a80;
   --coop-bad-soft: rgb(208 59 59 / 22%);

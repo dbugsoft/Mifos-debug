@@ -15,9 +15,9 @@
     margin-bottom: 1rem;
     padding: 1.5rem;
     box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
-    border: 1px solid var(--border-color, #ddd);
+    border: 1px solid var(--border-color, var(--dk-border, #ddd));
     border-radius: 8px;
-    background-color: var(--card-background, #fff);
+    background-color: var(--card-background, var(--dk-surface, #fff));
     transition:
       background-color 0.3s ease,
       border-color 0.3s ease;
@@ -32,7 +32,7 @@
       padding: 0.5rem;
 
       &.mat-body-strong {
-        color: var(--label-color, #555);
+        color: var(--label-color, var(--dk-text-2, #555));
         font-weight: 600;
       }
     }
@@ -59,13 +59,13 @@
     .content-row {
       display: flex;
       flex-direction: row;
-      border-bottom: 1px solid var(--border-color-light, #eee);
+      border-bottom: 1px solid var(--border-color-light, var(--dk-border, #eee));
       padding-bottom: 0.5rem;
 
       .label {
         flex: 0 0 40%;
         font-weight: 600;
-        color: var(--label-color, #555);
+        color: var(--label-color, var(--dk-text-2, #555));
         padding: 0.5rem 1rem 0.5rem 0;
       }
 

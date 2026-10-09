@@ -6,23 +6,63 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-@media (width >=992px) {
-  .checkbox-wrapper {
-    margin-top: 8px;
+// Same width as the breadcrumb and the lists.
+.container {
+  margin: 0 auto;
+  max-width: 84rem;
+  width: 90%;
+  padding-bottom: 32px;
+}
 
-    .checkbox {
-      padding: 0 0 17.5px;
-    }
+// Name keeps the width a scheme name needs; the two checkboxes sit beside it. All stack on phones.
+.form-grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 24px;
+
+  .field-lg {
+    flex: 0 1 280px;
+    min-width: 0;
   }
+
+  .field-check {
+    flex: 0 0 auto;
+    margin-bottom: 20px;
+  }
+}
+
+@media (width <= 600px) {
+  .form-grid .field-lg {
+    flex-basis: 100%;
+  }
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 16px 0 8px;
+
+  h3 {
+    margin: 0;
+  }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 24px;
 }
 
 // TODO: CONFIGURE THESE CLASSES GLOBALLY
 .is-differential {
-  color: #32cd32;
+  color: var(--dk-success, #32cd32);
 }
 
 .not-is-differential {
-  color: #f44366;
+  color: var(--dk-danger, #f44366);
 }
 
 table {

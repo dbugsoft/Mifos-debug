@@ -12,33 +12,33 @@
 :host {
   display: block;
 
-  --viz-1: #1074b9;
-  --viz-2: #eb6834;
-  --viz-3: #1baf7a;
-  --viz-ink: #1f2124;
-  --viz-ink-2: #52545a;
-  --viz-muted: #7b7e86;
-  --viz-grid: #e6e7eb;
-  --viz-surface: #fff;
-  --viz-tooltip: #303135;
-  --coop-card: #fff;
+  --viz-1: var(--dk-primary, #2460b9);
+  --viz-2: var(--dk-warning, #eb6834);
+  --viz-3: var(--dk-success, #1baf7a);
+  --viz-ink: var(--dk-text, #1f2124);
+  --viz-ink-2: var(--dk-text-2, #52545a);
+  --viz-muted: var(--dk-text-muted, #7b7e86);
+  --viz-grid: var(--dk-border, #e6e7eb);
+  --viz-surface: var(--dk-surface, #fff);
+  --viz-tooltip: var(--dk-text, #303135);
+  --coop-card: var(--dk-surface, #fff);
   --coop-shadow: 0 1px 2px rgb(16 24 40 / 6%), 0 1px 3px rgb(16 24 40 / 10%);
-  --coop-accent: #1074b9;
-  --coop-accent-soft: rgb(16 116 185 / 10%);
-  --coop-hover: rgb(16 116 185 / 6%);
-  --coop-good-ink: #1b7a1b;
+  --coop-accent: var(--dk-primary, #2460b9);
+  --coop-accent-soft: rgb(var(--dk-tint-rgb, 36 96 185) / 10%);
+  --coop-hover: rgb(var(--dk-tint-rgb, 36 96 185) / 6%);
+  --coop-good-ink: var(--dk-success, #1b7a1b);
   --coop-good-soft: rgb(12 163 12 / 12%);
-  --coop-warn-ink: #9a6400;
+  --coop-warn-ink: var(--dk-warning, #9a6400);
   --coop-warn-soft: rgb(250 178 25 / 18%);
-  --coop-bad-ink: #c62828;
+  --coop-bad-ink: var(--dk-danger, #c62828);
   --coop-bad-soft: rgb(208 59 59 / 11%);
-  --coop-shimmer-a: rgb(0 0 0 / 4%);
-  --coop-shimmer-b: rgb(0 0 0 / 9%);
-  --cls-pass: #0ca30c;
-  --cls-watch: #fab219;
-  --cls-substandard: #ec835a;
-  --cls-doubtful: #d03b3b;
-  --cls-loss: #8e1d1d;
+  --coop-shimmer-a: rgb(var(--dk-ink-rgb, 0 0 0) / 4%);
+  --coop-shimmer-b: rgb(var(--dk-ink-rgb, 0 0 0) / 9%);
+  --cls-pass: var(--dk-success, #0ca30c);
+  --cls-watch: var(--dk-warning, #fab219);
+  --cls-substandard: var(--dk-warning, #ec835a);
+  --cls-doubtful: var(--dk-danger, #d03b3b);
+  --cls-loss: var(--dk-danger, #8e1d1d);
 }
 
 :host-context(.dark-theme) {
@@ -53,8 +53,8 @@
   --viz-tooltip: #1a1a19;
   --coop-card: #424242;
   --coop-shadow: 0 1px 3px rgb(0 0 0 / 40%);
-  --coop-accent: #5ba2ec;
-  --coop-accent-soft: rgb(91 162 236 / 16%);
+  --coop-accent: #e0e0e0;
+  --coop-accent-soft: rgb(158 158 158 / 16%);
   --coop-hover: rgb(255 255 255 / 6%);
   --coop-good-ink: #5fd35f;
   --coop-good-soft: rgb(12 163 12 / 20%);

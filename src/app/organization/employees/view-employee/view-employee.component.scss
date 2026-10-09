@@ -75,9 +75,9 @@
 mat-card {
   width: 100%;
   box-sizing: border-box;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--dk-border, #e2e8f0);
   border-radius: 10px;
-  background: #fff;
+  background: var(--dk-surface, #fff);
   box-shadow: 0 2px 8px rgb(0 0 0 / 6%);
   overflow: hidden;
 }
@@ -103,17 +103,17 @@ mat-card-content {
   min-height: 72px;
   padding: 15px 17px;
   box-sizing: border-box;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--dk-border, #e5e7eb);
   border-radius: 8px;
-  background: #fafbfc;
+  background: var(--dk-surface-2, #fafbfc);
   transition:
     border-color 0.2s ease,
     background-color 0.2s ease;
 }
 
 .field-card:hover {
-  border-color: #cbd5e1;
-  background: #f8fafc;
+  border-color: var(--dk-border, #cbd5e1);
+  background: var(--dk-surface-2, #f8fafc);
 }
 
 /* =========================
@@ -122,7 +122,7 @@ mat-card-content {
 
 .field-label {
   margin-bottom: 6px;
-  color: #64748b;
+  color: var(--dk-text-muted, #64748b);
   font-size: 12px;
   font-weight: 600;
   line-height: 1.4;
@@ -135,7 +135,7 @@ mat-card-content {
    ========================= */
 
 .field-value {
-  color: #1e293b;
+  color: var(--dk-text, #1e293b);
   font-size: 14px;
   font-weight: 500;
   line-height: 1.5;
@@ -153,19 +153,19 @@ mat-card-content {
   min-height: 26px;
   padding: 3px 10px;
   box-sizing: border-box;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--dk-border, #d1d5db);
   border-radius: 999px;
-  background: #f1f5f9;
-  color: #64748b;
+  background: var(--dk-surface-2, #f1f5f9);
+  color: var(--dk-text-muted, #64748b);
   font-size: 12px;
   font-weight: 600;
   line-height: 1;
 }
 
 .badge-on {
-  border-color: #bbf7d0;
-  background: #f0fdf4;
-  color: #15803d;
+  border-color: var(--dk-success-border, #bbf7d0);
+  background: var(--dk-success-soft, #f0fdf4);
+  color: var(--dk-success, #15803d);
 }
 
 /* =========================

@@ -85,6 +85,14 @@ const routeHideBreadcrumbTrail = 'hideBreadcrumbTrail';
  * Example- hideBackLink: true
  */
 const routeHideBackLink = 'hideBackLink';
+/**
+ * Route data property: a function of the route's data giving the page heading, when the heading should differ
+ * from the crumb (the crumb shows the id, the heading the name). Read from the route config only, so child
+ * pages such as Edit keep their own heading.
+ *
+ * Example- pageTitle: (data) => `${data.user.firstname} ${data.user.lastname}`
+ */
+const routePageTitle = 'pageTitle';
 
 /**
  * Generate breadcrumbs dynamically via route configuration.
@@ -274,6 +282,11 @@ export class BreadcrumbComponent implements AfterViewInit {
               ].some((hosting) => !!(hosting?.routeConfig?.component || hosting?.routeConfig?.loadComponent))
             };
 
+            const pageTitle = route.routeConfig?.data?.[routePageTitle];
+            if (typeof pageTitle === 'function') {
+              breadcrumb.title = pageTitle(route.snapshot.data);
+            }
+
             const parentBreadcrumb: Breadcrumb | undefined = route.routeConfig?.data?.[routeParentBreadcrumb];
             if (parentBreadcrumb) {
               this.breadcrumbs.push(parentBreadcrumb);
@@ -305,7 +318,7 @@ export class BreadcrumbComponent implements AfterViewInit {
       .filter((crumb) => typeof crumb.url === 'string' && crumb.url && crumb.url !== currentUrl && !crumb.hostsPage);
     const parent = parents.length ? parents[parents.length - 1] : null;
     this.backUrl = parent ? parent.url : null;
-    this.backLabel = parent ? parent.label : '';
+    this.backLabel = parent ? (parent.title ?? parent.label) : '';
   }
 
   printableValue(value: string): string {

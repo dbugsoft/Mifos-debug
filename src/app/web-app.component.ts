@@ -8,15 +8,7 @@
 
 /* eslint-disable @angular-eslint/prefer-inject */
 /** Angular Imports */
-import {
-  ChangeDetectionStrategy,
-  Component,
-  OnInit,
-  HostListener,
-  HostBinding,
-  OnDestroy,
-  inject
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, HostListener, OnDestroy, inject } from '@angular/core';
 import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { MatSnackBar, MatSnackBarRef } from '@angular/material/snack-bar';
@@ -147,14 +139,13 @@ export class WebAppComponent implements OnInit, OnDestroy {
     private alertService: AlertService,
     private settingsService: SettingsService,
     private authenticationService: AuthenticationService,
+    // Injected so the saved/OS theme is applied at startup.
     private themingService: ThemingService,
     private dateUtils: Dates,
     private idle: IdleTimeoutService,
     private dialog: MatDialog,
     private documentationLinks: DocumentationLinksService
   ) {}
-
-  @HostBinding('class') public cssClass: string;
 
   /**
    * Initial Setup:
@@ -169,12 +160,6 @@ export class WebAppComponent implements OnInit, OnDestroy {
    */
 
   ngOnInit() {
-    this.themingService.theme.subscribe((value: string) => {
-      this.cssClass = value;
-    });
-    this.themingService.setInitialDarkMode();
-    this.themingService.setDarkMode(!!this.settingsService.themeDarkEnabled);
-
     // Setup logger
     if (environment.production) {
       Logger.enableProductionMode();

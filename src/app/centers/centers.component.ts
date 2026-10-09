@@ -24,6 +24,7 @@ import { CentersService } from './centers.service';
 
 /** Custom Data Source */
 import { CentersDataSource } from './centers.datasource';
+import { MatIcon } from '@angular/material/icon';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import {
   MatTable,
@@ -51,6 +52,7 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
     MatCheckbox,
+    MatIcon,
     FaIconComponent,
     MatTable,
     MatSort,
@@ -82,6 +84,7 @@ export class CentersComponent implements OnInit, AfterViewInit {
   externalId = new UntypedFormControl();
   /** Columns to be displayed in centers table. */
   displayedColumns = [
+    'sno',
     'name',
     'accountNo',
     'externalId',

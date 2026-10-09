@@ -6,17 +6,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-.product-card {
-  margin: 0 auto;
-  max-width: 80rem;
+// No card: the product sits directly on the page, aligned with the header above.
+.product-view {
+  margin: 0 auto 24px;
+  max-width: 84rem;
   width: 90%;
-  padding: 0;
 
   .navigation-tabs {
     overflow: auto;
-  }
-
-  i:hover {
-    cursor: pointer;
+    margin-bottom: 8px;
   }
 }

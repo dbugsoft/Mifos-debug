@@ -7,9 +7,9 @@
  */
 
 :host {
-  --imp-accent: var(--md-sys-color-primary, #1074b9);
-  --imp-line: var(--md-sys-color-outline-variant, #cbd5e1);
-  --imp-muted: var(--md-sys-color-on-surface-variant, #64748b);
+  --imp-accent: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+  --imp-line: var(--md-sys-color-outline-variant, var(--dk-border, #cbd5e1));
+  --imp-muted: var(--md-sys-color-on-surface-variant, var(--dk-text-muted, #64748b));
 
   // Material's own spacing hooks: 24px frame, tight between sections.
   --mat-dialog-headline-padding: 24px 24px 8px;

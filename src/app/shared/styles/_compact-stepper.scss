@@ -9,11 +9,12 @@
 // Create / edit stepper forms: fields sized by what they hold, not by row fraction.
 // Prefixed with .mat-stepper-vertical so it outranks each step's own scoped rules.
 // $root lets a plain (non-stepper) form use the same field sizing, e.g. the loan calculator.
-@mixin compact-stepper($root: '.mat-stepper-vertical') {
+// $uniform-grid lays every field and checkbox tile out in equal columns instead of content-sized widths.
+@mixin compact-stepper($root: '.mat-stepper-vertical', $uniform-grid: false) {
   :host ::ng-deep #{$root} {
-    --lp-line: var(--md-sys-color-outline-variant, #cbd5e1);
-    --lp-muted: var(--md-sys-color-on-surface-variant, #64748b);
-    --lp-accent: var(--md-sys-color-primary, #1074b9);
+    --lp-line: var(--md-sys-color-outline-variant, var(--dk-border, #cbd5e1));
+    --lp-muted: var(--md-sys-color-on-surface-variant, var(--dk-text-muted, #64748b));
+    --lp-accent: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
     --mat-form-field-outlined-container-shape: 8px;
     --mat-form-field-outlined-outline-color: var(--lp-line);
     --mat-form-field-outlined-hover-outline-color: var(--lp-muted);
@@ -73,7 +74,7 @@
 
     .mat-mdc-form-field-disabled .mat-mdc-text-field-wrapper {
       border-radius: 8px;
-      background: var(--md-sys-color-surface-container-low, #f1f5f9);
+      background: var(--md-sys-color-surface-container-low, var(--dk-surface-2, #f1f5f9));
     }
 
     // Checkboxes as setting tiles: label left, box right, whole tile clickable.
@@ -183,6 +184,145 @@
       .layout-row-wrap > mat-checkbox,
       .layout-row-wrap > mifosx-gl-account-selector {
         flex: 1 1 100%;
+      }
+    }
+
+    // Content-sized rows: tiles start at their label width, fields at their content width,
+    // and a number field with a longer label (.medium, .wide) gets room for it.
+    .layout-row-wrap.content-sized {
+      row-gap: 8px;
+
+      // Top-aligned: a field showing an error grows downward only, so the rest of its line stays put.
+      align-items: flex-start;
+
+      > mat-checkbox {
+        flex: 1 1 auto;
+        margin: 0;
+
+        .mdc-form-field {
+          gap: 16px;
+        }
+      }
+
+      > mat-form-field.wide:has([type='number']) {
+        flex-basis: 320px;
+      }
+
+      > mat-form-field.medium:has([type='number']) {
+        flex-basis: 240px;
+      }
+
+      // The AD | BS date field: room for the date, the switch and the other calendar's date.
+      > mifosx-nepali-date-input {
+        flex: 0 1 416px;
+        max-width: 100%;
+      }
+
+      // Short pick lists (a period type) sit at the width of a number field.
+      > mat-form-field.narrow {
+        flex-basis: 200px;
+      }
+
+      // Each line fills the row: items start at their content width and share what is left,
+      // so no line ends with a gap on the right.
+      > mat-form-field {
+        flex-grow: 1;
+      }
+
+      // ...except the last line: this zero-width filler sits at its end and takes the leftover,
+      // so the last line keeps natural widths and leaves its space on the right.
+      &::after {
+        content: '';
+        flex: 1000 1 0;
+      }
+
+      // A nested row starts on its own line.
+      > .flex-fill {
+        flex: 1 1 100%;
+        max-width: 100%;
+      }
+    }
+
+    @if $uniform-grid {
+      // One column width for every field and tile, so rows line up across the whole form.
+      // Headings, dividers, tables and nested sections span the row; nested sections are grids
+      // of the same full width, so their columns line up with the ones above.
+      // A short form can opt out with .content-sized and keep fields sized by what they hold.
+      // A read-only summary (the preview step's .tab-container) keeps its own layout.
+      .layout-row-wrap:not(.content-sized, .tab-container *) {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+        gap: 8px 16px;
+        align-items: start;
+
+        > * {
+          width: auto;
+          max-width: none;
+          min-width: 0;
+          margin: 0;
+        }
+
+        > mat-divider,
+        > h4,
+        > table,
+        > .flex-98,
+        > .flex-100,
+        > .flex-fill {
+          grid-column: 1 / -1;
+        }
+
+        // Names keep their wider field; long text takes the row.
+        > mat-form-field:has([formcontrolname='name']) {
+          grid-column: span 2;
+        }
+
+        // A 4-character code: keep the short field it had before.
+        > mat-form-field:has([formcontrolname='shortName']) {
+          justify-self: start;
+          width: 168px;
+        }
+
+        > mat-form-field:has(textarea) {
+          grid-column: 1 / -1;
+        }
+
+        // The AD | BS date field carries the switch and the other calendar's date inline: give it two columns.
+        > mifosx-nepali-date-input {
+          grid-column: span 2;
+        }
+
+        > mat-divider {
+          margin: 8px 0;
+        }
+
+        > h3 {
+          align-self: center;
+        }
+
+        // A checkbox is always one tile, even one marked full width.
+        > mat-checkbox,
+        > mat-checkbox:is(.flex-98, .flex-100, .flex-fill) {
+          grid-column: auto;
+          margin: 0;
+        }
+
+        > .hide-lt-md {
+          display: none;
+        }
+      }
+
+      // .single-row keeps a short set of fields on one line, sharing the width equally.
+      @media (width > 768px) {
+        .layout-row-wrap.single-row:not(.content-sized, .tab-container *) {
+          grid-template-columns: none;
+          grid-auto-flow: column;
+          grid-auto-columns: minmax(0, 1fr);
+        }
+
+        // .cols-4: four equal columns, so stacked rows of up to four fields line up.
+        .layout-row-wrap.cols-4:not(.content-sized, .tab-container *) {
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
       }
     }
   }

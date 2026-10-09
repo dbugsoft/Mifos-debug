@@ -52,6 +52,7 @@ import {
 import { MatStepperPrevious, MatStepperNext } from '@angular/material/stepper';
 import { FindPipe } from '../../../../pipes/find.pipe';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { NepaliDateInputComponent } from 'app/shared/nepali-date-input/nepali-date-input.component';
 
 @Component({
   selector: 'mifosx-recurring-deposit-product-interest-rate-chart-step',
@@ -66,6 +67,8 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
   ],
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
+    NepaliDateInputComponent,
+    MatTooltip,
     FaIconComponent,
     MatDivider,
     MatIconButton,
@@ -154,7 +157,6 @@ export class RecurringDepositProductInterestRateChartStepComponent implements On
 
   // Assign form the values for edit recurring Depoosit
   assignFormData() {
-    this.addChart();
     const isChartArray = Array.isArray(this.recurringDepositProductsTemplate.activeChart);
     if (this.recurringDepositProductsTemplate.activeChart) {
       if (!isChartArray) {
@@ -163,6 +165,9 @@ export class RecurringDepositProductInterestRateChartStepComponent implements On
         this.chartDetailData = this.recurringDepositProductsTemplate.activeChart;
       }
     }
+
+    // A chart form only for each existing chart: a new product starts empty, and Add opens one.
+    this.chartDetailData.forEach(() => this.addChart());
 
     // Build the array of Objects from the retrived value
     this.getChartsDetailsData();
@@ -331,7 +336,8 @@ export class RecurringDepositProductInterestRateChartStepComponent implements On
 
   createrecurringDepositProductInterestRateChartForm() {
     this.recurringDepositProductInterestRateChartForm = this.formBuilder.group({
-      charts: this.formBuilder.array([])
+      // The server rejects a product without an interest rate chart.
+      charts: this.formBuilder.array([], (charts: UntypedFormArray) => (charts.length ? null : { required: true }))
     });
   }
 

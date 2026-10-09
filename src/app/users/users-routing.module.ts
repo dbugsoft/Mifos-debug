@@ -52,22 +52,28 @@ const mifosRoutes: Routes = [
     resolve: { usersTemplate: UsersTemplateResolver }
   },
   {
+    // The user is resolved here: the crumb shows the id, the heading the user's name, and both pages below
+    // inherit the data.
     path: ':id',
-    data: { title: 'View User', routeParamBreadcrumb: 'id' },
+    data: {
+      title: 'View User',
+      routeParamBreadcrumb: 'id',
+      pageTitle: (data: { user: { firstname: string; lastname: string } }) =>
+        `${data.user.firstname} ${data.user.lastname}`
+    },
+    resolve: { user: UserResolver },
+    // Refetch on every visit, so the view shows the saved changes after an edit.
+    runGuardsAndResolvers: 'always',
     children: [
       {
         path: '',
-        component: ViewUserComponent,
-        resolve: { user: UserResolver }
+        component: ViewUserComponent
       },
       {
         path: 'edit',
         component: EditUserComponent,
-        data: { title: 'Edit User', breadcrumb: 'Edit', routeResolveBreadcrumb: false },
-        resolve: {
-          user: UserResolver,
-          usersTemplate: UsersTemplateResolver
-        }
+        data: { title: 'Edit User', breadcrumb: 'Edit', routeParamBreadcrumb: false },
+        resolve: { usersTemplate: UsersTemplateResolver }
       }
     ]
   }
@@ -122,7 +128,11 @@ const routes: Routes = [
   Route.withShell([
     {
       path: '',
-      data: { title: 'Users', breadcrumb: 'Users' },
+      data: {
+        title: 'Users',
+        breadcrumb: 'Users',
+        parentBreadcrumb: { label: 'Admin', url: '/administration' }
+      },
       children: selectedRoutes
     }
   ])

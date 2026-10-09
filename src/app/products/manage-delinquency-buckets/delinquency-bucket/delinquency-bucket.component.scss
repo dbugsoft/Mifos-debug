@@ -6,23 +6,60 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-.container {
-  .action-button {
-    margin-left: auto;
-  }
+@use '../../../shared/styles/list-layout' as *;
 
-  .search-button {
-    min-width: 30px;
-    margin: 4px;
+// Same frameless look as the Users and Templates lists.
+.container {
+  padding: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.list-toolbar {
+  margin-bottom: 16px;
+
+  .search-field {
+    --mat-form-field-container-height: 36px;
+    --mat-form-field-container-vertical-padding: 6px;
   }
 }
 
-table {
-  tr.select-row:hover {
-    cursor: pointer;
+.members-table {
+  th.mat-mdc-header-cell,
+  td.mat-mdc-cell {
+    padding: 8px 16px;
   }
 
-  tr:nth-child(odd).td {
-    color: black;
+  th.mat-mdc-header-cell + th.mat-mdc-header-cell {
+    border-left: 1px solid rgb(255 255 255 / 35%);
+  }
+}
+
+// The Create menu opens in an overlay outside this component, hence ::ng-deep on its panel class.
+::ng-deep .create-bucket-menu {
+  min-width: 280px !important;
+  max-width: none !important;
+
+  .mat-mdc-menu-item {
+    min-height: 44px;
+    white-space: nowrap;
+
+    .mat-mdc-menu-item-text {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.875rem;
+    }
+  }
+
+  .menu-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    color: var(--dk-primary, #2460b9);
+    background: color-mix(in srgb, var(--dk-primary, #2460b9) 12%, transparent);
   }
 }

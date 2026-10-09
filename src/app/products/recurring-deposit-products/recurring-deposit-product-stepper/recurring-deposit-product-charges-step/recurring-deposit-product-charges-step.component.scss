@@ -17,3 +17,9 @@ table {
 .margin-t {
   margin-top: 1em;
 }
+
+// Same height and corners as the charge dropdown beside it.
+.add-charge {
+  --mat-button-protected-container-height: 48px;
+  --mat-button-protected-container-shape: 8px;
+}

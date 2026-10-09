@@ -44,7 +44,7 @@ const routes: Routes = [
         {
           path: 'checker-inbox',
           component: CheckerInboxComponent,
-          data: { title: 'Checker Inbox' },
+          data: { title: 'Checker Inbox', breadcrumb: 'Checker Inbox' },
           resolve: {
             makerCheckerResource: GetMakerCheckers,
             makerCheckerTemplate: MakerCheckerTemplate
@@ -53,7 +53,7 @@ const routes: Routes = [
         {
           path: 'client-approval',
           component: ClientApprovalComponent,
-          data: { title: 'Client Approval' },
+          data: { title: 'Client Approval', breadcrumb: 'Client Approval' },
           resolve: {
             groupedClientData: GetGroupedClientsData
           }
@@ -61,7 +61,7 @@ const routes: Routes = [
         {
           path: 'loan-approval',
           component: LoanApprovalComponent,
-          data: { title: 'Loan Approval' },
+          data: { title: 'Loan Approval', breadcrumb: 'Loan Approval' },
           resolve: {
             officesData: GetOffices,
             loansData: GetLoansToBeApproved
@@ -70,7 +70,7 @@ const routes: Routes = [
         {
           path: 'council-approval',
           component: CouncilApprovalComponent,
-          data: { title: 'Council Approval' },
+          data: { title: 'Council Approval', breadcrumb: 'Council Approval' },
           resolve: {
             officesData: GetOffices,
             loansData: GetLoansToBeApproved
@@ -79,7 +79,7 @@ const routes: Routes = [
         {
           path: 'loan-disbursal',
           component: LoanDisbursalComponent,
-          data: { title: 'Loan Disbursal' },
+          data: { title: 'Loan Disbursal', breadcrumb: 'Loan Disbursal' },
           resolve: {
             loansData: GetLoansToBeDisbursed
           }
@@ -87,7 +87,7 @@ const routes: Routes = [
         {
           path: 'reschedule-loan',
           component: RescheduleLoanComponent,
-          data: { title: 'Reschedule Loan' },
+          data: { title: 'Reschedule Loan', breadcrumb: 'Reschedule Loan' },
           resolve: {
             rescheduleLoansData: GetRescheduleLoans
           }

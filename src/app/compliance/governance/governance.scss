@@ -62,9 +62,9 @@ button.tile {
 }
 
 .notice.bad {
-  border-color: #f1b8b3;
-  background: #fdeceb;
-  color: #6d150f;
+  border-color: var(--dk-danger-border, #f1b8b3);
+  background: var(--dk-danger-soft, #fdeceb);
+  color: var(--dk-danger, #6d150f);
 }
 
 .prompts {

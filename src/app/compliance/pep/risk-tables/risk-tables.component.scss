@@ -30,7 +30,7 @@ table.grid {
 
   th {
     padding: 10px 12px;
-    background: var(--md-sys-color-primary, #1074b9);
+    background: var(--md-sys-color-primary, var(--dk-fill, #1074b9));
     color: #fff;
     font-weight: 600;
     text-align: left;

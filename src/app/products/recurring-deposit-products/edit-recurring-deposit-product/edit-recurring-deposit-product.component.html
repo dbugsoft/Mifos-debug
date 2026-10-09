@@ -7,13 +7,7 @@
 -->
 
 <div class="container">
-  <mat-stepper
-    orientation="vertical"
-    [linear]="false"
-    class="mat-elevation-z8"
-    labelPosition="bottom"
-    #recurringDepositProductStepper
-  >
+  <mat-stepper orientation="vertical" [linear]="false" labelPosition="bottom" #recurringDepositProductStepper>
     <ng-template matStepperIcon="number">
       <fa-icon icon="pencil-alt" size="sm"></fa-icon>
     </ng-template>
@@ -35,7 +29,9 @@
     </ng-template>
 
     <mat-step [stepControl]="recurringDepositProductDetailsForm">
-      <ng-template matStepLabel>{{ 'labels.inputs.DETAILS' | translate }}</ng-template>
+      <ng-template matStepLabel
+        ><strong>{{ 'labels.inputs.DETAILS' | translate }}</strong></ng-template
+      >
 
       <mifosx-recurring-deposit-product-details-step
         [recurringDepositProductsTemplate]="recurringDepositProductsTemplate"
@@ -44,7 +40,9 @@
     </mat-step>
 
     <mat-step [stepControl]="recurringDepositProductCurrencyForm">
-      <ng-template matStepLabel>{{ 'labels.inputs.CURRENCY' | translate }}</ng-template>
+      <ng-template matStepLabel
+        ><strong>{{ 'labels.inputs.CURRENCY' | translate }}</strong></ng-template
+      >
 
       <mifosx-recurring-deposit-product-currency-step
         [recurringDepositProductsTemplate]="recurringDepositProductsTemplate"
@@ -53,7 +51,9 @@
     </mat-step>
 
     <mat-step [stepControl]="recurringDepositProductTermsForm">
-      <ng-template matStepLabel>{{ 'labels.inputs.TERMS' | translate }}</ng-template>
+      <ng-template matStepLabel
+        ><strong>{{ 'labels.inputs.TERMS' | translate }}</strong></ng-template
+      >
 
       <mifosx-recurring-deposit-product-terms-step
         [recurringDepositProductsTemplate]="recurringDepositProductsTemplate"
@@ -62,7 +62,9 @@
     </mat-step>
 
     <mat-step [stepControl]="recurringDepositProductSettingsForm">
-      <ng-template matStepLabel>{{ 'labels.inputs.SETTINGS' | translate }}</ng-template>
+      <ng-template matStepLabel
+        ><strong>{{ 'labels.inputs.SETTINGS' | translate }}</strong></ng-template
+      >
 
       <mifosx-recurring-deposit-product-settings-step
         [recurringDepositProductsTemplate]="recurringDepositProductsTemplate"
@@ -71,7 +73,9 @@
     </mat-step>
 
     <mat-step [stepControl]="recurringDepositProductInterestRateChartForm">
-      <ng-template matStepLabel>{{ 'labels.inputs.INTEREST RATE CHART' | translate }}</ng-template>
+      <ng-template matStepLabel
+        ><strong>{{ 'labels.inputs.INTEREST RATE CHART' | translate }}</strong></ng-template
+      >
 
       <mifosx-recurring-deposit-product-interest-rate-chart-step
         [recurringDepositProductsTemplate]="recurringDepositProductsTemplate"
@@ -80,7 +84,9 @@
     </mat-step>
 
     <mat-step>
-      <ng-template matStepLabel>{{ 'labels.inputs.CHARGES' | translate }}</ng-template>
+      <ng-template matStepLabel
+        ><strong>{{ 'labels.inputs.CHARGES' | translate }}</strong></ng-template
+      >
 
       <mifosx-recurring-deposit-product-charges-step
         [recurringDepositProductsTemplate]="recurringDepositProductsTemplate"
@@ -90,7 +96,9 @@
     </mat-step>
 
     <mat-step [stepControl]="recurringDepositProductAccountingForm">
-      <ng-template matStepLabel>{{ 'labels.inputs.ACCOUNTING' | translate }}</ng-template>
+      <ng-template matStepLabel
+        ><strong>{{ 'labels.inputs.ACCOUNTING' | translate }}</strong></ng-template
+      >
 
       <mifosx-recurring-deposit-product-accounting-step
         [recurringDepositProductsTemplate]="recurringDepositProductsTemplate"
@@ -102,7 +110,9 @@
 
     @if (recurringDepositProductFormValidAndNotPrinstine) {
       <mat-step state="preview" completed>
-        <ng-template matStepLabel>{{ 'labels.inputs.PREVIEW' | translate }}</ng-template>
+        <ng-template matStepLabel
+          ><strong>{{ 'labels.inputs.PREVIEW' | translate }}</strong></ng-template
+        >
         <mifosx-recurring-deposit-product-preview-step
           [recurringDepositProductsTemplate]="recurringDepositProductsTemplate"
           [chartSlabsDisplayedColumns]="recurringDepositProductInterestRateChartStep.chartSlabsDisplayedColumns"

@@ -24,7 +24,7 @@ mat-card {
 
 .mat-title {
   margin: 0;
-  color: #1f2937;
+  color: var(--dk-text, #1f2937);
   font-size: 18px;
   font-weight: 600;
 }
@@ -38,7 +38,7 @@ mat-card {
   width: 100%;
   overflow-x: auto;
   display: block;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--dk-border, #e2e8f0);
   border-radius: 10px;
 }
 
@@ -57,7 +57,7 @@ mat-card {
   text-align: center;
   position: sticky;
   right: 0;
-  background: var(--card-background, #fff);
+  background: var(--card-background, var(--dk-surface, #fff));
   z-index: 1;
 }
 
@@ -104,7 +104,7 @@ th.mat-mdc-header-cell:not(.actions-column, :first-child) {
 }
 
 .mat-mdc-header-row {
-  background-color: #1074b9;
+  background-color: var(--dk-fill, #1074b9);
 }
 
 .mat-mdc-header-cell {
@@ -118,9 +118,9 @@ th.mat-mdc-header-cell:not(.actions-column, :first-child) {
 }
 
 .mat-mdc-header-row .actions-column {
-  background: #1074b9;
+  background: var(--dk-fill, #1074b9);
 }
 
 .not-column-mandatory {
-  color: #dc2626;
+  color: var(--dk-danger, #dc2626);
 }

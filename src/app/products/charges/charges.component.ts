@@ -46,6 +46,7 @@ import { Charge } from './models/charge.model';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { MatTooltip } from '@angular/material/tooltip';
 import { FormatNumberPipe } from '../../pipes/format-number.pipe';
+import { MatIcon } from '@angular/material/icon';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
@@ -57,6 +58,7 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
   styleUrls: ['./charges.component.scss'],
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
+    MatIcon,
     FaIconComponent,
     MatTable,
     MatSort,

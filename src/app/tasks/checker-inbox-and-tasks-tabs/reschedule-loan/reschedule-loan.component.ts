@@ -36,6 +36,7 @@ import { SettingsService } from 'app/settings/settings.service';
 import { Dates } from 'app/core/utils/dates';
 import { TranslateService } from '@ngx-translate/core';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { MatIcon } from '@angular/material/icon';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { DateFormatPipe } from '../../../pipes/date-format.pipe';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
@@ -54,6 +55,7 @@ interface RescheduleFormData {
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
     FaIconComponent,
+    MatIcon,
     MatTable,
     MatColumnDef,
     MatHeaderCellDef,

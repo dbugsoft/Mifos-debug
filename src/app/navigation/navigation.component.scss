@@ -6,56 +6,177 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-// Component-specific styles - minimal overrides
-// Leverages global layout classes from main.scss
+@use '../shared/styles/list-layout' as *;
 
-:host {
-  display: block;
-}
-
+// No card or inner padding: the page lines up with the breadcrumb on both sides, like the other lists.
 .container {
-  width: 100%;
+  padding: 0;
+  background: none;
+  box-shadow: none;
 }
 
-// Using existing .layout-row-wrap.responsive-column from global styles
-// Only adding specific alignment needed for this component
-.layout-row-wrap.responsive-column {
-  align-items: flex-start;
-}
-
-// Extending global .flex-48 with min-width constraint for this component
-.flex-48 {
-  min-width: 20rem;
-
-  @media (width >= 1200px) {
-    flex-basis: 48%;
-  }
-}
-
-mat-card {
-  padding: 1rem;
-  border-radius: 0.5rem;
-  overflow: hidden;
-}
-
-mat-card-content {
+// Five pickers in one row on a laptop, wrapping on smaller screens; the details take the full width below.
+.pickers {
   display: grid;
-  grid-template-columns: 100%;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr));
+  // Top-aligned: a "None" hint under one picker must not make the others taller.
+  align-items: start;
+  gap: 16px;
+  margin-bottom: 24px;
 
-  @media (width >= 768px) {
-    grid-template-columns: 50% 50%;
-  }
+  mat-form-field {
+    // Same 36px control height as the search fields on the lists.
+    --mat-form-field-container-height: 36px;
+    --mat-form-field-container-vertical-padding: 6px;
 
-  @media (width >= 1200px) {
-    grid-template-columns: 50% 50%;
-    gap: 1rem;
+    min-width: 0;
   }
 }
 
-mat-form-field {
-  width: 100%;
+// Office, officer, center, group and member panels share one look: the icon in a blue circle beside the
+// name, then label / value pairs, three to a row (two on tablets, one on phones).
+.navigation .details {
+  ::ng-deep {
+    mat-card-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 0 0 16px;
+    }
+
+    .main-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      width: 64px;
+      height: 64px;
+      margin: 0;
+      border-radius: 50%;
+      color: var(--dk-primary, #2460b9);
+      background: rgb(var(--dk-tint-rgb, 36 96 185) / 10%);
+
+      svg {
+        width: 28px;
+        height: 28px;
+      }
+    }
+
+    mat-card-title-group {
+      flex: 1;
+      justify-content: flex-start;
+      text-align: left;
+    }
+
+    // Material's default title margins push the text below the icon; the header centres them instead.
+    .mat-mdc-card-header-text,
+    mat-card-title-group,
+    mat-card-title,
+    mat-card-subtitle,
+    mat-card-title-group .mat-typography {
+      margin: 0;
+      padding: 0;
+    }
+
+    h2 {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+
+    mat-card-subtitle p {
+      margin: 4px 0 0;
+      font-size: 0.85rem;
+    }
+
+    mat-card-content {
+      padding: 0;
+    }
+
+    // White tab bar with blue labels: the active one underlined in blue.
+    mat-tab-group {
+      --mat-tab-active-label-text-color: var(--dk-primary, #2460b9);
+      --mat-tab-active-focus-label-text-color: var(--dk-primary, #2460b9);
+      --mat-tab-active-hover-label-text-color: var(--dk-fill, #2460b9);
+      --mat-tab-inactive-label-text-color: var(--dk-text-muted, #64748b);
+      --mat-tab-inactive-focus-label-text-color: var(--dk-primary, #2460b9);
+      --mat-tab-inactive-hover-label-text-color: var(--dk-fill, #2460b9);
+      --mat-tab-active-indicator-color: var(--dk-primary, #2460b9);
+      --mat-tab-active-focus-indicator-color: var(--dk-primary, #2460b9);
+      --mat-tab-active-hover-indicator-color: var(--dk-fill, #2460b9);
+      --mat-tab-label-text-weight: 500;
+    }
+
+    .mat-mdc-tab-header {
+      border: 1px solid var(--dk-border, #e2e8f0);
+      border-radius: 8px;
+      background: var(--dk-surface, #fff);
+    }
+
+    .mat-mdc-tab-body-content {
+      padding-top: 16px;
+    }
+
+    // Account and group member tabs: the filter (and View Closed) share one 36px line.
+    :is(mifosx-loan-account-table, mifosx-savings-account-table, mifosx-share-account-table, mifosx-member-groups)
+      > .layout-row {
+      gap: 16px;
+      margin-bottom: 16px;
+
+      mat-form-field {
+        --mat-form-field-container-height: 36px;
+        --mat-form-field-container-vertical-padding: 6px;
+      }
+
+      .mat-mdc-form-field-subscript-wrapper {
+        display: none;
+      }
+
+      button {
+        height: 36px;
+      }
+    }
+
+    .layout-row-wrap {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(120px, max-content) minmax(0, 1fr));
+      border: 1px solid var(--dk-border, #e2e8f0);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .flex-50 {
+      display: block;
+      max-width: none;
+      margin: 0;
+      padding: 10px 16px;
+      font-size: 0.875rem;
+      color: var(--dk-text, #1e293b);
+      border-bottom: 1px solid var(--dk-border, #e2e8f0);
+      overflow-wrap: anywhere;
+    }
+
+    .flex-50.mat-body-strong {
+      font-weight: 500;
+      color: var(--dk-text-muted, #64748b);
+      background: var(--dk-surface-2, #f8fafc);
+    }
+  }
 }
 
-mat-label {
-  letter-spacing: 0.0125rem;
+@media (width <= 1100px) {
+  .navigation .details ::ng-deep .layout-row-wrap {
+    grid-template-columns: repeat(2, minmax(120px, max-content) minmax(0, 1fr));
+  }
+}
+
+@media (width <= 768px) {
+  .navigation .details {
+    ::ng-deep .layout-row-wrap {
+      grid-template-columns: minmax(110px, max-content) minmax(0, 1fr);
+    }
+  }
 }

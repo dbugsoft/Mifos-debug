@@ -74,7 +74,7 @@ export class SidenavComponent implements AfterViewInit {
 
   readonly sections = navSections;
   readonly modulePermission = modulePermission;
-  /** Labels of the open modules; several can be open at once. */
+  /** Labels of the open modules; opening one closes the others. */
   openModules = new Set<string>();
 
   /* Reference of the brand */
@@ -84,7 +84,9 @@ export class SidenavComponent implements AfterViewInit {
 
   /** Opens or closes a module's pages. */
   toggle(item: NavModule) {
-    if (!this.openModules.delete(item.label)) {
+    const wasOpen = this.openModules.has(item.label);
+    this.openModules.clear();
+    if (!wasOpen) {
       this.openModules.add(item.label);
     }
   }
@@ -104,6 +106,7 @@ export class SidenavComponent implements AfterViewInit {
   /** Opens the module holding the current page, as its pages become active. */
   onActiveChange(item: NavModule, active: boolean) {
     if (active) {
+      this.openModules.clear();
       this.openModules.add(item.label);
     }
   }

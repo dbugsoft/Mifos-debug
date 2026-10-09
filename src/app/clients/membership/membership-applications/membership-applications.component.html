@@ -18,107 +18,112 @@
     </p>
   }
 
-  <mat-card>
-    <mat-card-content>
-      <div class="bar">
-        <mat-form-field class="search" subscriptSizing="dynamic">
-          <mat-label>{{ 'membership.Search applicants' | translate }}</mat-label>
-          <input matInput [value]="search()" (input)="search.set($any($event.target).value)" />
-        </mat-form-field>
-        <span class="grow"></span>
-        @if (template()?.settings?.shareFirstEnabled) {
-          <button
-            mat-stroked-button
-            color="primary"
-            [routerLink]="['/members', 'create']"
-            [queryParams]="{ existing: true }"
-            *mifosxHasPermission="'ENTER_MEMBERSHIP'"
-          >
-            {{ 'membership.Enter an existing application' | translate }}
-          </button>
-        }
+  <div class="list-toolbar">
+    <div class="toolbar-left">
+      <mat-form-field class="search-field" appearance="outline" subscriptSizing="dynamic">
+        <mat-icon matPrefix>search</mat-icon>
+        <input
+          matInput
+          [placeholder]="'membership.Search applicants' | translate"
+          [value]="search()"
+          (input)="search.set($any($event.target).value)"
+        />
+      </mat-form-field>
+    </div>
+    <div class="toolbar-right">
+      @if (template()?.settings?.shareFirstEnabled) {
         <button
-          mat-raised-button
+          mat-stroked-button
           color="primary"
           [routerLink]="['/members', 'create']"
-          *mifosxHasPermission="'CREATE_MEMBERSHIP'"
+          [queryParams]="{ existing: true }"
+          *mifosxHasPermission="'ENTER_MEMBERSHIP'"
         >
-          <fa-icon icon="plus" class="m-r-10"></fa-icon>{{ 'membership.New Member Application' | translate }}
+          <fa-icon icon="file-alt" class="btn-icon"></fa-icon
+          >{{ 'membership.Enter an existing application' | translate }}
         </button>
-      </div>
+      }
+      <button
+        mat-raised-button
+        color="primary"
+        [routerLink]="['/members', 'create']"
+        *mifosxHasPermission="'CREATE_MEMBERSHIP'"
+      >
+        <fa-icon icon="plus" class="btn-icon"></fa-icon>{{ 'membership.New Member Application' | translate }}
+      </button>
+    </div>
+  </div>
 
-      <nav mat-tab-nav-bar [tabPanel]="panel" class="tabs">
-        @for (s of statuses; track s) {
-          <a mat-tab-link [active]="status() === s" (click)="show(s)" (keydown.enter)="show(s)" tabindex="0">
-            {{ 'membership.tab.' + s | translate }}
-          </a>
-        }
-      </nav>
-      <mat-tab-nav-panel #panel>
-        <div class="table-wrap">
-          <table class="list">
-            <thead>
-              <tr>
-                <th>{{ 'membership.SNo' | translate }}</th>
-                <th>{{ 'membership.Applicant' | translate }}</th>
-                <th>{{ 'labels.inputs.Account No' | translate }}</th>
-                <th class="num">{{ 'membership.Kitta' | translate }}</th>
-                <th class="num">{{ 'membership.Share amount' | translate }}</th>
-                <th>{{ 'membership.Applied on' | translate }}</th>
-                <th>
-                  {{ (status() === 'PENDING' ? 'membership.Board decision' : 'membership.Decided on') | translate }}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (a of visible(); track a.id; let i = $index) {
-                <tr (click)="open(a)" (keydown.enter)="open(a)" tabindex="0" class="row">
-                  <td>{{ i + 1 }}</td>
-                  <td>
-                    <b>{{ a.name }}</b>
-                    @if (a.organisation) {
-                      <span class="tag">{{ 'membership.Organisation' | translate }}</span>
-                    }
-                    @if (a.mobileNo) {
-                      <span class="sub">{{ a.mobileNo }}</span>
-                    }
-                    @if (a.kymMissing !== undefined && a.kymMissing !== null) {
-                      <span class="kym" [class.done]="a.kymMissing === 0">{{
-                        (a.kymMissing === 0 ? 'membership.kymComplete' : 'membership.kymMissing')
-                          | translate: { count: a.kymMissing }
-                      }}</span>
-                    }
-                  </td>
-                  <td class="num">{{ a.accountNo }}</td>
-                  <td class="num">{{ a.kitta }}</td>
-                  <td class="num">{{ 'membership.Rs' | translate }} {{ a.shareAmount | formatNumber }}</td>
-                  <td>{{ a.submittedOn | dateFormat }}</td>
-                  <td>
-                    @if (status() === 'PENDING') {
-                      @if (a.daysRemaining !== undefined && a.daysRemaining !== null) {
-                        <mifosx-membership-deadline [application]="a"></mifosx-membership-deadline>
-                      } @else {
-                        <span class="waiting">{{ 'membership.Waiting' | translate }}</span>
-                      }
-                      @if (a.enteredLate) {
-                        <span class="sub">{{ 'membership.Existing application' | translate }}</span>
-                      }
-                    } @else {
-                      {{ a.decidedOn | dateFormat }}
-                    }
-                  </td>
-                </tr>
-              } @empty {
-                <tr>
-                  <td colspan="7" class="empty">
-                    {{ (loading() ? 'membership.Loading' : 'membership.empty.' + status()) | translate }}
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-      </mat-tab-nav-panel>
-    </mat-card-content>
-  </mat-card>
+  <nav mat-tab-nav-bar [tabPanel]="panel" class="tabs">
+    @for (s of statuses; track s) {
+      <a mat-tab-link [active]="status() === s" (click)="show(s)" (keydown.enter)="show(s)" tabindex="0">
+        {{ 'membership.tab.' + s | translate }}
+      </a>
+    }
+  </nav>
+  <mat-tab-nav-panel #panel>
+    <div class="table-wrap">
+      <table class="list">
+        <thead>
+          <tr>
+            <th>{{ 'membership.SNo' | translate }}</th>
+            <th>{{ 'membership.Applicant' | translate }}</th>
+            <th>{{ 'labels.inputs.Account No' | translate }}</th>
+            <th class="num">{{ 'membership.Kitta' | translate }}</th>
+            <th class="num">{{ 'membership.Share amount' | translate }}</th>
+            <th>{{ 'membership.Applied on' | translate }}</th>
+            <th>
+              {{ (status() === 'PENDING' ? 'membership.Board decision' : 'membership.Decided on') | translate }}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (a of visible(); track a.id; let i = $index) {
+            <tr (click)="open(a)" (keydown.enter)="open(a)" tabindex="0" class="row">
+              <td>{{ i + 1 }}</td>
+              <td>
+                <span class="name">{{ a.name }}</span>
+                @if (a.organisation) {
+                  <span class="tag">{{ 'membership.Organisation' | translate }}</span>
+                }
+                @if (a.mobileNo) {
+                  <span class="sub">{{ a.mobileNo }}</span>
+                }
+                @if (a.kymMissing !== undefined && a.kymMissing !== null) {
+                  <span class="kym" [class.done]="a.kymMissing === 0">{{
+                    (a.kymMissing === 0 ? 'membership.kymComplete' : 'membership.kymMissing')
+                      | translate: { count: a.kymMissing }
+                  }}</span>
+                }
+              </td>
+              <td class="num">{{ a.accountNo }}</td>
+              <td class="num">{{ a.kitta }}</td>
+              <td class="num">{{ 'membership.Rs' | translate }} {{ a.shareAmount | formatNumber }}</td>
+              <td>{{ a.submittedOn | dateFormat }}</td>
+              <td>
+                @if (status() === 'PENDING') {
+                  @if (a.daysRemaining !== undefined && a.daysRemaining !== null) {
+                    <mifosx-membership-deadline [application]="a"></mifosx-membership-deadline>
+                  } @else {
+                    <span class="waiting">{{ 'membership.Waiting' | translate }}</span>
+                  }
+                  @if (a.enteredLate) {
+                    <span class="sub">{{ 'membership.Existing application' | translate }}</span>
+                  }
+                } @else {
+                  {{ a.decidedOn | dateFormat }}
+                }
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="7" class="empty">
+                {{ (loading() ? 'membership.Loading' : 'membership.empty.' + status()) | translate }}
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </mat-tab-nav-panel>
 </div>

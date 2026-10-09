@@ -51,12 +51,12 @@ import { NotificationsTrayComponent as NotificationsTrayComponent_1 } from '../.
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { DocumentationLinksService } from 'app/shared/services/documentation-links.service';
 import { SettingsService } from 'app/settings/settings.service';
+import { ThemeToggleComponent } from 'app/shared/theme-toggle/theme-toggle.component';
 import { KeyboardShortcutsDialogComponent } from 'app/shared/keyboard-shortcuts-dialog/keyboard-shortcuts-dialog.component';
 
 /**
  * Toolbar component.
  */
-// import { ThemeToggleComponent } from 'app/shared/theme-toggle/theme-toggle.component';
 
 @Component({
   selector: 'mifosx-toolbar',
@@ -74,8 +74,8 @@ import { KeyboardShortcutsDialogComponent } from 'app/shared/keyboard-shortcuts-
     MatIcon,
     NotificationsTrayComponent_1,
     MatMenu,
-    MatMenuItem
-    // ThemeToggleComponent: theme switcher hidden for now
+    MatMenuItem,
+    ThemeToggleComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })

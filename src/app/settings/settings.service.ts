@@ -291,12 +291,4 @@ export class SettingsService {
       }
     });
   }
-
-  setThemeDarkEnabled(enabled: boolean) {
-    localStorage.setItem('mifosXThemeDarkEnabled', JSON.stringify(enabled));
-  }
-
-  get themeDarkEnabled(): boolean {
-    return JSON.parse(localStorage.getItem('mifosXThemeDarkEnabled'));
-  }
 }

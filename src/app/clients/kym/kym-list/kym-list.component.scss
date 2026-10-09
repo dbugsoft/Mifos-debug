@@ -53,7 +53,7 @@
   border-collapse: collapse;
 
   th {
-    background: #1074b9;
+    background: var(--dk-fill, #2460b9);
     color: #fff;
     text-align: left;
     padding: 14px 16px;
@@ -71,7 +71,7 @@
 
   td {
     padding: 12px 16px;
-    border-bottom: 1px solid rgb(0 0 0 / 12%);
+    border-bottom: 1px solid rgb(var(--dk-ink-rgb, 0 0 0) / 12%);
     vertical-align: top;
   }
 
@@ -85,7 +85,7 @@
 
   .row:hover td,
   .row:focus td {
-    background: rgb(16 116 185 / 6%);
+    background: rgb(var(--dk-tint-rgb, 36 96 185) / 6%);
     outline: none;
   }
 
@@ -98,7 +98,7 @@
 
   .count {
     font-weight: 600;
-    color: #9f1f17;
+    color: var(--dk-danger, #9f1f17);
   }
 
   .tag {
@@ -108,8 +108,8 @@
     border-radius: 10px;
     font-size: 0.75rem;
     line-height: 20px;
-    color: #3f4448;
-    background: #eceff1;
+    color: var(--dk-text-2, #3f4448);
+    background: var(--dk-surface-2, #eceff1);
   }
 
   .empty {

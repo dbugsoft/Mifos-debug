@@ -8,29 +8,34 @@
 
 @if (showData) {
   <div class="tab-container mat-typography">
-    <div class="tasks-header">
-      <mat-form-field class="tasks-search-field">
-        <input
-          #filterInput
-          matInput
-          placeholder="{{ 'labels.text.Filter by name' | translate }}"
-          (keyup)="applyFilter(filterInput.value)"
-        />
-      </mat-form-field>
-      <button
-        mat-raised-button
-        color="success"
-        *mifosxHasPermission="'ACTIVATE_CLIENT'"
-        (click)="approveClients()"
-        class="tasks-action-btn"
-      >
-        <fa-icon icon="check" class="m-r-10"></fa-icon>{{ 'labels.buttons.Approve' | translate }}
-      </button>
+    <div class="list-toolbar">
+      <div class="toolbar-left">
+        <mat-form-field class="search-field" appearance="outline" subscriptSizing="dynamic">
+          <mat-icon matPrefix>search</mat-icon>
+          <input
+            #filterInput
+            matInput
+            placeholder="{{ 'labels.text.Filter by name' | translate }}"
+            (keyup)="applyFilter(filterInput.value)"
+          />
+        </mat-form-field>
+      </div>
+      <div class="toolbar-right">
+        <button
+          mat-raised-button
+          color="primary"
+          *mifosxHasPermission="'ACTIVATE_CLIENT'"
+          (click)="approveClients()"
+          class="tasks-action-btn"
+        >
+          <fa-icon icon="check" class="btn-icon"></fa-icon>{{ 'labels.buttons.Approve' | translate }}
+        </button>
+      </div>
     </div>
     @for (client of groupedClientEntries; track client.key) {
-      <h3>{{ client.key }}</h3>
+      <h3 class="group-heading">{{ client.key }}</h3>
       @if (client.value.length > 0 && groupedClientDataSources[client.key]) {
-        <table mat-table [dataSource]="groupedClientDataSources[client.key]">
+        <table mat-table [dataSource]="groupedClientDataSources[client.key]" class="members-table">
           <ng-container matColumnDef="select">
             <th mat-header-cell *matHeaderCellDef>
               <mat-checkbox
@@ -81,10 +86,8 @@
 }
 
 @if (!showData) {
-  <div class="alert">
-    <div class="message">
-      <i class="fa fa-exclamation-circle alert-check"></i>
-      {{ 'labels.text.No pending loans for approval' | translate }}
-    </div>
+  <div class="empty-state">
+    <fa-icon icon="tasks" size="2x" class="empty-icon"></fa-icon>
+    <p>{{ 'labels.text.No pending loans for approval' | translate }}</p>
   </div>
 }

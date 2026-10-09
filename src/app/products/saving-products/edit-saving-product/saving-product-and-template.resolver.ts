@@ -28,7 +28,7 @@ export class SavingProductAndTemplateResolver {
    * @returns {Observable<any>}
    */
   resolve(route: ActivatedRouteSnapshot): Observable<any> {
-    const productId = route.paramMap.get('productId');
+    const productId = route.parent.paramMap.get('productId');
     return this.productsService.getSavingProduct(productId, true);
   }
 }

@@ -76,7 +76,7 @@
  * - Displayed at bottom-center for 4 seconds
  */
 .info-snackbar {
-  background-color: #2196f3 !important;
+  background-color: var(--dk-fill, #2196f3) !important;
   color: white !important;
 
   .mat-mdc-snack-bar-label,

@@ -7,15 +7,15 @@
  */
 
 :host {
-  --header-bg: var(--md-sys-color-surface, #fff);
-  --header-accent: var(--md-sys-color-primary, #2460b9);
-  --header-text: var(--md-sys-color-on-surface, #303135);
+  --header-bg: var(--md-sys-color-surface, var(--dk-surface, #fff));
+  --header-accent: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+  --header-text: var(--md-sys-color-on-surface, var(--dk-text, #303135));
   // One neutral colour for every action icon; brand blue is kept for the app name.
-  --header-icon: #475569;
+  --header-icon: var(--dk-text-2, #475569);
 }
 
 :host-context(.dark-theme) {
-  --header-accent: #5ba2ec;
+  --header-accent: #fff;
   --header-icon: #cbd5e1;
 }
 

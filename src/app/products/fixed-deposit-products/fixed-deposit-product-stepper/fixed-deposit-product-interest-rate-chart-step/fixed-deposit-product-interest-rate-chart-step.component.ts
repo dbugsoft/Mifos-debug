@@ -53,6 +53,7 @@ import {
 import { MatStepperPrevious, MatStepperNext } from '@angular/material/stepper';
 import { FindPipe } from '../../../../pipes/find.pipe';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { NepaliDateInputComponent } from 'app/shared/nepali-date-input/nepali-date-input.component';
 
 @Component({
   selector: 'mifosx-fixed-deposit-product-interest-rate-chart-step',
@@ -67,6 +68,7 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
   ],
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
+    NepaliDateInputComponent,
     MatTooltip,
     FaIconComponent,
     MatDivider,
@@ -154,7 +156,6 @@ export class FixedDepositProductInterestRateChartStepComponent implements OnInit
   }
 
   assignFormData() {
-    this.addChart();
     const isChartArray = Array.isArray(this.fixedDepositProductsTemplate.activeChart);
     if (this.fixedDepositProductsTemplate.activeChart) {
       if (!isChartArray) {
@@ -163,6 +164,9 @@ export class FixedDepositProductInterestRateChartStepComponent implements OnInit
         this.chartDetailData = this.fixedDepositProductsTemplate.activeChart;
       }
     }
+
+    // A chart form only for each existing chart: a new product starts empty, and Add opens one.
+    this.chartDetailData.forEach(() => this.addChart());
 
     // Build the array of Objects from the retrived value
     this.getChartsDetailsData();
@@ -325,7 +329,8 @@ export class FixedDepositProductInterestRateChartStepComponent implements OnInit
 
   createFixedDepositProductInterestRateChartForm() {
     this.fixedDepositProductInterestRateChartForm = this.formBuilder.group({
-      charts: this.formBuilder.array([])
+      // The server rejects a product without an interest rate chart.
+      charts: this.formBuilder.array([], (charts: UntypedFormArray) => (charts.length ? null : { required: true }))
     });
   }
 

@@ -18,7 +18,7 @@
 p {
   text-align: center;
   font-size: 1.1rem;
-  color: var(--md-sys-color-on-surface, #1a1c1e);
+  color: var(--md-sys-color-on-surface, var(--dk-text, #1a1c1e));
   margin: 0 0 1rem;
 
   strong {
@@ -36,7 +36,7 @@ mat-divider {
 p:not(:first-of-type) {
   text-align: center;
   font-size: 0.95rem;
-  color: var(--md-sys-color-on-surface-variant, #44474e);
+  color: var(--md-sys-color-on-surface-variant, var(--dk-text-2, #44474e));
   margin-bottom: 1rem;
 }
 
@@ -59,16 +59,16 @@ p:not(:first-of-type) {
     ::ng-deep {
       .mdc-form-field {
         font-size: 0.95rem;
-        color: var(--md-sys-color-on-surface, #1a1c1e);
+        color: var(--md-sys-color-on-surface, var(--dk-text, #1a1c1e));
       }
 
       .mdc-radio__outer-circle {
-        border-color: var(--md-sys-color-on-surface-variant, #44474e);
+        border-color: var(--md-sys-color-on-surface-variant, var(--dk-border-strong, #44474e));
       }
 
       .mdc-radio--selected .mdc-radio__outer-circle,
       .mdc-radio--selected .mdc-radio__inner-circle {
-        border-color: var(--md-sys-color-primary, #1074b9);
+        border-color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
       }
     }
   }
@@ -98,7 +98,7 @@ p:not(:first-of-type) {
       }
 
       .mdc-line-ripple::after {
-        border-bottom-color: var(--md-sys-color-primary, #1074b9);
+        border-bottom-color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
       }
 
       .mat-mdc-form-field-hint-wrapper {
@@ -107,7 +107,7 @@ p:not(:first-of-type) {
 
       mat-hint {
         font-size: 0.75rem;
-        color: var(--md-sys-color-on-surface-variant, #44474e);
+        color: var(--md-sys-color-on-surface-variant, var(--dk-text-2, #44474e));
       }
     }
   }
@@ -131,7 +131,7 @@ p:not(:first-of-type) {
   }
 
   [mat-raised-button] {
-    background: var(--md-sys-color-primary, #1074b9);
+    background: var(--md-sys-color-primary, var(--dk-fill, #2460b9));
     color: var(--md-sys-color-on-primary, #fff);
     box-shadow:
       0 1px 2px rgb(0 0 0 / 30%),
@@ -150,11 +150,11 @@ p:not(:first-of-type) {
   }
 
   [mat-button] {
-    color: var(--md-sys-color-primary, #1074b9);
+    color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
     background: transparent;
 
     &:hover:not([disabled]) {
-      background: rgb(16 116 185 / 8%);
+      background: rgb(var(--dk-tint-rgb, 36 96 185) / 8%);
     }
   }
 
@@ -200,7 +200,7 @@ p:not(:first-of-type) {
   }
 
   p:not(:first-of-type) {
-    color: var(--md-sys-color-on-surface-variant, #c4c6cf);
+    color: var(--md-sys-color-on-surface-variant, var(--dk-text-muted, #c4c6cf));
   }
 
   .two-factor-auth-form {
@@ -211,21 +211,21 @@ p:not(:first-of-type) {
         }
 
         .mdc-radio__outer-circle {
-          border-color: var(--md-sys-color-on-surface-variant, #c4c6cf);
+          border-color: var(--md-sys-color-on-surface-variant, var(--dk-border, #c4c6cf));
         }
       }
     }
 
     [mat-raised-button] {
-      background: var(--md-sys-color-primary, #a8c8ff);
-      color: var(--md-sys-color-on-primary, #003258);
+      background: var(--md-sys-color-primary, var(--dk-primary-soft, #a8c8ff));
+      color: var(--md-sys-color-on-primary, var(--dk-text, #003258));
     }
 
     [mat-button] {
-      color: var(--md-sys-color-primary, #a8c8ff);
+      color: var(--md-sys-color-primary, var(--dk-primary, #a8c8ff));
 
       &:hover:not([disabled]) {
-        background: rgb(168 200 255 / 12%);
+        background: rgb(var(--dk-tint-rgb, 168 200 255) / 12%);
       }
     }
   }

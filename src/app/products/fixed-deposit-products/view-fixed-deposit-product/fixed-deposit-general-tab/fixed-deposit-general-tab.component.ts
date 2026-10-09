@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, ViewChild, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { trigger, state, transition, animate, style } from '@angular/animations';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
@@ -30,6 +30,9 @@ import { DateFormatPipe } from '../../../../pipes/date-format.pipe';
 import { FormatNumberPipe } from '../../../../pipes/format-number.pipe';
 import { YesnoPipe } from '../../../../pipes/yesno.pipe';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
+import { TranslateService } from '@ngx-translate/core';
+import { exportProductJson, exportProductPdf } from 'app/shared/utils/product-export.util';
 
 @Component({
   selector: 'mifosx-fixed-deposit-general-tab',
@@ -60,12 +63,19 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     FindPipe,
     DateFormatPipe,
     FormatNumberPipe,
-    YesnoPipe
+    YesnoPipe,
+    MatMenu,
+    MatMenuItem,
+    MatMenuTrigger
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FixedDepositGeneralTabComponent {
   private route = inject(ActivatedRoute);
+  private translateService = inject(TranslateService);
+
+  /** Rendered product summary; the PDF is built from it so it matches the screen. */
+  @ViewChild('summary') summary: ElementRef<HTMLElement>;
 
   /** Fixed Deposit Product data. */
   fixedDepositProductData: any;
@@ -111,5 +121,17 @@ export class FixedDepositGeneralTabComponent {
       this.fixedDepositProductData = data.fixedDepositProduct;
       this.fixedDepositProductsTemplate = data.fixedDepositProductsTemplate;
     });
+  }
+
+  exportDefinition(): void {
+    exportProductJson(this.fixedDepositProductData);
+  }
+
+  exportPdf(): void {
+    exportProductPdf(
+      this.summary.nativeElement,
+      this.fixedDepositProductData.name,
+      `${this.translateService.instant('labels.inputs.Fixed Deposit Product')} | ${this.fixedDepositProductData.shortName}`
+    );
   }
 }

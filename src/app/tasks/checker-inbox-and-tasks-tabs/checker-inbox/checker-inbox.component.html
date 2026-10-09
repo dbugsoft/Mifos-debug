@@ -7,65 +7,63 @@
 -->
 
 <div class="tab-container mat-typography">
-  <div class="search-row">
-    <mat-form-field class="search-field">
-      <input
-        matInput
-        placeholder="{{ 'labels.text.Search by user' | translate }}"
-        (keyup)="applyFilter($event.target.value)"
-      />
-    </mat-form-field>
-    <button
-      mat-icon-button
-      (click)="toggleAdvancedSearch()"
-      class="icon-button"
-      [attr.aria-label]="
-        showAdvancedSearch
-          ? ('labels.buttons.Hide advanced search' | translate)
-          : ('labels.buttons.Show advanced search' | translate)
-      "
-      [attr.aria-expanded]="showAdvancedSearch"
-    >
-      <mat-icon>{{ showAdvancedSearch ? 'arrow_drop_up' : 'arrow_drop_down' }}</mat-icon>
-    </button>
-    <button mat-raised-button class="mat-success tasks-action-btn" (click)="approveChecker()">
-      <fa-icon icon="check" class="m-r-10"></fa-icon>{{ 'labels.buttons.Approve' | translate }}
-    </button>
-    <button mat-raised-button color="warn" (click)="deleteChecker()" class="action-button">
-      <fa-icon icon="trash" class="m-r-10"></fa-icon>{{ 'labels.buttons.Delete' | translate }}
-    </button>
-    <button mat-raised-button class="mat-reject tasks-action-btn" (click)="rejectChecker()">
-      <fa-icon icon="times" class="m-r-10"></fa-icon>{{ 'labels.buttons.Reject' | translate }}
-    </button>
+  <div class="list-toolbar">
+    <div class="toolbar-left">
+      <mat-form-field class="search-field" appearance="outline" subscriptSizing="dynamic">
+        <mat-icon matPrefix>search</mat-icon>
+        <input
+          matInput
+          [placeholder]="'labels.text.Search by user' | translate"
+          (keyup)="applyFilter($event.target.value)"
+        />
+        <button
+          mat-icon-button
+          matSuffix
+          type="button"
+          (click)="toggleAdvancedSearch()"
+          [attr.aria-label]="
+            showAdvancedSearch
+              ? ('labels.buttons.Hide advanced search' | translate)
+              : ('labels.buttons.Show advanced search' | translate)
+          "
+          [attr.aria-expanded]="showAdvancedSearch"
+        >
+          <mat-icon>{{ showAdvancedSearch ? 'expand_less' : 'tune' }}</mat-icon>
+        </button>
+      </mat-form-field>
+    </div>
+    <div class="toolbar-right">
+      <button mat-raised-button color="primary" (click)="approveChecker()">
+        <fa-icon icon="check" class="btn-icon"></fa-icon>{{ 'labels.buttons.Approve' | translate }}
+      </button>
+      <button mat-stroked-button (click)="rejectChecker()">
+        <fa-icon icon="times" class="btn-icon"></fa-icon>{{ 'labels.buttons.Reject' | translate }}
+      </button>
+      <button mat-stroked-button color="warn" (click)="deleteChecker()">
+        <fa-icon icon="trash" class="btn-icon"></fa-icon>{{ 'labels.buttons.Delete' | translate }}
+      </button>
+    </div>
   </div>
   @if (showAdvancedSearch) {
     <form [formGroup]="makerCheckerSearchForm">
       <div class="advanced-search-container">
-        <mat-form-field class="search-field" (click)="makerDateTimeFromPicker.open()">
-          <mat-label>{{ 'labels.inputs.From date' | translate }}</mat-label>
-          <input
-            matInput
-            [min]="minDate"
-            [max]="maxDate"
-            [matDatepicker]="makerDateTimeFromPicker"
-            formControlName="makerDateTimeFrom"
-          />
-          <mat-datepicker-toggle matSuffix [for]="makerDateTimeFromPicker"></mat-datepicker-toggle>
-          <mat-datepicker #makerDateTimeFromPicker></mat-datepicker>
-        </mat-form-field>
-        <mat-form-field class="search-field" (click)="makerDateTimetoPicker.open()">
-          <mat-label>{{ 'labels.inputs.To date' | translate }}</mat-label>
-          <input
-            matInput
-            [min]="minDate"
-            [max]="maxDate"
-            [matDatepicker]="makerDateTimetoPicker"
-            formControlName="makerDateTimeto"
-          />
-          <mat-datepicker-toggle matSuffix [for]="makerDateTimetoPicker"></mat-datepicker-toggle>
-          <mat-datepicker #makerDateTimetoPicker></mat-datepicker>
-        </mat-form-field>
-        <mat-form-field class="search-field">
+        <mifosx-nepali-date-input
+          class="bs-date"
+          [inline]="true"
+          label="From date"
+          formControlName="makerDateTimeFrom"
+          [minDate]="minDate"
+          [maxDate]="maxDate"
+        />
+        <mifosx-nepali-date-input
+          class="bs-date"
+          [inline]="true"
+          label="To date"
+          formControlName="makerDateTimeto"
+          [minDate]="minDate"
+          [maxDate]="maxDate"
+        />
+        <mat-form-field class="field-md" appearance="outline" subscriptSizing="dynamic">
           <mat-label>{{ 'labels.inputs.Select action' | translate }}</mat-label>
           <mat-select formControlName="actionName">
             @for (action of makerCheckerTemplate.actionNames; track action) {
@@ -75,7 +73,7 @@
             }
           </mat-select>
         </mat-form-field>
-        <mat-form-field class="search-field">
+        <mat-form-field class="field-md" appearance="outline" subscriptSizing="dynamic">
           <mat-label>{{ 'labels.inputs.Select entity' | translate }}</mat-label>
           <mat-select formControlName="entityName">
             @for (entity of makerCheckerTemplate.entityNames; track entity) {
@@ -85,7 +83,7 @@
             }
           </mat-select>
         </mat-form-field>
-        <mat-form-field class="search-field">
+        <mat-form-field class="field-sm" appearance="outline" subscriptSizing="dynamic">
           <mat-label>{{ 'labels.inputs.Resource id' | translate }}</mat-label>
           <input matInput formControlName="resourceId" />
         </mat-form-field>
@@ -96,7 +94,7 @@
     </form>
   }
   @if (checkerData && !noSearchedData) {
-    <table mat-table [dataSource]="dataSource">
+    <table mat-table [dataSource]="dataSource" class="members-table">
       <ng-container matColumnDef="select">
         <th mat-header-cell *matHeaderCellDef>
           <mat-checkbox
@@ -150,21 +148,17 @@
       ></tr>
     </table>
   }
-  @if (checkerData && noSearchedData) {
-    <div class="alert">
-      <div class="message">
-        <i class="fa fa-exclamation-circle alert-check fa-2x"></i>
-        {{ 'labels.text.No checker inbox data available for this search' | translate }}
-      </div>
-    </div>
-  }
-
-  @if (!checkerData) {
-    <div class="alert">
-      <div class="message">
-        <i class="fa fa-exclamation-circle alert-check fa-2x"></i>
-        {{ 'labels.text.No checker inbox data available for this account' | translate }}
-      </div>
+  @if (!checkerData || noSearchedData) {
+    <div class="empty-state">
+      <fa-icon icon="tasks" size="2x" class="empty-icon"></fa-icon>
+      <p>
+        {{
+          (checkerData
+            ? 'labels.text.No checker inbox data available for this search'
+            : 'labels.text.No checker inbox data available for this account'
+          ) | translate
+        }}
+      </p>
     </div>
   }
 </div>

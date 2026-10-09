@@ -46,7 +46,7 @@ table {
 }
 
 .mat-mdc-header-row {
-  background-color: #1074b9;
+  background-color: var(--dk-fill, #1074b9);
   min-height: 52px;
 }
 
@@ -72,7 +72,7 @@ table {
 }
 
 .mat-mdc-row:hover {
-  background-color: rgb(86 182 234 / 3%);
+  background-color: rgb(var(--dk-tint-rgb, 86 182 234) / 3%);
 }
 
 .mat-column-category {
@@ -119,7 +119,7 @@ mat-hint {
   padding: 14px 16px;
   margin-bottom: 8px;
   border-radius: 6px;
-  background: rgb(0 0 0 / 3%);
+  background: rgb(var(--dk-ink-rgb, 0 0 0) / 3%);
 }
 
 /* Tablet */

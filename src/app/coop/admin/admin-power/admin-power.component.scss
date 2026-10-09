@@ -11,27 +11,27 @@
 ========================================================= */
 
 :host {
-  --primary: #1074b9;
-  --primary-dark: #0a5a8f;
-  --primary-light: #eaf4fb;
-  --surface: #fff;
-  --bg: #f5f8fb;
-  --border: #e2e8ed;
-  --border-light: #eef2f7;
-  --text-primary: #172b3a;
-  --text-secondary: #45525c;
-  --text-muted: #7d8b95;
-  --success: #2e8b57;
-  --success-bg: #eaf7ef;
-  --success-border: #c9ead6;
-  --danger: #c94b4b;
-  --danger-bg: #fdeeee;
-  --danger-border: #f1cccc;
-  --warning: #a56b00;
-  --warning-bg: #fff5df;
-  --warning-border: #f5deac;
-  --shadow-sm: 0 2px 8px rgb(16 42 67 / 5%);
-  --shadow-md: 0 8px 24px rgb(16 42 67 / 8%);
+  --primary: var(--dk-primary, #2460b9);
+  --primary-dark: var(--dk-primary, #0a5a8f);
+  --primary-light: var(--dk-primary-soft, #eaf4fb);
+  --surface: var(--dk-surface, #fff);
+  --bg: var(--dk-surface-2, #f5f8fb);
+  --border: var(--dk-border, #e2e8ed);
+  --border-light: var(--dk-border, #eef2f7);
+  --text-primary: var(--dk-text, #172b3a);
+  --text-secondary: var(--dk-text-2, #45525c);
+  --text-muted: var(--dk-text-muted, #7d8b95);
+  --success: var(--dk-success, #2e8b57);
+  --success-bg: var(--dk-success-soft, #eaf7ef);
+  --success-border: var(--dk-success-border, #c9ead6);
+  --danger: var(--dk-danger, #c94b4b);
+  --danger-bg: var(--dk-danger-soft, #fdeeee);
+  --danger-border: var(--dk-danger-border, #f1cccc);
+  --warning: var(--dk-warning, #a56b00);
+  --warning-bg: var(--dk-warning-soft, #fff5df);
+  --warning-border: var(--dk-warning-border, #f5deac);
+  --shadow-sm: 0 2px 8px rgb(var(--dk-tint-rgb, 16 42 67) / 5%);
+  --shadow-md: 0 8px 24px rgb(var(--dk-tint-rgb, 16 42 67) / 8%);
 
   display: block;
   width: 100%;
@@ -124,7 +124,7 @@
 
 .admin-detail-content::-webkit-scrollbar-thumb {
   border-radius: 8px;
-  background: #c7d4de;
+  background: var(--dk-primary-soft, #c7d4de);
 }
 
 .admin-detail-content::-webkit-scrollbar-thumb:hover {
@@ -157,7 +157,7 @@
 .skeleton {
   position: relative;
   border-radius: 6px;
-  background: #eef2f6;
+  background: var(--dk-surface-2, #eef2f6);
   overflow: hidden;
 }
 
@@ -317,7 +317,7 @@
   align-items: center;
   justify-content: center;
   border-radius: 11px;
-  background: #fff;
+  background: var(--dk-surface, #fff);
   color: var(--danger);
 
   mat-icon {
@@ -350,7 +350,7 @@
   border-radius: 8px !important;
   border-color: var(--danger-border) !important;
   color: var(--danger) !important;
-  background: #fff !important;
+  background: var(--dk-surface, #fff) !important;
   font-size: 12px !important;
 
   mat-icon {
@@ -416,7 +416,12 @@
   padding: 26px 30px;
   box-sizing: border-box;
   border-radius: 20px;
-  background: linear-gradient(135deg, #0f73b8 0%, #176fa9 55%, #125f92 100%);
+  background: linear-gradient(
+    135deg,
+    var(--dk-fill, #0f73b8) 0%,
+    var(--dk-fill, #176fa9) 55%,
+    var(--dk-fill, #125f92) 100%
+  );
   box-shadow: var(--shadow-md);
   color: #fff;
 }
@@ -495,7 +500,7 @@
   font-weight: 700;
   letter-spacing: 0.3px;
   white-space: nowrap;
-  background: #fff;
+  background: var(--dk-surface, #fff);
 }
 
 .status-dot {
@@ -619,7 +624,7 @@
   min-width: 0;
   padding: 18px 20px;
   box-sizing: border-box;
-  background: #fff;
+  background: var(--dk-surface, #fff);
   border-right: 1px solid var(--border-light);
 }
 
@@ -658,11 +663,11 @@
 }
 
 .pending-action {
-  background: linear-gradient(180deg, #f7fbff 0%, #fff 180px);
+  background: linear-gradient(180deg, var(--dk-surface-2, #f7fbff) 0%, var(--dk-surface, #fff) 180px);
 }
 
 .provisioned-action {
-  background: linear-gradient(180deg, #f8fcfa 0%, #fff 180px);
+  background: linear-gradient(180deg, var(--dk-surface-2, #f8fcfa) 0%, var(--dk-surface, #fff) 180px);
 }
 
 .action-header {
@@ -736,7 +741,7 @@
 }
 
 ::ng-deep .mat-mdc-text-field-wrapper {
-  background: #fff;
+  background: var(--dk-surface, #fff);
 }
 
 ::ng-deep .mat-mdc-input-element {
@@ -790,7 +795,7 @@
 
 .verify-button {
   background: var(--primary) !important;
-  color: #fff !important;
+  color: var(--dk-on-accent, #fff) !important;
 }
 
 .verify-button:hover:not(:disabled) {
@@ -800,7 +805,7 @@
 .activate-button {
   min-width: 220px;
   background: var(--success) !important;
-  color: #fff !important;
+  color: var(--dk-on-accent, #fff) !important;
 }
 
 .activate-button:hover:not(:disabled) {
@@ -817,7 +822,7 @@
    * low-contrast defaults, which reads as a "faded" look.
    */
   --mdc-filled-button-disabled-container-color: #a9b6bf;
-  --mdc-filled-button-disabled-label-text-color: #fff;
+  --mdc-filled-button-disabled-label-text-color: var(--dk-surface, #fff);
 
   background: #a9b6bf !important;
   color: #fff !important;
@@ -831,7 +836,7 @@
   padding: 0 18px;
   border: 1.5px solid var(--danger-border) !important;
   border-radius: 9px !important;
-  background: #fff !important;
+  background: var(--dk-surface, #fff) !important;
   color: var(--danger) !important;
   font-size: 13px !important;
   font-weight: 600 !important;
@@ -853,7 +858,7 @@
 }
 
 .reject-button:disabled {
-  color: #b5bcc2 !important;
+  color: var(--dk-text-muted, #b5bcc2) !important;
   border-color: var(--border) !important;
   opacity: 1 !important;
   cursor: not-allowed;
@@ -887,7 +892,7 @@
   align-items: center;
   justify-content: center;
   border-radius: 9px;
-  background: #fff;
+  background: var(--dk-surface, #fff);
   color: var(--danger);
 
   mat-icon {
@@ -923,7 +928,7 @@
   height: 40px;
   border-radius: 8px !important;
   border-color: var(--border) !important;
-  background: #fff !important;
+  background: var(--dk-surface, #fff) !important;
   color: var(--text-secondary) !important;
   font-size: 12px !important;
 }
@@ -933,7 +938,7 @@
   height: 40px;
   border-radius: 8px !important;
   background: var(--danger) !important;
-  color: #fff !important;
+  color: var(--dk-on-accent, #fff) !important;
   font-size: 12px !important;
   font-weight: 600 !important;
   display: inline-flex !important;
@@ -945,7 +950,7 @@
 
 .confirm-reject-button:disabled {
   --mdc-filled-button-disabled-container-color: #a9b6bf;
-  --mdc-filled-button-disabled-label-text-color: #fff;
+  --mdc-filled-button-disabled-label-text-color: var(--dk-surface, #fff);
 
   background: #a9b6bf !important;
   color: #fff !important;
@@ -970,12 +975,12 @@
 
 .active-status-card {
   border: 1.5px solid var(--success-border);
-  background: linear-gradient(180deg, #f8fcfa 0%, #fff 100%);
+  background: linear-gradient(180deg, var(--dk-surface-2, #f8fcfa) 0%, var(--dk-surface, #fff) 100%);
 }
 
 .rejected-status-card {
   border: 1.5px solid var(--danger-border);
-  background: linear-gradient(180deg, #fffafa 0%, #fff 100%);
+  background: linear-gradient(180deg, var(--dk-surface, #fffafa) 0%, var(--dk-surface, #fff) 100%);
 }
 
 .status-info-icon {
@@ -1035,7 +1040,7 @@
   padding: 9px 12px;
   border: 1px solid var(--border-light);
   border-radius: 8px;
-  background: #f8fafc;
+  background: var(--dk-surface-2, #f8fafc);
 }
 
 .tenant-label {
@@ -1064,7 +1069,7 @@
   padding: 13px 15px;
   border-left: 3px solid var(--danger);
   border-radius: 0 8px 8px 0;
-  background: #fff6f6;
+  background: var(--dk-surface-2, #fff6f6);
 }
 
 .remarks-label {
