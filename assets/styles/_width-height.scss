@@ -35,8 +35,9 @@ body {
   }
 }
 
+// Same width as the breadcrumb (.breadcrumb-wrapper), so page content lines up with the page title.
 .container {
-  max-width: 74rem;
+  max-width: 84rem;
   width: 90%;
 }
 

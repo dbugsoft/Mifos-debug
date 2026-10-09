@@ -1,0 +1,1 @@
+import{a as t}from"./chunk-5RYRUQTS.js";function o(){let e=getComputedStyle(document.body);t.defaults.color=e.getPropertyValue("--dk-text-2").trim()||"#666",t.defaults.borderColor=e.getPropertyValue("--dk-border").trim()||"rgba(0, 0, 0, 0.1)"}export{o as a};

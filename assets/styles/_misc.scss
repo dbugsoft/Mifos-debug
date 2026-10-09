@@ -39,7 +39,7 @@ div {
 }
 
 .alert {
-  background-color: #e8f4fd;
+  background-color: var(--dk-primary-soft, #e8f4fd);
   padding: 6px 16px;
   font-size: 0.875rem;
   font-family: Inter, 'Noto Sans Devanagari', sans-serif;
@@ -55,7 +55,7 @@ div {
   }
 
   .alert-check {
-    color: #359ff4;
+    color: var(--dk-primary, #359ff4);
     margin-right: 2px;
     font-size: 1.4rem;
   }
@@ -75,7 +75,12 @@ div {
   min-width: 100%;
   width: 100px;
   height: 12px;
-  background: linear-gradient(125deg, rgb(255 255 255), $status-approved, rgb(255 255 255));
+  background: linear-gradient(
+    125deg,
+    var(--dk-surface, rgb(255 255 255)),
+    $status-approved,
+    var(--dk-surface, rgb(255 255 255))
+  );
   animation:
     grow 4s linear infinite,
     move 4s linear infinite;
@@ -91,7 +96,7 @@ mat-card-title {
 .table-empty-state {
   text-align: center;
   padding: 40px 20px;
-  color: var(--mdc-theme-text-secondary-on-background, #666);
+  color: var(--mdc-theme-text-secondary-on-background, var(--dk-text-2, #666));
   font-size: 14px;
   cursor: auto;
 

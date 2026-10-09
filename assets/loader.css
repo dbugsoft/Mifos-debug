@@ -27,7 +27,7 @@
   position: absolute;
   inset: 0;
   border: 3.5px solid #e2e8f0;
-  border-top-color: #1074b9;
+  border-top-color: #2460b9;
   border-radius: 50%;
   animation: spin 1s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
 }
@@ -47,7 +47,7 @@
   width: 10px;
   height: 10px;
   margin: -5px 0 0 -5px;
-  background: #1074b9;
+  background: #2460b9;
   border-radius: 50%;
   animation: pulse-dot 1.2s ease-in-out infinite;
 }
@@ -55,7 +55,7 @@
 .loader-text {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #1074b9;
+  color: #2460b9;
   letter-spacing: 0.06em;
 }
 
@@ -76,7 +76,7 @@
 .loader-bar-fill {
   width: 40%;
   height: 100%;
-  background: linear-gradient(90deg, #1074b9, #0a5a8f);
+  background: linear-gradient(90deg, #2460b9, #0a5a8f);
   border-radius: 3px;
   animation: bar-slide 1.4s ease-in-out infinite;
 }
