@@ -20,6 +20,7 @@ import { ComplianceService } from '../../compliance.service';
 import { Grade } from '../../compliance.models';
 import { InputDialogComponent, InputDialogData } from '../../input-dialog/input-dialog.component';
 import { RiskService } from '../risk.service';
+import { MemberMatch, ScreeningService } from '../../screening/screening.service';
 import { EDD_DECISIONS, Edd, FLAG_KINDS, GRADES, MemberRisk, PepExposure, RiskFlag } from '../risk.models';
 
 /**
@@ -44,6 +45,7 @@ import { EDD_DECISIONS, Edd, FLAG_KINDS, GRADES, MemberRisk, PepExposure, RiskFl
 export class MemberRiskComponent implements OnInit {
   private compliance = inject(ComplianceService);
   private risk = inject(RiskService);
+  private screening = inject(ScreeningService);
   private route = inject(ActivatedRoute);
   private dialog = inject(MatDialog);
   private translate = inject(TranslateService);
@@ -55,6 +57,7 @@ export class MemberRiskComponent implements OnInit {
   readonly member = signal<MemberRisk | null>(null);
   readonly peps = signal<PepExposure[]>([]);
   readonly edd = signal<Edd[]>([]);
+  readonly matches = signal<MemberMatch[]>([]);
   readonly showEnded = signal(false);
 
   readonly openEdd = computed(() => this.edd().find((e) => !e.closedOn) ?? null);
@@ -86,13 +89,15 @@ export class MemberRiskComponent implements OnInit {
     forkJoin({
       member: this.risk.member(this.clientId),
       peps: this.risk.peps(this.clientId).pipe(catchError(() => of([] as PepExposure[]))),
-      edd: this.risk.edd(this.clientId).pipe(catchError(() => of([] as Edd[])))
+      edd: this.risk.edd(this.clientId).pipe(catchError(() => of([] as Edd[]))),
+      matches: this.screening.member(this.clientId).pipe(catchError(() => of([] as MemberMatch[])))
     })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((d) => {
         this.member.set(d.member);
         this.peps.set(d.peps);
         this.edd.set(d.edd);
+        this.matches.set(d.matches);
       });
   }
 

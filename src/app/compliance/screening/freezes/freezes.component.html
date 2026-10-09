@@ -1,0 +1,76 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="compliance-page">
+  @if (allowed() === false) {
+    <p class="empty">{{ 'compliance.You have no compliance access' | translate }}</p>
+  } @else {
+    <div class="filters">
+      <mat-button-toggle-group [value]="view()" (change)="show($event.value)">
+        @for (v of views; track v) {
+          <mat-button-toggle [value]="v">{{ 'compliance.screening.freezeView.' + v | translate }}</mat-button-toggle>
+        }
+      </mat-button-toggle-group>
+    </div>
+
+    <p class="hint">{{ 'compliance.screening.freezesLead' | translate }}</p>
+
+    @if (loading()) {
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }
+
+    <section class="frame">
+      <h2 class="legend">{{ 'compliance.screening.freezeView.' + view() | translate }}</h2>
+      @if (list().length) {
+        <div class="table-scroll">
+          <table class="plain-rows">
+            <thead>
+              <tr>
+                <th>{{ 'compliance.Member' | translate }}</th>
+                <th>{{ 'compliance.screening.List entry' | translate }}</th>
+                <th>{{ 'compliance.screening.Held since' | translate }}</th>
+                <th class="wide">{{ 'compliance.screening.Where it stands' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (f of list(); track f.id) {
+                <tr class="row" tabindex="0" (click)="open(f)" (keydown.enter)="open(f)">
+                  <td>
+                    <b>{{ f.name }}</b>
+                    <span class="sub">{{ f.accountNo }}</span>
+                  </td>
+                  <td>
+                    {{ f.subjectName }}
+                    <span class="sub"
+                      >{{ 'compliance.screening.source.' + f.source | translate }} · {{ f.reference }}</span
+                    >
+                  </td>
+                  <td>
+                    {{ (f.frozenAt.slice(0, 10) | adToBs) || f.frozenAt.slice(0, 10) }}
+                    <span class="sub">{{ f.frozenBy }}</span>
+                  </td>
+                  <td class="wide">
+                    {{ 'compliance.screening.freezeStatus.' + f.status | translate }}
+                    @if (f.releasedAt) {
+                      <span class="sub"
+                        >{{ (f.releasedAt.slice(0, 10) | adToBs) || f.releasedAt.slice(0, 10) }} ·
+                        {{ f.releasedBy }}</span
+                      >
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else if (!loading()) {
+        <p class="empty">{{ 'compliance.screening.noFreezes' | translate }}</p>
+      }
+    </section>
+  }
+</div>

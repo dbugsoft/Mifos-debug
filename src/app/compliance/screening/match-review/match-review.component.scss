@@ -1,0 +1,153 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+@use '../../compliance' as compliance;
+@use '../../risk/risk' as risk;
+
+@include compliance.page;
+@include risk.plain-rows;
+
+.title {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: center;
+
+  .name {
+    margin: 0;
+    font-size: 1.25rem;
+  }
+}
+
+.notice.bad {
+  border-color: #f1b8b3;
+  background: #fdeceb;
+  color: #6d150f;
+}
+
+.pair,
+.decide {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 20px;
+}
+
+.line {
+  display: block;
+}
+
+.sub {
+  display: block;
+  font-size: 0.75rem;
+  opacity: 0.85;
+}
+
+.note {
+  white-space: pre-wrap;
+}
+
+.table-scroll table.plain-rows {
+  min-width: 520px;
+}
+
+.score-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  align-items: baseline;
+  margin-top: 12px;
+
+  .score {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #7a4a00;
+
+    &.likely {
+      color: #9f1f17;
+    }
+  }
+
+  .hint {
+    margin: 0;
+  }
+}
+
+.decide {
+  gap: 20px;
+}
+
+.box {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 16px;
+  border: 1px solid rgb(127 127 127 / 35%);
+  border-radius: 8px;
+  background: var(--mat-sys-surface, #fff);
+
+  h3 {
+    margin: 0;
+    font-size: 1rem;
+  }
+
+  .full {
+    width: 100%;
+  }
+
+  ul {
+    margin: 0;
+    padding-left: 18px;
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
+
+  &.danger {
+    border-color: #e7a29b;
+    background: #fffafa;
+  }
+}
+
+.plain-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    padding: 6px 0;
+    border-bottom: 1px solid rgb(127 127 127 / 15%);
+  }
+}
+
+@media (width <= 760px) {
+  .pair,
+  .decide {
+    grid-template-columns: 1fr;
+  }
+
+  .table-scroll table.plain-rows {
+    min-width: 0;
+  }
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  align-items: center;
+  margin-top: 12px;
+
+  .hint {
+    margin: 0;
+  }
+}
+
+table.plain-rows .num {
+  text-align: right;
+  white-space: nowrap;
+}

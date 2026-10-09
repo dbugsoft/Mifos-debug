@@ -1,0 +1,112 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+@use '../../compliance' as compliance;
+@use '../../risk/risk' as risk;
+
+@include compliance.page;
+@include risk.plain-rows;
+
+.sub {
+  display: block;
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+.hint {
+  margin: 0 0 8px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.notice.done {
+  margin: 12px 0 0;
+  border-color: #9fd3a9;
+  background: #e3f3e6;
+  color: #1b4d25;
+}
+
+.facts {
+  margin-top: 12px;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+
+  mat-button-toggle-group {
+    flex-wrap: wrap;
+  }
+}
+
+.group-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: center;
+  margin-bottom: 8px;
+
+  .sub {
+    display: inline;
+  }
+
+  .all {
+    margin-left: auto;
+  }
+}
+
+.earlier {
+  margin-top: 12px;
+
+  summary {
+    cursor: pointer;
+    font-size: 0.875rem;
+  }
+}
+
+.plain-list {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    padding: 6px 0;
+    border-bottom: 1px solid rgb(127 127 127 / 15%);
+  }
+}
+
+table.plain-rows .num {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.table-scroll table.plain-rows {
+  min-width: 560px;
+}
+
+@media (width <= 600px) {
+  .table-scroll table.plain-rows {
+    min-width: 0;
+
+    .wide {
+      display: none;
+    }
+  }
+
+  .group-head .all {
+    margin-left: 0;
+  }
+}

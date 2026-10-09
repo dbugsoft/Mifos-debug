@@ -18,6 +18,7 @@ import { ComplianceService } from '../compliance.service';
 import { RiskService } from '../risk/risk.service';
 import { EddSummary, RiskSummary } from '../risk/risk.models';
 import { AlertSummary, CaseSummary, CasesService } from '../cases/cases.service';
+import { ScreeningService, ScreeningSummary } from '../screening/screening.service';
 import { AmlSettingsView, ComplianceAccess, LedgerStatus, TtrItem, TtrSummary, isoDate } from '../compliance.models';
 import { DueChipComponent } from '../due-chip/due-chip.component';
 
@@ -43,6 +44,7 @@ export class ComplianceHomeComponent implements OnInit {
   private compliance = inject(ComplianceService);
   private risk = inject(RiskService);
   private casesService = inject(CasesService);
+  private screening = inject(ScreeningService);
   private destroyRef = inject(DestroyRef);
 
   readonly loading = signal(true);
@@ -55,6 +57,7 @@ export class ComplianceHomeComponent implements OnInit {
   readonly eddSummary = signal<EddSummary | null>(null);
   readonly alertSummary = signal<AlertSummary | null>(null);
   readonly caseSummary = signal<CaseSummary | null>(null);
+  readonly screeningSummary = signal<ScreeningSummary | null>(null);
 
   readonly deadlineColumns = [
     'dueOn',
@@ -96,6 +99,9 @@ export class ComplianceHomeComponent implements OnInit {
               : of(null),
             cases: can('READ_AMLCOMPLIANCE', 'READ_AMLSUMMARY', 'READ_AMLDECISIONS')
               ? this.casesService.caseSummary().pipe(catchError(() => of(null)))
+              : of(null),
+            screening: can('READ_AMLCOMPLIANCE', 'READ_AMLSUMMARY')
+              ? this.screening.summary().pipe(catchError(() => of(null)))
               : of(null)
           });
         }),
@@ -110,6 +116,7 @@ export class ComplianceHomeComponent implements OnInit {
         this.eddSummary.set(data.edd);
         this.alertSummary.set(data.alerts);
         this.caseSummary.set(data.cases);
+        this.screeningSummary.set(data.screening);
         this.loading.set(false);
       });
   }

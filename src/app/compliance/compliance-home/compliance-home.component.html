@@ -57,8 +57,23 @@
       </div>
     }
 
-    @if (alertSummary() || caseSummary()) {
+    @if (alertSummary() || caseSummary() || screeningSummary()) {
       <div class="tiles">
+        @if (screeningSummary(); as sc) {
+          <a
+            class="tile"
+            [class.warn]="sc.open > 0"
+            [class.bad]="sc.likely > 0"
+            [routerLink]="can('READ_AMLCOMPLIANCE') ? ['screening'] : null"
+          >
+            <span class="label">{{ 'compliance.screening.Possible matches' | translate }}</span>
+            <span class="value">{{ sc.open }}</span>
+            <span class="sub">{{
+              (sc.lists.length ? 'compliance.screening.tileSub' : 'compliance.screening.noListsShort')
+                | translate: { likely: sc.likely, held: sc.confirmed }
+            }}</span>
+          </a>
+        }
         @if (alertSummary(); as a) {
           <a class="tile" [class.warn]="a.open > 0" [routerLink]="can('READ_AMLCOMPLIANCE') ? ['alerts'] : null">
             <span class="label">{{ 'compliance.alert.Open alerts' | translate }}</span>
@@ -126,6 +141,9 @@
       <nav class="links">
         <a mat-stroked-button color="primary" [routerLink]="['alerts']">{{ 'compliance.alert.Alerts' | translate }}</a>
         <a mat-stroked-button color="primary" [routerLink]="['cases']">{{ 'compliance.case.Cases' | translate }}</a>
+        <a mat-stroked-button color="primary" [routerLink]="['screening']">{{
+          'compliance.screening.Screening' | translate
+        }}</a>
         <a mat-stroked-button color="primary" [routerLink]="['risk']">{{ 'compliance.risk.view.HIGH' | translate }}</a>
         <a mat-stroked-button color="primary" [routerLink]="['peps']">{{
           'compliance.pep.Politically exposed persons' | translate
