@@ -5,7 +5,168 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-
 .container {
-  max-width: 37rem;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.container > mat-card {
+  padding: 20px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow:
+    0 2px 8px rgb(0 0 0 / 5%),
+    0 8px 24px rgb(0 0 0 / 6%);
+}
+
+mat-card-content {
+  padding: 4px;
+}
+
+.layout-column {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 20px;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+mat-label {
+  font-size: 14px;
+}
+
+input,
+mat-select {
+  font-size: 14px;
+}
+
+[readonly] {
+  color: #64748b;
+  cursor: not-allowed;
+}
+
+mat-error {
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+mat-card-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  padding: 20px 4px 4px;
+  margin: 0;
+  border-top: 1px solid #e7eaf0;
+}
+
+mat-card-actions button {
+  min-width: 100px;
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+mat-card-actions button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+mat-card-actions [type='button'] {
+  background: #f1f1f1;
+  color: #000;
+}
+
+mat-card-actions button:disabled {
+  cursor: not-allowed;
+}
+
+/* Tablet */
+@media (width <= 768px) {
+  .container {
+    padding: 18px;
+  }
+
+  .container > mat-card {
+    padding: 16px;
+    border-radius: 14px;
+  }
+
+  .layout-column {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  mat-card-actions {
+    padding-top: 16px;
+  }
+}
+
+/* Mobile */
+@media (width <= 600px) {
+  .container {
+    padding: 10px;
+  }
+
+  .container > mat-card {
+    padding: 12px;
+    border-radius: 12px;
+  }
+
+  mat-card-content {
+    padding: 2px;
+  }
+
+  .layout-column {
+    gap: 10px;
+  }
+
+  mat-label {
+    font-size: 13px;
+  }
+
+  input,
+  mat-select {
+    font-size: 13px;
+  }
+
+  mat-error {
+    font-size: 11px;
+  }
+
+  mat-card-actions {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+    padding: 16px 0 0;
+  }
+
+  mat-card-actions button {
+    width: 100%;
+    min-height: 44px;
+  }
+}
+
+/* Small mobile */
+@media (width <= 400px) {
+  .container {
+    padding: 6px;
+  }
+
+  .container > mat-card {
+    padding: 10px;
+  }
+
+  .layout-column {
+    gap: 8px;
+  }
 }

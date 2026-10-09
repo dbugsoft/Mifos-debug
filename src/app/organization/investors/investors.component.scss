@@ -6,6 +6,21 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+.container {
+  max-width: 75rem;
+  margin: 24px auto 0;
+  border-radius: 16px;
+  box-shadow:
+    0 2px 8px rgb(0 0 0 / 5%),
+    0 8px 24px rgb(0 0 0 / 6%);
+}
+
+@media (width <=768px) {
+  .container {
+    margin-top: 16px;
+  }
+}
+
 // Filter Section Styling
 .investor-filter-section {
   margin-bottom: 24px;
@@ -49,9 +64,17 @@
     .search-button {
       width: 100%;
       height: 48px;
+      border-radius: 8px;
       font-size: 15px;
       font-weight: 500;
       letter-spacing: 0.5px;
+      transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease;
+
+      &:hover {
+        transform: translateY(-1px);
+      }
 
       fa-icon {
         margin-right: 8px;
@@ -112,6 +135,10 @@
 }
 
 .record {
+  margin-bottom: 8px;
+  border-radius: 10px !important;
+  overflow: hidden;
+
   .record-actions {
     margin-top: 1%;
 
@@ -130,74 +157,47 @@
   }
 }
 
-$bar: 140px;
-$foo: $bar * 8;
-$color: #e2e4ec;
-
+// Contains the global `.loading` sweep bar (position: absolute) to this box
+// instead of letting it escape to the nearest positioned ancestor, which is
+// what made it render detached from the loading state it's meant to show.
 .loader {
+  position: relative;
+  overflow: hidden;
+  height: 12px;
   margin-bottom: 39px;
+  border-radius: 6px;
+  background: #f1f5f9;
 }
 
-.sidenav {
-  overflow-x: hidden;
-}
+// Clean, centered empty state in place of the default left-aligned global
+// `.alert` styling - Angular's view encapsulation scopes this override to
+// just this component.
+.alert {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 40px 16px;
+  margin: 0;
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  border-radius: 12px;
+  text-align: center;
 
-@keyframes move {
-  0% {
-    left: 0;
+  .message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 0;
+    font-size: 15px;
+    font-weight: 500;
+    color: #64748b;
   }
 
-  16.7% {
-    left: 0;
-  }
-
-  33.3% {
-    left: calc($foo / 2);
-  }
-
-  50% {
-    left: $foo - $bar;
-  }
-
-  66.7% {
-    left: calc($foo / 2);
-  }
-
-  83.3% {
-    left: 0;
-  }
-
-  100% {
-    left: 0;
-  }
-}
-
-@keyframes grow {
-  0% {
-    width: $bar;
-  }
-
-  16.7% {
-    width: calc($foo / 2);
-  }
-
-  33.3% {
-    width: calc($foo / 2);
-  }
-
-  50% {
-    width: $bar;
-  }
-
-  66.7% {
-    width: calc($foo / 2);
-  }
-
-  83.3% {
-    width: calc($foo / 2);
-  }
-
-  100% {
-    width: $bar;
+  .alert-check {
+    font-size: 1.75rem;
+    margin-right: 0;
+    color: #94a3b8;
   }
 }
