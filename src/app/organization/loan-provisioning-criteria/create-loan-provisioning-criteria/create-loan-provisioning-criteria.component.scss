@@ -5,268 +5,82 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
+
 .container {
-  width: 100%;
+  padding: 0.5rem;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 24px;
-  box-sizing: border-box;
 }
 
-.container > mat-card {
-  padding: 20px;
-  border-radius: 16px;
-  background: #fff;
-  box-shadow:
-    0 2px 8px rgb(0 0 0 / 5%),
-    0 8px 24px rgb(0 0 0 / 6%);
-}
-
-form {
-  width: 100%;
-}
-
-.layout-row.gap-2percent {
+.layout-row {
   display: flex;
-  flex-wrap: wrap;
-  gap: 18px 2%;
-  align-items: flex-start;
+  flex-direction: row;
 }
 
-.layout-row.gap-2percent .flex-fill {
-  flex: 1 1 48%;
-  min-width: 0;
-}
+mat-card {
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 10%) !important;
+  border-radius: 8px;
 
-mat-form-field {
-  width: 100%;
-}
-
-mat-label {
-  font-size: 14px;
-}
-
-input,
-mat-select {
-  font-size: 14px;
-}
-
-mat-error {
-  font-size: 12px;
-  line-height: 1.4;
-}
-
-mat-hint {
-  display: block;
-  margin: 0 0 8px;
-  color: #475569;
-  font-size: 13px;
-  line-height: 1.5;
+  .layout-row {
+    margin-bottom: 0.5rem;
+  }
 }
 
 .mat-elevation-z1 {
-  width: 100%;
-  margin-top: 18px;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  overflow-x: auto;
-  background: #fff;
-  box-shadow: none;
+  padding: 1rem;
+  margin-top: 0.5rem;
+  border-radius: 4px;
 }
 
 table {
   width: 100%;
-  min-width: 900px;
-  border-collapse: collapse;
-  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+
+  th {
+    font-weight: 600;
+  }
 }
 
-th.mat-mdc-header-cell,
-td.mat-mdc-cell {
-  padding: 12px 14px;
-  font-size: 14px;
-  white-space: nowrap;
+.mat-mdc-header-row {
+  background-color: #1074b9;
 }
 
-th.mat-mdc-header-cell {
-  background: #f8fafc;
-  color: #334155;
+.mat-mdc-header-cell {
+  color: #fff;
   font-weight: 600;
-  border-bottom: 1px solid #e2e8f0;
+  border-right: 1px solid rgb(255 255 255 / 25%);
 }
 
-td.mat-mdc-cell {
-  color: #1f2937;
-  border-bottom-color: #e2e8f0;
+.mat-mdc-header-cell:last-of-type {
+  border-right: 0;
 }
 
-tr.mat-mdc-row:hover {
-  background: #f8fafc;
+.m-t-20 {
+  margin-top: 2rem;
 }
 
-td.mat-mdc-cell:last-child,
-th.mat-mdc-header-cell:last-child {
-  text-align: center;
-}
-
-td button {
-  min-height: 36px;
-  padding: 0 12px;
-  border-radius: 7px;
-  font-size: 13px;
-  font-weight: 500;
-}
-
-td button:hover {
-  background: #f1f5f9;
-}
-
-fa-icon {
-  color: #000;
-}
-
-.m-t-20.layout-row {
-  display: flex;
-  justify-content: center;
+.layout-align-center {
   align-items: center;
-  gap: 20px;
+  justify-content: center;
 }
 
-.m-t-20.layout-row button {
-  min-width: 100px;
-  min-height: 40px;
-  padding: 0 16px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
-  transition:
-    transform 0.15s ease,
-    box-shadow 0.15s ease;
-}
-
-.m-t-20.layout-row button:hover:not(:disabled) {
-  transform: translateY(-1px);
-}
-
-.m-t-20.layout-row [type='button'] {
-  background: #f1f1f1;
-  color: #000;
-}
-
-.m-t-20.layout-row button:disabled {
-  cursor: not-allowed;
-}
-
-/* Tablet */
-@media (width <= 900px) {
+@media (width <= 768px) {
   .container {
-    padding: 18px;
+    padding: 0.5rem;
   }
 
-  .container > mat-card {
-    padding: 16px;
+  mat-card {
+    padding: 1rem;
   }
 
-  .layout-row.gap-2percent .flex-fill {
-    flex: 1 1 48%;
-  }
-
-  table {
-    min-width: 850px;
-  }
-}
-
-/* Mobile */
-@media (width <= 600px) {
-  .container {
-    padding: 10px;
-  }
-
-  .container > mat-card {
-    padding: 12px;
-    border-radius: 12px;
-  }
-
-  .layout-row.gap-2percent {
+  .layout-row {
     flex-direction: column;
-    gap: 10px;
   }
 
-  .layout-row.gap-2percent .flex-fill {
-    width: 100%;
-    flex: 1 1 100%;
-  }
-
-  mat-label {
-    font-size: 13px;
-  }
-
-  input,
-  mat-select {
-    font-size: 13px;
-  }
-
-  mat-error {
-    font-size: 11px;
-  }
-
-  mat-hint {
-    font-size: 12px;
-  }
-
-  .mat-elevation-z1 {
-    margin-top: 14px;
-    border-radius: 8px;
-  }
-
-  table {
-    min-width: 850px;
-  }
-
-  th.mat-mdc-header-cell,
-  td.mat-mdc-cell {
-    padding: 10px 12px;
-    font-size: 13px;
-  }
-
-  td button {
-    min-height: 40px;
-  }
-
-  .m-t-20.layout-row {
+  .gap-20px {
     flex-direction: column;
-    align-items: stretch;
-    gap: 8px;
-    margin-top: 16px;
-  }
-
-  .m-t-20.layout-row button {
     width: 100%;
-    min-height: 44px;
-  }
-}
-
-/* Small mobile */
-@media (width <= 400px) {
-  .container {
-    padding: 6px;
-  }
-
-  .container > mat-card {
-    padding: 10px;
-  }
-
-  table {
-    min-width: 820px;
-  }
-
-  th.mat-mdc-header-cell,
-  td.mat-mdc-cell {
-    padding: 9px 10px;
-    font-size: 12px;
-  }
-
-  td button {
-    font-size: 12px;
   }
 }

@@ -40,7 +40,7 @@
 }
 
 fa-icon {
-  color: #000;
+  color: #fff;
 }
 
 .container > mat-card {
@@ -56,36 +56,39 @@ mat-card-content {
   padding: 4px;
 }
 
-.field-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px 20px;
-}
-
-.field-card {
-  min-height: 70px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 6px;
-  padding: 14px 16px;
-  box-sizing: border-box;
+.detail-table {
+  width: 100%;
   border: 1px solid #e2e8f0;
   border-radius: 10px;
-  background: #fff;
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
 }
 
-.field-card:hover {
+.detail-table tr:not(:last-child) th,
+.detail-table tr:not(:last-child) td {
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.detail-table tr:nth-child(even) {
   background: #f8fafc;
 }
 
-.field-label {
+.detail-table th,
+.detail-table td {
+  padding: 14px 18px;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.detail-table th {
+  width: 35%;
   color: #334155;
   font-size: 13px;
   font-weight: 600;
 }
 
-.field-value {
+.detail-table td {
   color: #1f2937;
   font-size: 14px;
   line-height: 1.5;
@@ -140,8 +143,8 @@ mat-card-actions button:hover {
 }
 
 mat-card-actions [type='button'] {
-  background: #f1f1f1;
-  color: #000;
+  background: #1074b9;
+  color: #fff;
 }
 
 /* Tablet */
@@ -155,11 +158,8 @@ mat-card-actions [type='button'] {
     border-radius: 14px;
   }
 
-  .field-grid {
-    gap: 14px;
-  }
-
-  .field-card {
+  .detail-table th,
+  .detail-table td {
     padding: 12px 14px;
   }
 
@@ -194,21 +194,27 @@ mat-card-actions [type='button'] {
     padding: 2px;
   }
 
-  .field-grid {
-    grid-template-columns: 1fr;
-    gap: 10px;
+  .detail-table,
+  .detail-table tbody,
+  .detail-table tr,
+  .detail-table th,
+  .detail-table td {
+    display: block;
+    width: 100%;
   }
 
-  .field-card {
-    min-height: 64px;
-    padding: 11px 12px;
+  .detail-table tr {
+    padding: 10px 12px;
   }
 
-  .field-label {
-    font-size: 13px;
+  .detail-table tr:not(:last-child) {
+    border-bottom: 1px solid #e2e8f0;
   }
 
-  .field-value {
+  .detail-table th,
+  .detail-table td {
+    padding: 2px 0;
+    border-bottom: 0 !important;
     font-size: 13px;
   }
 
@@ -235,17 +241,8 @@ mat-card-actions [type='button'] {
     padding: 10px;
   }
 
-  .field-grid {
-    gap: 8px;
-  }
-
-  .field-card {
-    min-height: 60px;
-    padding: 10px;
-  }
-
-  .field-label,
-  .field-value {
+  .detail-table th,
+  .detail-table td {
     font-size: 12px;
   }
 

@@ -5,378 +5,181 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
+
 :host {
   display: block;
-  width: 100%;
-  background: #f5f6f8;
 }
 
-/* Page container */
 .container {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 16px;
-}
-
-/* Main card */
-.container > mat-card {
-  width: 100%;
-  box-sizing: border-box;
+  max-width: 1200px;
+  margin: 0 auto;
   padding: 24px;
-  background: #fff;
-  border: 1px solid #e0e3e7;
-  border-radius: 12px;
-  box-shadow: 0 1px 4px rgb(0 0 0 / 4%);
 }
 
-/* Form section */
+mat-card {
+  padding: 28px;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgb(0 0 0 / 8%);
+}
+
 form {
-  width: 100%;
+  margin-bottom: 28px;
 }
 
 .layout-row {
-  display: flex;
   align-items: flex-start;
 }
 
-.gap-2percent {
-  gap: 24px;
+mat-form-field {
+  min-width: 0;
 }
 
 .flex-fill {
   flex: 1 1 0;
-  min-width: 0;
 }
 
-/* Form fields */
-mat-form-field {
+table {
   width: 100%;
-
-  /* Material field outline */
-  --mdc-outlined-text-field-outline-color: #d4d8dd;
-  --mdc-outlined-text-field-hover-outline-color: #9da3aa;
-  --mdc-outlined-text-field-focus-outline-color: #000;
+  border-collapse: collapse;
+  overflow: hidden;
+  border-radius: 8px;
 }
 
-/* Labels */
-mat-label {
-  color: #000 !important;
-  font-weight: 400 !important;
-}
-
-/* Input */
-[matInput] {
-  color: #000 !important;
-  font-weight: 400 !important;
-  caret-color: #000;
-}
-
-/* Select */
-mat-select {
-  color: #000 !important;
-  font-weight: 400 !important;
-}
-
-.mat-mdc-select-value {
-  color: #000 !important;
-  font-weight: 400 !important;
-}
-
-.mat-mdc-select-arrow {
-  color: #000 !important;
-}
-
-/* Required error */
-mat-error {
-  color: #b42318 !important;
-  font-size: 12px;
-  font-weight: 400 !important;
-}
-
-mat-error strong {
-  font-weight: 400 !important;
-}
-
-/* Hint */
-mat-hint {
-  display: block;
-  margin: 0;
-  padding: 12px 14px;
-  color: #000;
-  background: #f7f7f7;
-  border-left: 3px solid #000;
-  border-radius: 4px;
-  font-size: 13px;
-  font-weight: 400;
-}
-
-/* Table container */
-.mat-elevation-z1 {
-  width: 100%;
-  margin-top: 12px;
-  overflow-x: auto;
-  background: #fff;
-  border: 1px solid #dfe3e7;
-  border-radius: 10px;
-  box-shadow: none !important;
-}
-
-/* Table */
-[mat-table] {
-  width: 100%;
-  min-width: 900px;
-  background: #fff;
-}
-
-/* Table header */
 .mat-mdc-header-row {
-  height: 52px;
-  background: #f0f1f3;
+  background-color: #1074b9;
+  min-height: 52px;
 }
 
 .mat-mdc-header-cell {
-  padding: 0 16px;
-  color: #000 !important;
-  font-size: 13px;
-  font-weight: 400 !important;
+  color: #fff;
+  font-weight: 600;
   white-space: nowrap;
-  border-bottom: 1px solid #d9dde2;
+  border-right: 1px solid rgb(255 255 255 / 25%);
 }
 
-/* Table rows */
+.mat-mdc-header-cell:last-of-type {
+  border-right: 0;
+}
+
+.mat-mdc-cell,
+.mat-mdc-header-cell {
+  padding: 14px 16px;
+}
+
 .mat-mdc-row {
   min-height: 58px;
-  background: #fff;
-  transition: background-color 0.15s ease;
+  transition: background-color 0.2s ease;
 }
 
 .mat-mdc-row:hover {
-  background: #fafafa;
+  background-color: rgb(86 182 234 / 3%);
 }
 
-/* Table cells */
-.mat-mdc-cell {
-  padding: 14px 16px;
-  color: #000 !important;
-  font-size: 13px;
-  font-weight: 400 !important;
-  border-bottom: 1px solid #eceef0;
-}
-
-.mat-mdc-row:last-child .mat-mdc-cell {
-  border-bottom: none;
-}
-
-/* Category */
 .mat-column-category {
   min-width: 140px;
 }
 
-/* Age */
 .mat-column-minAge,
-.mat-column-maxAge {
-  width: 90px;
-  text-align: center;
-}
-
-/* Percentage */
+.mat-column-maxAge,
 .mat-column-percentage {
-  width: 110px;
+  width: 100px;
   text-align: center;
 }
 
-/* Account columns */
 .mat-column-liabilityAccount,
 .mat-column-expenseAccount {
-  min-width: 190px;
+  min-width: 180px;
 }
 
-/* Actions */
 .mat-column-edit {
-  width: 110px;
-  min-width: 110px;
-  text-align: center;
+  width: 130px;
+  white-space: nowrap;
 }
 
-/* Edit button */
+button {
+  border-radius: 6px;
+}
+
 .mat-column-edit button {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  height: 34px;
-  min-width: 72px;
-  padding: 0 10px;
-  color: #000 !important;
-  background: #fff;
-  border: 1px solid #d1d5d9;
+  gap: 4px;
+}
+
+.m-t-20 {
+  margin-top: 24px;
+}
+
+.m-t-10 {
+  margin-top: 12px;
+}
+
+mat-hint {
+  display: block;
+  padding: 14px 16px;
+  margin-bottom: 8px;
   border-radius: 6px;
-  font-size: 12px;
-  font-weight: 400 !important;
-  box-shadow: none;
-}
-
-.mat-column-edit button:hover {
-  background: #f1f2f3;
-  border-color: #000;
-}
-
-/* Edit icon */
-.mat-column-edit fa-icon {
-  color: #000 !important;
-  font-size: 13px;
-}
-
-/* Bottom actions */
-.layout-align-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.layout-align-center button {
-  min-width: 105px;
-  height: 40px;
-  padding: 0 18px;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 400 !important;
-  box-shadow: none;
-}
-
-/* Cancel */
-.layout-align-center [type='button'] {
-  color: #000;
-  background: #fff;
-  border: 1px solid #cfd4d9;
-}
-
-.layout-align-center [type='button']:hover {
-  background: #f3f4f5;
-  border-color: #000;
-}
-
-/* Submit */
-.layout-align-center [color='primary'] {
-  font-weight: 400 !important;
-}
-
-/* Disabled submit */
-.layout-align-center [color='primary']:disabled {
-  opacity: 0.5;
-}
-
-/* FontAwesome icons */
-fa-icon {
-  color: #000;
-}
-
-fa-icon svg {
-  stroke-width: 2.5;
+  background: rgb(0 0 0 / 3%);
 }
 
 /* Tablet */
 @media (width <= 900px) {
   .container {
-    padding: 10px;
+    padding: 16px;
   }
 
-  .container > mat-card {
-    padding: 18px;
-  }
-
-  .gap-2percent {
-    gap: 16px;
-  }
-
-  .mat-mdc-header-cell,
-  .mat-mdc-cell {
-    padding: 12px;
-  }
-}
-
-/* Mobile */
-@media (width <= 600px) {
-  .container {
-    padding: 5px;
-  }
-
-  .container > mat-card {
-    padding: 12px;
-    border-radius: 9px;
+  mat-card {
+    padding: 20px;
   }
 
   .layout-row {
     flex-direction: column;
   }
 
-  .gap-2percent {
-    gap: 0;
-  }
-
   .flex-fill {
     width: 100%;
-    flex: 1 1 100%;
   }
 
-  .mat-elevation-z1 {
-    margin-top: 10px;
-    border-radius: 8px;
-  }
-
-  [mat-table] {
-    min-width: 900px;
-  }
-
-  .mat-mdc-header-cell {
-    height: 46px;
-    padding: 0 10px;
-    font-size: 12px;
-  }
-
-  .mat-mdc-cell {
-    padding: 11px 10px;
-    font-size: 12px;
-  }
-
-  .mat-column-edit button {
-    height: 32px;
-    min-width: 68px;
-    padding: 0 8px;
-  }
-
-  .layout-align-center {
-    flex-direction: column;
-    width: 100%;
-    gap: 10px;
-  }
-
-  .layout-align-center button {
-    width: 100%;
-    min-width: 0;
+  .mat-column-liabilityAccount,
+  .mat-column-expenseAccount {
+    min-width: 150px;
   }
 }
 
-/* Small mobile */
-@media (width <= 400px) {
+/* Mobile */
+@media (width <= 600px) {
   .container {
-    padding: 3px;
+    padding: 10px;
   }
 
-  .container > mat-card {
-    padding: 9px;
+  mat-card {
+    padding: 14px;
+    border-radius: 8px;
   }
 
-  .mat-mdc-header-cell,
-  .mat-mdc-cell {
-    padding: 9px 8px;
+  .mat-mdc-cell,
+  .mat-mdc-header-cell {
+    padding: 10px 12px;
   }
 
-  mat-label {
-    font-size: 12px;
+  .mat-column-category {
+    min-width: 120px;
   }
 
-  mat-error,
-  mat-hint {
-    font-size: 11px;
+  .mat-column-liabilityAccount,
+  .mat-column-expenseAccount {
+    min-width: 150px;
+  }
+
+  .mat-column-edit {
+    width: auto;
+  }
+
+  .mat-column-edit button {
+    padding: 0 8px;
+  }
+
+  .mat-column-edit button fa-icon {
+    margin-right: 0;
   }
 }

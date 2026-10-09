@@ -15,3 +15,26 @@ table {
   font-size: 0.9em;
   margin-left: 4px;
 }
+
+.mat-elevation-z8 {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.mat-mdc-header-row {
+  background-color: #1074b9;
+}
+
+.mat-mdc-header-cell {
+  color: #fff;
+  font-weight: 600;
+  border-right: 1px solid rgb(255 255 255 / 25%);
+}
+
+.mat-mdc-header-cell:last-of-type {
+  border-right: 0;
+}
+
+.not-column-mandatory {
+  color: #dc2626;
+}

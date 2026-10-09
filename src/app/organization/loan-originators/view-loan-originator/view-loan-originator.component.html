@@ -16,36 +16,34 @@
 <div class="container">
   <mat-card>
     <mat-card-content>
-      <div class="field-grid">
-        <div class="field-card">
-          <span class="field-label">{{ 'labels.inputs.Name' | translate }}</span>
-          <span class="field-value wrap-content">{{ loanOriginatorData.name }}</span>
-        </div>
-
-        <div class="field-card">
-          <span class="field-label">{{ 'labels.inputs.External Id' | translate }}</span>
-          <span class="field-value wrap-content">{{ loanOriginatorData.externalId }}</span>
-        </div>
-
-        <div class="field-card">
-          <span class="field-label">{{ 'labels.inputs.Status' | translate }}</span>
-          <span class="field-value">
-            <span class="badge" [class.badge-on]="loanOriginatorData.status === 'ACTIVE'">
-              {{ loanOriginatorData.status }}
-            </span>
-          </span>
-        </div>
-
-        <div class="field-card">
-          <span class="field-label">{{ 'labels.inputs.Originator Type' | translate }}</span>
-          <span class="field-value">{{ loanOriginatorData.originatorType?.name }}</span>
-        </div>
-
-        <div class="field-card">
-          <span class="field-label">{{ 'labels.inputs.Channel Type' | translate }}</span>
-          <span class="field-value">{{ loanOriginatorData.channelType?.name }}</span>
-        </div>
-      </div>
+      <table class="detail-table">
+        <tbody>
+          <tr>
+            <th>{{ 'labels.inputs.Name' | translate }}</th>
+            <td class="wrap-content">{{ loanOriginatorData.name }}</td>
+          </tr>
+          <tr>
+            <th>{{ 'labels.inputs.External Id' | translate }}</th>
+            <td class="wrap-content">{{ loanOriginatorData.externalId }}</td>
+          </tr>
+          <tr>
+            <th>{{ 'labels.inputs.Status' | translate }}</th>
+            <td>
+              <span class="badge" [class.badge-on]="loanOriginatorData.status === 'ACTIVE'">
+                {{ loanOriginatorData.status }}
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <th>{{ 'labels.inputs.Originator Type' | translate }}</th>
+            <td>{{ loanOriginatorData.originatorType?.name }}</td>
+          </tr>
+          <tr>
+            <th>{{ 'labels.inputs.Channel Type' | translate }}</th>
+            <td>{{ loanOriginatorData.channelType?.name }}</td>
+          </tr>
+        </tbody>
+      </table>
     </mat-card-content>
 
     <mat-card-actions class="layout-row align-center gap-5px responsive-column">
