@@ -19,6 +19,7 @@ import { RiskService } from '../risk/risk.service';
 import { EddSummary, RiskSummary } from '../risk/risk.models';
 import { AlertSummary, CaseSummary, CasesService } from '../cases/cases.service';
 import { ScreeningService, ScreeningSummary } from '../screening/screening.service';
+import { GovernanceService, Prompt, ReportDue } from '../governance/governance.service';
 import { AmlSettingsView, ComplianceAccess, LedgerStatus, TtrItem, TtrSummary, isoDate } from '../compliance.models';
 import { DueChipComponent } from '../due-chip/due-chip.component';
 
@@ -45,6 +46,7 @@ export class ComplianceHomeComponent implements OnInit {
   private risk = inject(RiskService);
   private casesService = inject(CasesService);
   private screening = inject(ScreeningService);
+  private governance = inject(GovernanceService);
   private destroyRef = inject(DestroyRef);
 
   readonly loading = signal(true);
@@ -58,6 +60,8 @@ export class ComplianceHomeComponent implements OnInit {
   readonly alertSummary = signal<AlertSummary | null>(null);
   readonly caseSummary = signal<CaseSummary | null>(null);
   readonly screeningSummary = signal<ScreeningSummary | null>(null);
+  readonly prompts = signal<Prompt[]>([]);
+  readonly reportsDue = signal<ReportDue[]>([]);
 
   readonly deadlineColumns = [
     'dueOn',
@@ -102,7 +106,13 @@ export class ComplianceHomeComponent implements OnInit {
               : of(null),
             screening: can('READ_AMLCOMPLIANCE', 'READ_AMLSUMMARY')
               ? this.screening.summary().pipe(catchError(() => of(null)))
-              : of(null)
+              : of(null),
+            prompts: can('READ_AMLCOMPLIANCE', 'READ_AMLSUMMARY', 'READ_AMLDECISIONS', 'MANAGE_AMLGOVERNANCE')
+              ? this.governance.prompts().pipe(catchError(() => of([] as Prompt[])))
+              : of([] as Prompt[]),
+            reports: can('READ_AMLCOMPLIANCE', 'READ_AMLSUMMARY', 'READ_AMLDECISIONS')
+              ? this.governance.reports().pipe(catchError(() => of({ reports: [], due: [] as ReportDue[] })))
+              : of({ reports: [], due: [] as ReportDue[] })
           });
         }),
         takeUntilDestroyed(this.destroyRef)
@@ -117,6 +127,8 @@ export class ComplianceHomeComponent implements OnInit {
         this.alertSummary.set(data.alerts);
         this.caseSummary.set(data.cases);
         this.screeningSummary.set(data.screening);
+        this.prompts.set(data.prompts);
+        this.reportsDue.set(data.reports.due);
         this.loading.set(false);
       });
   }

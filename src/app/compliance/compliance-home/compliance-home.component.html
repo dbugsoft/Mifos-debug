@@ -19,6 +19,27 @@
       </div>
     }
 
+    @for (d of reportsDue(); track d.type) {
+      @if (d.daysLeft <= 30) {
+        <div class="notice" role="status">
+          <span>{{
+            'compliance.reports.homeDue'
+              | translate
+                : { report: ('compliance.reports.type.' + d.type | translate), year: d.label, days: d.daysLeft }
+          }}</span>
+          <a [routerLink]="['reports']">{{ 'compliance.reports.Reports' | translate }}</a>
+        </div>
+      }
+    }
+    @for (p of prompts(); track p.code) {
+      <div class="notice" role="status">
+        <span>{{
+          'compliance.governance.prompt.' + p.code | translate: { date: p.dueOn ? (p.dueOn | adToBs) || p.dueOn : '' }
+        }}</span>
+        <a [routerLink]="['governance']">{{ 'compliance.governance.Governance' | translate }}</a>
+      </div>
+    }
+
     @if (summary(); as s) {
       <div class="tiles">
         <a class="tile" [class.warn]="s.dueSoon > 0" [class.bad]="s.overdue > 0" [routerLink]="['threshold-reports']">
@@ -144,6 +165,12 @@
         <a mat-stroked-button color="primary" [routerLink]="['screening']">{{
           'compliance.screening.Screening' | translate
         }}</a>
+        <a mat-stroked-button color="primary" [routerLink]="['reports']">{{
+          'compliance.reports.Reports' | translate
+        }}</a>
+        <a mat-stroked-button color="primary" [routerLink]="['governance']">{{
+          'compliance.governance.Governance' | translate
+        }}</a>
         <a mat-stroked-button color="primary" [routerLink]="['risk']">{{ 'compliance.risk.view.HIGH' | translate }}</a>
         <a mat-stroked-button color="primary" [routerLink]="['peps']">{{
           'compliance.pep.Politically exposed persons' | translate
@@ -153,6 +180,15 @@
         }}</a>
         <a mat-stroked-button color="primary" [routerLink]="['risk-tables']">{{
           'compliance.pep.Occupation and area grades' | translate
+        }}</a>
+      </nav>
+    } @else if (can('READ_AMLSUMMARY', 'READ_AMLDECISIONS', 'MANAGE_AMLGOVERNANCE')) {
+      <nav class="links">
+        <a mat-stroked-button color="primary" [routerLink]="['reports']">{{
+          'compliance.reports.Reports' | translate
+        }}</a>
+        <a mat-stroked-button color="primary" [routerLink]="['governance']">{{
+          'compliance.governance.Governance' | translate
         }}</a>
       </nav>
     }
