@@ -92,6 +92,15 @@
           <mat-option [value]="true">{{ 'membership.On' | translate }}</mat-option>
         </mat-select>
       </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>{{ 'membership.KYM complete before approval' | translate }}</mat-label>
+        <mat-select formControlName="kymRequiredForApproval">
+          <mat-option [value]="true">{{ 'membership.On' | translate }}</mat-option>
+          <mat-option [value]="false">{{ 'membership.Off' | translate }}</mat-option>
+        </mat-select>
+        <mat-hint>{{ 'membership.kymRequiredHint' | translate }}</mat-hint>
+      </mat-form-field>
     </div>
 
     @if (canUpdate) {

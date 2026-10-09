@@ -5,3 +5,181 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
+
+:host {
+  display: block;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+mat-card {
+  padding: 28px;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgb(0 0 0 / 8%);
+}
+
+form {
+  margin-bottom: 28px;
+}
+
+.layout-row {
+  align-items: flex-start;
+}
+
+mat-form-field {
+  min-width: 0;
+}
+
+.flex-fill {
+  flex: 1 1 0;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.mat-mdc-header-row {
+  background-color: #1074b9;
+  min-height: 52px;
+}
+
+.mat-mdc-header-cell {
+  color: #fff;
+  font-weight: 600;
+  white-space: nowrap;
+  border-right: 1px solid rgb(255 255 255 / 25%);
+}
+
+.mat-mdc-header-cell:last-of-type {
+  border-right: 0;
+}
+
+.mat-mdc-cell,
+.mat-mdc-header-cell {
+  padding: 14px 16px;
+}
+
+.mat-mdc-row {
+  min-height: 58px;
+  transition: background-color 0.2s ease;
+}
+
+.mat-mdc-row:hover {
+  background-color: rgb(86 182 234 / 3%);
+}
+
+.mat-column-category {
+  min-width: 140px;
+}
+
+.mat-column-minAge,
+.mat-column-maxAge,
+.mat-column-percentage {
+  width: 100px;
+  text-align: center;
+}
+
+.mat-column-liabilityAccount,
+.mat-column-expenseAccount {
+  min-width: 180px;
+}
+
+.mat-column-edit {
+  width: 130px;
+  white-space: nowrap;
+}
+
+button {
+  border-radius: 6px;
+}
+
+.mat-column-edit button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.m-t-20 {
+  margin-top: 24px;
+}
+
+.m-t-10 {
+  margin-top: 12px;
+}
+
+mat-hint {
+  display: block;
+  padding: 14px 16px;
+  margin-bottom: 8px;
+  border-radius: 6px;
+  background: rgb(0 0 0 / 3%);
+}
+
+/* Tablet */
+@media (width <= 900px) {
+  .container {
+    padding: 16px;
+  }
+
+  mat-card {
+    padding: 20px;
+  }
+
+  .layout-row {
+    flex-direction: column;
+  }
+
+  .flex-fill {
+    width: 100%;
+  }
+
+  .mat-column-liabilityAccount,
+  .mat-column-expenseAccount {
+    min-width: 150px;
+  }
+}
+
+/* Mobile */
+@media (width <= 600px) {
+  .container {
+    padding: 10px;
+  }
+
+  mat-card {
+    padding: 14px;
+    border-radius: 8px;
+  }
+
+  .mat-mdc-cell,
+  .mat-mdc-header-cell {
+    padding: 10px 12px;
+  }
+
+  .mat-column-category {
+    min-width: 120px;
+  }
+
+  .mat-column-liabilityAccount,
+  .mat-column-expenseAccount {
+    min-width: 150px;
+  }
+
+  .mat-column-edit {
+    width: auto;
+  }
+
+  .mat-column-edit button {
+    padding: 0 8px;
+  }
+
+  .mat-column-edit button fa-icon {
+    margin-right: 0;
+  }
+}

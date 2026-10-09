@@ -1,0 +1,258 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="compliance-page">
+  <div class="filters">
+    <mat-button-toggle-group [(ngModel)]="view" (change)="load()" [attr.aria-label]="'compliance.Show' | translate">
+      @for (v of views; track v.value) {
+        <mat-button-toggle [value]="v.value">{{ v.label | translate }}</mat-button-toggle>
+      }
+    </mat-button-toggle-group>
+  </div>
+
+  <p class="hint">{{ 'compliance.Threshold explanation' | translate }}</p>
+
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
+
+  <section class="frame">
+    <h2 class="legend">{{ 'compliance.Threshold transactions' | translate }}</h2>
+    @if (selected().size > 0) {
+      <div class="selection-bar">
+        <span>{{ 'compliance.Selected' | translate: { count: selected().size } }}</span>
+        <button mat-raised-button color="primary" type="button" (click)="makeReports()" [disabled]="busy()">
+          {{ 'compliance.Make goAML files' | translate }}
+        </button>
+        <span class="hint">{{ 'compliance.One report per member and day' | translate }}</span>
+      </div>
+    }
+    @if (items().length) {
+      <div class="table-scroll">
+        <table mat-table [dataSource]="items()" class="blue">
+          <ng-container matColumnDef="select">
+            <th mat-header-cell *matHeaderCellDef>
+              <span class="visually-hidden">{{ 'compliance.Select' | translate }}</span>
+            </th>
+            <td mat-cell *matCellDef="let i" (click)="$event.stopPropagation()">
+              @if (selectable(i)) {
+                <mat-checkbox
+                  [checked]="selected().has(i.id)"
+                  (change)="toggle(i)"
+                  [aria-label]="i.name"
+                ></mat-checkbox>
+              }
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="transactionDate">
+            <th mat-header-cell *matHeaderCellDef>{{ 'compliance.Transaction date' | translate }}</th>
+            <td mat-cell *matCellDef="let i">
+              {{ i.transactionDate | adToBs }}
+              <span class="sub">{{ isoDate(i.transactionDate) }} AD</span>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="member">
+            <th mat-header-cell *matHeaderCellDef>{{ 'compliance.Member' | translate }}</th>
+            <td mat-cell *matCellDef="let i">
+              {{ i.name }}
+              <span class="sub">{{ i.accountNo }} · {{ i.office }}</span>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="cash">
+            <th mat-header-cell *matHeaderCellDef>{{ 'compliance.Cash' | translate }}</th>
+            <td mat-cell *matCellDef="let i">
+              {{ (i.direction === 'IN' ? 'compliance.In' : 'compliance.Out') | translate }} ·
+              {{ 'compliance.transactions count' | translate: { count: i.movementCount } }}
+              @if (i.basis === 'COOP_BANK') {
+                <span class="sub">{{ 'compliance.Into our bank account' | translate }}</span>
+              }
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="amount">
+            <th mat-header-cell *matHeaderCellDef class="num">{{ 'compliance.Amount' | translate }}</th>
+            <td mat-cell *matCellDef="let i" class="num">{{ i.totalAmount | formatNumber }}</td>
+          </ng-container>
+          <ng-container matColumnDef="dueOn">
+            <th mat-header-cell *matHeaderCellDef>{{ 'compliance.Send by' | translate }}</th>
+            <td mat-cell *matCellDef="let i">
+              {{ i.dueOn | adToBs }}
+              @if (i.daysLeft !== null && i.daysLeft !== undefined) {
+                <mifosx-due-chip [daysLeft]="i.daysLeft"></mifosx-due-chip>
+              }
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>{{ 'compliance.Status' | translate }}</th>
+            <td mat-cell *matCellDef="let i">
+              <span class="chip grey">{{ 'compliance.ttrStatus.' + i.status | translate }}</span>
+              @if (i.needsCorrection) {
+                <span class="chip red">{{ 'compliance.Needs a correction' | translate }}</span>
+              }
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="itemColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: itemColumns" (click)="open(row)" class="clickable"></tr>
+        </table>
+      </div>
+    } @else if (!loading()) {
+      <p class="empty">{{ 'compliance.Nothing here' | translate }}</p>
+    }
+  </section>
+
+  @if (detail(); as d) {
+    <section class="frame" aria-live="polite">
+      <h2 class="legend">{{ d.item.name }} · {{ d.item.transactionDate | adToBs }}</h2>
+      <dl class="facts">
+        <div class="fact">
+          <dt class="fact-label">{{ 'compliance.Total' | translate }}</dt>
+          <dd class="fact-value">{{ d.item.totalAmount | formatNumber }}</dd>
+        </div>
+        <div class="fact">
+          <dt class="fact-label">{{ 'compliance.Judged against' | translate }}</dt>
+          <dd class="fact-value">{{ d.item.thresholdUsed | formatNumber }}</dd>
+        </div>
+        <div class="fact">
+          <dt class="fact-label">{{ 'compliance.Status' | translate }}</dt>
+          <dd class="fact-value">{{ 'compliance.ttrStatus.' + d.item.status | translate }}</dd>
+        </div>
+        @if (d.item.statusReason) {
+          <div class="fact">
+            <dt class="fact-label">{{ 'compliance.Note' | translate }}</dt>
+            <dd class="fact-value">{{ d.item.statusReason }}</dd>
+          </div>
+        }
+      </dl>
+      @if (d.movements.length) {
+        <div class="table-scroll movements">
+          <table mat-table [dataSource]="d.movements" class="blue">
+            <ng-container matColumnDef="kind">
+              <th mat-header-cell *matHeaderCellDef>{{ 'compliance.Transaction' | translate }}</th>
+              <td mat-cell *matCellDef="let m">
+                {{ 'compliance.kind.' + m.kind | translate }}
+                <span class="sub">{{ 'compliance.product.' + m.product | translate }}</span>
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="paymentType">
+              <th mat-header-cell *matHeaderCellDef>{{ 'compliance.Payment type' | translate }}</th>
+              <td mat-cell *matCellDef="let m">{{ m.paymentType || ('compliance.None' | translate) }}</td>
+            </ng-container>
+            <ng-container matColumnDef="amount">
+              <th mat-header-cell *matHeaderCellDef class="num">{{ 'compliance.Amount' | translate }}</th>
+              <td mat-cell *matCellDef="let m" class="num">{{ m.amount | formatNumber }}</td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="['kind', 'paymentType', 'amount']"></tr>
+            <tr mat-row *matRowDef="let row; columns: ['kind', 'paymentType', 'amount']"></tr>
+          </table>
+        </div>
+      }
+      <div class="actions">
+        @if (canFile()) {
+          @if (d.item.status === 'NEW' || d.item.status === 'HISTORICAL' || d.item.status === 'WITHDRAWN') {
+            <button mat-stroked-button type="button" (click)="exempt(d.item)">
+              {{ 'compliance.Exempt' | translate }}
+            </button>
+          }
+          @if (d.item.status === 'HISTORICAL') {
+            <button mat-raised-button color="primary" type="button" (click)="reportLate(d.item)">
+              {{ 'compliance.Report it late' | translate }}
+            </button>
+          }
+          @if (d.item.status === 'EXEMPT') {
+            <button mat-stroked-button type="button" (click)="reopen(d.item)">
+              {{ 'compliance.Reopen' | translate }}
+            </button>
+          }
+        }
+        <span class="spacer"></span>
+        <button mat-button type="button" (click)="close()">{{ 'labels.buttons.Close' | translate }}</button>
+      </div>
+    </section>
+  }
+
+  <section class="frame">
+    <h2 class="legend">{{ 'compliance.goAML files' | translate }}</h2>
+    @if (reports().length) {
+      <div class="table-scroll">
+        <table mat-table [dataSource]="reports()" class="blue">
+          <ng-container matColumnDef="reference">
+            <th mat-header-cell *matHeaderCellDef>{{ 'compliance.Report' | translate }}</th>
+            <td mat-cell *matCellDef="let r">
+              {{ r.reference }}
+              @if (r.dueOn) {
+                <span class="sub">{{ 'compliance.Send by' | translate }} {{ r.dueOn | adToBs }}</span>
+              }
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="member">
+            <th mat-header-cell *matHeaderCellDef>{{ 'compliance.Member' | translate }}</th>
+            <td mat-cell *matCellDef="let r">{{ r.clientName }}</td>
+          </ng-container>
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>{{ 'compliance.Status' | translate }}</th>
+            <td mat-cell *matCellDef="let r">
+              <span [class]="statusTone(r.status)">{{ 'compliance.reportStatus.' + r.status | translate }}</span>
+              @if (r.fiuReference) {
+                <span class="sub">FIU: {{ r.fiuReference }}</span>
+              }
+              @if (r.problems?.length && (r.status === 'DRAFT' || r.status === 'READY')) {
+                <ul class="problems">
+                  @for (p of r.problems; track p) {
+                    <li>{{ p }}</li>
+                  }
+                </ul>
+              }
+              @if (r.outcomeNote) {
+                <span class="sub">{{ r.outcomeNote }}</span>
+              }
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>{{ 'compliance.Action' | translate }}</th>
+            <td mat-cell *matCellDef="let r" class="row-actions">
+              @if (canFile()) {
+                @if (r.status === 'READY' || r.status === 'DRAFT') {
+                  <button mat-stroked-button type="button" (click)="download(r)">
+                    {{ 'compliance.Download' | translate }}
+                  </button>
+                  <button mat-button type="button" (click)="regenerate(r)">
+                    {{ 'compliance.Rebuild' | translate }}
+                  </button>
+                }
+                @if (r.status === 'READY') {
+                  <button mat-raised-button color="primary" type="button" (click)="submitted(r)">
+                    {{ 'compliance.Record as sent' | translate }}
+                  </button>
+                }
+                @if (r.status === 'DRAFT' || r.status === 'READY') {
+                  <button mat-button type="button" (click)="discard(r)">{{ 'compliance.Discard' | translate }}</button>
+                }
+                @if (r.status === 'SUBMITTED') {
+                  <button mat-stroked-button type="button" (click)="accepted(r)">
+                    {{ 'compliance.Accepted' | translate }}
+                  </button>
+                  <button mat-button color="warn" type="button" (click)="rejected(r)">
+                    {{ 'compliance.Rejected' | translate }}
+                  </button>
+                }
+                @if (r.status === 'REJECTED') {
+                  <button mat-raised-button color="primary" type="button" (click)="correct(r)">
+                    {{ 'compliance.Make a correction' | translate }}
+                  </button>
+                }
+              }
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="reportColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: reportColumns"></tr>
+        </table>
+      </div>
+    } @else {
+      <p class="empty">{{ 'compliance.No goAML files yet' | translate }}</p>
+    }
+  </section>
+</div>

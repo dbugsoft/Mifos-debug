@@ -67,6 +67,11 @@ import {
 } from '../membership/membership-decision-dialog/membership-decision-dialog.component';
 import { openApplyDialog, reloadMemberPage } from '../membership/membership-tab/membership-tab.component';
 import { ClientActionNotifierService } from './client-actions/client-action-notifier.service';
+import { KymService } from '../kym/kym.service';
+import { KymChipComponent } from '../kym/kym-chip/kym-chip.component';
+import { ExtraChecksChipComponent } from 'app/compliance/risk/extra-checks-chip/extra-checks-chip.component';
+import { CasesService } from 'app/compliance/cases/cases.service';
+import { raiseConcern } from 'app/compliance/cases/raise-concern';
 
 @Component({
   selector: 'mifosx-clients-view',
@@ -95,6 +100,8 @@ import { ClientActionNotifierService } from './client-actions/client-action-noti
     StatusLookupPipe,
     DateFormatPipe,
     MembershipDeadlineComponent,
+    KymChipComponent,
+    ExtraChecksChipComponent,
     AdToBsPipe,
     MatDivider
   ],
@@ -172,6 +179,7 @@ export class ClientsViewComponent implements OnInit {
   readonly membershipTemplate = signal<MembershipTemplate | null>(null);
   private membershipService = inject(MembershipService);
   private notifier = inject(ClientActionNotifierService);
+  private casesService = inject(CasesService);
   /**
    * blob: URL of the client's photo, or null when there is none.
    * A signal, because this component is OnPush: a plain field set in the HTTP callback would not
@@ -217,6 +225,7 @@ export class ClientsViewComponent implements OnInit {
 
   /** Every member has a Membership tab for users who may read memberships, with or without an application on record. */
   readonly canReadMembership = this.membershipService.canRead();
+  readonly canReadKym = inject(KymService).canRead();
 
   /** Approve and Refuse are offered, unless "a different person must approve" is on and this user entered it. */
   get canDecideMembership(): boolean {
@@ -245,6 +254,13 @@ export class ClientsViewComponent implements OnInit {
       this.shareFirstRule() &&
       !!this.membershipTemplate()?.shareProducts.length &&
       this.membershipService.can('ENTER_MEMBERSHIP')
+    );
+  }
+
+  /** Tells the compliance officer what was noticed (fineract-dbug #133); the answer is only that it was sent. */
+  raiseConcern(): void {
+    raiseConcern(this.dialog, this.casesService, this.clientViewData.id).subscribe(
+      (sent) => sent && this.notifier.notify('compliance.concern.sent')
     );
   }
 

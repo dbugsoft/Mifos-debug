@@ -1,0 +1,305 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="compliance-page">
+  @if (allowed() === false) {
+    <p class="empty">{{ 'compliance.You have no compliance access' | translate }}</p>
+  } @else if (member(); as m) {
+    @if (busy()) {
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }
+
+    <!-- Who, and the grade -->
+    <section class="frame head">
+      <div class="who">
+        <h2 class="name">{{ m.name }}</h2>
+        <span class="sub"
+          >{{ m.accountNo }} ·
+          <a [routerLink]="['/members', m.clientId]">{{ 'compliance.risk.Member page' | translate }}</a></span
+        >
+      </div>
+      <div class="grade">
+        <span
+          class="chip big"
+          [class.red]="m.grade === 'HIGH'"
+          [class.amber]="m.grade === 'MEDIUM'"
+          [class.green]="m.grade === 'NORMAL'"
+          >{{ 'compliance.grade.' + m.grade | translate }}</span
+        >
+        @if (openEdd()) {
+          <span class="chip blue big">{{ 'compliance.edd.Under enhanced checks' | translate }}</span>
+        }
+      </div>
+      <dl class="facts">
+        @if (m.overrideGrade) {
+          <div class="fact">
+            <dt class="fact-label">{{ 'compliance.risk.Set by the officer' | translate }}</dt>
+            <dd class="fact-value">
+              {{ 'compliance.grade.' + m.overrideGrade | translate }}
+              <span class="sub"
+                >{{
+                  'compliance.risk.computedWas'
+                    | translate: { grade: ('compliance.grade.' + m.computedGrade | translate) }
+                }}
+                · {{ m.overrideBy }}{{ m.overrideReason ? ': ' + m.overrideReason : '' }}</span
+              >
+            </dd>
+          </div>
+        }
+        <div class="fact">
+          <dt class="fact-label">{{ 'compliance.risk.Last review' | translate }}</dt>
+          <dd class="fact-value">
+            {{ m.lastReviewOn ? (m.lastReviewOn | adToBs) : '—' }}{{ m.reviewedBy ? ' · ' + m.reviewedBy : '' }}
+          </dd>
+        </div>
+        <div class="fact">
+          <dt class="fact-label">{{ 'compliance.risk.Next review' | translate }}</dt>
+          <dd class="fact-value">
+            {{ m.nextReviewOn ? (m.nextReviewOn | adToBs) : '—' }}
+            @if (m.reviewDue) {
+              <span class="chip red">{{ 'compliance.risk.Overdue' | translate }}</span>
+            }
+          </dd>
+        </div>
+      </dl>
+      <div class="actions">
+        @if (canOverride || canManage) {
+          <button mat-raised-button color="primary" type="button" (click)="review()" [disabled]="busy()">
+            <mat-icon>task_alt</mat-icon>{{ 'compliance.risk.Confirm the grade' | translate }}
+          </button>
+        }
+        @if (canOverride) {
+          <button mat-stroked-button type="button" (click)="changeGrade()" [disabled]="busy()">
+            {{ 'compliance.risk.Change the grade' | translate }}
+          </button>
+        }
+      </div>
+    </section>
+
+    <!-- Why -->
+    <section class="frame">
+      <h3 class="legend">{{ 'compliance.risk.Why this grade' | translate }}</h3>
+      <ul class="reasons">
+        @for (r of m.reasons; track $index) {
+          <li>
+            <span
+              class="chip"
+              [class.red]="r.grade === 'HIGH'"
+              [class.amber]="r.grade === 'MEDIUM'"
+              [class.green]="r.grade === 'NORMAL'"
+              >{{ 'compliance.grade.' + r.grade | translate }}</span
+            >
+            <span class="what">
+              <b>{{ ruleText(r.rule) }}</b>
+              @if (r.detail && r.detail !== ruleText(r.rule)) {
+                <span class="sub">{{ r.detail }}</span>
+              }
+            </span>
+            <span class="basis">{{ 'compliance.basis.' + r.basis | translate }}</span>
+          </li>
+        }
+      </ul>
+    </section>
+
+    <!-- Politically exposed persons -->
+    @if (peps().length) {
+      <section class="frame">
+        <h3 class="legend">{{ 'compliance.risk.Politically exposed persons' | translate }}</h3>
+        <ul class="plain-list">
+          @for (p of peps(); track p.pepId) {
+            <li>
+              <b>{{ p.fullName }}</b>
+              <span class="sub"
+                >{{ p.post ?? p.postDetail }} · {{ 'compliance.pepRelationship.' + p.relationship | translate
+                }}{{ p.relationshipDetail ? ': ' + p.relationshipDetail : '' }}
+                @if (p.leftOfficeOn) {
+                  · {{ 'compliance.risk.left office' | translate }} {{ p.leftOfficeOn | adToBs }}
+                }
+              </span>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+
+    <!-- The officer's flags -->
+    <section class="frame">
+      <h3 class="legend">{{ 'compliance.risk.What the officer knows' | translate }}</h3>
+      <div class="frame-head">
+        <p class="hint">{{ 'compliance.risk.flagsHint' | translate }}</p>
+        @if (canManage || canOverride) {
+          <button mat-stroked-button type="button" (click)="addFlag()" [disabled]="busy()">
+            <mat-icon>add</mat-icon>{{ 'compliance.risk.Add' | translate }}
+          </button>
+        }
+      </div>
+      @if (activeFlags().length) {
+        <ul class="plain-list">
+          @for (f of activeFlags(); track f.id) {
+            <li class="with-action">
+              <span>
+                <b>{{ 'compliance.flag.' + f.kind | translate }}</b> · {{ 'compliance.grade.' + f.grade | translate }}
+                <span class="sub">{{ f.detail }}{{ f.source ? ' (' + f.source + ')' : '' }}</span>
+                <span class="sub">{{ f.createdBy }} · {{ f.createdAt.slice(0, 10) | adToBs }}</span>
+              </span>
+              @if (canManage || canOverride) {
+                <button mat-button type="button" (click)="endFlag(f)">{{ 'compliance.risk.End' | translate }}</button>
+              }
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="empty">{{ 'compliance.risk.noFlags' | translate }}</p>
+      }
+      @if (endedFlags().length) {
+        <button mat-button type="button" (click)="showEnded.set(!showEnded())">
+          {{ (showEnded() ? 'compliance.risk.Hide ended' : 'compliance.risk.Show ended') | translate }} ({{
+            endedFlags().length
+          }})
+        </button>
+        @if (showEnded()) {
+          <ul class="plain-list ended">
+            @for (f of endedFlags(); track f.id) {
+              <li>
+                <b>{{ 'compliance.flag.' + f.kind | translate }}</b>
+                <span class="sub">{{ f.detail }}</span>
+                <span class="sub"
+                  >{{ 'compliance.risk.Ended' | translate }} {{ f.endedAt!.slice(0, 10) | adToBs }}:
+                  {{ f.endReason }}</span
+                >
+              </li>
+            }
+          </ul>
+        }
+      }
+    </section>
+
+    <!-- Enhanced due diligence -->
+    <section class="frame">
+      <h3 class="legend">{{ 'compliance.edd.Enhanced checks' | translate }}</h3>
+      @if (openEdd(); as e) {
+        <dl class="facts">
+          <div class="fact">
+            <dt class="fact-label">{{ 'compliance.edd.Why' | translate }}</dt>
+            <dd class="fact-value">{{ e.why }}</dd>
+          </div>
+          <div class="fact">
+            <dt class="fact-label">{{ 'compliance.edd.Since' | translate }}</dt>
+            <dd class="fact-value">
+              {{ e.openedOn | adToBs }} · {{ e.openedBy ?? ('compliance.edd.by itself' | translate) }}
+            </dd>
+          </div>
+          <div class="fact">
+            <dt class="fact-label">{{ 'compliance.risk.Next review' | translate }}</dt>
+            <dd class="fact-value">{{ e.nextReviewOn | adToBs }}</dd>
+          </div>
+          @if (e.sourceOfAssets) {
+            <div class="fact">
+              <dt class="fact-label">{{ 'compliance.edd.Source of assets' | translate }}</dt>
+              <dd class="fact-value">{{ e.sourceOfAssets }}</dd>
+            </div>
+          }
+          @if (e.findings) {
+            <div class="fact">
+              <dt class="fact-label">{{ 'compliance.edd.Findings' | translate }}</dt>
+              <dd class="fact-value">
+                {{ e.findings }}
+                <span class="sub">{{ 'compliance.edd.decision.' + e.decision | translate }}</span>
+              </dd>
+            </div>
+          }
+        </dl>
+        @if (canManage) {
+          <div class="actions">
+            <button mat-raised-button color="primary" type="button" (click)="reviewEdd(e)" [disabled]="busy()">
+              {{ 'compliance.edd.Record a review' | translate }}
+            </button>
+            <button mat-stroked-button type="button" (click)="closeEdd(e)" [disabled]="busy()">
+              {{ 'compliance.edd.End enhanced checks' | translate }}
+            </button>
+          </div>
+        }
+      } @else {
+        <div class="frame-head">
+          <p class="hint">{{ 'compliance.edd.notUnder' | translate }}</p>
+          @if (canManage) {
+            <button mat-stroked-button type="button" (click)="startEdd()" [disabled]="busy()">
+              {{ 'compliance.edd.Start enhanced checks' | translate }}
+            </button>
+          }
+        </div>
+      }
+      @if (pastEdd().length) {
+        <ul class="plain-list ended">
+          @for (e of pastEdd(); track e.id) {
+            <li>
+              <b>{{ e.openedOn | adToBs }} – {{ e.closedOn! | adToBs }}</b>
+              <span class="sub">{{ e.why }}</span>
+              <span class="sub">{{ e.closeFinding }}</span>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+
+    <!-- History -->
+    <section class="frame">
+      <h3 class="legend">{{ 'compliance.risk.Grade history' | translate }}</h3>
+      <div class="table-scroll">
+        <table class="plain-rows">
+          <thead>
+            <tr>
+              <th>{{ 'compliance.risk.When' | translate }}</th>
+              <th>{{ 'compliance.risk.Grade' | translate }}</th>
+              <th>{{ 'compliance.risk.What happened' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (h of m.history; track $index) {
+              <tr>
+                <td>{{ h.changedAt.slice(0, 10) | adToBs }}</td>
+                <td>
+                  {{ 'compliance.grade.' + h.grade | translate }}
+                  @if (h.computedGrade !== h.grade) {
+                    <span class="sub">{{
+                      'compliance.risk.computedWas'
+                        | translate: { grade: ('compliance.grade.' + h.computedGrade | translate) }
+                    }}</span>
+                  }
+                </td>
+                <td>
+                  {{ h.note }}
+                  <span class="sub">{{ h.changedBy ?? ('compliance.risk.the system' | translate) }}</span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+    @if (matches().length) {
+      <section class="frame">
+        <h3 class="legend">{{ 'compliance.screening.Sanctions screening' | translate }}</h3>
+        <ul class="plain-list">
+          @for (m of matches(); track m.id) {
+            <li>
+              <a [routerLink]="['/compliance', 'screening', 'matches', m.id]">{{ m.subjectName }}</a>
+              · {{ 'compliance.screening.status.' + m.status | translate }}
+              <span class="sub"
+                >{{ 'compliance.screening.source.' + m.source | translate }} · {{ m.reference }} · {{ m.closestName }} ·
+                {{ m.score.toFixed(2) }}</span
+              >
+            </li>
+          }
+        </ul>
+      </section>
+    }
+  } @else {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
+</div>

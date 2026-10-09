@@ -210,8 +210,9 @@
       </mat-checkbox>
     }
 
-    <!-- Membership application: the citizenship, with the person's details (fineract-dbug ADR 0035) -->
-    @if (membershipMode) {
+    <!-- Membership application: the citizenship, with the person's details (fineract-dbug ADR 0035); not for an
+         organisation, whose people are linked on its KYM tab (ADR 0042) -->
+    @if (membershipMode && !isOrganisation) {
       <mifosx-membership-citizenship class="flex-98"></mifosx-membership-citizenship>
     }
 
@@ -313,9 +314,12 @@
   </div>
 
   <div class="layout-row align-center gap-2percent margin-t">
-    <button mat-raised-button color="primary" matStepperNext [disabled]="!valid">
-      {{ 'labels.buttons.Next' | translate }}
-      <fa-icon icon="arrow-right" class="m-l-10"></fa-icon>
-    </button>
+    <!-- A disabled button gets no clicks, so they land on this wrapper and show what is missing -->
+    <span class="next-wrapper" (click)="showMissingFields()">
+      <button mat-raised-button color="primary" matStepperNext [disabled]="!valid">
+        {{ 'labels.buttons.Next' | translate }}
+        <fa-icon icon="arrow-right" class="m-l-10"></fa-icon>
+      </button>
+    </span>
   </div>
 </form>

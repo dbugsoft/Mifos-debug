@@ -7,5 +7,211 @@
  */
 
 .container {
-  max-width: 37rem;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+/* Main card */
+.container > mat-card {
+  padding: 20px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow:
+    0 2px 8px rgb(0 0 0 / 5%),
+    0 8px 24px rgb(0 0 0 / 6%);
+}
+
+/* Form fields */
+.layout-column {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 20px;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+mat-form-field input,
+mat-form-field mat-select {
+  font-size: 14px;
+}
+
+mat-label {
+  font-size: 14px;
+}
+
+mat-error {
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+/* Action buttons */
+mat-card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 20px 4px 4px;
+  margin: 0;
+  border-top: 1px solid #e7eaf0;
+}
+
+mat-card-actions button {
+  min-width: 100px;
+  min-height: 40px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+}
+
+/* Cancel button */
+mat-card-actions [type='button'] {
+  background: #f1f1f1;
+  color: #000;
+}
+
+/* Configuration wizard popover */
+.mw400 {
+  max-width: 400px;
+  margin: 0;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.mw400 a {
+  color: #1e293b;
+  font-weight: 600;
+  text-decoration: underline;
+
+  &:hover {
+    color: #000;
+  }
+}
+
+h2 {
+  margin: 0 0 10px;
+  color: #1e293b;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+/* Popover buttons */
+.layout-row.align-end {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 18px;
+}
+
+.layout-row.align-end button {
+  min-height: 38px;
+  border-radius: 7px;
+  font-size: 13px;
+}
+
+/* Tablet */
+@media (width <= 768px) {
+  .container {
+    padding: 18px;
+  }
+
+  .container > mat-card {
+    padding: 16px;
+    border-radius: 14px;
+  }
+
+  .layout-column {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  mat-card-actions {
+    padding-top: 16px;
+  }
+}
+
+/* Mobile */
+@media (width <= 600px) {
+  .container {
+    padding: 10px;
+  }
+
+  .container > mat-card {
+    padding: 12px;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgb(0 0 0 / 5%);
+  }
+
+  mat-card-content {
+    padding: 4px 0;
+  }
+
+  .layout-column {
+    gap: 10px;
+  }
+
+  mat-card-actions {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+    padding: 16px 0 0;
+  }
+
+  mat-card-actions button {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .mw400 {
+    max-width: 100%;
+    font-size: 13px;
+  }
+
+  h2 {
+    font-size: 18px;
+  }
+
+  .layout-row.align-end {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .layout-row.align-end button {
+    width: 100%;
+  }
+}
+
+/* Small mobile */
+@media (width <= 400px) {
+  .container {
+    padding: 6px;
+  }
+
+  .container > mat-card {
+    padding: 10px;
+  }
+
+  mat-label,
+  mat-form-field input,
+  mat-form-field mat-select {
+    font-size: 13px;
+  }
+
+  mat-error {
+    font-size: 11px;
+  }
 }

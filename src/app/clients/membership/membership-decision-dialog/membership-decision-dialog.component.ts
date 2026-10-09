@@ -7,6 +7,7 @@
  */
 
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { FormBuilder, Validators } from '@angular/forms';
 import {
   MAT_DIALOG_DATA,
@@ -47,7 +48,8 @@ export interface MembershipDecisionData {
     MatDialogActions,
     MatDialogClose,
     NepaliDateInputComponent,
-    FormatNumberPipe
+    FormatNumberPipe,
+    RouterLink
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -68,6 +70,8 @@ export class MembershipDecisionDialogComponent {
   readonly minDate = this.fromIso(this.application.submittedOn);
   readonly maxDate = this.settingsService.businessDate ?? new Date();
   readonly busy = signal(false);
+  /** The applicant's KYM still lacks something and the cooperative approves only complete ones (ADR 0042). */
+  readonly kymBlocks = signal(false);
 
   readonly form = this.formBuilder.group({
     date: [
@@ -107,8 +111,16 @@ export class MembershipDecisionDialogComponent {
     ]
   });
 
+  constructor() {
+    if (this.approve && (this.application.kymMissing ?? 0) > 0) {
+      this.membershipService
+        .template()
+        .subscribe((t) => this.kymBlocks.set(t.settings.kymRequiredForApproval !== false));
+    }
+  }
+
   submit(): void {
-    if (this.form.invalid || this.busy()) {
+    if (this.form.invalid || this.busy() || this.kymBlocks()) {
       this.form.markAllAsTouched();
       return;
     }

@@ -1,0 +1,98 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+@use '../../compliance' as compliance;
+
+@include compliance.page;
+
+.sub {
+  display: block;
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+.regrade {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: center;
+}
+
+table.grid {
+  width: 100%;
+  min-width: 480px;
+  border-collapse: collapse;
+
+  th {
+    padding: 10px 12px;
+    background: var(--md-sys-color-primary, #1074b9);
+    color: #fff;
+    font-weight: 600;
+    text-align: left;
+  }
+
+  td {
+    padding: 6px 12px;
+    border-bottom: 1px solid rgb(127 127 127 / 15%);
+    vertical-align: middle;
+  }
+
+  .grade {
+    width: 180px;
+  }
+}
+
+.areas {
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid rgb(127 127 127 / 15%);
+  }
+}
+
+.empty + .add-area,
+.empty + .hint {
+  margin-top: 12px;
+}
+
+.add-area {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+  align-items: center;
+
+  .note {
+    grid-column: span 2;
+  }
+}
+
+@media (width <= 600px) {
+  .add-area .note {
+    grid-column: auto;
+  }
+
+  table.grid {
+    min-width: 0;
+
+    th,
+    td {
+      padding: 6px 8px;
+    }
+
+    .grade {
+      width: 120px;
+    }
+  }
+}

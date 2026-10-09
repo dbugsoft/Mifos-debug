@@ -1,0 +1,50 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+// Plain HTML tables in the compliance pages' blue-header look (the shared `table.blue` styles Material tables).
+@mixin plain-rows {
+  table.plain-rows {
+    width: 100%;
+    border-collapse: collapse;
+
+    th {
+      padding: 12px 14px;
+      background: var(--md-sys-color-primary, #1074b9);
+      color: #fff;
+      font-weight: 600;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    th + th {
+      border-left: 1px solid rgb(255 255 255 / 35%);
+    }
+
+    td {
+      padding: 10px 14px;
+      border-bottom: 1px solid rgb(127 127 127 / 18%);
+      vertical-align: top;
+    }
+
+    .sub {
+      display: block;
+      font-size: 0.75rem;
+      opacity: 0.8;
+    }
+
+    tr.row {
+      cursor: pointer;
+    }
+
+    tr.row:hover td,
+    tr.row:focus td {
+      background: rgb(16 116 185 / 6%);
+      outline: none;
+    }
+  }
+}

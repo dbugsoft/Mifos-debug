@@ -7,5 +7,70 @@
  */
 
 .container {
-  max-width: 37rem;
+  max-width: 50rem;
+  margin: 0 auto;
+}
+
+.container > mat-card {
+  border-radius: 16px;
+  box-shadow:
+    0 2px 8px rgb(0 0 0 / 5%),
+    0 8px 24px rgb(0 0 0 / 6%);
+}
+
+.working-days-section {
+  margin-bottom: 20px;
+}
+
+.section-label {
+  display: block;
+  margin-bottom: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+// A wrapping grid of pill-style toggles instead of a single cramped column -
+// reads better at a glance and reflows naturally on narrow screens.
+.working-days-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.working-day-chip {
+  padding: 8px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  background: #f8fafc;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+
+  &:hover {
+    border-color: #cbd5e1;
+  }
+
+  &.mat-mdc-checkbox-checked {
+    border-color: #bbf7d0;
+    background: #f0fdf4;
+  }
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+@media (width <=600px) {
+  .container > mat-card {
+    border-radius: 12px;
+  }
+
+  .working-day-chip {
+    width: 100%;
+  }
+
+  .working-days-grid {
+    flex-direction: column;
+  }
 }

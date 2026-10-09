@@ -92,6 +92,7 @@
           #sharesStep
           [template]="membershipTemplate"
           [mode]="existingApplication ? 'existing' : 'new'"
+          [organisation]="legalFormType === 2"
         ></mifosx-membership-shares-step>
       </mat-step>
     }
@@ -115,7 +116,10 @@
         @if (membershipMode) {
           <mifosx-membership-shares-preview
             [choice]="sharesStep?.choice() ?? null"
-            [citizenshipNumber]="clientGeneralStep.citizenship?.value()?.citizenshipNumber ?? null"
+            [organisation]="legalFormType === 2"
+            [citizenshipNumber]="
+              legalFormType === 2 ? null : (clientGeneralStep.citizenship?.value()?.citizenshipNumber ?? null)
+            "
             [district]="clientGeneralStep.citizenship?.districtLabel() ?? null"
             [nomineeName]="sharesStep?.form?.value?.nomineeName ?? null"
             [nomineeRelationship]="sharesStep?.form?.value?.nomineeRelationship ?? null"

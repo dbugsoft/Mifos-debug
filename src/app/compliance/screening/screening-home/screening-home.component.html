@@ -1,0 +1,216 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="compliance-page">
+  @if (allowed() === false) {
+    <p class="empty">{{ 'compliance.You have no compliance access' | translate }}</p>
+  } @else {
+    @if (busy()) {
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }
+
+    <section class="frame">
+      <h2 class="legend">{{ 'compliance.screening.Lists' | translate }}</h2>
+      <p class="hint">{{ 'compliance.screening.listsLead' | translate }}</p>
+      @if (current().length) {
+        <div class="table-scroll">
+          <table class="plain-rows">
+            <thead>
+              <tr>
+                <th>{{ 'compliance.screening.List' | translate }}</th>
+                <th class="num">{{ 'compliance.screening.Entries' | translate }}</th>
+                <th>{{ 'compliance.screening.Loaded' | translate }}</th>
+                <th class="wide">{{ 'compliance.screening.Changes' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (v of current(); track v.id) {
+                <tr>
+                  <td>
+                    <b>{{ 'compliance.screening.source.' + v.source | translate }}</b>
+                    @if (v.publishedOn) {
+                      <span class="sub"
+                        >{{ 'compliance.screening.Published' | translate }}
+                        {{ (v.publishedOn | adToBs) || v.publishedOn }}</span
+                      >
+                    }
+                  </td>
+                  <td class="num">{{ v.entries }}</td>
+                  <td>
+                    {{ (v.loadedAt.slice(0, 10) | adToBs) || v.loadedAt.slice(0, 10) }}
+                    <span class="sub">{{ v.loadedBy ?? ('compliance.risk.the system' | translate) }}</span>
+                  </td>
+                  <td class="wide">
+                    @if (v.added === null || v.added === undefined) {
+                      {{ 'compliance.screening.First version' | translate }}
+                    } @else {
+                      {{
+                        'compliance.screening.changes'
+                          | translate: { added: v.added, removed: v.removed, changed: v.changed }
+                      }}
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <p class="notice">{{ 'compliance.screening.noLists' | translate }}</p>
+      }
+
+      <dl class="facts">
+        <div class="fact">
+          <dt class="fact-label">{{ 'compliance.screening.UN list last checked' | translate }}</dt>
+          <dd class="fact-value">
+            @if (lists()?.lastUnCheck; as c) {
+              {{ (c.at.slice(0, 10) | adToBs) || c.at.slice(0, 10) }} · {{ c.note }}
+            } @else {
+              {{ 'compliance.screening.Never' | translate }}
+            }
+          </dd>
+        </div>
+        <div class="fact">
+          <dt class="fact-label">{{ 'compliance.screening.Everyone last screened' | translate }}</dt>
+          <dd class="fact-value">
+            @if (lists()?.lastRun; as r) {
+              {{ (r.startedAt.slice(0, 10) | adToBs) || r.startedAt.slice(0, 10) }} ·
+              {{ 'compliance.screening.runSub' | translate: { screened: r.screened, found: r.newMatches } }}
+            } @else {
+              {{ 'compliance.screening.Never' | translate }}
+            }
+          </dd>
+        </div>
+      </dl>
+
+      @if (result(); as r) {
+        <p class="notice done">
+          @if (r.unchanged) {
+            {{ 'compliance.screening.unchanged' | translate }}
+          } @else {
+            @if (r.entries) {
+              {{ 'compliance.screening.loadedEntries' | translate: { entries: r.entries } }}
+            }
+            @if (r.screening; as s) {
+              {{ 'compliance.screening.screenedResult' | translate: { screened: s.screened, found: s.newMatches } }}
+            }
+          }
+        </p>
+      }
+
+      @if (canManage) {
+        <div class="actions">
+          <button mat-raised-button color="primary" type="button" (click)="downloadUn()" [disabled]="busy()">
+            <mat-icon>cloud_download</mat-icon>{{ 'compliance.screening.Download the UN list now' | translate }}
+          </button>
+          <button mat-stroked-button type="button" (click)="homeFile.click()" [disabled]="busy()">
+            <mat-icon>upload</mat-icon>{{ 'compliance.screening.Load the Home Ministry list' | translate }}
+          </button>
+          <input #homeFile type="file" hidden accept=".xlsx,.csv" (change)="upload('HOME_MINISTRY', $event)" />
+          <button mat-stroked-button type="button" (click)="unFile.click()" [disabled]="busy()">
+            <mat-icon>upload</mat-icon>{{ 'compliance.screening.Load the UN list from a file' | translate }}
+          </button>
+          <input #unFile type="file" hidden accept=".xml" (change)="upload('UN', $event)" />
+          <button mat-button type="button" (click)="template()">
+            <mat-icon>description</mat-icon>{{ 'compliance.screening.Template for the Home Ministry list' | translate }}
+          </button>
+          <button mat-button type="button" (click)="screenAll()" [disabled]="busy()">
+            {{ 'compliance.screening.Screen everyone again' | translate }}
+          </button>
+        </div>
+      }
+
+      @if (earlier().length) {
+        <details class="earlier">
+          <summary>{{ 'compliance.screening.Earlier versions' | translate }}</summary>
+          <ul class="plain-list">
+            @for (v of earlier(); track v.id) {
+              <li>
+                {{ 'compliance.screening.source.' + v.source | translate }} ·
+                {{ (v.loadedAt.slice(0, 10) | adToBs) || v.loadedAt.slice(0, 10) }} · {{ v.entries }}
+                {{ 'compliance.screening.entries' | translate }}
+                <span class="sub">{{ v.fileName ?? '' }} {{ v.loadedBy ?? '' }}</span>
+              </li>
+            }
+          </ul>
+        </details>
+      }
+    </section>
+
+    <div class="filters">
+      <mat-button-toggle-group [value]="view()" (change)="show($event.value)">
+        @for (v of views; track v) {
+          <mat-button-toggle [value]="v">{{ 'compliance.screening.view.' + v | translate }}</mat-button-toggle>
+        }
+      </mat-button-toggle-group>
+      <a mat-stroked-button color="primary" [routerLink]="['/compliance', 'screening', 'freezes']">
+        {{ 'compliance.screening.Funds held' | translate }}
+      </a>
+    </div>
+
+    <p class="hint">{{ 'compliance.screening.matchesLead' | translate }}</p>
+
+    @if (loading()) {
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }
+
+    @for (g of groups(); track g.source + g.reference) {
+      <section class="frame group">
+        <h2 class="legend">{{ g.entryName }}</h2>
+        <div class="group-head">
+          <span class="chip" [class.red]="g.level === 'LIKELY'" [class.amber]="g.level === 'POSSIBLE'"
+            >{{ 'compliance.screening.level.' + g.level | translate }} · {{ g.bestScore.toFixed(2) }}</span
+          >
+          <span class="sub">{{ 'compliance.screening.source.' + g.source | translate }} · {{ g.reference }}</span>
+          @if (canManage && openCount(g) > 1) {
+            <button mat-stroked-button type="button" class="all" (click)="notAMatchAll(g)" [disabled]="busy()">
+              {{ 'compliance.screening.Not a match for all' | translate }} ({{ openCount(g) }})
+            </button>
+          }
+        </div>
+        <div class="table-scroll">
+          <table class="plain-rows">
+            <thead>
+              <tr>
+                <th>{{ 'compliance.screening.Who' | translate }}</th>
+                <th>{{ 'compliance.Member' | translate }}</th>
+                <th class="num">{{ 'compliance.screening.Score' | translate }}</th>
+                <th class="wide">{{ 'compliance.screening.Where it stands' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (m of g.matches; track m.id) {
+                <tr class="row" tabindex="0" (click)="open(m)" (keydown.enter)="open(m)">
+                  <td>
+                    <b>{{ m.subjectName }}</b>
+                    <span class="sub">{{ 'compliance.screening.subject.' + m.subjectType | translate }}</span>
+                  </td>
+                  <td>
+                    {{ m.memberName }}
+                    <span class="sub">{{ m.accountNo }} · {{ m.office }}</span>
+                  </td>
+                  <td class="num">{{ m.score.toFixed(2) }}</td>
+                  <td class="wide">
+                    {{ 'compliance.screening.status.' + m.status | translate }}
+                    @if (m.clearedWhy) {
+                      <span class="sub">{{ 'compliance.screening.cleared.' + m.clearedWhy | translate }}</span>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+    } @empty {
+      @if (!loading()) {
+        <p class="empty">{{ 'compliance.screening.empty.' + view() | translate }}</p>
+      }
+    }
+  }
+</div>

@@ -85,6 +85,14 @@
                   <mifosx-membership-deadline [application]="membershipApplication()"></mifosx-membership-deadline
                 ></span>
               }
+              @if (
+                canReadKym && (clientViewData.status.value === 'Active' || clientViewData.status.value === 'Pending')
+              ) {
+                <mifosx-kym-chip [clientId]="clientViewData.id"></mifosx-kym-chip>
+              }
+              @if (clientViewData.status.value === 'Active' || clientViewData.status.value === 'Pending') {
+                <mifosx-extra-checks-chip [clientId]="clientViewData.id"></mifosx-extra-checks-chip>
+              }
             </h3>
             <button
               type="button"
@@ -227,6 +235,13 @@
         }
 
         <button mat-menu-item [matMenuTriggerFor]="More">{{ 'labels.buttons.More' | translate }}</button>
+        <!-- fineract-dbug #133: any staff member can tell the compliance officer what they noticed -->
+        <button mat-menu-item (click)="raiseConcern()">
+          <mat-icon matListIcon>
+            <fa-icon icon="flag" size="sm"></fa-icon>
+          </mat-icon>
+          <span>{{ 'compliance.concern.Raise a concern' | translate }}</span>
+        </button>
       </mat-menu>
 
       <mat-menu #accountApplications="matMenu">
@@ -427,6 +442,11 @@
           [active]="membership.isActive"
         >
           {{ 'membership.Membership' | translate }}
+        </a>
+      }
+      @if (canReadKym) {
+        <a mat-tab-link [routerLink]="['./kym']" routerLinkActive #kym="routerLinkActive" [active]="kym.isActive">
+          {{ 'kym.KYM' | translate }}
         </a>
       }
       <a

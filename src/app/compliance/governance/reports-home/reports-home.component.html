@@ -1,0 +1,97 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="compliance-page">
+  @if (allowed() === false) {
+    <p class="empty">{{ 'compliance.You have no compliance access' | translate }}</p>
+  } @else {
+    @if (busy()) {
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }
+    <p class="hint">{{ 'compliance.reports.lead' | translate }}</p>
+
+    @if (due().length) {
+      <div class="tiles">
+        @for (d of due(); track d.type) {
+          <button
+            type="button"
+            class="tile"
+            [class.warn]="d.daysLeft <= 30"
+            [class.bad]="d.daysLeft < 0"
+            (click)="start(d)"
+            [disabled]="!canPrepare && d.status === 'NOT_STARTED'"
+          >
+            <span class="label">{{ 'compliance.reports.type.' + d.type | translate }}</span>
+            <span class="value small">{{ d.label }}</span>
+            <span class="sub">
+              {{ 'compliance.reports.dueBy' | translate }} {{ (d.dueOn | adToBs) || d.dueOn }}
+              <mifosx-due-chip [daysLeft]="d.daysLeft"></mifosx-due-chip>
+            </span>
+            <span class="sub">{{ 'compliance.reports.status.' + d.status | translate }}</span>
+          </button>
+        }
+      </div>
+    }
+
+    <section class="frame">
+      <h2 class="legend">{{ 'compliance.reports.Reports' | translate }}</h2>
+      @if (canPrepare) {
+        <div class="actions top">
+          <button mat-stroked-button color="primary" type="button" (click)="prepare()" [disabled]="busy()">
+            {{ 'compliance.reports.Prepare a report' | translate }}
+          </button>
+        </div>
+      }
+      @if (reports().length) {
+        <div class="table-scroll">
+          <table class="plain-rows">
+            <thead>
+              <tr>
+                <th>{{ 'compliance.reports.Report' | translate }}</th>
+                <th>{{ 'compliance.reports.Fiscal year' | translate }}</th>
+                <th>{{ 'compliance.reports.Where it stands' | translate }}</th>
+                <th class="wide">{{ 'compliance.reports.Prepared' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (r of reports(); track r.type + r.fiscalYear) {
+                <tr
+                  class="row"
+                  tabindex="0"
+                  (click)="open(r.type, r.fiscalYear)"
+                  (keydown.enter)="open(r.type, r.fiscalYear)"
+                >
+                  <td>
+                    <b>{{ 'compliance.reports.type.' + r.type | translate }}</b>
+                  </td>
+                  <td>{{ label(r.fiscalYear) }}</td>
+                  <td>
+                    <span class="chip" [class.green]="r.status === 'APPROVED'" [class.amber]="r.status === 'DRAFT'">{{
+                      'compliance.reports.status.' + r.status | translate
+                    }}</span>
+                    @if (r.approvedBy) {
+                      <span class="sub">{{ r.approvedBy }}</span>
+                    }
+                  </td>
+                  <td class="wide">
+                    @if (r.preparedAt) {
+                      {{ (r.preparedAt.slice(0, 10) | adToBs) || r.preparedAt.slice(0, 10) }}
+                    }
+                    <span class="sub">{{ r.preparedBy ?? '' }}</span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <p class="empty">{{ 'compliance.reports.none' | translate }}</p>
+      }
+    </section>
+  }
+</div>

@@ -95,9 +95,24 @@ export class ClientGeneralStepComponent implements OnInit {
   /** The citizenship fields, present on a membership application */
   @ViewChild(MembershipCitizenshipComponent) citizenship?: MembershipCitizenshipComponent;
 
-  /** The step is complete: the client form, and on a membership application the citizenship too. */
+  /**
+   * The step is complete: the client form, and on a person's membership application the citizenship too (an
+   * organisation has none, fineract-dbug ADR 0042).
+   */
   get valid(): boolean {
-    return this.createClientForm.valid && (!this.membershipMode || !!this.citizenship?.value());
+    return this.createClientForm.valid && (!this.membershipMode || this.isOrganisation || !!this.citizenship?.value());
+  }
+
+  /** Legal form Entity: an organisation (another cooperative, a company, a group, an institution). */
+  get isOrganisation(): boolean {
+    return this.createClientForm?.value?.legalFormId === LegalFormId.ENTITY;
+  }
+
+  /** A click on the greyed-out Next turns every missing required field red, so it is clear what blocks the step. */
+  showMissingFields(): void {
+    if (this.valid) return;
+    this.createClientForm.markAllAsTouched();
+    this.citizenship?.showErrors();
   }
   /** Create Client Form */
   createClientForm: FormGroup;

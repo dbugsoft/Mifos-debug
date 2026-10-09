@@ -119,7 +119,8 @@ mat-divider {
 }
 
 mat-checkbox {
-  margin: 8px 0;
+  // No top margin, so the outlined checkbox lines up with the fields beside it (#221)
+  margin: 0 0 8px;
 
   &.margin-v {
     margin-top: 12px;

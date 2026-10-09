@@ -28,46 +28,31 @@
 <div class="container">
   <mat-card>
     <mat-card-content>
-      <div class="layout-row-wrap">
-        <div class="flex-50 header">
-          {{ 'labels.inputs.Name' | translate }}
+      <div class="field-grid">
+        <div class="field-card">
+          <span class="field-label">{{ 'labels.inputs.Name' | translate }}</span>
+          <span class="field-value wrap-content">{{ holidayData.name }}</span>
         </div>
 
-        <div class="flex-50">
-          {{ holidayData.name }}
+        <div class="field-card">
+          <span class="field-label">{{ 'labels.inputs.From Date' | translate }}</span>
+          <span class="field-value">{{ holidayData.fromDate | dateFormat }}</span>
         </div>
 
-        <div class="flex-50 header">
-          {{ 'labels.inputs.From Date' | translate }}
+        <div class="field-card">
+          <span class="field-label">{{ 'labels.inputs.To Date' | translate }}</span>
+          <span class="field-value">{{ holidayData.toDate | dateFormat }}</span>
         </div>
 
-        <div class="flex-50">
-          {{ holidayData.fromDate | dateFormat }}
+        <div class="field-card">
+          <span class="field-label">{{ 'labels.inputs.Repayments Scheduled To' | translate }}</span>
+          @if (holidayData.repaymentsRescheduledTo !== undefined && holidayData.repaymentsRescheduledTo !== null) {
+            <span class="field-value">{{ holidayData.repaymentsRescheduledTo | dateFormat }}</span>
+          }
+          @if (holidayData.repaymentsRescheduledTo === undefined || holidayData.repaymentsRescheduledTo === null) {
+            <span class="field-value">{{ 'labels.inputs.Next Repayment Date' | translate }}</span>
+          }
         </div>
-
-        <div class="flex-50 header">
-          {{ 'labels.inputs.To Date' | translate }}
-        </div>
-
-        <div class="flex-50">
-          {{ holidayData.toDate | dateFormat }}
-        </div>
-
-        <div class="flex-50 header">
-          {{ 'labels.inputs.Repayments Scheduled To' | translate }}
-        </div>
-
-        @if (holidayData.repaymentsRescheduledTo !== undefined && holidayData.repaymentsRescheduledTo !== null) {
-          <div class="flex-50">
-            {{ holidayData.repaymentsRescheduledTo | dateFormat }}
-          </div>
-        }
-
-        @if (holidayData.repaymentsRescheduledTo === undefined || holidayData.repaymentsRescheduledTo === null) {
-          <div class="flex-50">
-            {{ 'labels.inputs.Next Repayment Date' | translate }}
-          </div>
-        }
       </div>
     </mat-card-content>
   </mat-card>

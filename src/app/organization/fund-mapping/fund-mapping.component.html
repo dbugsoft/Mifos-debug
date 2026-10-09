@@ -1,17 +1,17 @@
 <!--
-  Copyright since 2025 Mifos Initiative
+    Copyright since 2025 Mifos Initiative
 
-  This Source Code Form is subject to the terms of the Mozilla Public
-  License, v. 2.0. If a copy of the MPL was not distributed with this
-  file, You can obtain one at http://mozilla.org/MPL/2.0/.
--->
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
+  -->
 
 @if (!isCollapsed) {
   <mat-card class="container">
     <form [formGroup]="fundMappingForm" (ngSubmit)="submit()">
       <mat-card-content>
         <div class="layout-row-wrap gap-2percent responsive-column align-start-center">
-          <mat-form-field class="flex-48">
+          <mat-form-field class="flex-31">
             <mat-label>{{ 'labels.inputs.Loan Status' | translate }}</mat-label>
             <mat-select formControlName="loanStatus" multiple>
               <mat-option value="all">{{ 'labels.inputs.All' | translate }}</mat-option>
@@ -21,8 +21,7 @@
               <mat-option value="writeoff">{{ 'labels.inputs.Closed (written-off)' | translate }}</mat-option>
             </mat-select>
           </mat-form-field>
-          <span class="flex-48 hide-lt-md"></span>
-          <mat-form-field class="flex-48">
+          <mat-form-field class="flex-31">
             <mat-label>{{ 'labels.inputs.Product' | translate }}</mat-label>
             <mat-select formControlName="loanProducts" multiple>
               @for (product of advanceSearchTemplate.loanProducts; track product) {
@@ -32,7 +31,7 @@
               }
             </mat-select>
           </mat-form-field>
-          <mat-form-field class="flex-48">
+          <mat-form-field class="flex-31">
             <mat-label>{{ 'labels.inputs.Office' | translate }}</mat-label>
             <mat-select formControlName="offices" multiple>
               @for (office of advanceSearchTemplate.offices; track office) {
@@ -270,7 +269,7 @@
           }
         </div>
       </mat-card-content>
-      <mat-card-actions class="layout-row align-center gap-5px responsive-column">
+      <mat-card-actions class="layout-row align-end gap-5px responsive-column">
         <button type="button" mat-raised-button [routerLink]="['../']">
           {{ 'labels.buttons.Cancel' | translate }}
         </button>

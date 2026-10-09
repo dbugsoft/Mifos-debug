@@ -52,6 +52,12 @@
         <fa-icon icon="user-check" class="btn-icon"></fa-icon>
         {{ 'membership.Applications' | translate }}
       </button>
+      @if (canReadKym) {
+        <button mat-stroked-button color="primary" [routerLink]="['kym']">
+          <fa-icon icon="address-card" class="btn-icon"></fa-icon>
+          {{ 'kym.list.Member KYM' | translate }}
+        </button>
+      }
       <!-- Shown once the share-first setting is known, so its label does not change under the user's eyes -->
       @if (shareFirstRule() !== null) {
         <button mat-raised-button color="primary" [routerLink]="['create']" *mifosxHasPermission="'CREATE_CLIENT'">

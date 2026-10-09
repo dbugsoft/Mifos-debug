@@ -5,11 +5,228 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-
 .container {
-  max-width: 37rem;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 24px;
+  box-sizing: border-box;
 }
 
+.container > mat-card {
+  padding: 20px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow:
+    0 2px 8px rgb(0 0 0 / 5%),
+    0 8px 24px rgb(0 0 0 / 6%);
+}
+
+/* Form layout */
+.layout-column {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px 20px;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+mat-label {
+  font-size: 14px;
+}
+
+input,
+mat-select {
+  font-size: 14px;
+}
+
+mat-error {
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+/* Loan officer checkbox */
 .loan-officer {
-  padding: 17.5px 0;
+  align-self: center;
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+  font-size: 14px;
+}
+
+/* Form actions */
+mat-card-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  padding: 20px 4px 4px;
+  margin: 0;
+  border-top: 1px solid #e7eaf0;
+}
+
+mat-card-actions button {
+  min-width: 100px;
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+mat-card-actions button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+/* Cancel button */
+mat-card-actions [type='button'] {
+  background: #f1f1f1;
+  color: #000;
+}
+
+/* Configuration wizard popover */
+h2 {
+  margin: 0 0 12px;
+  color: #1f2937;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.mw400 {
+  max-width: 400px;
+  margin: 0 0 20px;
+  color: #475569;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.mw400 a {
+  color: #1d4ed8;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.mw400 a:hover {
+  text-decoration: underline;
+}
+
+.layout-row.align-end {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.layout-row.align-end button {
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* Tablet */
+@media (width <= 768px) {
+  .container {
+    padding: 18px;
+  }
+
+  .container > mat-card {
+    padding: 16px;
+    border-radius: 14px;
+  }
+
+  .layout-column {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .loan-officer {
+    min-height: 48px;
+  }
+
+  mat-card-actions {
+    padding-top: 16px;
+  }
+}
+
+/* Mobile */
+@media (width <= 600px) {
+  .container {
+    padding: 10px;
+  }
+
+  .container > mat-card {
+    padding: 12px;
+    border-radius: 12px;
+  }
+
+  .layout-column {
+    gap: 10px;
+  }
+
+  mat-label {
+    font-size: 13px;
+  }
+
+  input,
+  mat-select {
+    font-size: 13px;
+  }
+
+  mat-error {
+    font-size: 11px;
+  }
+
+  .loan-officer {
+    min-height: 44px;
+    font-size: 13px;
+  }
+
+  mat-card-actions {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+    padding: 16px 0 0;
+  }
+
+  mat-card-actions button {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .layout-row.align-end {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .layout-row.align-end button {
+    width: 100%;
+  }
+}
+
+/* Small mobile */
+@media (width <= 400px) {
+  .container {
+    padding: 6px;
+  }
+
+  .container > mat-card {
+    padding: 10px;
+  }
+
+  .mw400 {
+    font-size: 13px;
+  }
+
+  h2 {
+    font-size: 18px;
+  }
 }

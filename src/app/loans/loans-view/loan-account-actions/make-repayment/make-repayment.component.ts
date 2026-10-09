@@ -9,6 +9,7 @@
 /** Angular Imports */
 import { ChangeDetectionStrategy, Component, OnInit, inject, ChangeDetectorRef, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { SourceOfFundsService } from 'app/compliance/source-of-funds/source-of-funds.service';
 import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
 
 /** Custom Services */
@@ -44,6 +45,7 @@ export class MakeRepaymentComponent extends LoanAccountActionsBaseComponent impl
   private cdr = inject(ChangeDetectorRef);
   private destroyRef = inject(DestroyRef);
   private alertService = inject(AlertService);
+  private sourceOfFunds = inject(SourceOfFundsService);
 
   /** Payment Type Options */
   paymentTypes: PaymentType[] = [];
@@ -405,6 +407,25 @@ export class MakeRepaymentComponent extends LoanAccountActionsBaseComponent impl
   }
 
   private submitCommandAction(payload: any) {
+    // a repayment of the line or more first asks where the money comes from (fineract-dbug #132, #137)
+    if (this.loanProductService.isLoanProduct && this.command === 'repayment') {
+      this.sourceOfFunds
+        .ensureDeclared('LOAN', { accountId: this.loanId }, Number(payload.transactionAmount))
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe((declared) => {
+          if (declared) {
+            this.postCommandAction(payload);
+          } else {
+            this.isSubmitting = false;
+            this.cdr.markForCheck();
+          }
+        });
+    } else {
+      this.postCommandAction(payload);
+    }
+  }
+
+  private postCommandAction(payload: any) {
     if (this.loanProductService.isLoanProduct) {
       this.loanService
         .submitLoanActionButton(this.loanId, payload, this.command)
