@@ -1,0 +1,168 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+// The yearly reports and governance screens: the compliance pages' own look.
+@use '../compliance' as compliance;
+@use '../risk/risk' as risk;
+
+@include compliance.page;
+@include risk.plain-rows;
+
+.sub {
+  display: block;
+  font-size: 0.75rem;
+  opacity: 0.85;
+}
+
+.hint {
+  margin: 0;
+}
+
+button.tile {
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:disabled {
+    cursor: default;
+  }
+
+  .value.small {
+    font-size: 1.125rem;
+  }
+}
+
+.title {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: center;
+
+  .name {
+    margin: 0;
+    font-size: 1.25rem;
+  }
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-top: 12px;
+
+  &.top {
+    margin: 0 0 12px;
+  }
+}
+
+.notice.bad {
+  border-color: #f1b8b3;
+  background: #fdeceb;
+  color: #6d150f;
+}
+
+.prompts {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+table.plain-rows {
+  .num {
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .no {
+    width: 3rem;
+    white-space: nowrap;
+  }
+
+  .edit {
+    width: 100%;
+    min-width: 160px;
+  }
+}
+
+.table-scroll table.plain-rows {
+  min-width: 560px;
+}
+
+.plain-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    padding: 8px 0;
+    border-bottom: 1px solid rgb(127 127 127 / 15%);
+  }
+
+  li.with-action {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.pack {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 4px 16px;
+  margin: 8px 0 0;
+  font-size: 0.875rem;
+
+  dd {
+    margin: 0;
+  }
+}
+
+@media (width <= 600px) {
+  .table-scroll table.plain-rows {
+    min-width: 0;
+
+    .wide {
+      display: none;
+    }
+  }
+}
+
+input.edit,
+textarea.edit {
+  box-sizing: border-box;
+  padding: 6px 8px;
+  border: 1px solid rgb(127 127 127 / 45%);
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+
+textarea.edit {
+  resize: vertical;
+}
+
+.earlier {
+  margin-top: 12px;
+
+  summary {
+    cursor: pointer;
+    font-size: 0.875rem;
+  }
+}
+
+.note {
+  margin: 4px 0;
+  white-space: pre-wrap;
+}

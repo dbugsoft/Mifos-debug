@@ -212,6 +212,26 @@ const routes: Routes = [
           data: { title: 'Funds held', breadcrumb: 'Funds held', routeParamBreadcrumb: false }
         },
         {
+          path: 'reports',
+          loadComponent: () =>
+            import('./compliance/governance/reports-home/reports-home.component').then((m) => m.ReportsHomeComponent),
+          data: { title: 'Yearly reports', breadcrumb: 'Yearly reports' }
+        },
+        {
+          path: 'reports/:type/:fiscalYear',
+          loadComponent: () =>
+            import('./compliance/governance/report-view/report-view.component').then((m) => m.ReportViewComponent),
+          data: { title: 'Yearly report', breadcrumb: 'Yearly report', routeParamBreadcrumb: false }
+        },
+        {
+          path: 'governance',
+          loadComponent: () =>
+            import('./compliance/governance/governance-page/governance-page.component').then(
+              (m) => m.GovernancePageComponent
+            ),
+          data: { title: 'Governance', breadcrumb: 'Governance' }
+        },
+        {
           path: 'risk-tables',
           loadComponent: () =>
             import('./compliance/pep/risk-tables/risk-tables.component').then((m) => m.RiskTablesComponent),
