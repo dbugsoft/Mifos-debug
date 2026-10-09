@@ -17,7 +17,7 @@
        PROFILE STATUS
   ====================================================== -->
 
-  <div class="profile-status" *ngIf="profileStatus">
+  <div class="profile-status" *ngIf="profileStatus && hasSubmittedDocuments">
     <span class="status-badge">
       <span class="status-dot"></span>
       {{ profileStatus }}
@@ -35,7 +35,7 @@
          coop-stepper's activation/onboarding welcome), so all three
          are skipped here. -->
     <mifosx-coop-system-status
-      *ngIf="isEditMode && profileStatus !== 'ACTIVE' && profileStatus !== 'PROVISIONED'"
+      *ngIf="isEditMode && hasSubmittedDocuments && profileStatus !== 'ACTIVE' && profileStatus !== 'PROVISIONED'"
     ></mifosx-coop-system-status>
 
     @if (initialLoading) {
