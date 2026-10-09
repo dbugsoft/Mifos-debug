@@ -53,7 +53,7 @@ mat-card-content {
     }
 
     &:not(:last-child, :nth-last-child(2)) {
-      border-bottom: 1px solid #ddd;
+      border-bottom: 1px solid var(--dk-border, #ddd);
     }
   }
 

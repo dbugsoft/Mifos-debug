@@ -61,7 +61,7 @@
   gap: 8px;
   margin-top: 16px;
   padding-top: 16px;
-  border-top: 1px solid var(--md-sys-color-outline-variant, #cbd5e1);
+  border-top: 1px solid var(--md-sys-color-outline-variant, var(--dk-border, #cbd5e1));
 }
 
 .external-id-status {
@@ -69,10 +69,10 @@
   font-weight: 500;
 
   &.success {
-    color: #388e3c;
+    color: var(--dk-success, #388e3c);
   }
 
   &.error {
-    color: #d32f2f;
+    color: var(--dk-danger, #d32f2f);
   }
 }

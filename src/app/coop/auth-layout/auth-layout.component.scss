@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-$brand-blue: #1074b9;
+$brand-blue: #2460b9;
 $brand-blue-dark: #0a5a8f;
 $text-muted: #64748b;
 $input-border: #e2e8f0;
@@ -28,7 +28,7 @@ $input-border: #e2e8f0;
   position: relative;
   overflow: hidden;
   background:
-    linear-gradient(150deg, rgb(8 60 120 / 90%) 0%, rgb(14 90 160 / 85%) 40%, rgb(16 116 185 / 80%) 100%),
+    linear-gradient(150deg, rgb(8 60 120 / 90%) 0%, rgb(14 90 160 / 85%) 40%, rgb(36 96 185 / 80%) 100%),
     url('/assets/images/hero.jpg') center / cover no-repeat;
 }
 
@@ -174,7 +174,7 @@ $input-border: #e2e8f0;
   flex: 1;
   display: flex;
   flex-direction: column;
-  background: #f8fafc;
+  background: var(--dk-surface-2, #f8fafc);
   position: relative;
   min-height: 100vh;
   overflow: hidden auto;
@@ -197,9 +197,9 @@ $input-border: #e2e8f0;
   max-width: var(--card-max-width, 440px);
   padding: 2.5rem;
   box-sizing: border-box;
-  border: 1px solid #eef1f4;
+  border: 1px solid var(--dk-border, #eef1f4);
   border-radius: 16px;
-  background: #fff;
+  background: var(--dk-surface, #fff);
   box-shadow: 0 10px 40px rgb(16 42 67 / 7%);
   animation: coop-auth-card-in 0.35s ease both;
 }
@@ -244,12 +244,12 @@ $input-border: #e2e8f0;
   padding: 1rem;
   margin-top: auto;
   font-size: 0.8rem;
-  color: $text-muted;
-  border-top: 1px solid $input-border;
+  color: var(--dk-text-muted, #{$text-muted});
+  border-top: 1px solid var(--dk-border, #{$input-border});
 }
 
 .login-footer a {
-  color: $brand-blue;
+  color: var(--dk-primary, #{$brand-blue});
   text-decoration: none;
   font-weight: 500;
 }
@@ -269,14 +269,14 @@ $input-border: #e2e8f0;
   }
 
   .login-card {
-    border-color: #2c2d30;
+    border-color: var(--dk-border-strong, #2c2d30);
     background: #1e1e1e;
     box-shadow: 0 10px 40px rgb(0 0 0 / 30%);
   }
 
   .login-footer {
-    color: #a0a0a0;
-    border-top-color: #333;
+    color: var(--dk-text-muted, #a0a0a0);
+    border-top-color: var(--dk-border-strong, #333);
   }
 }
 

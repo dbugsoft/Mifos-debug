@@ -38,7 +38,7 @@ mat-card-title {
 
   h4 {
     margin: 0;
-    color: #1f2937;
+    color: var(--dk-text, #1f2937);
     font-size: 18px;
     font-weight: 600;
   }
@@ -50,7 +50,7 @@ mat-card-content {
 
 [formarrayname] > div {
   padding: 16px 0;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--dk-border, #e2e8f0);
 }
 
 [formarrayname] > div:first-child {
@@ -83,18 +83,18 @@ mat-card-content {
 
 .options-wrapper [mat-icon-button] {
   border-radius: 8px;
-  background: #f1f5f9;
-  color: #475569;
+  background: var(--dk-surface-2, #f1f5f9);
+  color: var(--dk-text-2, #475569);
 }
 
 .options-wrapper [mat-icon-button][color='primary'] {
-  background: #e0f0fa;
-  color: #1074b9;
+  background: var(--dk-primary-soft, #e0f0fa);
+  color: var(--dk-primary, #1074b9);
 }
 
 .options-wrapper [mat-icon-button][color='warn'] {
-  background: #fde8e8;
-  color: #dc2626;
+  background: var(--dk-danger-soft, #fde8e8);
+  color: var(--dk-danger, #dc2626);
 }
 
 .options-wrapper [mat-stroked-button] {

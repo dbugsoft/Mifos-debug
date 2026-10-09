@@ -16,7 +16,7 @@
 
       // Make sure mat-label text is visible in light theme
       :where(mat-label) {
-        color: rgb(0 0 0 / 87%); // Standard Material Design text color for light theme
+        color: rgb(var(--dk-ink-rgb, 0 0 0) / 87%); // Standard Material Design text color for light theme
       }
     }
   }

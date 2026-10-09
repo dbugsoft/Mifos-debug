@@ -22,8 +22,8 @@
 }
 
 .office-card-wrapper {
-  background: #fff;
-  border: 1px solid #e2e8f0;
+  background: var(--dk-surface, #fff);
+  border: 1px solid var(--dk-border, #e2e8f0);
   border-radius: 9px;
   overflow: hidden;
 }
@@ -37,12 +37,12 @@
   align-items: center;
   min-height: 52px;
   padding: 0 22px;
-  background: #f8fafc;
-  border-bottom: 1px solid #e2e8f0;
+  background: var(--dk-surface-2, #f8fafc);
+  border-bottom: 1px solid var(--dk-border, #e2e8f0);
 }
 
 .card-title {
-  color: #1e293b;
+  color: var(--dk-text, #1e293b);
   font-size: 16px;
   font-weight: 600;
 }
@@ -56,7 +56,7 @@
 }
 
 .compact-view {
-  color: #334155;
+  color: var(--dk-text-2, #334155);
 }
 
 .compact-details {
@@ -71,7 +71,7 @@
   width: 45%;
   box-sizing: border-box;
   padding: 15px 16px 15px 0;
-  color: #64748b;
+  color: var(--dk-text-muted, #64748b);
   font-size: 13px;
   font-weight: 600;
 }
@@ -83,7 +83,7 @@
   min-width: 0;
   box-sizing: border-box;
   padding: 15px 0 15px 16px;
-  color: #1f2937;
+  color: var(--dk-text, #1f2937);
   font-size: 14px;
   line-height: 1.5;
   overflow-wrap: anywhere;
@@ -100,7 +100,7 @@
   height: 1px;
   margin: 0;
   border: 0;
-  background: #edf0f2;
+  background: var(--dk-surface-2, #edf0f2);
 }
 
 /* =========================
@@ -170,13 +170,13 @@
 
   .flex-45.left {
     padding: 12px 0 3px;
-    color: #64748b;
+    color: var(--dk-text-muted, #64748b);
     font-size: 12px;
   }
 
   .flex-50.right {
     padding: 3px 0 12px;
-    color: #1f2937;
+    color: var(--dk-text, #1f2937);
     font-size: 14px;
   }
 

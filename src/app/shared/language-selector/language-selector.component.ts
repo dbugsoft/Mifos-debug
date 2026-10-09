@@ -14,6 +14,8 @@ import { UntypedFormControl, ReactiveFormsModule } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { SettingsService } from 'app/settings/settings.service';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
+import { MatIcon } from '@angular/material/icon';
 
 /**
  * Language selector component.
@@ -26,7 +28,11 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
   templateUrl: './language-selector.component.html',
   styleUrls: ['./language-selector.component.scss'],
   imports: [
-    ...STANDALONE_SHARED_IMPORTS
+    ...STANDALONE_SHARED_IMPORTS,
+    MatMenu,
+    MatMenuItem,
+    MatMenuTrigger,
+    MatIcon
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -39,6 +45,9 @@ export class LanguageSelectorComponent {
 
   /** Show label in the form field. Defaults to true. */
   @Input() showLabel: boolean = true;
+
+  /** A toolbar button with a menu instead of a form field. */
+  @Input() compact = false;
 
   /** Language selector form control. */
   languageSelector = new UntypedFormControl();
@@ -55,6 +64,11 @@ export class LanguageSelectorComponent {
    * Sets a new language to be used by the application.
    * @param {string} language New language.
    */
+  choose(language: string) {
+    this.languageSelector.setValue(language);
+    this.setLanguage();
+  }
+
   setLanguage() {
     this.translateService.use(this.languageSelector.value);
     this.settingsService.setLanguage({ name: '', code: this.languageSelector.value.substring(0, 2) });

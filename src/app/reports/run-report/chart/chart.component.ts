@@ -17,6 +17,7 @@ import { ChartData } from '../../common-models/chart-data.model';
 
 /** Charting Imports */
 import { Chart, registerables } from 'chart.js';
+import { applyChartTheme } from 'app/shared/utils/chart-theme.util';
 import { MatButtonToggleGroup, MatButtonToggle } from '@angular/material/button-toggle';
 import { NgStyle } from '@angular/common';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
@@ -77,6 +78,7 @@ export class ChartComponent implements OnChanges {
     if (this.chart) {
       this.chart.destroy();
     }
+    applyChartTheme();
     this.chart = new Chart('output', {
       type: 'pie',
       data: {
@@ -108,6 +110,7 @@ export class ChartComponent implements OnChanges {
     if (this.chart) {
       this.chart.destroy();
     }
+    applyChartTheme();
     this.chart = new Chart('output', {
       type: 'bar',
       data: {

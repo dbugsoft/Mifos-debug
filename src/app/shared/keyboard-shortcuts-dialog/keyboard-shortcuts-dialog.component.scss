@@ -7,10 +7,10 @@
  */
 
 .modifier-key {
-  border: 1px solid #0000004d;
+  border: 1px solid rgb(var(--dk-ink-rgb, 0 0 0) / 30.2%);
   padding: 0.3rem;
-  background: #f8f8f8;
-  color: #00000086;
+  background: var(--dk-surface-2, #f8f8f8);
+  color: rgb(var(--dk-ink-rgb, 0 0 0) / 52.5%);
   font-weight: bold;
   border-radius: 0.3rem;
 }

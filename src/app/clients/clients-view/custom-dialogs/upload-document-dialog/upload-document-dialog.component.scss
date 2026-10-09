@@ -20,7 +20,7 @@
 
 // Title: a little bigger, centred, in the app's blue (through Material's own title tokens).
 h1.mat-mdc-dialog-title {
-  --mat-dialog-subhead-color: var(--md-sys-color-primary, #1074b9);
+  --mat-dialog-subhead-color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
   --mat-dialog-subhead-size: 1.25rem;
   --mat-dialog-subhead-weight: 600;
   --mat-dialog-subhead-line-height: 1.75rem;

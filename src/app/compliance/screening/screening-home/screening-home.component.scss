@@ -31,9 +31,9 @@
 
 .notice.done {
   margin: 12px 0 0;
-  border-color: #9fd3a9;
-  background: #e3f3e6;
-  color: #1b4d25;
+  border-color: var(--dk-success, #9fd3a9);
+  background: var(--dk-success-soft, #e3f3e6);
+  color: var(--dk-text, #1b4d25);
 }
 
 .facts {

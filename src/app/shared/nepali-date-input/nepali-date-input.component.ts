@@ -191,7 +191,7 @@ export class NepaliDateInputComponent implements ControlValueAccessor, OnInit, D
     effect(() => {
       const preferred = this.preference.calendar();
       if (!this.modeChosen) {
-        this.mode = this.calendar ?? preferred;
+        this.mode = this.calendar ?? preferred ?? 'BS';
         this.cdr.markForCheck();
       }
     });

@@ -26,7 +26,7 @@ table {
 }
 
 .mat-mdc-header-row {
-  background-color: #1074b9;
+  background-color: var(--dk-fill, #1074b9);
 }
 
 .mat-mdc-header-cell {
@@ -55,13 +55,13 @@ table {
 }
 
 .enabled {
-  background: #dcfce7;
-  color: #15803d;
+  background: var(--dk-success-soft, #dcfce7);
+  color: var(--dk-success, #15803d);
 }
 
 .disabled {
-  background: #fde8e8;
-  color: #b91c1c;
+  background: var(--dk-danger-soft, #fde8e8);
+  color: var(--dk-danger, #b91c1c);
 }
 
 .mat-column-edit [mat-button] {

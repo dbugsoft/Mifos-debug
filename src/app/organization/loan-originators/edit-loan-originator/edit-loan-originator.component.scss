@@ -16,7 +16,7 @@
 .container > mat-card {
   padding: 20px;
   border-radius: 16px;
-  background: #fff;
+  background: var(--dk-surface, #fff);
   box-shadow:
     0 2px 8px rgb(0 0 0 / 5%),
     0 8px 24px rgb(0 0 0 / 6%);
@@ -46,7 +46,7 @@ mat-select {
 }
 
 [readonly] {
-  color: #64748b;
+  color: var(--dk-text-muted, #64748b);
   cursor: not-allowed;
 }
 
@@ -62,7 +62,7 @@ mat-card-actions {
   gap: 8px;
   padding: 20px 4px 4px;
   margin: 0;
-  border-top: 1px solid #e7eaf0;
+  border-top: 1px solid var(--dk-border, #e7eaf0);
 }
 
 mat-card-actions button {
@@ -82,8 +82,8 @@ mat-card-actions button:hover:not(:disabled) {
 }
 
 mat-card-actions [type='button'] {
-  background: #f1f1f1;
-  color: #000;
+  background: var(--dk-surface-2, #f1f1f1);
+  color: var(--dk-text, #000);
 }
 
 mat-card-actions button:disabled {

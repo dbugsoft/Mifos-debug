@@ -46,7 +46,7 @@ fa-icon {
 .container > mat-card {
   padding: 20px;
   border-radius: 16px;
-  background: #fff;
+  background: var(--dk-surface, #fff);
   box-shadow:
     0 2px 8px rgb(0 0 0 / 5%),
     0 8px 24px rgb(0 0 0 / 6%);
@@ -58,7 +58,7 @@ mat-card-content {
 
 .detail-table {
   width: 100%;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--dk-border, #e2e8f0);
   border-radius: 10px;
   border-collapse: separate;
   border-spacing: 0;
@@ -67,11 +67,11 @@ mat-card-content {
 
 .detail-table tr:not(:last-child) th,
 .detail-table tr:not(:last-child) td {
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--dk-border, #e2e8f0);
 }
 
 .detail-table tr:nth-child(even) {
-  background: #f8fafc;
+  background: var(--dk-surface-2, #f8fafc);
 }
 
 .detail-table th,
@@ -83,13 +83,13 @@ mat-card-content {
 
 .detail-table th {
   width: 35%;
-  color: #334155;
+  color: var(--dk-text-2, #334155);
   font-size: 13px;
   font-weight: 600;
 }
 
 .detail-table td {
-  color: #1f2937;
+  color: var(--dk-text, #1f2937);
   font-size: 14px;
   line-height: 1.5;
 }
@@ -105,15 +105,15 @@ mat-card-content {
   min-height: 26px;
   padding: 0 10px;
   border-radius: 13px;
-  background: #f1f5f9;
-  color: #475569;
+  background: var(--dk-surface-2, #f1f5f9);
+  color: var(--dk-text-2, #475569);
   font-size: 12px;
   font-weight: 600;
 }
 
 .badge-on {
-  background: #dcfce7;
-  color: #166534;
+  background: var(--dk-success-soft, #dcfce7);
+  color: var(--dk-success, #166534);
 }
 
 mat-card-actions {
@@ -123,7 +123,7 @@ mat-card-actions {
   gap: 8px;
   padding: 20px 4px 4px;
   margin: 0;
-  border-top: 1px solid #e7eaf0;
+  border-top: 1px solid var(--dk-border, #e7eaf0);
 }
 
 mat-card-actions button {
@@ -143,7 +143,7 @@ mat-card-actions button:hover {
 }
 
 mat-card-actions [type='button'] {
-  background: #1074b9;
+  background: var(--dk-fill, #1074b9);
   color: #fff;
 }
 
@@ -208,7 +208,7 @@ mat-card-actions [type='button'] {
   }
 
   .detail-table tr:not(:last-child) {
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--dk-border, #e2e8f0);
   }
 
   .detail-table th,

@@ -52,7 +52,7 @@ mat-card-content {
 .layout-row-wrap {
   display: grid;
   grid-template-columns: 1fr 2fr;
-  border: 1px solid rgb(0 0 0 / 8%);
+  border: 1px solid rgb(var(--dk-ink-rgb, 0 0 0) / 8%);
   border-radius: 8px;
   overflow: hidden;
 }
@@ -63,9 +63,9 @@ mat-card-content {
   align-items: center;
   min-height: 58px;
   padding: 14px 18px;
-  background: rgb(0 0 0 / 3%);
+  background: rgb(var(--dk-ink-rgb, 0 0 0) / 3%);
   font-weight: 600;
-  border-bottom: 1px solid rgb(0 0 0 / 8%);
+  border-bottom: 1px solid rgb(var(--dk-ink-rgb, 0 0 0) / 8%);
 }
 
 /* Value */
@@ -74,7 +74,7 @@ mat-card-content {
   align-items: center;
   min-height: 58px;
   padding: 14px 18px;
-  border-bottom: 1px solid rgb(0 0 0 / 8%);
+  border-bottom: 1px solid rgb(var(--dk-ink-rgb, 0 0 0) / 8%);
   word-break: break-word;
 }
 
@@ -141,7 +141,7 @@ mat-card-content {
   .layout-row-wrap > .flex-50:not(.mat-body-strong) {
     min-height: auto;
     padding: 4px 14px 14px;
-    border-bottom: 1px solid rgb(0 0 0 / 8%);
+    border-bottom: 1px solid rgb(var(--dk-ink-rgb, 0 0 0) / 8%);
   }
 
   .layout-row-wrap > :nth-last-child(-n + 2) {

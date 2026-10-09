@@ -40,11 +40,11 @@
 }
 
 .error-log {
-  color: #ffa726;
+  color: var(--dk-warning, #ffa726);
 }
 
 .mat-mdc-header-row {
-  background-color: #1074b9;
+  background-color: var(--dk-fill, #1074b9);
 }
 
 .mat-mdc-header-cell {

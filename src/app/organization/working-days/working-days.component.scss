@@ -27,7 +27,7 @@
   margin-bottom: 12px;
   font-size: 1rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--dk-text, #1f2937);
 }
 
 // A wrapping grid of pill-style toggles instead of a single cramped column -
@@ -40,20 +40,20 @@
 
 .working-day-chip {
   padding: 8px 16px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--dk-border, #e2e8f0);
   border-radius: 999px;
-  background: #f8fafc;
+  background: var(--dk-surface-2, #f8fafc);
   transition:
     border-color 0.15s ease,
     background 0.15s ease;
 
   &:hover {
-    border-color: #cbd5e1;
+    border-color: var(--dk-border, #cbd5e1);
   }
 
   &.mat-mdc-checkbox-checked {
-    border-color: #bbf7d0;
-    background: #f0fdf4;
+    border-color: var(--dk-success-border, #bbf7d0);
+    background: var(--dk-success-soft, #f0fdf4);
   }
 }
 

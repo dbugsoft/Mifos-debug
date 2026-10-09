@@ -8,7 +8,14 @@
 
 /** Angular Imports */
 import { Injectable, inject } from '@angular/core';
-import { HttpEvent, HttpInterceptor, HttpHandler, HttpRequest, HttpErrorResponse } from '@angular/common/http';
+import {
+  HttpContextToken,
+  HttpEvent,
+  HttpInterceptor,
+  HttpHandler,
+  HttpRequest,
+  HttpErrorResponse
+} from '@angular/common/http';
 
 /** rxjs Imports */
 import { Observable, throwError } from 'rxjs';
@@ -26,6 +33,9 @@ import { isHandledSignInRefusal, isStaffAccessUrl } from '../authentication/staf
 
 /** Initialize Logger */
 const log = new Logger('ErrorHandlerInterceptor');
+
+/** Set on a request whose caller handles every failure itself, so no global alert is shown. */
+export const SILENT_ERRORS = new HttpContextToken<boolean>(() => false);
 
 /**
  * Http Request interceptor to add a default error handler to requests.
@@ -63,6 +73,9 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
   }
 
   private handleError(response: HttpErrorResponse, request: HttpRequest<any>): Observable<HttpEvent<any>> {
+    if (request.context.get(SILENT_ERRORS)) {
+      return throwError(() => response);
+    }
     const status = response.status;
     const errorBody = this.parseErrorBody(response.error);
 

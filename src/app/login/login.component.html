@@ -6,71 +6,31 @@
   file, You can obtain one at http://mozilla.org/MPL/2.0/.
 -->
 <div class="login-wrapper">
-  <!-- Left Panel - Hero -->
-  <div class="hero-panel hide-lt-lg">
-    <div class="hero-overlay"></div>
-    <div class="hero-content">
-      <h1 class="hero-title">Welcome to COFMIS</h1>
-      <p class="hero-subtitle">
-        Your trusted cooperative banking platform for savings, loans, share management, and seamless financial services.
-      </p>
-
-      <!-- Features -->
-      <div class="hero-features">
-        <div class="feature-item">
-          <div class="feature-check">
-            <span class="check-mark">&#10003;</span>
-          </div>
-          <div class="feature-text">
-            <strong>Savings &amp; Deposits</strong>
-            <span>Manage member savings, fixed deposits, and recurring deposits</span>
-          </div>
-        </div>
-        <div class="feature-item">
-          <div class="feature-check">
-            <span class="check-mark">&#10003;</span>
-          </div>
-          <div class="feature-text">
-            <strong>Loan Management</strong>
-            <span>Process loan applications, disbursements, and repayments</span>
-          </div>
-        </div>
-        <div class="feature-item">
-          <div class="feature-check">
-            <span class="check-mark">&#10003;</span>
-          </div>
-          <div class="feature-text">
-            <strong>Share Capital</strong>
-            <span>Track member shares, dividends, and equity contributions</span>
-          </div>
-        </div>
-      </div>
-    </div>
+  <div class="login-lang-selector">
+    <mifosx-language-selector [compact]="true"></mifosx-language-selector>
   </div>
 
-  <!-- Right Panel - Login Form -->
-  <div class="login-panel">
-    <!-- Language Selector -->
-    <div class="login-lang-selector">
-      <mifosx-language-selector appearance="outline" [showLabel]="false"></mifosx-language-selector>
-    </div>
-    <div class="login-card-container">
-      <div class="login-card">
-        <!-- Logo -->
-        <div class="logo-section">
-          @if (!themeDarkEnabled) {
-            <img [src]="logoPath" (error)="onLogoError()" alt="{{ 'APP_NAME' | translate }} Logo" class="logo-image" />
-          } @else {
-            <img
-              [src]="logoPathDark"
-              (error)="onLogoErrorDark()"
-              alt="{{ 'APP_NAME' | translate }} Logo"
-              class="logo-image"
-            />
-          }
-        </div>
+  <div class="login-stage">
+    <div class="login-shell">
+      <!-- Left Panel - Welcome -->
+      <aside class="hero-panel">
+        <h1 class="hero-title">Welcome to {{ 'APP_NAME' | translate }}</h1>
+        <p class="hero-full-name">{{ 'APP_FULL_NAME' | translate }}</p>
+        <hr class="hero-divider" />
+        <p class="hero-subtitle">
+          Your trusted cooperative banking platform for savings, loans, share management, and seamless financial
+          services. Manage member savings, fixed and recurring deposits, loan applications, disbursements and
+          repayments, and member shares and dividends in a single platform.
+        </p>
+      </aside>
+
+      <!-- Right Panel - Login Form -->
+      <main class="login-card">
+        <div class="card-avatar"><mifosx-m3-icon name="person" [filled]="true"></mifosx-m3-icon></div>
+
         @if (!staffAccess.step()) {
-          <p class="card-subtitle">Enter your credentials to access your account</p>
+          <h2 class="card-title">{{ 'staffAccess.signIn.Sign in' | translate }}</h2>
+          <p class="card-subtitle">{{ 'staffAccess.signIn.Sign in subtitle' | translate }}</p>
         }
 
         <!-- Tenant Selector -->
@@ -103,30 +63,15 @@
             }
           }
         </div>
-
-        <!-- Resources section (desktop only) -->
-        <!-- <div class="resources-section">
-          <p class="resources-title">Helpful Resources</p>
-          <div class="resources-links">
-            <a
-              href="https://mifosforge.jira.com/wiki/spaces/docs/pages/52035622/User+Manual"
-              target="_blank"
-              rel="noopener noreferrer"
-              >User Manual</a
-            >
-            <a href="https://mifos.org/community/" target="_blank" rel="noopener noreferrer">Community</a>
-            <a href="https://mifosforge.jira.com/wiki/spaces/docs/overview" target="_blank" rel="noopener noreferrer"
-              >Documentation</a
-            >
-          </div>
-        </div> -->
-      </div>
+      </main>
     </div>
-
-    <!-- Footer -->
-    <p class="login-footer">
-      &copy; 2026 COFMIS. All rights reserved. Developed by
-      <a href="https://dibugsoft.com/" target="_blank" rel="noopener noreferrer">Debugsoft</a>
-    </p>
   </div>
+
+  <footer class="login-footer">
+    <span>&copy; 2026 {{ 'APP_NAME' | translate }}. All rights reserved.</span>
+    <span>
+      Developed by:
+      <a href="https://dibugsoft.com/" target="_blank" rel="noopener noreferrer">DEBUGSOFT P. LTD.</a>
+    </span>
+  </footer>
 </div>

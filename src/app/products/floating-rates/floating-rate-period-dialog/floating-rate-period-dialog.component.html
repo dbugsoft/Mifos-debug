@@ -10,8 +10,8 @@
 
 <mat-dialog-content>
   <form [formGroup]="floatingRatePeriodForm">
-    <div class="layout-column">
-      <mat-form-field (click)="fromDatePicker.open()">
+    <div class="form-grid">
+      <mat-form-field class="field-date" (click)="fromDatePicker.open()">
         <mat-label>{{ 'labels.inputs.From Date' | translate }}</mat-label>
         <input required matInput formControlName="fromDate" [min]="minDate" [matDatepicker]="fromDatePicker" />
         <mat-datepicker-toggle matSuffix [for]="fromDatePicker"></mat-datepicker-toggle>
@@ -24,7 +24,7 @@
         }
       </mat-form-field>
 
-      <mat-form-field>
+      <mat-form-field class="field-rate">
         <mat-label>{{ 'labels.inputs.Interest Rate' | translate }}</mat-label>
         <input matInput type="number" required formControlName="interestRate" min="0" />
         @if (floatingRatePeriodForm.controls.interestRate.hasError('required')) {

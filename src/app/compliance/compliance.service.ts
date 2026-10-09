@@ -6,7 +6,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpContext, HttpParams } from '@angular/common/http';
+import { SILENT_ERRORS } from 'app/core/http/error-handler.interceptor';
 import { Injectable, inject, signal } from '@angular/core';
 import { Observable, catchError, of, shareReplay, tap } from 'rxjs';
 import {
@@ -41,11 +42,14 @@ export class ComplianceService {
   /** What this user may see; asked once per sign-in. A failure means no access. */
   loadAccess(refresh = false): Observable<ComplianceAccess> {
     if (!this.access$ || refresh) {
-      this.access$ = this.http.get<ComplianceAccess>('/nepal/aml/access').pipe(
-        catchError(() => of(NO_ACCESS)),
-        tap((a) => this.access.set(a)),
-        shareReplay(1)
-      );
+      this.access$ = this.http
+        // a backend without compliance answers 404; that only means no menu, not an error to show
+        .get<ComplianceAccess>('/nepal/aml/access', { context: new HttpContext().set(SILENT_ERRORS, true) })
+        .pipe(
+          catchError(() => of(NO_ACCESS)),
+          tap((a) => this.access.set(a)),
+          shareReplay(1)
+        );
     }
     return this.access$;
   }

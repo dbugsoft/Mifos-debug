@@ -15,14 +15,14 @@
 
 :root {
   // Surface Colors - Light Theme
-  --toolbar-surface: var(--md-sys-color-surface-container, #f3f3f3);
+  --toolbar-surface: var(--md-sys-color-surface-container, var(--dk-surface-2, #f3f3f3));
   --toolbar-on-surface: var(--md-sys-color-on-surface, #1a1c1e);
   --toolbar-on-surface-variant: var(--md-sys-color-on-surface-variant, #44474e);
-  --toolbar-primary: var(--md-sys-color-primary, #2460b9);
-  --toolbar-on-primary: var(--md-sys-color-on-primary, #fff);
-  --toolbar-primary-container: var(--md-sys-color-primary-container, #d1e4ff);
-  --toolbar-on-primary-container: var(--md-sys-color-on-primary-container, #001d35);
-  --toolbar-surface-container-high: var(--md-sys-color-surface-container-high, #e8e8eb);
+  --toolbar-primary: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+  --toolbar-on-primary: var(--md-sys-color-on-primary, var(--dk-surface, #fff));
+  --toolbar-primary-container: var(--md-sys-color-primary-container, var(--dk-primary-soft, #d1e4ff));
+  --toolbar-on-primary-container: var(--md-sys-color-on-primary-container, var(--dk-text, #001d35));
+  --toolbar-surface-container-high: var(--md-sys-color-surface-container-high, var(--dk-surface-2, #e8e8eb));
 
   // Dimensions
   --toolbar-height: 64px;
@@ -58,8 +58,9 @@
   --toolbar-state-active-opacity: 0.16;
 
   // Elevation (MD3 Level 2)
-  --toolbar-elevation: 0px 2px 4px rgb(0 0 0 / 4%), 0px 1px 2px rgb(0 0 0 / 6%);
-  --toolbar-elevation-scrolled: 0px 4px 8px rgb(0 0 0 / 6%), 0px 2px 4px rgb(0 0 0 / 8%);
+  --toolbar-elevation: 0px 2px 4px rgb(var(--dk-ink-rgb, 0 0 0) / 4%), 0px 1px 2px rgb(var(--dk-ink-rgb, 0 0 0) / 6%);
+  --toolbar-elevation-scrolled:
+    0px 4px 8px rgb(var(--dk-ink-rgb, 0 0 0) / 6%), 0px 2px 4px rgb(var(--dk-ink-rgb, 0 0 0) / 8%);
 
   // Motion (MD3 easing curves)
   --toolbar-easing-standard: cubic-bezier(0.4, 0, 0.2, 1);
@@ -68,7 +69,7 @@
   --toolbar-duration-medium: 250ms;
 
   // Search Component
-  --toolbar-search-background: var(--md-sys-color-surface-container-high, #e8e8eb);
+  --toolbar-search-background: var(--md-sys-color-surface-container-high, var(--dk-surface-2, #e8e8eb));
   --toolbar-search-border-radius: 28px;
   --toolbar-search-padding: 4px 16px;
 }
@@ -78,9 +79,9 @@
   --toolbar-surface: var(--md-sys-color-surface-container, #2c2f36);
   --toolbar-on-surface: var(--md-sys-color-on-surface, #e2e2e5);
   --toolbar-on-surface-variant: var(--md-sys-color-on-surface-variant, #c4c6d0);
-  --toolbar-primary: var(--md-sys-color-primary, #5ba2ec);
-  --toolbar-primary-container: var(--md-sys-color-primary-container, #003a6b);
-  --toolbar-on-primary-container: var(--md-sys-color-on-primary-container, #d1e4ff);
+  --toolbar-primary: var(--md-sys-color-primary, #e0e0e0);
+  --toolbar-primary-container: var(--md-sys-color-primary-container, #393939);
+  --toolbar-on-primary-container: var(--md-sys-color-on-primary-container, #e2e2e2);
   --toolbar-surface-container-high: var(--md-sys-color-surface-container-high, #3d4047);
 
   // Elevation (MD3 Level 2 - Dark theme has stronger shadows)

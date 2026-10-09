@@ -46,17 +46,17 @@ table {
 
 // TODO: CONFIGURE THESE CLASSES GLOBALLY
 .enabled {
-  color: #32cd32;
+  color: var(--dk-success, #32cd32);
 }
 
 .disabled {
-  color: #f44366;
+  color: var(--dk-danger, #f44366);
 }
 
 .manual-entries-allowed {
-  color: #32cd32;
+  color: var(--dk-success, #32cd32);
 }
 
 .manual-entries-not-allowed {
-  color: #f44366;
+  color: var(--dk-danger, #f44366);
 }

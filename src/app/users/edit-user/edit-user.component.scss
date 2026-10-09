@@ -6,6 +6,60 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-.password-never-expires-wrapper {
-  padding: 17.5px 0;
+// Same width as the breadcrumb and the lists.
+.container {
+  margin: 0 auto;
+  max-width: 84rem;
+  width: 90%;
+  padding-bottom: 32px;
+}
+
+// Each field keeps the width its input needs and does not stretch to fill the row; all stack on phones.
+.form-grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  column-gap: 16px;
+
+  mat-form-field {
+    min-width: 0;
+  }
+
+  .field-name {
+    flex: 0 1 180px;
+  }
+
+  .field-password {
+    flex: 0 1 220px;
+  }
+
+  .field-office {
+    flex: 0 1 240px;
+  }
+
+  .field-email {
+    flex: 0 1 280px;
+  }
+
+  .row-break {
+    flex-basis: 100%;
+  }
+
+  .field-check {
+    flex: 0 0 auto;
+    margin-bottom: 16px;
+  }
+}
+
+@media (width <= 600px) {
+  .form-grid mat-form-field {
+    flex-basis: 100%;
+  }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 24px;
 }

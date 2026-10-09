@@ -80,7 +80,7 @@
     }
 
     &:hover:not(:disabled) {
-      background: var(--mat-datepicker-calendar-date-hover-state-background-color, rgb(0 0 0 / 6%));
+      background: var(--mat-datepicker-calendar-date-hover-state-background-color, rgb(var(--dk-ink-rgb, 0 0 0) / 6%));
     }
 
     &:disabled {
@@ -112,7 +112,7 @@
     transition: background 0.1s ease;
 
     &:hover {
-      background: var(--mat-datepicker-calendar-date-hover-state-background-color, rgb(0 0 0 / 6%));
+      background: var(--mat-datepicker-calendar-date-hover-state-background-color, rgb(var(--dk-ink-rgb, 0 0 0) / 6%));
     }
   }
 
@@ -149,7 +149,7 @@
     transition: background 0.1s ease;
 
     &:hover {
-      background: var(--mat-datepicker-calendar-date-hover-state-background-color, rgb(0 0 0 / 6%));
+      background: var(--mat-datepicker-calendar-date-hover-state-background-color, rgb(var(--dk-ink-rgb, 0 0 0) / 6%));
     }
 
     &--selected {
@@ -187,7 +187,7 @@
     transition: background 0.1s ease;
 
     &:hover {
-      background: var(--mat-datepicker-calendar-date-hover-state-background-color, rgb(0 0 0 / 6%));
+      background: var(--mat-datepicker-calendar-date-hover-state-background-color, rgb(var(--dk-ink-rgb, 0 0 0) / 6%));
     }
 
     &--selected {
@@ -243,11 +243,11 @@
     transition: background 0.1s ease;
 
     &:hover {
-      background: var(--mat-datepicker-calendar-date-hover-state-background-color, rgb(0 0 0 / 6%));
+      background: var(--mat-datepicker-calendar-date-hover-state-background-color, rgb(var(--dk-ink-rgb, 0 0 0) / 6%));
     }
 
     &:focus-visible {
-      outline: 2px solid var(--mat-datepicker-calendar-date-selected-state-background-color, #6750a4);
+      outline: 2px solid var(--mat-datepicker-calendar-date-selected-state-background-color, var(--dk-purple, #6750a4));
       outline-offset: -2px;
     }
 
@@ -258,9 +258,9 @@
     }
 
     &--today {
-      color: var(--mat-datepicker-calendar-date-today-outline-color, #6750a4);
+      color: var(--mat-datepicker-calendar-date-today-outline-color, var(--dk-purple, #6750a4));
       font-weight: 700;
-      outline: 1px solid var(--mat-datepicker-calendar-date-today-outline-color, #6750a4);
+      outline: 1px solid var(--mat-datepicker-calendar-date-today-outline-color, var(--dk-purple, #6750a4));
     }
 
     &--disabled,
@@ -276,13 +276,13 @@
     display: flex;
     justify-content: space-between;
     padding: 3px 8px 6px;
-    border-top: 1px solid var(--mat-datepicker-calendar-header-divider-color, rgb(0 0 0 / 10%));
+    border-top: 1px solid var(--mat-datepicker-calendar-header-divider-color, rgb(var(--dk-ink-rgb, 0 0 0) / 10%));
   }
 
   &__footer-btn {
     border: none;
     background: transparent;
-    color: var(--mat-datepicker-calendar-date-selected-state-background-color, #6750a4);
+    color: var(--mat-datepicker-calendar-date-selected-state-background-color, var(--dk-purple, #6750a4));
     font-size: 11px;
     font-weight: 600;
     font-family: inherit;
@@ -294,7 +294,7 @@
     transition: background 0.1s ease;
 
     &:hover {
-      background: var(--mat-datepicker-calendar-date-hover-state-background-color, rgb(0 0 0 / 6%));
+      background: var(--mat-datepicker-calendar-date-hover-state-background-color, rgb(var(--dk-ink-rgb, 0 0 0) / 6%));
     }
 
     &:disabled {
@@ -308,7 +308,7 @@
 .mfx-cal-switch {
   display: inline-flex;
   margin-right: 8px;
-  border: 1px solid var(--mat-sys-outline-variant, #bdbdbd);
+  border: 1px solid var(--mat-sys-outline-variant, var(--dk-border, #bdbdbd));
   border-radius: 12px;
   overflow: hidden;
   vertical-align: middle;
@@ -317,7 +317,7 @@
     padding: 2px 8px;
     border: 0;
     background: transparent;
-    color: var(--mat-sys-on-surface-variant, #616161);
+    color: var(--mat-sys-on-surface-variant, var(--dk-text-2, #616161));
     font: 600 11px/1.4 inherit;
     cursor: pointer;
 
@@ -328,7 +328,7 @@
   }
 
   .mfx-cal-switch--on {
-    background: var(--mat-sys-primary, #1074b9);
+    background: var(--mat-sys-primary, var(--dk-fill, #2460b9));
     color: var(--mat-sys-on-primary, #fff);
   }
 }
@@ -338,30 +338,36 @@
 }
 
 .mfx-bs-picker__warning {
-  color: var(--mat-sys-error, #d32f2f);
+  color: var(--mat-sys-error, var(--dk-danger, #d32f2f));
 }
 
 .mfx-bs-picker__link {
   padding: 0;
   border: 0;
   background: none;
-  color: var(--mat-sys-primary, #1074b9);
+  color: var(--mat-sys-primary, var(--dk-primary, #2460b9));
   font: inherit;
   text-decoration: underline;
   cursor: pointer;
 }
 
 // ── Inline layout ─────────────────────────────────────────────────────────────
-// `18 Ashwin 2083 [cal] ··· [BS|AD] 4 Oct 2026 AD`: the input is as wide as its date so the calendar icon
-// sits right after it; the switch and the other calendar's date stay at the end of the field.
+// `18 Ashwin 2083 [cal] | [BS|AD] | 4 Oct 2026 AD`: three columns with equal outer ones, so the BS | AD switch
+// sits in the centre of every date field and never moves with the mode or the length of either date.
 .mfx-bs-picker--inline {
+  ::ng-deep .mat-mdc-form-field-flex {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    column-gap: 8px;
+  }
+
   ::ng-deep .mat-mdc-form-field-infix {
     display: flex;
     align-items: center;
     gap: 8px;
-    // Material's fixed 180px width would push the field past its slot; size to the date instead.
+    // Material's fixed 180px width would push the field past its slot; the grid column sizes it instead.
     width: auto;
-    min-width: 0;
   }
 
   .mfx-bs-picker__input,
@@ -372,51 +378,84 @@
     // A global rule gives the AD input a 5px vertical margin, which made the field taller than its neighbours.
     margin: 0;
     field-sizing: content;
+    text-overflow: ellipsis;
   }
 
   .mfx-bs-picker__cal-icon {
     flex-shrink: 0;
   }
 
-  // On a narrow screen the other calendar's date gives way (ellipsis) rather than widening the field.
   mat-form-field,
-  ::ng-deep .mat-mdc-text-field-wrapper,
-  ::ng-deep .mat-mdc-form-field-flex,
-  ::ng-deep .mat-mdc-form-field-icon-suffix {
+  ::ng-deep .mat-mdc-text-field-wrapper {
     min-width: 0;
   }
 
-  // A fixed slot for the other calendar's date (fits "32 Mangsir 2083 BS"), so the BS | AD switch stays
-  // in the same place when the mode, and with it the length of this date, changes.
+  // The right column: the other calendar's date, cut with an ellipsis on a narrow field.
   .mfx-bs-picker__other {
-    flex: 0 0 136px;
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     // Material's suffix area has line-height 0, which with overflow: hidden clips the text away.
     line-height: 1.5;
   }
+}
 
-  // Narrow phones: a smaller slot, still the same width in both modes.
-  @media (width <= 480px) {
-    .mfx-bs-picker__other {
-      flex-basis: 104px;
-    }
+.mfx-bs-picker__other {
+  color: var(--mat-sys-on-surface-variant, var(--dk-text-2, #616161));
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+// Inline look: one line high like its neighbours, read as date · calendar switch · picker.
+:host ::ng-deep .mfx-bs-picker--inline {
+  // Not Material's 180px minimum: the grid column sizes the date side.
+  .mat-mdc-form-field-infix {
+    min-width: 0;
   }
 
-  // The switch and the slot never shrink; the date side of the field gives way instead.
-  ::ng-deep .mat-mdc-form-field-icon-suffix {
-    flex-shrink: 0;
+  // The suffix holds the switch and the other calendar's date; unwrapped, they take the grid's centre and right
+  // columns.
+  .mat-mdc-form-field-flex > .mat-mdc-form-field-icon-suffix {
+    display: contents;
+  }
+
+  // The whole field opens the calendar in BS mode, so the whole field says so. Material drops the right padding
+  // when a field has a suffix; keep it equal to the left so the centre column is the field's centre.
+  .mat-mdc-text-field-wrapper {
+    padding-right: 16px;
+    cursor: pointer;
+  }
+
+  // Empty field: the label sits where the date goes, and a content-sized input put the calendar icon on top
+  // of it. Until the label floats, the input fills the line so the icon waits at its end.
+  .mat-mdc-form-field:not(:has(.mdc-floating-label--float-above)) .mat-mdc-form-field-infix input {
+    flex: 1 1 auto;
+  }
+
+  // The other calendar's date reads as part of the value, not a caption: near the date's size, muted.
+  .mfx-bs-picker__other {
+    color: var(--md-sys-color-on-surface-variant, var(--dk-text-muted, #64748b));
+    font-size: 0.875rem;
+  }
+}
+
+// Both layouts: the BS | AD switch as a segmented control next to the calendar icon, and the other calendar's
+// date as a quiet hint (standard layout, used in dialogs). A 24px calendar button keeps the field as high as its
+// neighbours.
+:host ::ng-deep .mfx-bs-picker {
+  // A global rule gives the AD input a 5px vertical margin, which made the field taller than its neighbours.
+  .mat-mdc-form-field-infix input {
+    margin: 0;
   }
 
   // In AD mode Material's datepicker button is 32px, inside an inline element that adds line height:
   // make both 24px so the field is as high as its neighbours, with the same 20px icon as BS mode.
-  ::ng-deep .mat-datepicker-toggle {
+  .mat-datepicker-toggle {
     display: flex;
     flex-shrink: 0;
   }
 
-  ::ng-deep .mat-datepicker-toggle .mat-mdc-icon-button {
+  .mat-datepicker-toggle .mat-mdc-icon-button {
     --mat-icon-button-state-layer-size: 24px;
     --mat-icon-button-touch-target-size: 24px;
 
@@ -439,37 +478,14 @@
   .mfx-cal-switch--on {
     order: -1;
   }
-}
 
-.mfx-bs-picker__other {
-  color: var(--mat-sys-on-surface-variant, #616161);
-  font-size: 0.75rem;
-  white-space: nowrap;
-}
-
-// Inline look: one line high like its neighbours, read as date · calendar switch · picker.
-:host ::ng-deep .mfx-bs-picker--inline {
-  // Material's 180px minimum input width pushed the calendar icon under the switch.
-  .mat-mdc-form-field-infix {
-    min-width: 0;
-  }
-
-  // The whole field opens the calendar in BS mode, so the whole field says so.
-  .mat-mdc-text-field-wrapper {
-    cursor: pointer;
-  }
-
-  // Empty field: the label sits where the date goes, and a content-sized input put the calendar icon on top
-  // of it. Until the label floats, the input fills the line so the icon waits at its end.
-  .mat-mdc-form-field:not(:has(.mdc-floating-label--float-above)) .mat-mdc-form-field-infix input {
-    flex: 1 1 auto;
-  }
-
+  // The margin keeps the calendar icon, which ends the date side, off the BS | AD switch.
   .mat-mdc-form-field-icon-suffix {
     display: flex;
     flex-wrap: nowrap;
     align-items: center;
     gap: 8px;
+    margin-left: 8px;
     padding-right: 8px;
   }
 
@@ -481,14 +497,14 @@
     padding: 2px;
     border: 0;
     border-radius: 8px;
-    background: var(--md-sys-color-surface-container-high, #e8edf3);
+    background: var(--md-sys-color-surface-container-high, var(--dk-surface-2, #e8edf3));
 
     button {
       min-width: 32px;
       height: 20px;
       padding: 0 8px;
       border-radius: 6px;
-      color: var(--md-sys-color-on-surface-variant, #64748b);
+      color: var(--md-sys-color-on-surface-variant, var(--dk-text-muted, #64748b));
       font-family: inherit;
       font-size: 0.6875rem;
       font-weight: 600;
@@ -499,33 +515,27 @@
         color 0.15s ease;
 
       &:hover:not(:disabled, .mfx-cal-switch--on) {
-        color: var(--md-sys-color-on-surface, #1e293b);
+        color: var(--md-sys-color-on-surface, var(--dk-text, #1e293b));
       }
 
       &:focus-visible {
-        outline: 2px solid var(--md-sys-color-primary, #1074b9);
+        outline: 2px solid var(--md-sys-color-primary, var(--dk-primary, #2460b9));
         outline-offset: 1px;
       }
     }
 
     .mfx-cal-switch--on {
-      background: var(--md-sys-color-surface, #fff);
-      color: var(--md-sys-color-primary, #1074b9);
+      background: var(--md-sys-color-surface, var(--dk-surface, #fff));
+      color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
       box-shadow: 0 1px 2px rgb(15 23 42 / 16%);
     }
-  }
-
-  // The other calendar's date reads as part of the value, not a caption: near the date's size, muted.
-  .mfx-bs-picker__other {
-    color: var(--md-sys-color-on-surface-variant, #64748b);
-    font-size: 0.875rem;
   }
 
   .mfx-bs-picker__cal-icon {
     width: 20px !important;
     height: 20px !important;
     font-size: 20px !important;
-    color: var(--md-sys-color-on-surface-variant, #64748b);
+    color: var(--md-sys-color-on-surface-variant, var(--dk-text-muted, #64748b));
     opacity: 1;
   }
 
@@ -535,7 +545,7 @@
   }
 
   .mat-mdc-form-field-hint {
-    color: var(--md-sys-color-on-surface-variant, #64748b);
+    color: var(--md-sys-color-on-surface-variant, var(--dk-text-muted, #64748b));
     font-size: 0.75rem;
     letter-spacing: 0.01em;
   }

@@ -46,7 +46,7 @@
 
     div,
     ng-template > div {
-      background-color: #0a6aac;
+      background-color: var(--dk-fill, #0a6aac);
 
       p {
         color: white;

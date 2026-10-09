@@ -11,27 +11,27 @@
 ========================================================= */
 
 :host {
-  --primary: #1074b9;
-  --primary-dark: #0a5a8f;
-  --primary-light: #eaf4fb;
-  --surface: #fff;
-  --bg: #f5f8fb;
-  --border: #e2e8ed;
-  --border-light: #eef2f7;
-  --text-primary: #172b3a;
-  --text-secondary: #45525c;
-  --text-muted: #7d8b95;
-  --success: #2e8b57;
-  --success-bg: #eaf7ef;
-  --success-border: #c9ead6;
-  --danger: #c94b4b;
-  --danger-bg: #fdeeee;
-  --danger-border: #f1cccc;
-  --warning: #a56b00;
-  --warning-bg: #fff5df;
-  --warning-border: #f5deac;
-  --shadow-sm: 0 2px 8px rgb(16 42 67 / 5%);
-  --shadow-md: 0 8px 24px rgb(16 42 67 / 8%);
+  --primary: var(--dk-primary, #2460b9);
+  --primary-dark: var(--dk-primary, #0a5a8f);
+  --primary-light: var(--dk-primary-soft, #eaf4fb);
+  --surface: var(--dk-surface, #fff);
+  --bg: var(--dk-surface-2, #f5f8fb);
+  --border: var(--dk-border, #e2e8ed);
+  --border-light: var(--dk-border, #eef2f7);
+  --text-primary: var(--dk-text, #172b3a);
+  --text-secondary: var(--dk-text-2, #45525c);
+  --text-muted: var(--dk-text-muted, #7d8b95);
+  --success: var(--dk-success, #2e8b57);
+  --success-bg: var(--dk-success-soft, #eaf7ef);
+  --success-border: var(--dk-success-border, #c9ead6);
+  --danger: var(--dk-danger, #c94b4b);
+  --danger-bg: var(--dk-danger-soft, #fdeeee);
+  --danger-border: var(--dk-danger-border, #f1cccc);
+  --warning: var(--dk-warning, #a56b00);
+  --warning-bg: var(--dk-warning-soft, #fff5df);
+  --warning-border: var(--dk-warning-border, #f5deac);
+  --shadow-sm: 0 2px 8px rgb(var(--dk-tint-rgb, 16 42 67) / 5%);
+  --shadow-md: 0 8px 24px rgb(var(--dk-tint-rgb, 16 42 67) / 8%);
 
   display: block;
   width: 100%;
@@ -67,7 +67,7 @@
   justify-content: center;
   padding: 20px;
   box-sizing: border-box;
-  background: rgb(16 42 67 / 55%);
+  background: rgb(var(--dk-tint-rgb, 16 42 67) / 55%);
   backdrop-filter: blur(3px);
 }
 
@@ -78,7 +78,7 @@
   box-sizing: border-box;
   text-align: center;
   border-radius: 20px;
-  background: #fff;
+  background: var(--dk-surface, #fff);
   box-shadow: var(--shadow-md);
 }
 
@@ -156,7 +156,7 @@
 }
 
 .admin-detail-content::-webkit-scrollbar-thumb {
-  background: #cbd5dc;
+  background: var(--dk-primary-soft, #cbd5dc);
   border-radius: 10px;
 }
 
@@ -177,8 +177,13 @@
   padding: 28px 32px;
   box-sizing: border-box;
   border-radius: 20px;
-  background: linear-gradient(135deg, #0d5d94 0%, #1074b9 55%, #2f8fd1 100%);
-  box-shadow: 0 10px 28px rgb(16 116 185 / 22%);
+  background: linear-gradient(
+    135deg,
+    var(--dk-fill, #0d5d94) 0%,
+    var(--dk-fill, #2460b9) 55%,
+    var(--dk-fill, #2f8fd1) 100%
+  );
+  box-shadow: 0 10px 28px rgb(36 96 185 / 22%);
 }
 
 .header-left {
@@ -274,14 +279,14 @@
 
 .status-badge.status-provisioned {
   background: var(--primary-light);
-  border-color: #cfe6f7;
+  border-color: var(--dk-primary-border, #cfe6f7);
   color: var(--primary-dark);
 }
 
 .status-badge.status-active {
   background: var(--success-bg);
   border-color: var(--success-border);
-  color: #217a48;
+  color: var(--dk-success, #217a48);
 }
 
 .status-badge.status-rejected {
@@ -323,25 +328,25 @@
 .success-alert {
   background: var(--success-bg);
   border: 1px solid var(--success-border);
-  color: #1e6b41;
+  color: var(--dk-success, #1e6b41);
 }
 
 .success-alert .alert-icon {
   background: var(--success);
-  color: #fff;
+  color: var(--dk-on-accent, #fff);
 }
 
 .error-alert,
 .error-message {
   background: var(--danger-bg);
   border: 1px solid var(--danger-border);
-  color: #9b3232;
+  color: var(--dk-danger, #9b3232);
 }
 
 .error-alert .alert-icon,
 .error-message .alert-icon {
   background: var(--danger);
-  color: #fff;
+  color: var(--dk-on-accent, #fff);
 }
 
 /* =========================================================
@@ -451,7 +456,7 @@
   min-height: 66px;
   padding: 13px 15px;
   box-sizing: border-box;
-  background: #fff;
+  background: var(--dk-surface, #fff);
   border: 1.5px solid var(--border);
   border-radius: 10px;
 }
@@ -557,8 +562,8 @@
   padding: 5px 9px;
   border: 1px solid var(--border);
   border-radius: 7px;
-  background: #f8fafc;
-  color: #334155;
+  background: var(--dk-surface-2, #f8fafc);
+  color: var(--dk-text-2, #334155);
   font-family: SFMono-Regular, Consolas, 'Liberation Mono', monospace;
   font-size: 11px;
   font-weight: 700;
@@ -574,7 +579,7 @@
   box-sizing: border-box;
   border: 1.5px solid var(--border);
   border-radius: 12px;
-  background: #fafbfc;
+  background: var(--dk-surface-2, #fafbfc);
   color: var(--text-secondary);
   font-size: 13px;
   line-height: 1.7;
@@ -602,17 +607,17 @@
   padding: 17px 18px;
   box-sizing: border-box;
   border-radius: 13px;
-  background: #fff;
+  background: var(--dk-surface, #fff);
 }
 
 .applicant-remark {
-  border: 1.5px solid #d6e8fb;
-  background: #fff;
+  border: 1.5px solid var(--dk-primary-border, #d6e8fb);
+  background: var(--dk-surface, #fff);
 }
 
 .admin-remark {
   border: 1.5px solid var(--border);
-  background: #fff;
+  background: var(--dk-surface, #fff);
 }
 
 .remark-label {
@@ -647,8 +652,8 @@
 }
 
 .pending-action {
-  border: 1.5px solid #cfe6f7;
-  background: linear-gradient(180deg, #f7fbff 0%, #fff 140px);
+  border: 1.5px solid var(--dk-primary-border, #cfe6f7);
+  background: linear-gradient(180deg, var(--dk-surface-2, #f7fbff) 0%, var(--dk-surface, #fff) 140px);
 }
 
 .action-header {
@@ -700,7 +705,7 @@
 }
 
 ::ng-deep .action-card .mat-mdc-text-field-wrapper {
-  background: #fff;
+  background: var(--dk-surface, #fff);
 }
 
 ::ng-deep .action-card .mat-mdc-form-field.mat-focused .mdc-notched-outline__leading,
@@ -723,10 +728,10 @@
   height: 44px;
   border-radius: 9px !important;
   background: var(--primary) !important;
-  color: #fff !important;
+  color: var(--dk-on-accent, #fff) !important;
   font-size: 12.5px !important;
   font-weight: 700 !important;
-  box-shadow: 0 4px 12px rgb(16 116 185 / 26%) !important;
+  box-shadow: 0 4px 12px rgb(36 96 185 / 26%) !important;
   transition:
     background 0.15s ease,
     transform 0.15s ease;
@@ -747,7 +752,7 @@
   height: 44px;
   border: 1.5px solid var(--danger-border) !important;
   border-radius: 9px !important;
-  background: #fff !important;
+  background: var(--dk-surface, #fff) !important;
   color: var(--danger) !important;
   font-size: 12.5px !important;
   font-weight: 700 !important;
@@ -794,21 +799,21 @@
   flex: 0 0 auto;
   border-radius: 9px;
   background: var(--danger);
-  color: #fff;
+  color: var(--dk-on-accent, #fff);
   font-size: 15px;
   font-weight: 800;
 }
 
 .reject-form-header h3 {
   margin: 0 0 4px;
-  color: #7a2a2a;
+  color: var(--dk-danger, #7a2a2a);
   font-size: 14px;
   font-weight: 750;
 }
 
 .reject-form-header p {
   margin: 0;
-  color: #9b4c4c;
+  color: var(--dk-danger, #9b4c4c);
   font-size: 11.5px;
   line-height: 1.6;
 }
@@ -834,7 +839,7 @@
   height: 40px;
   border-radius: 8px !important;
   background: var(--danger) !important;
-  color: #fff !important;
+  color: var(--dk-on-accent, #fff) !important;
   font-size: 12px !important;
   font-weight: 700 !important;
   box-shadow: 0 4px 10px rgb(201 75 75 / 26%) !important;
@@ -894,15 +899,15 @@
 
 .active-card .status-info-icon {
   background: var(--success);
-  color: #fff;
+  color: var(--dk-on-accent, #fff);
 }
 
 .active-card h2 {
-  color: #1e6b41;
+  color: var(--dk-success, #1e6b41);
 }
 
 .active-card p {
-  color: #2f7a54;
+  color: var(--dk-success, #2f7a54);
 }
 
 .rejected-card {
@@ -912,15 +917,15 @@
 
 .rejected-card .status-info-icon {
   background: var(--danger);
-  color: #fff;
+  color: var(--dk-on-accent, #fff);
 }
 
 .rejected-card h2 {
-  color: #9b3232;
+  color: var(--dk-danger, #9b3232);
 }
 
 .rejected-card p {
-  color: #a84545;
+  color: var(--dk-danger, #a84545);
 }
 
 /* =========================================================
@@ -939,7 +944,7 @@
 .nav-box {
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgb(16 116 185 / 14%);
+  box-shadow: 0 2px 8px rgb(36 96 185 / 14%);
 }
 
 .nav-button {
@@ -982,7 +987,7 @@
 
 .nav-box-back .back-button {
   background: var(--primary) !important;
-  color: #fff !important;
+  color: var(--dk-on-accent, #fff) !important;
 }
 
 .nav-box-back .back-button:hover:not(:disabled) {
@@ -991,7 +996,7 @@
 
 .nav-box-next .next-button {
   background: var(--primary) !important;
-  color: #fff !important;
+  color: var(--dk-on-accent, #fff) !important;
 }
 
 .nav-box-next .next-button:hover:not(:disabled) {
@@ -1005,7 +1010,7 @@
 .skeleton {
   position: relative;
   overflow: hidden;
-  background: #e7ecf1;
+  background: var(--dk-surface-2, #e7ecf1);
   border-radius: 6px;
 }
 

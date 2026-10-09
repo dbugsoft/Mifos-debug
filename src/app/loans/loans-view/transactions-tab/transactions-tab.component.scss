@@ -8,25 +8,25 @@
 
 /* ── Design tokens (mirrors charges-tab) ────────────────────── */
 :host {
-  --ch-blue-700: #1565c0;
-  --ch-blue-600: #1976d2;
-  --ch-blue-100: #bbdefb;
-  --ch-blue-50: #e3f2fd;
-  --ch-blue-20: #f0f7ff;
-  --ch-surface: #fff;
-  --ch-surface-alt: #f4f7fb;
-  --ch-surface-h: #ebf2fa;
-  --ch-border: #dde5f0;
-  --ch-text-1: #0d1b2a;
-  --ch-text-2: #4a6785;
-  --ch-text-3: #8fa5bc;
-  --ch-paid: #2e7d32;
-  --ch-paid-bg: #e8f5e9;
-  --ch-partial: #e65100;
-  --ch-partial-bg: #fff3e0;
-  --ch-alert: #c62828;
-  --ch-alert-bg: #ffebee;
-  --ch-zero: #b0bec5;
+  --ch-blue-700: var(--dk-primary, #1565c0);
+  --ch-blue-600: var(--dk-primary, #1976d2);
+  --ch-blue-100: var(--dk-primary-soft, #bbdefb);
+  --ch-blue-50: var(--dk-primary-soft, #e3f2fd);
+  --ch-blue-20: var(--dk-primary-soft, #f0f7ff);
+  --ch-surface: var(--dk-surface, #fff);
+  --ch-surface-alt: var(--dk-surface-2, #f4f7fb);
+  --ch-surface-h: var(--dk-primary-soft, #ebf2fa);
+  --ch-border: var(--dk-border, #dde5f0);
+  --ch-text-1: var(--dk-text, #0d1b2a);
+  --ch-text-2: var(--dk-primary, #4a6785);
+  --ch-text-3: var(--dk-primary, #8fa5bc);
+  --ch-paid: var(--dk-success, #2e7d32);
+  --ch-paid-bg: var(--dk-success-soft, #e8f5e9);
+  --ch-partial: var(--dk-warning, #e65100);
+  --ch-partial-bg: var(--dk-warning-soft, #fff3e0);
+  --ch-alert: var(--dk-danger, #c62828);
+  --ch-alert-bg: var(--dk-danger-soft, #ffebee);
+  --ch-zero: var(--dk-text-muted, #b0bec5);
 
   /* transaction state tokens */
   --tx-disbursement: var(--ch-blue-700);
@@ -37,14 +37,14 @@
   --tx-accrual-bg: var(--ch-surface-h);
   --tx-reversed: var(--ch-alert);
   --tx-reversed-bg: var(--ch-alert-bg);
-  --tx-downpayment: #6a1b9a;
-  --tx-downpayment-bg: #f3e5f5;
+  --tx-downpayment: var(--dk-purple, #6a1b9a);
+  --tx-downpayment-bg: var(--dk-purple-soft, #f3e5f5);
   --tx-chargeoff: var(--ch-partial);
   --tx-chargeoff-bg: var(--ch-partial-bg);
-  --tx-reage: #283593;
-  --tx-reage-bg: #e8eaf6;
-  --tx-reamortize: #00695c;
-  --tx-reamortize-bg: #e0f2f1;
+  --tx-reage: var(--dk-primary, #283593);
+  --tx-reage-bg: var(--dk-primary-soft, #e8eaf6);
+  --tx-reamortize: var(--dk-text, #00695c);
+  --tx-reamortize-bg: var(--dk-primary-soft, #e0f2f1);
   --tx-linked: var(--ch-paid);
   --tx-linked-bg: var(--ch-paid-bg);
 
@@ -54,25 +54,25 @@
 
 /* ── Dark mode overrides ─────────────────────────────────────── */
 :host-context(.dark-theme) {
-  --ch-blue-700: #5b9bd5;
-  --ch-blue-600: #7ab3e0;
-  --ch-blue-100: #1a3a60;
-  --ch-blue-50: #0a2040;
+  --ch-blue-700: #e0e0e0;
+  --ch-blue-600: #e0e0e0;
+  --ch-blue-100: #393939;
+  --ch-blue-50: #202020;
   --ch-blue-20: #0d1f35;
   --ch-surface: #1a2535;
   --ch-surface-alt: #101d2d;
   --ch-surface-h: #132032;
-  --ch-border: #1e3050;
+  --ch-border: #303030;
   --ch-text-1: #e2ebf6;
-  --ch-text-2: #8baecf;
-  --ch-text-3: #6a8fad;
+  --ch-text-2: #c4c6d0;
+  --ch-text-3: #b0b2ba;
   --ch-paid: #66bb6a;
   --ch-paid-bg: #172b1a;
   --ch-partial: #ffa726;
   --ch-partial-bg: #281c0b;
   --ch-alert: #ef9a9a;
   --ch-alert-bg: #2b1212;
-  --ch-zero: #6a8fad;
+  --ch-zero: #b0b2ba;
   --tx-downpayment: #ce93d8;
   --tx-downpayment-bg: #1a0a26;
   --tx-reage: #9fa8da;

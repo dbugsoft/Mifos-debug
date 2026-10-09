@@ -35,8 +35,8 @@
     justify-content: center;
     font-weight: 700;
     font-size: 13px;
-    background: #e0e0e0;
-    color: #555;
+    background: var(--dk-surface-2, #e0e0e0);
+    color: var(--dk-text-2, #555);
   }
 
   .done .n {
@@ -45,7 +45,7 @@
   }
 
   .now .n {
-    background: #1074b9;
+    background: var(--dk-fill, #2460b9);
     color: #fff;
   }
 
@@ -86,15 +86,15 @@
   font-weight: 600;
 
   &.PENDING {
-    color: #f29400;
+    color: var(--dk-warning, #f29400);
   }
 
   &.APPROVED {
-    color: #2e7d32;
+    color: var(--dk-success, #2e7d32);
   }
 
   &.REJECTED {
-    color: #c62828;
+    color: var(--dk-danger, #c62828);
   }
 }
 /* stylelint-enable selector-class-pattern */
@@ -121,15 +121,15 @@ h3 {
   padding: 1px 8px;
   border-radius: 10px;
   font-size: 12px;
-  background: #e8f1fb;
-  color: #0b5a91;
+  background: var(--dk-primary-soft, #e8f1fb);
+  color: var(--dk-primary, #0b5a91);
 }
 
 .notice {
   margin: 16px 0 0;
   padding: 10px 14px;
   border-radius: 6px;
-  background: #f6f9fc;
+  background: var(--dk-surface-2, #f6f9fc);
 }
 
 :host-context(.dark-theme) {
@@ -138,7 +138,7 @@ h3 {
   }
 
   .tag {
-    background: rgb(16 116 185 / 25%);
+    background: rgb(98 98 98 / 25%);
     color: inherit;
   }
 }
@@ -152,7 +152,7 @@ h3 {
   border-collapse: collapse;
 
   th {
-    background: #1074b9;
+    background: var(--dk-fill, #2460b9);
     color: #fff;
     text-align: left;
     padding: 10px 12px;
@@ -161,7 +161,7 @@ h3 {
 
   td {
     padding: 10px 12px;
-    border-bottom: 1px solid rgb(0 0 0 / 12%);
+    border-bottom: 1px solid rgb(var(--dk-ink-rgb, 0 0 0) / 12%);
   }
 }
 

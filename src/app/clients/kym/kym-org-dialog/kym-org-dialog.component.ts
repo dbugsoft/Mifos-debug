@@ -133,7 +133,7 @@ function iso(d: Date | null): string | null {
         margin-top: 8px;
         padding: 12px;
         border-radius: 6px;
-        background: rgb(16 116 185 / 6%);
+        background: rgb(36 96 185 / 6%);
       }
       @media (width <= 600px) {
         .row {

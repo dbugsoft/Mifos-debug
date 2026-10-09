@@ -13,9 +13,9 @@
 }
 
 .breadcrumb-wrapper {
-  --bc-text: var(--md-sys-color-on-surface, #1e293b);
-  --bc-muted: var(--md-sys-color-on-surface-variant, #64748b);
-  --bc-accent: var(--md-sys-color-primary, #2460b9);
+  --bc-text: var(--md-sys-color-on-surface, var(--dk-text, #1e293b));
+  --bc-muted: var(--md-sys-color-on-surface-variant, var(--dk-text-muted, #64748b));
+  --bc-accent: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
 
   margin: 0 auto;
   max-width: 84rem;
@@ -49,8 +49,8 @@
   border-radius: 18px;
   font-weight: 500;
   color: var(--bc-accent);
-  background: var(--md-sys-color-surface, #fff);
-  border: 1px solid var(--md-sys-color-outline-variant, #cbd5e1);
+  background: var(--md-sys-color-surface, var(--dk-surface, #fff));
+  border: 1px solid var(--md-sys-color-outline-variant, var(--dk-border, #cbd5e1));
   text-decoration: none;
   transition:
     background-color 0.15s ease,
@@ -59,7 +59,7 @@
 
   &:hover {
     border-color: var(--bc-accent);
-    background: color-mix(in srgb, var(--bc-accent) 8%, var(--md-sys-color-surface, #fff));
+    background: color-mix(in srgb, var(--bc-accent) 8%, var(--md-sys-color-surface, var(--dk-surface, #fff)));
   }
 
   &:hover mat-icon {
@@ -156,7 +156,7 @@
   .breadcrumb-wrapper {
     --bc-text: var(--md-sys-color-on-surface, #f1f5f9);
     --bc-muted: var(--md-sys-color-on-surface-variant, #94a3b8);
-    --bc-accent: var(--md-sys-color-primary, #5ba2ec);
+    --bc-accent: var(--md-sys-color-primary, #e0e0e0);
   }
 }
 

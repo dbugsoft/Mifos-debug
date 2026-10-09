@@ -6,122 +6,102 @@
   file, You can obtain one at http://mozilla.org/MPL/2.0/.
 -->
 
-<div class="container m-b-20 layout-row layout-lt-md-column align-end gap-2percent user-actions">
-  <button mat-raised-button color="primary" [routerLink]="['edit']">
-    <fa-icon icon="edit" class="m-r-10"></fa-icon>
-    {{ 'labels.buttons.Edit' | translate }}
-  </button>
-  <button mat-raised-button color="warn" (click)="delete()">
-    <fa-icon icon="trash" class="m-r-10"></fa-icon>
-    {{ 'labels.buttons.Delete' | translate }}
-  </button>
-  <button mat-raised-button color="primary" (click)="changeUserPassword()">
-    <fa-icon icon="cog" class="m-r-10"></fa-icon>
-    {{ 'labels.buttons.Change Password' | translate }}
-  </button>
-  @if (loginStatus()?.locked && canUnlock) {
-    <button mat-raised-button color="primary" (click)="unlock()">
-      <fa-icon icon="lock-open" class="m-r-10"></fa-icon>
-      {{ 'staffAccess.users.Unlock account' | translate }}
-    </button>
-  }
-  @if (loginStatus()?.emailVerificationRequired && !loginStatus()?.emailVerified && canSendCode && userData.email) {
-    <button mat-raised-button color="primary" (click)="sendVerificationCode()">
-      <fa-icon icon="envelope" class="m-r-10"></fa-icon>
-      {{ 'staffAccess.users.Send verification code' | translate }}
-    </button>
-  }
-</div>
-
 <div class="container">
-  <mat-card>
-    <mat-card-content>
-      <div class="content-rows">
-        <div class="content-row">
-          <div class="label">{{ 'labels.inputs.Login Name' | translate }}</div>
-          <div class="value">{{ userData.username }}</div>
-        </div>
+  <div class="page-actions">
+    <button mat-raised-button color="primary" [routerLink]="['edit']">
+      <fa-icon icon="edit" class="m-r-10"></fa-icon>
+      {{ 'labels.buttons.Edit' | translate }}
+    </button>
+    <button mat-raised-button color="warn" (click)="delete()">
+      <fa-icon icon="trash" class="m-r-10"></fa-icon>
+      {{ 'labels.buttons.Delete' | translate }}
+    </button>
+    <button mat-raised-button color="primary" (click)="changeUserPassword()">
+      <fa-icon icon="cog" class="m-r-10"></fa-icon>
+      {{ 'labels.buttons.Change Password' | translate }}
+    </button>
+    @if (loginStatus()?.locked && canUnlock) {
+      <button mat-raised-button color="primary" (click)="unlock()">
+        <fa-icon icon="lock-open" class="m-r-10"></fa-icon>
+        {{ 'staffAccess.users.Unlock account' | translate }}
+      </button>
+    }
+    @if (loginStatus()?.emailVerificationRequired && !loginStatus()?.emailVerified && canSendCode && userData.email) {
+      <button mat-raised-button color="primary" (click)="sendVerificationCode()">
+        <fa-icon icon="envelope" class="m-r-10"></fa-icon>
+        {{ 'staffAccess.users.Send verification code' | translate }}
+      </button>
+    }
+  </div>
 
-        <div class="content-row">
-          <div class="label">{{ 'labels.inputs.First Name' | translate }}</div>
-          <div class="value">{{ userData.firstname }}</div>
-        </div>
+  <dl class="details">
+    <dt>{{ 'labels.inputs.Login Name' | translate }}</dt>
+    <dd>
+      {{ userData.username }}
+    </dd>
 
-        <div class="content-row">
-          <div class="label">{{ 'labels.inputs.Last Name' | translate }}</div>
-          <div class="value">{{ userData.lastname }}</div>
-        </div>
+    <dt>{{ 'labels.inputs.First Name' | translate }}</dt>
+    <dd>
+      {{ userData.firstname }}
+    </dd>
 
-        @if (userData.email) {
-          <div class="content-row">
-            <div class="label">{{ 'labels.inputs.Email' | translate }}</div>
-            <div class="value">
-              {{ userData.email }}
-              @if (loginStatus()?.emailVerificationRequired) {
-                @if (loginStatus()?.emailVerified) {
-                  <span class="login-state after-text status-active">
-                    <fa-icon icon="check"></fa-icon>{{ 'staffAccess.users.Verified' | translate }}
-                  </span>
-                } @else {
-                  <span class="login-state after-text status-pending">
-                    <fa-icon icon="envelope"></fa-icon>{{ 'staffAccess.users.Email not verified' | translate }}
-                  </span>
-                }
-              }
-            </div>
-          </div>
-        }
+    <dt>{{ 'labels.inputs.Last Name' | translate }}</dt>
+    <dd>
+      {{ userData.lastname }}
+    </dd>
 
-        @if (loginStatus(); as status) {
-          <div class="content-row">
-            <div class="label">{{ 'staffAccess.users.Sign-in' | translate }}</div>
-            <div class="value">
-              @if (status.locked) {
-                <span class="login-state status-deleted">
-                  <fa-icon icon="lock"></fa-icon>
-                  {{
-                    'staffAccess.users.Locked after wrong passwords' | translate: { count: status.failedLoginAttempts }
-                  }}
-                </span>
-              } @else {
-                <span class="login-state status-active">
-                  <fa-icon icon="check"></fa-icon>{{ 'staffAccess.users.Can sign in' | translate }}
-                </span>
-              }
-            </div>
-          </div>
-        }
-
-        <div class="content-row">
-          <div class="label">{{ 'labels.inputs.Roles' | translate }}</div>
-          <div class="value">
-            @for (role of userData.selectedRoles; track role) {
-              <span>
-                {{ role.name }}
-              </span>
-            }
-          </div>
-        </div>
-
-        <div class="content-row">
-          <div class="label">{{ 'labels.buttons.Is Self Service' | translate }}</div>
-          <div class="value">
-            <span class="self-service-container">
-              <span
-                [ngClass]="userData.isSelfServiceUser ? 'self-service-true' : 'self-service-false'"
-                class="self-service-indicator"
-              ></span>
-              {{ userData.isSelfServiceUser ? ('labels.buttons.Yes' | translate) : ('labels.buttons.No' | translate) }}
+    @if (userData.email) {
+      <dt>{{ 'labels.inputs.Email' | translate }}</dt>
+      <dd>
+        {{ userData.email }}
+        @if (loginStatus()?.emailVerificationRequired) {
+          @if (loginStatus()?.emailVerified) {
+            <span class="login-state after-text status-active">
+              <fa-icon icon="check"></fa-icon>{{ 'staffAccess.users.Verified' | translate }}
             </span>
-          </div>
-        </div>
-      </div>
+          } @else {
+            <span class="login-state after-text status-pending">
+              <fa-icon icon="envelope"></fa-icon>{{ 'staffAccess.users.Email not verified' | translate }}
+            </span>
+          }
+        }
+      </dd>
+    }
 
-      <div class="layout-row layout-align-center gap-2percent column-on-mobile back-button-container">
-        <button type="button" mat-raised-button color="primary" [routerLink]="['../']">
-          {{ 'labels.buttons.Back' | translate }}
-        </button>
-      </div>
-    </mat-card-content>
-  </mat-card>
+    @if (loginStatus(); as status) {
+      <dt>{{ 'staffAccess.users.Sign-in' | translate }}</dt>
+      <dd>
+        @if (status.locked) {
+          <span class="login-state status-deleted">
+            <fa-icon icon="lock"></fa-icon>
+            {{ 'staffAccess.users.Locked after wrong passwords' | translate: { count: status.failedLoginAttempts } }}
+          </span>
+        } @else {
+          <span class="login-state status-active">
+            <fa-icon icon="check"></fa-icon>{{ 'staffAccess.users.Can sign in' | translate }}
+          </span>
+        }
+      </dd>
+    }
+
+    <dt>{{ 'labels.inputs.Roles' | translate }}</dt>
+    <dd>
+      @for (role of userData.selectedRoles; track role) {
+        <span>
+          {{ role.name }}
+        </span>
+      }
+    </dd>
+
+    <dt>{{ 'labels.buttons.Is Self Service' | translate }}</dt>
+    <dd>
+      <span class="self-service-container">
+        <span
+          [ngClass]="userData.isSelfServiceUser ? 'self-service-true' : 'self-service-false'"
+          class="self-service-indicator"
+        ></span>
+        {{ userData.isSelfServiceUser ? ('labels.buttons.Yes' | translate) : ('labels.buttons.No' | translate) }}
+      </span>
+    </dd>
+  </dl>
 </div>

@@ -24,6 +24,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslateService } from '@ngx-translate/core';
 import { Chart, registerables } from 'chart.js';
+import { applyChartTheme } from 'app/shared/utils/chart-theme.util';
 import { debounceTime, distinctUntilChanged, filter, of, switchMap } from 'rxjs';
 import { ClientsService } from 'app/clients/clients.service';
 import { BsCalendarService } from 'app/core/bs-calendar/bs-calendar.service';
@@ -355,6 +356,7 @@ export class LoanCalculatorComponent implements OnDestroy {
     const t = (key: string) => this.translate.instant(key);
     const style = getComputedStyle(canvas);
     const color = (token: string, fallback: string) => style.getPropertyValue(token).trim() || fallback;
+    applyChartTheme();
     this.chart = new Chart(canvas, {
       type: 'bar',
       data: {
@@ -364,8 +366,8 @@ export class LoanCalculatorComponent implements OnDestroy {
             type: 'line',
             label: t('labels.inputs.Balance Of Loan'),
             data: this.installments.map((p) => p.principalLoanBalanceOutstanding),
-            borderColor: color('--mat-sys-primary', '#1074b9'),
-            backgroundColor: color('--mat-sys-primary', '#1074b9'),
+            borderColor: color('--mat-sys-primary', '#2460b9'),
+            backgroundColor: color('--mat-sys-primary', '#2460b9'),
             yAxisID: 'balance',
             pointRadius: 2,
             order: 0

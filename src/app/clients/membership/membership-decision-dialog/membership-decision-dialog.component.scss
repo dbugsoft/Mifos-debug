@@ -30,7 +30,7 @@
   margin: 0 0 16px;
   padding: 8px 12px;
   border-radius: 6px;
-  background: #f6f9fc;
+  background: var(--dk-surface-2, #f6f9fc);
 }
 
 :host-context(.dark-theme) .paid {
@@ -38,7 +38,7 @@
 }
 
 .error {
-  color: #c62828;
+  color: var(--dk-danger, #c62828);
   font-size: 12px;
   margin: 0 0 8px;
 }
@@ -59,8 +59,8 @@
   margin: 0 0 12px;
   padding: 10px 14px;
   border-radius: 6px;
-  background: #fdeceb;
-  color: #9f1f17;
+  background: var(--dk-danger-soft, #fdeceb);
+  color: var(--dk-danger, #9f1f17);
 
   a {
     margin-left: 6px;

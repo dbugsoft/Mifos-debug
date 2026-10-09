@@ -15,20 +15,20 @@
   margin: 0 auto 20px;
   padding: 20px 24px;
   box-sizing: border-box;
-  border: 1.5px solid #cfe6f7;
+  border: 1.5px solid var(--dk-primary-border, #cfe6f7);
   border-radius: 16px;
-  background: #fff;
+  background: var(--dk-surface, #fff);
   box-shadow: 0 2px 8px rgb(16 42 67 / 5%);
 }
 
 .system-status-card.danger {
-  border-color: #f1cccc;
-  background: #fdeeee;
+  border-color: var(--dk-danger-border, #f1cccc);
+  background: var(--dk-danger-soft, #fdeeee);
 }
 
 .system-status-card.muted-card {
-  border-color: #e2e8ed;
-  background: #fafbfc;
+  border-color: var(--dk-border, #e2e8ed);
+  background: var(--dk-surface-2, #fafbfc);
 }
 
 .card-heading {
@@ -45,8 +45,8 @@
   height: 40px;
   flex: 0 0 auto;
   border-radius: 11px;
-  background: #eaf4fb;
-  color: #1074b9;
+  background: var(--dk-primary-soft, #eaf4fb);
+  color: var(--dk-primary, #2460b9);
   font-size: 17px;
   font-weight: 800;
 }
@@ -58,14 +58,14 @@
 
 .card-heading h2 {
   margin: 0 0 4px;
-  color: #172b3a;
+  color: var(--dk-text, #172b3a);
   font-size: 15.5px;
   font-weight: 750;
 }
 
 .card-heading p {
   margin: 0;
-  color: #45525c;
+  color: var(--dk-text-2, #45525c);
   font-size: 12.5px;
   line-height: 1.6;
 }
@@ -83,14 +83,14 @@
   flex-direction: column;
   min-width: 0;
   padding: 12px 14px;
-  border: 1.5px solid #e2e8ed;
+  border: 1.5px solid var(--dk-border, #e2e8ed);
   border-radius: 10px;
-  background: #fff;
+  background: var(--dk-surface, #fff);
 }
 
 .detail dt {
   margin-bottom: 6px;
-  color: #7d8b95;
+  color: var(--dk-text-muted, #7d8b95);
   font-size: 9.5px;
   font-weight: 750;
   letter-spacing: 0.06em;
@@ -99,7 +99,7 @@
 
 .detail dd {
   margin: 0;
-  color: #172b3a;
+  color: var(--dk-text, #172b3a);
   font-size: 13px;
   font-weight: 600;
   overflow-wrap: anywhere;
@@ -119,21 +119,21 @@
 
 .copy-button {
   padding: 3px 10px;
-  border: 1px solid #e2e8ed;
+  border: 1px solid var(--dk-border, #e2e8ed);
   border-radius: 7px;
-  background: #fff;
-  color: #1074b9;
+  background: var(--dk-surface, #fff);
+  color: var(--dk-primary, #2460b9);
   font-size: 11px;
   font-weight: 700;
   cursor: pointer;
 }
 
 .copy-button:hover {
-  background: #eaf4fb;
+  background: var(--dk-primary-soft, #eaf4fb);
 }
 
 .sign-in-link {
-  color: #1074b9;
+  color: var(--dk-primary, #2460b9);
   text-decoration: none;
 }
 
@@ -142,14 +142,14 @@
 }
 
 .muted {
-  color: #7d8b95;
+  color: var(--dk-text-muted, #7d8b95);
   font-weight: 500;
 }
 
 .guidance {
   margin: 0;
   padding-left: 20px;
-  color: #45525c;
+  color: var(--dk-text-2, #45525c);
   font-size: 12.5px;
   line-height: 1.7;
 }
@@ -186,8 +186,8 @@
   height: 68px;
   margin-bottom: 20px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #e3f7ec 0%, #d2f0e0 100%);
-  color: #2e8b57;
+  background: linear-gradient(135deg, var(--dk-success-soft, #e3f7ec) 0%, var(--dk-success-soft, #d2f0e0) 100%);
+  color: var(--dk-success, #2e8b57);
   font-size: 32px;
   font-weight: 800;
   box-shadow: 0 8px 20px rgb(46 139 87 / 20%);
@@ -195,7 +195,7 @@
 
 .hero-title {
   margin: 0 0 10px;
-  color: #172b3a;
+  color: var(--dk-text, #172b3a);
   font-size: 30px;
   font-weight: 800;
   letter-spacing: -0.01em;
@@ -203,7 +203,7 @@
 
 .hero-subtitle {
   margin: 0;
-  color: #526270;
+  color: var(--dk-text-2, #526270);
   font-size: 14.5px;
   line-height: 1.65;
 }
@@ -213,9 +213,9 @@
   max-width: 920px;
   padding: 28px 32px;
   box-sizing: border-box;
-  border: 1.5px solid #cfe6f7;
+  border: 1.5px solid var(--dk-primary-border, #cfe6f7);
   border-radius: 18px;
-  background: #fff;
+  background: var(--dk-surface, #fff);
   box-shadow: 0 4px 20px rgb(16 42 67 / 6%);
 }
 
@@ -223,17 +223,17 @@
 // only the icon tint and the card's own heading/text differ.
 
 .hero-icon.onboarding {
-  background: linear-gradient(135deg, #eaf4fb 0%, #d7ecf9 100%);
-  color: #1074b9;
-  box-shadow: 0 8px 20px rgb(16 116 185 / 20%);
+  background: linear-gradient(135deg, var(--dk-primary-soft, #eaf4fb) 0%, var(--dk-primary-soft, #d7ecf9) 100%);
+  color: var(--dk-primary, #2460b9);
+  box-shadow: 0 8px 20px rgb(36 96 185 / 20%);
 }
 
 // PROVISIONED reuses the same hero/actions layout, with no details
 // card underneath (there is nothing to sign in with yet).
 
 .hero-icon.pending {
-  background: linear-gradient(135deg, #fff4e0 0%, #ffe9c2 100%);
-  color: #b9720f;
+  background: linear-gradient(135deg, var(--dk-warning-soft, #fff4e0) 0%, var(--dk-warning-soft, #ffe9c2) 100%);
+  color: var(--dk-warning, #b9720f);
   box-shadow: 0 8px 20px rgb(185 114 15 / 20%);
 }
 
@@ -243,14 +243,14 @@
 
 .onboarding-card-title {
   margin: 0 0 8px;
-  color: #172b3a;
+  color: var(--dk-text, #172b3a);
   font-size: 16px;
   font-weight: 750;
 }
 
 .onboarding-card-text {
   margin: 0;
-  color: #45525c;
+  color: var(--dk-text-2, #45525c);
   font-size: 13px;
   line-height: 1.7;
 }
@@ -268,19 +268,19 @@
   padding: 0 24px;
   border: none;
   border-radius: 9px;
-  background: #1074b9;
+  background: var(--dk-fill, #2460b9);
   color: #fff;
   font-size: 13.5px;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgb(16 116 185 / 25%);
+  box-shadow: 0 4px 12px rgb(36 96 185 / 25%);
   transition:
     background 0.18s ease,
     transform 0.18s ease;
 }
 
 .welcome-next-button:hover {
-  background: #0c639e;
+  background: var(--dk-fill, #0c639e);
   transform: translateY(-1px);
 }
 

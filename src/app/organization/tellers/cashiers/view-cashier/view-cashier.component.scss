@@ -43,7 +43,7 @@ mat-card-content {
 
 .detail-table {
   width: 100%;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--dk-border, #e2e8f0);
   border-radius: 10px;
   border-collapse: separate;
   border-spacing: 0;
@@ -52,11 +52,11 @@ mat-card-content {
 
 .detail-table tr:not(:last-child) th,
 .detail-table tr:not(:last-child) td {
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--dk-border, #e2e8f0);
 }
 
 .detail-table tr:nth-child(even) {
-  background: #f8fafc;
+  background: var(--dk-surface-2, #f8fafc);
 }
 
 .detail-table th,
@@ -68,13 +68,13 @@ mat-card-content {
 
 .detail-table th {
   width: 35%;
-  color: #334155;
+  color: var(--dk-text-2, #334155);
   font-size: 13px;
   font-weight: 600;
 }
 
 .detail-table td {
-  color: #1f2937;
+  color: var(--dk-text, #1f2937);
   font-size: 14px;
   line-height: 1.5;
 }
@@ -86,7 +86,7 @@ mat-card-actions {
   gap: 8px;
   padding: 20px 4px 4px;
   margin: 0;
-  border-top: 1px solid #e7eaf0;
+  border-top: 1px solid var(--dk-border, #e7eaf0);
 }
 
 /* Tablet */
@@ -144,7 +144,7 @@ mat-card-actions {
   }
 
   .detail-table tr:not(:last-child) {
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--dk-border, #e2e8f0);
   }
 
   .detail-table th,

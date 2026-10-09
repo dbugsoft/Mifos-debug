@@ -9,7 +9,7 @@
 table {
   width: 100%;
   box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
-  border: 1px solid var(--border-color, #ddd);
+  border: 1px solid var(--border-color, var(--dk-border, #ddd));
   border-radius: 8px;
   transition:
     background-color 0.3s ease,
@@ -24,7 +24,7 @@ table {
   margin-bottom: 1rem;
   padding: 1.5rem;
   box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
-  border: 1px solid var(--border-color, #ddd);
+  border: 1px solid var(--border-color, var(--dk-border, #ddd));
   border-radius: 8px;
   transition:
     background-color 0.3s ease,
@@ -33,7 +33,7 @@ table {
 
 .table-container {
   box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
-  border: 1px solid var(--border-color, #ddd);
+  border: 1px solid var(--border-color, var(--dk-border, #ddd));
   border-radius: 8px;
   transition:
     background-color 0.3s ease,

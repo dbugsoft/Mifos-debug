@@ -7,13 +7,7 @@
 -->
 
 <div class="container">
-  <mat-stepper
-    orientation="vertical"
-    [linear]="false"
-    class="mat-elevation-z8"
-    labelPosition="bottom"
-    #savingProductStepper
-  >
+  <mat-stepper orientation="vertical" [linear]="false" labelPosition="bottom" #savingProductStepper>
     <ng-template matStepperIcon="number">
       <fa-icon icon="pencil-alt" size="sm"></fa-icon>
     </ng-template>
@@ -35,13 +29,17 @@
     </ng-template>
 
     <mat-step [stepControl]="savingProductDetailsForm">
-      <ng-template matStepLabel>{{ 'labels.inputs.DETAILS' | translate }}</ng-template>
+      <ng-template matStepLabel
+        ><strong>{{ 'labels.inputs.DETAILS' | translate }}</strong></ng-template
+      >
 
       <mifosx-saving-product-details-step></mifosx-saving-product-details-step>
     </mat-step>
 
     <mat-step [stepControl]="savingProductCurrencyForm">
-      <ng-template matStepLabel>{{ 'labels.inputs.CURRENCY' | translate }}</ng-template>
+      <ng-template matStepLabel
+        ><strong>{{ 'labels.inputs.CURRENCY' | translate }}</strong></ng-template
+      >
 
       <mifosx-saving-product-currency-step
         [savingProductsTemplate]="savingProductsTemplate"
@@ -49,7 +47,9 @@
     </mat-step>
 
     <mat-step [stepControl]="savingProductTermsForm">
-      <ng-template matStepLabel>{{ 'labels.inputs.TERMS' | translate }}</ng-template>
+      <ng-template matStepLabel
+        ><strong>{{ 'labels.inputs.TERMS' | translate }}</strong></ng-template
+      >
 
       <mifosx-saving-product-terms-step
         [savingProductsTemplate]="savingProductsTemplate"
@@ -57,7 +57,9 @@
     </mat-step>
 
     <mat-step [stepControl]="savingProductSettingsForm">
-      <ng-template matStepLabel>{{ 'labels.inputs.SETTINGS' | translate }}</ng-template>
+      <ng-template matStepLabel
+        ><strong>{{ 'labels.inputs.SETTINGS' | translate }}</strong></ng-template
+      >
 
       <mifosx-saving-product-settings-step
         [savingProductsTemplate]="savingProductsTemplate"
@@ -65,7 +67,9 @@
     </mat-step>
 
     <mat-step>
-      <ng-template matStepLabel>{{ 'labels.inputs.CHARGES' | translate }}</ng-template>
+      <ng-template matStepLabel
+        ><strong>{{ 'labels.inputs.CHARGES' | translate }}</strong></ng-template
+      >
 
       <mifosx-saving-product-charges-step
         [savingProductsTemplate]="savingProductsTemplate"
@@ -75,7 +79,9 @@
     </mat-step>
 
     <mat-step [stepControl]="savingProductAccountingForm">
-      <ng-template matStepLabel>{{ 'labels.inputs.ACCOUNTING' | translate }}</ng-template>
+      <ng-template matStepLabel
+        ><strong>{{ 'labels.inputs.ACCOUNTING' | translate }}</strong></ng-template
+      >
 
       <mifosx-saving-product-accounting-step
         [savingProductsTemplate]="savingProductsTemplate"
@@ -88,7 +94,9 @@
     </mat-step>
     @if (savingProductFormValid) {
       <mat-step state="preview" completed>
-        <ng-template matStepLabel>{{ 'labels.inputs.PREVIEW' | translate }}</ng-template>
+        <ng-template matStepLabel
+          ><strong>{{ 'labels.inputs.PREVIEW' | translate }}</strong></ng-template
+        >
         <mifosx-saving-product-preview-step
           [savingProductsTemplate]="savingProductsTemplate"
           [accountingRuleData]="accountingRuleData"

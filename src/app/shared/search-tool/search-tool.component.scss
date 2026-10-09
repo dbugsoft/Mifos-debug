@@ -11,12 +11,7 @@
 // ── Toolbar toggle ────────────────────────────────────────────────────────────
 
 .search-toggle {
-  color: rgb(255 255 255 / 72%);
-  transition: color 0.15s ease;
-
-  &:hover {
-    color: $white;
-  }
+  color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
 }
 
 // ── Backdrop ──────────────────────────────────────────────────────────────────
@@ -29,7 +24,7 @@
   align-items: flex-start;
   justify-content: center;
   padding-top: clamp(80px, 22vh, 200px);
-  background-color: rgb(6 10 22 / 60%);
+  background-color: rgb(var(--dk-ink-rgb, 0 0 0) / 60%);
   backdrop-filter: blur(8px);
 }
 
@@ -114,7 +109,7 @@
   }
 
   &:hover {
-    background-color: #2d4bc8 !important;
+    background-color: var(--dk-fill, #2d4bc8) !important;
   }
 
   &:active {
@@ -154,9 +149,9 @@
   }
 
   &--active {
-    border-color: rgb(68 97 226 / 65%);
-    background-color: rgb(68 97 226 / 18%) !important;
-    color: #8ca4f5 !important;
+    border-color: rgb(var(--dk-tint-rgb, 68 97 226) / 65%);
+    background-color: rgb(var(--dk-tint-rgb, 68 97 226) / 18%) !important;
+    color: var(--dk-primary, #8ca4f5) !important;
     font-weight: 600;
   }
 }

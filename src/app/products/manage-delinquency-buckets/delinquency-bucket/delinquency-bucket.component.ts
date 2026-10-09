@@ -8,6 +8,7 @@
 
 import { ChangeDetectionStrategy, Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
+import { MatIcon } from '@angular/material/icon';
 import { MatSort, MatSortHeader } from '@angular/material/sort';
 import {
   MatTableDataSource,
@@ -49,7 +50,8 @@ import { DelinquencyBucketBaseComponent } from '../delinquency-base.component';
     MatPaginator,
     MatMenu,
     MatMenuTrigger,
-    MatMenuItem
+    MatMenuItem,
+    MatIcon
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })

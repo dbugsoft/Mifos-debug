@@ -14,11 +14,11 @@
 ========================================================= */
 
 .access-action {
-  background: linear-gradient(180deg, #f3fbf6 0%, #fff 180px);
+  background: linear-gradient(180deg, var(--dk-surface-2, #f3fbf6) 0%, var(--dk-surface, #fff) 180px);
 }
 
 .security-action {
-  background: linear-gradient(180deg, #fffaf0 0%, #fff 180px);
+  background: linear-gradient(180deg, var(--dk-warning-soft, #fffaf0) 0%, var(--dk-surface, #fff) 180px);
 }
 
 .warning-icon {
@@ -31,7 +31,7 @@
 .warning-message {
   border: 1px solid var(--warning-border);
   background: var(--warning-bg);
-  color: #6f4b00;
+  color: var(--dk-text, #6f4b00);
 
   mat-icon {
     color: var(--warning);
@@ -74,7 +74,7 @@
   padding: 4px 10px;
   border: 1px solid var(--border);
   border-radius: 7px;
-  background: #fff;
+  background: var(--dk-surface, #fff);
   color: var(--primary);
   font-size: 11px;
   font-weight: 700;
@@ -153,18 +153,18 @@
 
 .email-status.sent {
   background: var(--success-bg);
-  color: #1e6b41;
+  color: var(--dk-success, #1e6b41);
 }
 
 .email-status.failed {
   background: var(--danger-bg);
-  color: #9b3232;
+  color: var(--dk-danger, #9b3232);
 }
 
 .email-status.not-configured,
 .email-status.none {
   background: var(--warning-bg);
-  color: #6f4b00;
+  color: var(--dk-text, #6f4b00);
 }
 
 /* ---------- actions ---------- */
@@ -180,9 +180,9 @@
   min-width: 180px;
   height: 44px;
   padding: 0 18px;
-  border: 1.5px solid #cfe6f7 !important;
+  border: 1.5px solid var(--dk-primary-border, #cfe6f7) !important;
   border-radius: 9px !important;
-  background: #fff !important;
+  background: var(--dk-surface, #fff) !important;
   color: var(--primary) !important;
   font-size: 13px !important;
   font-weight: 600 !important;

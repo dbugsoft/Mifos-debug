@@ -37,7 +37,7 @@
         .mdc-notched-outline__leading,
         .mdc-notched-outline__notch,
         .mdc-notched-outline__trailing {
-          border-color: var(--md-sys-color-outline, #79747e);
+          border-color: var(--md-sys-color-outline, var(--dk-border-strong, #79747e));
           border-width: 1px;
         }
       }
@@ -48,7 +48,7 @@
           .mdc-notched-outline__leading,
           .mdc-notched-outline__notch,
           .mdc-notched-outline__trailing {
-            border-color: var(--md-sys-color-on-surface, #1a1c1e);
+            border-color: var(--md-sys-color-on-surface, var(--dk-border-strong, #1a1c1e));
           }
         }
       }
@@ -59,30 +59,30 @@
           .mdc-notched-outline__leading,
           .mdc-notched-outline__notch,
           .mdc-notched-outline__trailing {
-            border-color: var(--md-sys-color-primary, #1074b9);
+            border-color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
             border-width: 2px;
           }
         }
 
         .mat-mdc-floating-label {
-          color: var(--md-sys-color-primary, #1074b9);
+          color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
         }
       }
 
       // Select styling
       .mat-mdc-select {
         font-size: 0.875rem;
-        color: var(--md-sys-color-on-surface, #1a1c1e);
+        color: var(--md-sys-color-on-surface, var(--dk-text, #1a1c1e));
       }
 
       .mat-mdc-select-arrow {
-        color: var(--md-sys-color-on-surface-variant, #44474e);
+        color: var(--md-sys-color-on-surface-variant, var(--dk-text-2, #44474e));
       }
 
       // Label styling
       .mat-mdc-floating-label {
         font-size: 0.875rem;
-        color: var(--md-sys-color-on-surface-variant, #44474e);
+        color: var(--md-sys-color-on-surface-variant, var(--dk-text-2, #44474e));
       }
     }
   }
@@ -114,12 +114,12 @@
         .mdc-notched-outline__leading,
         .mdc-notched-outline__notch,
         .mdc-notched-outline__trailing {
-          border-color: var(--md-sys-color-primary, #5ba2ec);
+          border-color: var(--md-sys-color-primary, #e0e0e0);
         }
       }
 
       .mat-mdc-floating-label {
-        color: var(--md-sys-color-primary, #5ba2ec);
+        color: var(--md-sys-color-primary, #e0e0e0);
       }
     }
 
@@ -134,5 +134,32 @@
     .mat-mdc-floating-label {
       color: var(--md-sys-color-on-surface-variant, #c4c6d0);
     }
+  }
+}
+
+// ===== Compact (toolbar) variant: a plain button like the toolbar's other actions =====
+.language-button {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 40px;
+  padding: 0 6px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+
+  &:hover {
+    background: rgb(127 127 127 / 12%);
+  }
+
+  mat-icon {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    font-size: 20px;
   }
 }

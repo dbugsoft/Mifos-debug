@@ -23,6 +23,7 @@ import { SettingsService } from 'app/settings/settings.service';
 import { Dates } from 'app/core/utils/dates';
 import { GlAccountSelectorComponent } from '../../../shared/accounting/gl-account-selector/gl-account-selector.component';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { NepaliDateInputComponent } from 'app/shared/nepali-date-input/nepali-date-input.component';
 
 /**
  * Create Tax Component component.
@@ -33,7 +34,8 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
   styleUrls: ['./create-tax-component.component.scss'],
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
-    GlAccountSelectorComponent
+    GlAccountSelectorComponent,
+    NepaliDateInputComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })

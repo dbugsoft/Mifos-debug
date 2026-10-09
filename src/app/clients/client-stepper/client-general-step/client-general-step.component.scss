@@ -133,7 +133,7 @@ mat-checkbox {
 
 // BS date, calendar icon, the BS | AD switch and the other calendar's date on one line, as on Edit Member.
 .bs-date {
-  flex: 0 1 416px;
+  flex: 0 1 448px;
   max-width: 100%;
 }
 
@@ -172,15 +172,15 @@ mat-checkbox {
   font-weight: 500;
 
   &.loading {
-    color: #1976d2;
+    color: var(--dk-primary, #1976d2);
   }
 
   &.success {
-    color: #388e3c;
+    color: var(--dk-success, #388e3c);
   }
 
   &.error {
-    color: #d32f2f;
+    color: var(--dk-danger, #d32f2f);
   }
 }
 

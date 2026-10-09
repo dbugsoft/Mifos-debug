@@ -48,7 +48,7 @@
       overflow: hidden;
 
       .mat-mdc-header-row {
-        background: var(--md-sys-color-primary, #1074b9);
+        background: var(--md-sys-color-primary, var(--dk-fill, #2460b9));
       }
 
       th.mat-mdc-header-cell {
@@ -83,10 +83,10 @@
       .identity-action-button {
         --mat-button-protected-container-color: color-mix(
           in srgb,
-          var(--md-sys-color-primary, #1074b9) 12%,
+          var(--md-sys-color-primary, #2460b9) 12%,
           transparent
         );
-        --mat-button-protected-label-text-color: var(--md-sys-color-primary, #1074b9);
+        --mat-button-protected-label-text-color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
         --mat-button-protected-container-elevation-shadow: none;
         --mat-button-protected-hover-container-elevation-shadow: none;
 
@@ -151,7 +151,7 @@
 // $title its title (relative to the box).
 @mixin framed-section($box: '.tab-container', $title: '> h3', $dark: true) {
   #{$box} {
-    --legend-bg: #fff;
+    --legend-bg: var(--dk-surface, #fff);
 
     position: relative;
     margin: 28px 24px 24px;
@@ -209,7 +209,7 @@
 
   #{$label} {
     margin: 0;
-    color: rgb(127 127 127);
+    color: var(--dk-text-muted, rgb(127 127 127));
     font-size: 0.875rem;
 
     &::after {
@@ -219,7 +219,7 @@
 
   #{$value} {
     margin: 0;
-    color: var(--md-sys-color-primary, #1074b9);
+    color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
     font-size: 0.875rem;
     font-weight: 500;
     overflow-wrap: anywhere;

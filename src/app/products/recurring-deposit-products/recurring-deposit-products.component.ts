@@ -44,9 +44,10 @@ import { ConfigurationWizardService } from '../../configuration-wizard/configura
 
 /** Custom Dialog Component */
 import { NextStepDialogComponent } from '../../configuration-wizard/next-step-dialog/next-step-dialog.component';
-import { MatTooltip } from '@angular/material/tooltip';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { MatIcon } from '@angular/material/icon';
+import { MatPrefix } from '@angular/material/form-field';
 
 /**
  * Recurring Deposit Products component.
@@ -57,7 +58,6 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
   styleUrls: ['./recurring-deposit-products.component.scss'],
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
-    MatTooltip,
     FaIconComponent,
     MatTable,
     MatSort,
@@ -71,7 +71,9 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     MatHeaderRow,
     MatRowDef,
     MatRow,
-    MatPaginator
+    MatPaginator,
+    MatIcon,
+    MatPrefix
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })

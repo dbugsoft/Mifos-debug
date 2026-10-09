@@ -78,7 +78,8 @@ export class CreateEditComponent implements OnInit {
       resize: false,
       skin: isDark ? 'oxide-dark' : 'oxide',
       content_css: isDark ? 'dark' : 'default',
-      content_style: isDark ? 'body { background-color: transparent !important; }' : '',
+      // The editor's text lives in an iframe the app's dark theme cannot reach: make it light in dark mode.
+      content_style: isDark ? 'body { background-color: transparent !important; color: #f1f5f9 !important; }' : '',
       body_class: isDark ? 'dark-theme' : '',
       plugins: 'lists link table media codesample',
       toolbar:

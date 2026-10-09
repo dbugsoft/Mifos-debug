@@ -54,8 +54,8 @@ mat-divider {
   line-height: 24px;
   text-align: center;
   letter-spacing: 0.04em;
-  color: var(--md-sys-color-primary, #1074b9);
-  background: color-mix(in srgb, var(--md-sys-color-primary, #1074b9) 10%, transparent);
+  color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+  background: color-mix(in srgb, var(--md-sys-color-primary, var(--dk-fill, #2460b9)) 10%, transparent);
 }
 
 .product-option-text {
@@ -77,7 +77,7 @@ mat-divider {
   gap: 8px;
   font-size: 0.8125rem;
   line-height: 1.4;
-  color: var(--md-sys-color-on-surface-variant, #64748b);
+  color: var(--md-sys-color-on-surface-variant, var(--dk-text-muted, #64748b));
 }
 
 .meta-currency {
@@ -85,8 +85,16 @@ mat-divider {
 }
 
 ::ng-deep .loan-product-select-panel {
-  --mat-option-selected-state-layer-color: color-mix(in srgb, var(--md-sys-color-primary, #1074b9) 10%, transparent);
-  --mat-option-hover-state-layer-color: color-mix(in srgb, var(--md-sys-color-primary, #1074b9) 5%, transparent);
+  --mat-option-selected-state-layer-color: color-mix(
+    in srgb,
+    var(--md-sys-color-primary, var(--dk-primary, #2460b9)) 10%,
+    transparent
+  );
+  --mat-option-hover-state-layer-color: color-mix(
+    in srgb,
+    var(--md-sys-color-primary, var(--dk-fill, #2460b9)) 5%,
+    transparent
+  );
   --mat-option-selected-state-label-text-color: inherit;
 
   min-width: max(360px, 100%) !important;

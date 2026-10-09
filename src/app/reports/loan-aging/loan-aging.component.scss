@@ -66,7 +66,7 @@ h3 {
   }
 
   .overdue {
-    color: var(--mat-sys-error, #c62828);
+    color: var(--mat-sys-error, var(--dk-danger, #c62828));
   }
 }
 
@@ -100,7 +100,7 @@ h3 {
 
   // Blue header with white partitions, as on the member and loan product lists.
   .mat-mdc-header-row {
-    background: var(--md-sys-color-primary, #1074b9);
+    background: var(--md-sys-color-primary, var(--dk-fill, #2460b9));
   }
 
   th.mat-mdc-header-cell {

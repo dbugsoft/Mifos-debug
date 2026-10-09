@@ -16,11 +16,11 @@ table {
 
 // TODO: CONFIGURE THESE CLASSES GLOBALLY
 .system-defined {
-  color: #32cd32;
+  color: var(--dk-success, #32cd32);
 }
 
 .not-system-defined {
-  color: #f44366;
+  color: var(--dk-danger, #f44366);
 }
 
 .mat-elevation-z8 {
@@ -29,7 +29,7 @@ table {
 }
 
 .mat-mdc-header-row {
-  background-color: #1074b9;
+  background-color: var(--dk-fill, #1074b9);
 }
 
 .mat-mdc-header-cell {

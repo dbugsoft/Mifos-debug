@@ -28,14 +28,14 @@
 
 .system-info-table {
   width: 100%;
-  border: 1px solid var(--md-sys-color-outline-variant, #e2e8f0);
+  border: 1px solid var(--md-sys-color-outline-variant, var(--dk-border, #e2e8f0));
   border-radius: 10px;
   border-collapse: separate;
   border-spacing: 0;
   overflow: hidden;
 
   tr {
-    border-bottom: 1px solid var(--md-sys-color-outline-variant, #e2e8f0);
+    border-bottom: 1px solid var(--md-sys-color-outline-variant, var(--dk-border, #e2e8f0));
   }
 
   tr:last-child {
@@ -43,7 +43,7 @@
   }
 
   tr:nth-child(even) {
-    background: var(--md-sys-color-surface-variant, #f8fafc);
+    background: var(--md-sys-color-surface-variant, var(--dk-surface-2, #f8fafc));
   }
 
   td {
@@ -55,28 +55,28 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.02em;
-    color: var(--md-sys-color-on-surface-variant, #64748b);
+    color: var(--md-sys-color-on-surface-variant, var(--dk-text-muted, #64748b));
     width: 35%;
   }
 
   .info-value {
     font-size: 15px;
     font-weight: 600;
-    color: var(--md-sys-color-on-surface, #1f2937);
+    color: var(--md-sys-color-on-surface, var(--dk-text, #1f2937));
     overflow-wrap: anywhere;
   }
 }
 
 .licensing-section {
   padding: 24px 0 0;
-  border-top: 1px solid var(--md-sys-color-outline-variant, #e2e8f0);
+  border-top: 1px solid var(--md-sys-color-outline-variant, var(--dk-border, #e2e8f0));
 
   h2 {
     display: flex;
     align-items: center;
     gap: 10px;
     margin: 0 0 16px;
-    color: #1f2937;
+    color: var(--dk-text, #1f2937);
     font-size: 1.25rem;
     font-weight: 600;
 
@@ -86,19 +86,19 @@
       width: 4px;
       height: 20px;
       border-radius: 2px;
-      background: #1074b9;
+      background: var(--dk-fill, #1074b9);
     }
   }
 
   p {
     line-height: 1.6;
     margin-bottom: 12px;
-    color: var(--md-sys-color-on-surface-variant, #475569);
+    color: var(--md-sys-color-on-surface-variant, var(--dk-text-2, #475569));
   }
 
   // stylelint-disable-next-line selector-pseudo-element-no-unknown
   ::ng-deep a {
-    color: #1074b9;
+    color: var(--dk-primary, #1074b9);
     font-weight: 500;
     text-decoration: none;
 
@@ -115,7 +115,7 @@
   li {
     margin-bottom: 10px;
     line-height: 1.5;
-    color: var(--md-sys-color-on-surface-variant, #475569);
+    color: var(--md-sys-color-on-surface-variant, var(--dk-text-2, #475569));
   }
 }
 
@@ -190,7 +190,7 @@
 
     // stylelint-disable-next-line selector-pseudo-element-no-unknown
     ::ng-deep a {
-      color: #0098ff;
+      color: #e0e0e0;
     }
 
     li {

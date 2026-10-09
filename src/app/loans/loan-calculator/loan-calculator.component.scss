@@ -22,16 +22,17 @@
 @include compact-stepper('.calculator-form');
 
 // Row 1: member, product, principal, rate. Row 2: repayments, every + frequency, date.
-// Each field is as wide as what it holds; only member and product names vary, so only they grow.
+// Each field is as wide as what it holds and none grows, so member and product keep the same width before the
+// product is picked (when they are the only fields) as after.
 // Laptop and up only: on a phone the shared rule puts every field at full width.
 @media (width > 768px) {
   .calculator-form .layout-row-wrap > mat-form-field:has([formcontrolname='member']) {
-    flex: 1 1 200px;
+    flex: 0 1 260px;
   }
 
-  // Product names run longer than member names, so the product field takes more of the spare room.
+  // Product names run longer than member names.
   .calculator-form .layout-row-wrap > mat-form-field:has([formcontrolname='productId']) {
-    flex: 2 1 240px;
+    flex: 0 1 390px;
   }
 
   .calculator-form .layout-row-wrap > mat-form-field:has([formcontrolname='principal']) {
@@ -126,7 +127,7 @@ button fa-icon {
 
   // Blue header with white partitions, as on the member and loan product lists.
   .mat-mdc-header-row {
-    background: var(--md-sys-color-primary, #1074b9);
+    background: var(--md-sys-color-primary, var(--dk-fill, #2460b9));
   }
 
   th.mat-mdc-header-cell {

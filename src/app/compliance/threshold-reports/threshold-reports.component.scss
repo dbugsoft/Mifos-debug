@@ -29,7 +29,7 @@
   margin-bottom: 12px;
   padding: 10px 14px;
   border-radius: 8px;
-  background: color-mix(in srgb, var(--md-sys-color-primary, #1074b9) 12%, transparent);
+  background: color-mix(in srgb, var(--md-sys-color-primary, var(--dk-fill, #2460b9)) 12%, transparent);
 }
 
 .clickable {
@@ -69,7 +69,7 @@
   margin: 6px 0 0;
   padding-left: 18px;
   font-size: 0.8rem;
-  color: #7a4a00;
+  color: var(--dk-warning, #7a4a00);
 }
 
 .visually-hidden {
