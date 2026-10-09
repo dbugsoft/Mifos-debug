@@ -36,10 +36,10 @@
   justify-content: center;
   flex-shrink: 0;
   border-radius: 11px;
-  background: linear-gradient(135deg, #1074b9 0%, #0d5d94 100%);
+  background: linear-gradient(135deg, #2460b9 0%, #0d5d94 100%);
   color: #fff;
   font-size: 20px;
-  box-shadow: 0 3px 8px rgb(16 116 185 / 28%);
+  box-shadow: 0 3px 8px rgb(36 96 185 / 28%);
 }
 
 .navbar-text {
@@ -49,7 +49,7 @@
 .navbar-text .eyebrow {
   display: block;
   margin-bottom: 2px;
-  color: #1074b9;
+  color: #2460b9;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 1.2px;
@@ -100,14 +100,14 @@
   bottom: 0;
   width: 100%;
   height: 2px;
-  background: #1074b9;
+  background: #2460b9;
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.18s ease;
 }
 
 .navbar-links .nav-link:hover {
-  color: #1074b9;
+  color: #2460b9;
 }
 
 .navbar-links .nav-link:hover::after {
@@ -119,8 +119,8 @@
   height: 36px;
   border-radius: 7px !important;
   background: #fff !important;
-  color: #1074b9 !important;
-  border: 1px solid #1074b9 !important;
+  color: #2460b9 !important;
+  border: 1px solid #2460b9 !important;
   font-size: 12px !important;
   font-weight: 600 !important;
   transition:
@@ -129,7 +129,7 @@
 }
 
 .logout-button:hover {
-  background: #1074b9 !important;
+  background: #2460b9 !important;
   color: #fff !important;
 }
 

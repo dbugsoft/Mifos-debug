@@ -9,21 +9,20 @@
 /** Angular Imports */
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import {
-  AfterViewInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   DestroyRef,
-  ElementRef,
   OnInit,
   ViewChild,
   inject
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NavigationEnd, Router } from '@angular/router';
 
 /** rxjs Imports */
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { filter, map } from 'rxjs/operators';
 
 /** Custom Services */
 import { ProgressBarService } from '../progress-bar/progress-bar.service';
@@ -35,6 +34,16 @@ import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
 import { ContentComponent } from './content/content.component';
 import { FooterComponent } from '../../shared/footer/footer.component';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+
+const COLLAPSED_KEY = 'mifosXSidenavCollapsed';
+
+function readCollapsed(): boolean {
+  try {
+    return localStorage.getItem(COLLAPSED_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
 
 /**
  * Shell component.
@@ -58,22 +67,23 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ShellComponent implements OnInit, AfterViewInit {
+export class ShellComponent implements OnInit {
   private breakpointObserver = inject(BreakpointObserver);
   private progressBarService = inject(ProgressBarService);
   private cdr = inject(ChangeDetectorRef);
   private destroyRef = inject(DestroyRef);
+  private router = inject(Router);
 
   /** Subscription to breakpoint observer for handset. */
   isHandset$: Observable<boolean> = this.breakpointObserver
     .observe(Breakpoints.Handset)
     .pipe(map((result) => result.matches));
-  /** Sets the initial state of sidenav as collapsed. Not collapsed if false. */
-  sidenavCollapsed = true;
+  /** Whether the sidenav shows icons only; remembered across sessions. */
+  sidenavCollapsed = readCollapsed();
+  /** The scrolling page area beside the sidenav. */
+  @ViewChild(MatSidenavContent) private pageArea: MatSidenavContent;
   /** Progress bar mode. */
   progressBarMode: string;
-  /** Page area beside the sidenav: toolbar, breadcrumb and content. */
-  @ViewChild(MatSidenavContent, { read: ElementRef }) private pageArea: ElementRef<HTMLElement>;
 
   /**
    * Subscribes to progress bar to update its mode.
@@ -83,45 +93,13 @@ export class ShellComponent implements OnInit, AfterViewInit {
       this.progressBarMode = mode;
       this.cdr.detectChanges();
     });
-  }
-
-  /**
-   * Keeps the page's left edge under the first toolbar menu label as the layout changes
-   * (window resize, sidenav opened / collapsed).
-   */
-  ngAfterViewInit() {
-    const resizeObserver = new ResizeObserver(() => this.alignPageToToolbar());
-    resizeObserver.observe(this.pageArea.nativeElement);
-    this.destroyRef.onDestroy(() => resizeObserver.disconnect());
-  }
-
-  /**
-   * Shifts breadcrumb and content (via --page-shift) so the shared content edge, a centred
-   * box 90% wide and at most 84rem, starts where the first toolbar label's text starts.
-   * Desktop only: on narrow screens the label sits too far in to follow.
-   */
-  private alignPageToToolbar() {
-    const area = this.pageArea.nativeElement;
-    const width = area.clientWidth;
-    const label = area.querySelector('#mifosx-toolbar .tab-link');
-    const text = label && Array.from(label.childNodes).find((node) => node.textContent?.trim());
-    let shift = 0;
-
-    if (text && width >= 960) {
-      const start = text.textContent.search(/\S/);
-      const range = document.createRange();
-      range.setStart(text, start);
-      range.setEnd(text, start + 1);
-      const target = range.getBoundingClientRect().left - area.getBoundingClientRect().left;
-      const maxContent = 84 * parseFloat(getComputedStyle(document.documentElement).fontSize);
-
-      // Edge = shift + 5% of the remaining width, or centred when the 84rem cap applies.
-      shift = (target - 0.05 * width) / 0.95;
-      if (0.9 * (width - shift) > maxContent) {
-        shift = 2 * target - width + maxContent;
-      }
-    }
-    area.style.setProperty('--page-shift', `${Math.round(shift)}px`);
+    // Only the page area scrolls, which the router's window scroll reset doesn't reach.
+    this.router.events
+      .pipe(
+        filter((event) => event instanceof NavigationEnd),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe(() => this.pageArea?.scrollTo({ top: 0 }));
   }
 
   /**
@@ -130,6 +108,11 @@ export class ShellComponent implements OnInit, AfterViewInit {
    */
   toggleCollapse($event: boolean) {
     this.sidenavCollapsed = $event;
+    try {
+      localStorage.setItem(COLLAPSED_KEY, $event ? '1' : '0');
+    } catch {
+      // The choice just won't be remembered.
+    }
     this.cdr.detectChanges();
   }
 }

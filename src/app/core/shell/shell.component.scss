@@ -11,20 +11,34 @@
   height: 100vh;
 
   .sidebar-panel {
-    min-height: 100vh;
-    overflow: auto;
-    box-shadow:
-      0 3px 1px -2px rgb(0 0 0 / 20%),
-      0 2px 2px 0 rgb(0 0 0 / 14%),
-      0 1px 5px 0 rgb(0 0 0 / 12%);
+    border: 0;
+    transition: width 0.2s ease;
   }
 
   .sidebar-full {
-    width: 15rem;
+    width: 16.5rem;
   }
 
   .sidebar-compact {
-    width: 4rem;
+    width: 4.5rem;
+  }
+}
+
+// Printing: only the page, at full length.
+@media print {
+  #mifosx-shell-container {
+    height: auto;
+
+    .sidebar-panel,
+    mifosx-toolbar {
+      display: none;
+    }
+
+    // Material sets the sidenav's width as an inline margin.
+    .sidenav {
+      margin-left: 0 !important;
+      overflow: visible;
+    }
   }
 }
 
@@ -38,14 +52,15 @@ $color: #e2e4ec;
   flex-direction: column;
   min-height: 100%;
 
-  mifosx-content {
-    flex: 1;
+  // Header stays put while the page scrolls under it.
+  mifosx-toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
   }
 
-  // Set by ShellComponent so the page edge lines up with the first toolbar label.
-  mifosx-breadcrumb,
   mifosx-content {
-    margin-left: var(--page-shift, 0);
+    flex: 1;
   }
 }
 
