@@ -24,7 +24,7 @@
           <b>{{ 'membership.Board decision' | translate }}</b>
           @if (a.status === 'PENDING') {
             <mifosx-membership-deadline [application]="a"></mifosx-membership-deadline>
-            @if (a.daysRemaining == null) {
+            @if (a.daysRemaining === null || a.daysRemaining === undefined) {
               <span class="sub">{{ 'membership.Waiting for a decision' | translate }}</span>
             }
           } @else {
@@ -83,7 +83,7 @@
         <tr>
           <td>{{ 'membership.Payment' | translate }}</td>
           <td>
-            @if (a.amountReceived != null) {
+            @if (a.amountReceived !== null && a.amountReceived !== undefined) {
               {{
                 'membership.paidOn'
                   | translate: { amount: (a.amountReceived | formatNumber), date: (a.paidOn | dateFormat) }
@@ -96,7 +96,7 @@
             }
           </td>
         </tr>
-        @if (a.refundAmount != null) {
+        @if (a.refundAmount !== null && a.refundAmount !== undefined) {
           <tr>
             <td>{{ 'membership.Refund' | translate }}</td>
             <td>
@@ -248,7 +248,7 @@
                 <td>{{ e.decidedOn | dateFormat }}</td>
                 <td>
                   {{ e.rejectionReason ?? e.approvalNote ?? '' }}
-                  @if (e.refundAmount != null) {
+                  @if (e.refundAmount !== null && e.refundAmount !== undefined) {
                     <span class="muted"
                       >· {{ 'membership.Refund' | translate }} {{ 'membership.Rs' | translate }}
                       {{ e.refundAmount | formatNumber }}</span
