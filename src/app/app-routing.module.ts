@@ -186,6 +186,32 @@ const routes: Routes = [
           data: { title: 'Case', breadcrumb: 'Case', routeParamBreadcrumb: false }
         },
         {
+          path: 'screening',
+          loadComponent: () =>
+            import('./compliance/screening/screening-home/screening-home.component').then(
+              (m) => m.ScreeningHomeComponent
+            ),
+          data: { title: 'Screening', breadcrumb: 'Screening' }
+        },
+        {
+          path: 'screening/matches/:id',
+          loadComponent: () =>
+            import('./compliance/screening/match-review/match-review.component').then((m) => m.MatchReviewComponent),
+          data: { title: 'Possible match', breadcrumb: 'Possible match', routeParamBreadcrumb: false }
+        },
+        {
+          path: 'screening/freezes',
+          loadComponent: () =>
+            import('./compliance/screening/freezes/freezes.component').then((m) => m.FreezesComponent),
+          data: { title: 'Funds held', breadcrumb: 'Funds held' }
+        },
+        {
+          path: 'screening/freezes/:id',
+          loadComponent: () =>
+            import('./compliance/screening/freeze-detail/freeze-detail.component').then((m) => m.FreezeDetailComponent),
+          data: { title: 'Funds held', breadcrumb: 'Funds held', routeParamBreadcrumb: false }
+        },
+        {
           path: 'risk-tables',
           loadComponent: () =>
             import('./compliance/pep/risk-tables/risk-tables.component').then((m) => m.RiskTablesComponent),

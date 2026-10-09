@@ -54,6 +54,9 @@ export interface AmlSettings {
   unknownPaymentCountsAsCash: boolean;
   goamlEntityId?: string | null;
   goamlBranchCode?: string | null;
+  screeningPossibleScore: number;
+  screeningLikelyScore: number;
+  unListUrl: string;
 }
 
 export type CashClass = 'CASH' | 'COOP_BANK_CASH' | 'NON_CASH';

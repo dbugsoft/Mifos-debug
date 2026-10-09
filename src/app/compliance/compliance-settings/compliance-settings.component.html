@@ -165,6 +165,26 @@
       </section>
 
       <section class="frame">
+        <h3 class="legend">{{ 'compliance.screening.Sanctions screening' | translate }}</h3>
+        <div class="fields">
+          <mat-form-field>
+            <mat-label>{{ 'compliance.screening.Possible match from (score in percent)' | translate }}</mat-label>
+            <input matInput type="number" formControlName="screeningPossibleScore" min="70" max="99" />
+            <mat-hint>{{ 'compliance.Policy' | translate }}: {{ policy('screeningPossibleScore') }}</mat-hint>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>{{ 'compliance.screening.Likely match from (score in percent)' | translate }}</mat-label>
+            <input matInput type="number" formControlName="screeningLikelyScore" min="70" max="100" />
+            <mat-hint>{{ 'compliance.Policy' | translate }}: {{ policy('screeningLikelyScore') }}</mat-hint>
+          </mat-form-field>
+          <mat-form-field class="wide">
+            <mat-label>{{ 'compliance.screening.Where the UN list is downloaded from' | translate }}</mat-label>
+            <input matInput formControlName="unListUrl" maxlength="500" />
+          </mat-form-field>
+        </div>
+      </section>
+
+      <section class="frame">
         <h3 class="legend">goAML</h3>
         <div class="fields">
           <mat-form-field>

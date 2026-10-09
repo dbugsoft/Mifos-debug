@@ -282,6 +282,23 @@
         </table>
       </div>
     </section>
+    @if (matches().length) {
+      <section class="frame">
+        <h3 class="legend">{{ 'compliance.screening.Sanctions screening' | translate }}</h3>
+        <ul class="plain-list">
+          @for (m of matches(); track m.id) {
+            <li>
+              <a [routerLink]="['/compliance', 'screening', 'matches', m.id]">{{ m.subjectName }}</a>
+              · {{ 'compliance.screening.status.' + m.status | translate }}
+              <span class="sub"
+                >{{ 'compliance.screening.source.' + m.source | translate }} · {{ m.reference }} · {{ m.closestName }} ·
+                {{ m.score.toFixed(2) }}</span
+              >
+            </li>
+          }
+        </ul>
+      </section>
+    }
   } @else {
     <mat-progress-bar mode="indeterminate"></mat-progress-bar>
   }

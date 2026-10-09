@@ -37,7 +37,9 @@ const WHOLE_NUMBERS: (keyof AmlSettings)[] = [
   'retentionYears',
   'pepRetentionYears',
   'structuringWindowDays',
-  'structuringBandPercent'
+  'structuringBandPercent',
+  'screeningPossibleScore',
+  'screeningLikelyScore'
 ];
 const CHOICES: (keyof AmlSettings)[] = [
   'atLineCountsAs',
@@ -55,6 +57,7 @@ const SWITCHES: (keyof AmlSettings)[] = [
 const TEXTS: (keyof AmlSettings)[] = [
   'goamlEntityId',
   'goamlBranchCode',
+  'unListUrl',
   'kymGateAllFrom',
   'secondApproverAbove'
 ];
