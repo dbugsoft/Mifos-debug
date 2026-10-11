@@ -16,7 +16,10 @@
         [routerLink]="['/reports', category.name]"
         [attr.aria-current]="filter === category.name ? 'page' : null"
       >
-        {{ cleanTranslatedCategory(getCategoryKey(category.name) | translate) }}
+        @if (category.icon) {
+          <mat-icon class="pill-icon">{{ category.icon }}</mat-icon>
+        }
+        {{ cleanTranslatedCategory(category.labelKey ?? getCategoryKey(category.name) | translate) }}
         <span class="count">{{ category.count }}</span>
       </a>
     }
@@ -31,6 +34,28 @@
 
   <div class="mat-elevation-z8">
     <table mat-table [dataSource]="dataSource" matSort>
+      <ng-container matColumnDef="favourite">
+        <th mat-header-cell *matHeaderCellDef class="favourite-cell"></th>
+        <td mat-cell *matCellDef="let report" class="favourite-cell">
+          <button
+            type="button"
+            mat-icon-button
+            class="favourite-toggle"
+            [class.active]="isFavourite(report)"
+            [matTooltip]="
+              (isFavourite(report) ? 'labels.text.Remove from favourites' : 'labels.text.Add to favourites') | translate
+            "
+            [attr.aria-label]="
+              (isFavourite(report) ? 'labels.text.Remove from favourites' : 'labels.text.Add to favourites') | translate
+            "
+            [attr.aria-pressed]="isFavourite(report)"
+            (click)="toggleFavourite($event, report)"
+          >
+            <mat-icon>{{ isFavourite(report) ? 'star' : 'star_border' }}</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
       <ng-container matColumnDef="reportName">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>
           {{ 'labels.text.BIRT' | translate }}

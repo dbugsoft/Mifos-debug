@@ -9,6 +9,11 @@
 table {
   width: 100%;
 
+  .favourite-cell {
+    width: 48px;
+    padding-right: 0;
+  }
+
   .select-row:hover {
     cursor: pointer;
   }
@@ -79,5 +84,19 @@ table {
     .count {
       background-color: color-mix(in srgb, currentcolor 20%, transparent);
     }
+  }
+}
+
+.pill-icon {
+  width: 16px;
+  height: 16px;
+  font-size: 16px;
+}
+
+.favourite-toggle {
+  color: var(--md-sys-color-on-surface-variant, #44474e);
+
+  &.active {
+    color: var(--dk-warning, #f5a623);
   }
 }

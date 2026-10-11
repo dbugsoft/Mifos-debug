@@ -9,6 +9,8 @@
 /** Angular Imports */
 import { ChangeDetectorRef, Component, DestroyRef, Input, ViewChild, OnChanges, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Subject, of } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
 import { MatPaginator } from '@angular/material/paginator';
 import {
   MatTableDataSource,
@@ -33,11 +35,10 @@ import { SelectBase } from 'app/shared/form-dialog/formfield/model/select-base';
 import { InputBase } from 'app/shared/form-dialog/formfield/model/input-base';
 import { FormDialogComponent } from 'app/shared/form-dialog/form-dialog.component';
 import { environment } from '../../../../environments/environment';
-import { ProgressBarService } from 'app/core/progress-bar/progress-bar.service';
 
 import * as ExcelJS from 'exceljs';
-import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { MatIcon } from '@angular/material/icon';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
@@ -60,8 +61,8 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     MatRowDef,
     MatRow,
     MatPaginator,
-    FaIconComponent,
-    MatIcon
+    MatIcon,
+    MatProgressSpinner
   ]
 })
 export class TableAndSmsComponent implements OnChanges {
@@ -70,7 +71,6 @@ export class TableAndSmsComponent implements OnChanges {
   private cdr = inject(ChangeDetectorRef);
   dialog = inject(MatDialog);
   private decimalPipe = inject(DecimalPipe);
-  private progressBarService = inject(ProgressBarService);
 
   /** Run Report Data */
   @Input() dataObject: any;
@@ -81,8 +81,12 @@ export class TableAndSmsComponent implements OnChanges {
   dataSource = new MatTableDataSource();
   /** Maps column name to type */
   columnTypes: any[] = [];
-  /** substitute for resolver */
-  hideOutput = true;
+  /** Set once the first response (or error) has arrived. */
+  loaded = false;
+  /** A run is in flight; earlier output stays visible underneath the spinner. */
+  loading = false;
+  /** Runs to fetch; switchMap cancels a run superseded by a newer one. */
+  private runs = new Subject<any>();
   /** Data to be converted into CSV file */
   csvData: any;
   notExistsReportData = false;
@@ -92,47 +96,63 @@ export class TableAndSmsComponent implements OnChanges {
   /** Paginator for run-report table. */
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
+  constructor() {
+    this.runs
+      .pipe(
+        switchMap((dataObject: any) =>
+          this.reportsService.getRunReportData(dataObject.report.name, dataObject.formData).pipe(
+            map((res: any) => ({ res })),
+            /** Caught per run, so one failed run doesn't end the stream for the next ones. */
+            catchError(() => of({ res: null }))
+          )
+        ),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe(({ res }) => {
+        if (res) {
+          this.showResponse(res);
+        } else {
+          this.hasError = true;
+          this.finishLoading();
+        }
+      });
+  }
+
   /**
    * Fetches run report data post changes in run report form.
    */
   ngOnChanges() {
-    this.hideOutput = true;
+    this.loading = true;
+    this.runs.next(this.dataObject);
+  }
+
+  /**
+   * Shows a run's response in place of the previous output.
+   * @param {any} res Run report response.
+   */
+  showResponse(res: any) {
     this.hasError = false;
     this.columnTypes = [];
     this.displayedColumns = [];
-    this.getRunReportData();
+    this.toBeExportedToRepo = this.dataObject.formData.exportS3;
+    if (!this.toBeExportedToRepo) {
+      this.csvData = res.data;
+      this.notExistsReportData = res.data.length === 0;
+      if (!this.notExistsReportData) {
+        this.setOutputTable(res.data);
+        res.columnHeaders.forEach((header: any) => {
+          this.columnTypes.push(header.columnDisplayType);
+          this.displayedColumns.push(header.columnName);
+        });
+      }
+    }
+    this.finishLoading();
   }
 
-  getRunReportData() {
-    const exportS3 = this.dataObject.formData.exportS3;
-    this.reportsService
-      .getRunReportData(this.dataObject.report.name, this.dataObject.formData)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (res: any) => {
-          this.toBeExportedToRepo = exportS3;
-          if (!this.toBeExportedToRepo) {
-            this.csvData = res.data;
-            this.notExistsReportData = res.data.length === 0;
-            if (!this.notExistsReportData) {
-              this.setOutputTable(res.data);
-              res.columnHeaders.forEach((header: any) => {
-                this.columnTypes.push(header.columnDisplayType);
-                this.displayedColumns.push(header.columnName);
-              });
-            }
-          }
-          this.hideOutput = false;
-          this.progressBarService.decrease();
-          this.cdr.markForCheck();
-        },
-        error: () => {
-          this.hasError = true;
-          this.hideOutput = false;
-          this.progressBarService.decrease();
-          this.cdr.markForCheck();
-        }
-      });
+  private finishLoading() {
+    this.loaded = true;
+    this.loading = false;
+    this.cdr.markForCheck();
   }
 
   /**

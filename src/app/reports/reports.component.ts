@@ -27,9 +27,17 @@ import {
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { DragScrollDirective } from 'app/directives/drag-scroll.directive';
+import { MatIcon } from '@angular/material/icon';
+import { MatIconButton } from '@angular/material/button';
+import { MatTooltip } from '@angular/material/tooltip';
+import { ReportPreferencesService } from './report-preferences.service';
 
 /** Route param for reports that have no category. */
 export const UNCATEGORIZED = 'Others';
+/** Route param for the user's favourite reports. */
+export const FAVOURITES = 'favourites';
+/** Route param for the user's recently run reports. */
+export const RECENT = 'recent';
 
 /** Order of the core Fineract categories in the tab bar; other categories follow alphabetically. */
 const CATEGORY_ORDER = [
@@ -46,6 +54,10 @@ export interface ReportCategory {
   name: string;
   /** Number of reports in the category. */
   count: number;
+  /** Translation key, set for the favourites and recent shortcuts. */
+  labelKey?: string;
+  /** Material icon, set for the favourites and recent shortcuts. */
+  icon?: string;
 }
 
 /**
@@ -70,6 +82,9 @@ export interface ReportCategory {
     MatRowDef,
     MatRow,
     MatPaginator,
+    MatIcon,
+    MatIconButton,
+    MatTooltip,
     DragScrollDirective
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -78,6 +93,7 @@ export class ReportsComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
+  private preferences = inject(ReportPreferencesService);
 
   /** Reports data. */
   reportsData: any;
@@ -87,6 +103,7 @@ export class ReportsComponent implements OnInit {
   categories: ReportCategory[] = [];
   /** Columns to be displayed in reports table. */
   displayedColumns: string[] = [
+    'favourite',
     'reportName',
     'reportType'
   ];
@@ -116,7 +133,7 @@ export class ReportsComponent implements OnInit {
    *Sets and filters the reports table by category.
    */
   ngOnInit() {
-    this.categories = this.buildCategories(this.reportsData || []);
+    this.setCategories();
     if (!this.filter && this.categories.length) {
       this.router.navigate(
         [
@@ -128,39 +145,84 @@ export class ReportsComponent implements OnInit {
       return;
     }
     this.setReports();
-    this.filterReportsByCategory();
+    this.setCustomFilterPredicate();
   }
 
   /**
-   * Switches filterPredicate if filterValue is not null.
+   * Filters the reports of the selected tab by a search string.
    * @param {string} filterValue filter string for mat-table.
    */
   applyFilter(filterValue: string) {
-    if (filterValue.length) {
-      this.setCustomFilterPredicate();
-      this.dataSource.filter = filterValue.trim().toLowerCase();
-    } else {
-      this.filterReportsByCategory();
-    }
+    this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
   /**
    * Initializes the data source, paginator and sorter for reports table.
    */
   setReports() {
-    this.dataSource = new MatTableDataSource(this.reportsData);
+    this.dataSource = new MatTableDataSource(this.reportsInView());
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
   }
 
   /**
-   * Filters the data source only for report category passed in route params.
+   * Reports of the selected tab; the shortcuts keep their own order (most recent first for recent).
    */
-  filterReportsByCategory() {
-    this.dataSource.filterPredicate = (data: any, filter: string) => {
-      return this.categoryOf(data) === filter;
-    };
-    this.dataSource.filter = this.filter;
+  reportsInView(): any[] {
+    const reports: any[] = this.reportsData || [];
+    if (this.filter === FAVOURITES || this.filter === RECENT) {
+      const ids = this.filter === FAVOURITES ? this.preferences.favourites : this.preferences.recent;
+      return ids.map((id) => reports.find((report) => report.id === id)).filter(Boolean);
+    }
+    return reports.filter((report) => this.categoryOf(report) === this.filter);
+  }
+
+  /**
+   * Sets the tabs: favourites and recent (when they have reports, or are open), then the categories.
+   */
+  setCategories() {
+    const reports: any[] = this.reportsData || [];
+    const exists = (id: number) => reports.some((report) => report.id === id);
+    const shortcuts: ReportCategory[] = [
+      {
+        name: FAVOURITES,
+        count: this.preferences.favourites.filter(exists).length,
+        labelKey: 'labels.text.Favourites',
+        icon: 'star'
+      },
+      {
+        name: RECENT,
+        count: this.preferences.recent.filter(exists).length,
+        labelKey: 'labels.text.Recent',
+        icon: 'history'
+      }
+    ].filter((shortcut) => shortcut.count > 0 || shortcut.name === this.filter);
+    this.categories = [
+      ...shortcuts,
+      ...this.buildCategories(reports)
+    ];
+  }
+
+  /**
+   * @param {any} report Report.
+   * @returns {boolean} Whether the report is one of the user's favourites.
+   */
+  isFavourite(report: any): boolean {
+    return this.preferences.isFavourite(report.id);
+  }
+
+  /**
+   * Stars or unstars a report without opening it.
+   * @param {Event} event Click event, stopped so the row link doesn't fire.
+   * @param {any} report Report.
+   */
+  toggleFavourite(event: Event, report: any) {
+    event.stopPropagation();
+    this.preferences.toggleFavourite(report.id);
+    this.setCategories();
+    if (this.filter === FAVOURITES) {
+      this.dataSource.data = this.reportsInView();
+    }
   }
 
   /**
@@ -199,7 +261,7 @@ export class ReportsComponent implements OnInit {
   }
 
   /**
-   *  Filters Reports for filter value string and report category.
+   *  Filters Reports for filter value string.
    */
   setCustomFilterPredicate() {
     this.dataSource.filterPredicate = (data: any, filter: string) => {
@@ -214,13 +276,7 @@ export class ReportsComponent implements OnInit {
         .toLowerCase();
       /** Transform the filter by converting it to lowercase and removing whitespace. */
       const transformedFilter = filter.trim().toLowerCase();
-      /* Seperates filter for All reports page.*/
-
-      if (this.filter) {
-        return dataStr.indexOf(transformedFilter) !== -1 && this.categoryOf(data) === this.filter;
-      } else {
-        return dataStr.indexOf(transformedFilter) !== -1;
-      }
+      return dataStr.indexOf(transformedFilter) !== -1;
     };
   }
 

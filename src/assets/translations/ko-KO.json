@@ -497,6 +497,7 @@
       "Home": "집"
     },
     "buttons": {
+      "Apply": "적용",
       "Photo": "Photo",
       "Open Module": "Open Module",
       "Accept Transfer": "전송 수락",
@@ -4095,6 +4096,10 @@
       "withhold tax for this account": "이 계정에 대한 원천징수세",
       "withoutCategory": "카테고리 없음",
       "Others": "기타",
+      "Favourites": "즐겨찾기",
+      "Recent": "최근",
+      "Add to favourites": "즐겨찾기에 추가",
+      "Remove from favourites": "즐겨찾기에서 제거",
       "“Maker-Checker” principle requires every tasks": "\"Maker-Checker\" 원칙은 오류와 오용 가능성을 줄이기 위해 모든 작업을 두 사람이 완료하도록 요구합니다. 한 사람이 프로세스를 시작하고 두 번째 사람이 프로세스를 완료합니다.",
       "Pick a member from the search results": "Pick a member from the search results",
       "Copied to clipboard": "Copied to clipboard"

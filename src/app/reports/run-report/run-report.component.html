@@ -6,10 +6,31 @@
   file, You can obtain one at http://mozilla.org/MPL/2.0/.
 -->
 
-<div class="container input">
-  <mat-card *ngIf="!isCollapsed">
+<div class="container">
+  <div class="report-header">
+    <a mat-icon-button [routerLink]="backLink" [attr.aria-label]="'labels.buttons.Back' | translate">
+      <mat-icon>arrow_back</mat-icon>
+    </a>
+    <h2 class="report-title">{{ report.name }}</h2>
+    <button
+      type="button"
+      mat-icon-button
+      class="favourite-toggle"
+      [class.active]="isFavourite"
+      [matTooltip]="(isFavourite ? 'labels.text.Remove from favourites' : 'labels.text.Add to favourites') | translate"
+      [attr.aria-label]="
+        (isFavourite ? 'labels.text.Remove from favourites' : 'labels.text.Add to favourites') | translate
+      "
+      [attr.aria-pressed]="isFavourite"
+      (click)="toggleFavourite()"
+    >
+      <mat-icon>{{ isFavourite ? 'star' : 'star_border' }}</mat-icon>
+    </button>
+  </div>
+
+  <mat-card class="filters">
     <form [formGroup]="reportForm">
-      <mat-card-content class="form-grid">
+      <mat-card-content class="filter-grid">
         <ng-container *ngFor="let param of paramData" [ngSwitch]="param.displayType">
           <ng-container class="test" *ngIf="reportForm.contains(param.name)">
             <mat-form-field class="form-field" *ngSwitchCase="'text'">
@@ -81,59 +102,25 @@
           </mat-error>
         </mat-form-field>
 
-        <div class="flex-98" *ngIf="exportToS3Allowed">
+        <div class="full-row" *ngIf="exportToS3Allowed">
           <mat-checkbox labelPosition="after" formControlName="exportOutputToS3">
             {{ 'labels.text.Export output data to S3 repository' | translate }} [{{ exportToS3Repository }}]
           </mat-checkbox>
         </div>
       </mat-card-content>
 
-      <mat-card-actions class="layout-row align-between gap-5px responsive-column">
-        <button
-          type="button"
-          mat-raised-button
-          [routerLink]="report.category ? ['/reports', report.category] : ['/reports']"
-        >
-          {{ 'labels.buttons.Cancel' | translate }}
-        </button>
-        <button
-          mat-raised-button
-          color="primary"
-          [disabled]="!reportForm.valid || isProcessing"
-          id="runreport"
-          (click)="run()"
-        >
-          <fa-icon icon="file-export" class="m-r-10"></fa-icon>
-          {{ 'labels.buttons.Run Report' | translate }}
-        </button>
-        <button
-          *ngIf="isTableReport()"
-          mat-raised-button
-          color="primary"
-          [disabled]="!reportForm.valid || isProcessing"
-          (click)="runReportAndExport($event)"
-        >
-          <fa-icon icon="download" class="m-r-10"></fa-icon>
-          {{ 'labels.buttons.Run and Download Report' | translate }}
+      <mat-card-actions class="filter-actions">
+        <button mat-raised-button color="primary" [disabled]="!reportForm.valid" id="runreport" (click)="run()">
+          {{ 'labels.buttons.Apply' | translate }}
         </button>
       </mat-card-actions>
     </form>
   </mat-card>
-</div>
 
-<div class="container output" *ngIf="isCollapsed">
-  <mat-card>
-    <div class="m-b-20">
-      <button mat-raised-button color="primary" (click)="isCollapsed = false">
-        {{ 'labels.buttons.Parameters' | translate }}
-      </button>
-    </div>
-
-    <div>
-      <mifosx-table-and-sms *ngIf="!hideTable" [dataObject]="dataObject"></mifosx-table-and-sms>
-      <mifosx-chart *ngIf="!hideChart" [dataObject]="dataObject"></mifosx-chart>
-      <mifosx-pentaho *ngIf="!hidePentaho" [dataObject]="dataObject"></mifosx-pentaho>
-      <mifosx-birt *ngIf="!hideBirt" [dataObject]="dataObject"></mifosx-birt>
-    </div>
+  <mat-card class="output" *ngIf="hasRun">
+    <mifosx-table-and-sms *ngIf="!hideTable" [dataObject]="dataObject"></mifosx-table-and-sms>
+    <mifosx-chart *ngIf="!hideChart" [dataObject]="dataObject"></mifosx-chart>
+    <mifosx-pentaho *ngIf="!hidePentaho" [dataObject]="dataObject"></mifosx-pentaho>
+    <mifosx-birt *ngIf="!hideBirt" [dataObject]="dataObject"></mifosx-birt>
   </mat-card>
 </div>

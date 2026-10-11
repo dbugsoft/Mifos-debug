@@ -6,15 +6,53 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-.input {
-  max-width: 37rem;
+.report-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
 }
 
-.form-grid {
-  display: flex;
-  flex-direction: column;
+.report-title {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.favourite-toggle {
+  color: var(--md-sys-color-on-surface-variant, #44474e);
+
+  &.active {
+    color: var(--dk-warning, #f5a623);
+  }
+}
+
+.filters {
+  margin-bottom: 16px;
+}
+
+.filter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(216px, 1fr));
+  align-items: start;
+  gap: 0 16px;
+  padding-top: 16px;
 }
 
 .form-field {
   width: 100%;
+}
+
+.full-row {
+  grid-column: 1 / -1;
+}
+
+.filter-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
 }
