@@ -10,6 +10,14 @@
   overflow: auto;
 }
 
+.export-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
 .output-area {
   position: relative;
 }
