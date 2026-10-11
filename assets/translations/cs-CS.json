@@ -498,6 +498,7 @@
       "Home": "Domov"
     },
     "buttons": {
+      "Apply": "Použít",
       "Photo": "Photo",
       "Open Module": "Open Module",
       "Accept Transfer": "Přijmout převod",
@@ -4095,6 +4096,11 @@
       "username": "uživatelské jméno",
       "withhold tax for this account": "srazit daň pro tento účet",
       "withoutCategory": "Bez kategorie",
+      "Others": "Ostatní",
+      "Favourites": "Oblíbené",
+      "Recent": "Nedávné",
+      "Add to favourites": "Přidat do oblíbených",
+      "Remove from favourites": "Odebrat z oblíbených",
       "“Maker-Checker” principle requires every tasks": "Princip „Maker-Checker“ vyžaduje, aby každý úkol prováděli dva lidé, aby se snížila pravděpodobnost chyb a zneužití. Jedna osoba proces iniciuje a druhá jej dokončí.",
       "Pick a member from the search results": "Pick a member from the search results",
       "Copied to clipboard": "Copied to clipboard"
