@@ -497,6 +497,7 @@
       "Home": "Namai"
     },
     "buttons": {
+      "Apply": "Taikyti",
       "Photo": "Photo",
       "Open Module": "Open Module",
       "Accept Transfer": "Priimti perkėlimą",
@@ -4095,6 +4096,11 @@
       "username": "Vartotojo vardas",
       "withhold tax for this account": "išskaičiuoti mokesčius už šią sąskaitą",
       "withoutCategory": "Bez kategorijos",
+      "Others": "Kiti",
+      "Favourites": "Mėgstami",
+      "Recent": "Naujausi",
+      "Add to favourites": "Pridėti prie mėgstamų",
+      "Remove from favourites": "Pašalinti iš mėgstamų",
       "“Maker-Checker” principle requires every tasks": "„Maker-Checker“ principas reikalauja, kad kiekvieną užduotį atliktų du žmonės, kad būtų sumažinta klaidų ir netinkamo naudojimo galimybė. Vienas asmuo pradeda procesą, o antrasis jį užbaigia.",
       "Pick a member from the search results": "Pick a member from the search results",
       "Copied to clipboard": "Copied to clipboard"

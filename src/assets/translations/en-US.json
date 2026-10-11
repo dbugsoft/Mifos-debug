@@ -500,6 +500,7 @@
       "Home": "Home"
     },
     "buttons": {
+      "Apply": "Apply",
       "Photo": "Photo",
       "Open Module": "Open Module",
       "Accept Transfer": "Accept Transfer",
@@ -4205,6 +4206,11 @@
       "username": "username",
       "withhold tax for this account": "withhold tax for this account",
       "withoutCategory": "Without Category",
+      "Others": "Others",
+      "Favourites": "Favourites",
+      "Recent": "Recent",
+      "Add to favourites": "Add to favourites",
+      "Remove from favourites": "Remove from favourites",
       "“Maker-Checker” principle requires every tasks": "The “Maker-Checker” principle requires every task to be completed by two people to reduce the chance of errors and misuse. One person initiates the process and the second completes it.",
       "Navigate directly to any platform area": "Navigate directly to any platform area",
       "Profiles and accounts": "Profiles & accounts",

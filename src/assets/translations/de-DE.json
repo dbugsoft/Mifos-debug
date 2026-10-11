@@ -499,6 +499,7 @@
       "Home": "Heim"
     },
     "buttons": {
+      "Apply": "Anwenden",
       "Photo": "Photo",
       "Open Module": "Open Module",
       "Accept Transfer": "Akzeptieren Sie die Übertragung",
@@ -4096,6 +4097,11 @@
       "username": "Nutzername",
       "withhold tax for this account": "für dieses Konto die Steuer einbehalten",
       "withoutCategory": "Ohne Kategorie",
+      "Others": "Sonstige",
+      "Favourites": "Favoriten",
+      "Recent": "Zuletzt verwendet",
+      "Add to favourites": "Zu Favoriten hinzufügen",
+      "Remove from favourites": "Aus Favoriten entfernen",
       "“Maker-Checker” principle requires every tasks": "Das „Maker-Checker“-Prinzip erfordert, dass jede Aufgabe von zwei Personen erledigt wird, um das Risiko von Fehlern und Missbrauch zu verringern. Eine Person leitet den Prozess ein und die zweite Person schließt ihn ab.",
       "Pick a member from the search results": "Pick a member from the search results",
       "Copied to clipboard": "Copied to clipboard"
