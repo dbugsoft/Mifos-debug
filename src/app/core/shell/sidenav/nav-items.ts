@@ -56,7 +56,6 @@ export const memberManagementCards: MenuCard[] = [
 
 /** Pages of the Reports landing page and sidebar group. */
 export const reportsCards: (MenuCard & NavPage)[] = [
-  { label: 'labels.menus.All', icon: 'list-ul', path: ['/reports'], permission: 'READ_REPORT', exact: true },
   { label: 'labels.menus.Clients', icon: 'users', path: [
       '/reports',
       'Client'

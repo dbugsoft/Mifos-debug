@@ -26,6 +26,27 @@ import {
 } from '@angular/material/table';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { DragScrollDirective } from 'app/directives/drag-scroll.directive';
+
+/** Route param for reports that have no category. */
+export const UNCATEGORIZED = 'Others';
+
+/** Order of the core Fineract categories in the tab bar; other categories follow alphabetically. */
+const CATEGORY_ORDER = [
+  'Client',
+  'Loan',
+  'Savings',
+  'Fund',
+  'Accounting'
+];
+
+/** A tab in the reports category bar. */
+export interface ReportCategory {
+  /** Route param and filter value. */
+  name: string;
+  /** Number of reports in the category. */
+  count: number;
+}
 
 /**
  * Reports component.
@@ -48,7 +69,8 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     MatHeaderRow,
     MatRowDef,
     MatRow,
-    MatPaginator
+    MatPaginator,
+    DragScrollDirective
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -61,11 +83,12 @@ export class ReportsComponent implements OnInit {
   reportsData: any;
   /** Report category filter. */
   filter: string;
+  /** Categories shown as tabs. */
+  categories: ReportCategory[] = [];
   /** Columns to be displayed in reports table. */
   displayedColumns: string[] = [
     'reportName',
-    'reportType',
-    'reportCategory'
+    'reportType'
   ];
   /** Data source for reports table. */
   dataSource = new MatTableDataSource();
@@ -93,6 +116,17 @@ export class ReportsComponent implements OnInit {
    *Sets and filters the reports table by category.
    */
   ngOnInit() {
+    this.categories = this.buildCategories(this.reportsData || []);
+    if (!this.filter && this.categories.length) {
+      this.router.navigate(
+        [
+          '/reports',
+          this.categories[0].name
+        ],
+        { replaceUrl: true }
+      );
+      return;
+    }
     this.setReports();
     this.filterReportsByCategory();
   }
@@ -124,9 +158,44 @@ export class ReportsComponent implements OnInit {
    */
   filterReportsByCategory() {
     this.dataSource.filterPredicate = (data: any, filter: string) => {
-      return data.reportCategory === filter;
+      return this.categoryOf(data) === filter;
     };
     this.dataSource.filter = this.filter;
+  }
+
+  /**
+   * Groups reports into categories with counts, core categories first and uncategorized last.
+   * @param {any[]} reports Reports.
+   */
+  buildCategories(reports: any[]): ReportCategory[] {
+    const counts = new Map<string, number>();
+    reports.forEach((report) => {
+      const name = this.categoryOf(report);
+      counts.set(name, (counts.get(name) || 0) + 1);
+    });
+    const rank = (name: string) => {
+      if (name === UNCATEGORIZED) {
+        return CATEGORY_ORDER.length + 1;
+      }
+      const index = CATEGORY_ORDER.indexOf(name);
+      return index === -1 ? CATEGORY_ORDER.length : index;
+    };
+    return Array.from(
+      counts,
+      ([
+        name,
+        count
+      ]) => ({ name, count })
+    ).sort((a, b) => rank(a.name) - rank(b.name) || a.name.localeCompare(b.name));
+  }
+
+  /**
+   * Category of a report, as used in the route param.
+   * @param {any} report Report.
+   */
+  categoryOf(report: any): string {
+    const category = report.reportCategory;
+    return !category || category === '(NULL)' || category.trim() === '' ? UNCATEGORIZED : category;
   }
 
   /**
@@ -148,7 +217,7 @@ export class ReportsComponent implements OnInit {
       /* Seperates filter for All reports page.*/
 
       if (this.filter) {
-        return dataStr.indexOf(transformedFilter) !== -1 && data.reportCategory === this.filter;
+        return dataStr.indexOf(transformedFilter) !== -1 && this.categoryOf(data) === this.filter;
       } else {
         return dataStr.indexOf(transformedFilter) !== -1;
       }
@@ -156,8 +225,8 @@ export class ReportsComponent implements OnInit {
   }
 
   getCategoryKey(category: string): string {
-    if (!category || category === '(NULL)' || category.trim() === '') {
-      return 'labels.text.withoutCategory';
+    if (!category || category === '(NULL)' || category === UNCATEGORIZED || category.trim() === '') {
+      return 'labels.text.Others';
     }
 
     if (category.startsWith('labels.text.')) {

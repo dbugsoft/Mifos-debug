@@ -113,9 +113,10 @@ export class RunReportComponent implements OnInit {
     this.report.name = this.route.snapshot.params['name'];
     this.route.queryParams
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((queryParams: { type: any; id: any }) => {
+      .subscribe((queryParams: { type: any; id: any; category: string }) => {
         this.report.type = queryParams.type;
         this.report.id = queryParams.id;
+        this.report.category = queryParams.category;
       });
     this.route.data
       .pipe(takeUntilDestroyed(this.destroyRef))

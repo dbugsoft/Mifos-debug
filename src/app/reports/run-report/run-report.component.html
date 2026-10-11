@@ -89,7 +89,11 @@
       </mat-card-content>
 
       <mat-card-actions class="layout-row align-between gap-5px responsive-column">
-        <button type="button" mat-raised-button [routerLink]="['/reports']">
+        <button
+          type="button"
+          mat-raised-button
+          [routerLink]="report.category ? ['/reports', report.category] : ['/reports']"
+        >
           {{ 'labels.buttons.Cancel' | translate }}
         </button>
         <button
