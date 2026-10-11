@@ -26,7 +26,10 @@ export interface CoopProfile {
   houseNo: string;
   mobilePhone: string;
   officePhone: string;
-  logoUrl: string;
+  totalMaleMembers: number;
+  totalFemaleMembers: number;
+  totalOtherMembers: number;
+  webUrl: string;
   status?: string;
   about: string;
   remarks: string;
@@ -61,6 +64,25 @@ export interface CoopMe {
   role: string;
 }
 
+export type CoopApplicationStatus =
+  | 'NO_PROFILE'
+  | 'UNVERIFIED_EMAIL'
+  | 'PENDING'
+  | 'PROVISIONED'
+  | 'ACTIVE'
+  | 'REJECTED'
+  | 'WITHDRAWN';
+
+export interface CoopSystemStatus {
+  email: string;
+  status: CoopApplicationStatus;
+  cooperativeCode?: string;
+  tenantIdentifier?: string;
+  frontendUrl?: string;
+  tenantAdminUsername?: string;
+  message?: string;
+}
+
 /**
  * Plain HTTP access for Coop profile/me/locations data.
  *
@@ -81,6 +103,8 @@ export class CoopProfileService {
 
   private readonly meUrl = `${environment.coopApiUrl}/nepal/coop-registration/public/me`;
 
+  private readonly statusUrl = `${environment.coopApiUrl}/nepal/coop-registration/public/status`;
+
   // =====================================================
   // PROFILE
   // =====================================================
@@ -99,6 +123,10 @@ export class CoopProfileService {
 
   getMe(): Observable<CoopMe> {
     return this.http.get<CoopMe>(this.meUrl);
+  }
+
+  getStatus(): Observable<CoopSystemStatus> {
+    return this.http.get<CoopSystemStatus>(this.statusUrl);
   }
 
   // =====================================================

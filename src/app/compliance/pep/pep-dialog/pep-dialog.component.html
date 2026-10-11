@@ -1,0 +1,102 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<h2 mat-dialog-title>
+  {{ (editing ? 'compliance.pep.Change the record' : 'compliance.pep.Add a person') | translate }}
+</h2>
+<form [formGroup]="form" (ngSubmit)="save()">
+  <mat-dialog-content>
+    @if (data.suggestion; as s) {
+      <p class="lead">
+        {{ 'compliance.pep.fromSuggestion' | translate: { member: s.memberName } }}
+      </p>
+    }
+    <div class="row">
+      <mat-form-field>
+        <mat-label>{{ 'compliance.pep.Full name' | translate }}</mat-label>
+        <input matInput formControlName="fullName" maxlength="200" required />
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>{{ 'compliance.pep.Category' | translate }}</mat-label>
+        <mat-select formControlName="category">
+          @for (c of template()?.categories ?? []; track c) {
+            <mat-option [value]="c">{{ 'compliance.pep.category.' + c | translate }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <div class="row">
+      <mat-form-field>
+        <mat-label>{{ 'compliance.pep.Post' | translate }}</mat-label>
+        <mat-select formControlName="postId">
+          <mat-option [value]="null">—</mat-option>
+          @for (p of template()?.posts ?? []; track p.id) {
+            <mat-option [value]="p.id">{{ p.name }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>{{ 'compliance.pep.Post in words' | translate }}</mat-label>
+        <input matInput formControlName="postDetail" maxlength="200" />
+        <mat-hint>{{ 'compliance.pep.postHint' | translate }}</mat-hint>
+      </mat-form-field>
+    </div>
+    <div class="row">
+      <mat-form-field>
+        <mat-label>{{ 'compliance.pep.Citizenship number' | translate }}</mat-label>
+        <input matInput formControlName="citizenshipNo" maxlength="50" />
+      </mat-form-field>
+      <mifosx-nepali-date-input
+        formControlName="dateOfBirth"
+        [label]="'compliance.pep.Date of birth' | translate"
+        [maxDate]="today"
+      ></mifosx-nepali-date-input>
+    </div>
+    <div class="row">
+      <mifosx-nepali-date-input
+        formControlName="startedOn"
+        [label]="'compliance.pep.Took office' | translate"
+        [maxDate]="today"
+      ></mifosx-nepali-date-input>
+      <mifosx-nepali-date-input
+        formControlName="leftOfficeOn"
+        [label]="'compliance.pep.Left office' | translate"
+        [maxDate]="today"
+      ></mifosx-nepali-date-input>
+    </div>
+    @if (editing && form.value.leftOfficeOn) {
+      <mifosx-nepali-date-input
+        formControlName="retainUntil"
+        [label]="'compliance.pep.Keep until' | translate"
+      ></mifosx-nepali-date-input>
+      <p class="hint">{{ 'compliance.pep.keepHint' | translate: { years: template()?.retentionYears ?? 10 } }}</p>
+    }
+    <div class="row">
+      <mat-form-field>
+        <mat-label>{{ 'compliance.pep.Where from' | translate }}</mat-label>
+        <mat-select formControlName="source" required>
+          @for (s of template()?.sources ?? []; track s) {
+            <mat-option [value]="s">{{ 'compliance.pep.source.' + s | translate }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <mat-form-field class="full">
+      <mat-label>{{ 'compliance.pep.Evidence' | translate }}</mat-label>
+      <textarea matInput rows="2" formControlName="evidence" maxlength="1000"></textarea>
+    </mat-form-field>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-raised-button type="button" mat-dialog-close [disabled]="busy()">
+      {{ 'labels.buttons.Cancel' | translate }}
+    </button>
+    <button mat-raised-button color="primary" type="submit" [disabled]="busy() || form.invalid">
+      {{ 'compliance.risk.Save' | translate }}
+    </button>
+  </mat-dialog-actions>
+</form>

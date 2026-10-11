@@ -17,6 +17,13 @@
   </mat-button-toggle-group>
 </div>
 
-<div [ngStyle]="{ display: hideOutput ? 'none' : 'block' }">
-  <canvas id="output"></canvas>
+<div class="chart-area" [attr.aria-busy]="loading">
+  <div [ngStyle]="{ display: hideOutput ? 'none' : 'block' }">
+    <canvas id="output"></canvas>
+  </div>
+  @if (loading) {
+    <div class="loading-overlay" [class.initial]="hideOutput">
+      <mat-progress-spinner mode="indeterminate" diameter="40"></mat-progress-spinner>
+    </div>
+  }
 </div>

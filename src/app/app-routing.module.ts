@@ -13,6 +13,9 @@ import { Routes, RouterModule } from '@angular/router';
 // Not Found Component
 import { NotFoundComponent } from './not-found/not-found.component';
 import { CallbackComponent } from './zitadel/callback/callback.component';
+import { UnconfiguredHostComponent } from './unconfigured-host/unconfigured-host.component';
+import { unmappedHostGuard } from './unconfigured-host/unmapped-host.guard';
+import { Route } from './core/route/route.service';
 
 /**
  * App routing module.
@@ -22,7 +25,13 @@ import { CallbackComponent } from './zitadel/callback/callback.component';
 const routes: Routes = [
   {
     path: 'login',
+    // Opt-in (window.env.blockUnmappedHosts): refuse to sign in on a host mapped to no cooperative.
+    canActivate: [unmappedHostGuard],
     loadChildren: () => import('./login/login.module').then((m) => m.LoginModule)
+  },
+  {
+    path: 'unconfigured-host',
+    component: UnconfiguredHostComponent
   },
   {
     path: 'coop',
@@ -100,6 +109,146 @@ const routes: Routes = [
     path: 'appusers',
     loadChildren: () => import('./users/users.module').then((m) => m.UsersModule)
   },
+  Route.withShell([
+    {
+      path: 'loan-calculator',
+      loadComponent: () =>
+        import('./loans/loan-calculator/loan-calculator.component').then((m) => m.LoanCalculatorComponent),
+      data: { title: 'Loan Calculator', breadcrumb: 'Loan Calculator' }
+    },
+    {
+      path: 'compliance',
+      data: { title: 'Compliance', breadcrumb: 'Compliance' },
+      children: [
+        {
+          path: '',
+          loadComponent: () =>
+            import('./compliance/compliance-home/compliance-home.component').then((m) => m.ComplianceHomeComponent)
+        },
+        {
+          path: 'threshold-reports',
+          loadComponent: () =>
+            import('./compliance/threshold-reports/threshold-reports.component').then(
+              (m) => m.ThresholdReportsComponent
+            ),
+          data: { title: 'Threshold reports', breadcrumb: 'Threshold reports' }
+        },
+        {
+          path: 'risk',
+          loadComponent: () =>
+            import('./compliance/risk/risk-list/risk-list.component').then((m) => m.RiskListComponent),
+          data: { title: 'Member risk', breadcrumb: 'Member risk' }
+        },
+        {
+          path: 'members/:clientId',
+          loadComponent: () =>
+            import('./compliance/risk/member-risk/member-risk.component').then((m) => m.MemberRiskComponent),
+          data: { title: 'Compliance profile', breadcrumb: 'Compliance profile', routeParamBreadcrumb: false }
+        },
+        {
+          path: 'peps',
+          loadComponent: () =>
+            import('./compliance/pep/pep-register/pep-register.component').then((m) => m.PepRegisterComponent),
+          data: { title: 'Politically exposed persons', breadcrumb: 'Politically exposed persons' }
+        },
+        {
+          path: 'peps/:id',
+          loadComponent: () =>
+            import('./compliance/pep/pep-detail/pep-detail.component').then((m) => m.PepDetailComponent),
+          data: {
+            title: 'Politically exposed person',
+            breadcrumb: 'Politically exposed person',
+            routeParamBreadcrumb: false
+          }
+        },
+        {
+          path: 'alerts',
+          loadComponent: () =>
+            import('./compliance/cases/alert-list/alert-list.component').then((m) => m.AlertListComponent),
+          data: { title: 'Alerts', breadcrumb: 'Alerts' }
+        },
+        {
+          path: 'alerts/:id',
+          loadComponent: () =>
+            import('./compliance/cases/alert-detail/alert-detail.component').then((m) => m.AlertDetailComponent),
+          data: { title: 'Alert', breadcrumb: 'Alert', routeParamBreadcrumb: false }
+        },
+        {
+          path: 'cases',
+          loadComponent: () =>
+            import('./compliance/cases/case-list/case-list.component').then((m) => m.CaseListComponent),
+          data: { title: 'Cases', breadcrumb: 'Cases' }
+        },
+        {
+          path: 'cases/:id',
+          loadComponent: () =>
+            import('./compliance/cases/case-detail/case-detail.component').then((m) => m.CaseDetailComponent),
+          data: { title: 'Case', breadcrumb: 'Case', routeParamBreadcrumb: false }
+        },
+        {
+          path: 'screening',
+          loadComponent: () =>
+            import('./compliance/screening/screening-home/screening-home.component').then(
+              (m) => m.ScreeningHomeComponent
+            ),
+          data: { title: 'Screening', breadcrumb: 'Screening' }
+        },
+        {
+          path: 'screening/matches/:id',
+          loadComponent: () =>
+            import('./compliance/screening/match-review/match-review.component').then((m) => m.MatchReviewComponent),
+          data: { title: 'Possible match', breadcrumb: 'Possible match', routeParamBreadcrumb: false }
+        },
+        {
+          path: 'screening/freezes',
+          loadComponent: () =>
+            import('./compliance/screening/freezes/freezes.component').then((m) => m.FreezesComponent),
+          data: { title: 'Funds held', breadcrumb: 'Funds held' }
+        },
+        {
+          path: 'screening/freezes/:id',
+          loadComponent: () =>
+            import('./compliance/screening/freeze-detail/freeze-detail.component').then((m) => m.FreezeDetailComponent),
+          data: { title: 'Funds held', breadcrumb: 'Funds held', routeParamBreadcrumb: false }
+        },
+        {
+          path: 'reports',
+          loadComponent: () =>
+            import('./compliance/governance/reports-home/reports-home.component').then((m) => m.ReportsHomeComponent),
+          data: { title: 'Yearly reports', breadcrumb: 'Yearly reports' }
+        },
+        {
+          path: 'reports/:type/:fiscalYear',
+          loadComponent: () =>
+            import('./compliance/governance/report-view/report-view.component').then((m) => m.ReportViewComponent),
+          data: { title: 'Yearly report', breadcrumb: 'Yearly report', routeParamBreadcrumb: false }
+        },
+        {
+          path: 'governance',
+          loadComponent: () =>
+            import('./compliance/governance/governance-page/governance-page.component').then(
+              (m) => m.GovernancePageComponent
+            ),
+          data: { title: 'Governance', breadcrumb: 'Governance' }
+        },
+        {
+          path: 'risk-tables',
+          loadComponent: () =>
+            import('./compliance/pep/risk-tables/risk-tables.component').then((m) => m.RiskTablesComponent),
+          data: { title: 'Occupation and area grades', breadcrumb: 'Occupation and area grades' }
+        }
+      ]
+    },
+    {
+      path: 'loan-aging',
+      loadComponent: () => import('./reports/loan-aging/loan-aging.component').then((m) => m.LoanAgingComponent),
+      data: {
+        title: 'Loan Aging',
+        breadcrumb: 'Loan Aging',
+        parentBreadcrumb: { label: 'Reports', url: '/reports-overview' }
+      }
+    }
+  ]),
   {
     path: 'callback',
     component: CallbackComponent

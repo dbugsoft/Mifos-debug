@@ -12,10 +12,14 @@ import { AlertService } from 'app/core/alert/alert.service';
 import { SettingsService } from 'app/settings/settings.service';
 import { Subscription } from 'rxjs';
 import { SystemService } from '../system.service';
-import { MatTabGroup, MatTab } from '@angular/material/tabs';
+import { MatTabGroup, MatTab, MatTabContent } from '@angular/material/tabs';
 import { GlobalConfigurationsTabComponent } from './global-configurations-tab/global-configurations-tab.component';
 import { BusinessDateTabComponent } from './business-date-tab/business-date-tab.component';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { MembershipSettingsComponent } from 'app/clients/membership/membership-settings/membership-settings.component';
+import { MembershipService } from 'app/clients/membership/membership.service';
+import { ComplianceService } from 'app/compliance/compliance.service';
+import { ComplianceSettingsComponent } from 'app/compliance/compliance-settings/compliance-settings.component';
 
 @Component({
   selector: 'mifosx-configurations',
@@ -25,8 +29,11 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     ...STANDALONE_SHARED_IMPORTS,
     MatTabGroup,
     MatTab,
+    MatTabContent,
     GlobalConfigurationsTabComponent,
-    BusinessDateTabComponent
+    BusinessDateTabComponent,
+    MembershipSettingsComponent,
+    ComplianceSettingsComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -38,6 +45,10 @@ export class ConfigurationsComponent implements OnInit {
   alert$: Subscription;
 
   isBusinessDateEnabled = false;
+  /** Membership settings (fineract-dbug ADR 0023), for users who may read memberships */
+  readonly showMembership = inject(MembershipService).canRead();
+  /** Compliance settings (fineract-dbug #196), for roles given the compliance permissions by name */
+  readonly compliance = inject(ComplianceService);
 
   ngOnInit(): void {
     this.alert$ = this.alertService.alertEvent.subscribe((alertEvent: Alert) => {

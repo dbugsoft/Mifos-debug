@@ -12,4 +12,11 @@
 export interface Breadcrumb {
   label: string;
   url: string;
+  /**
+   * The crumb's route has a component that is displaying the current page around it, as an entity
+   * view does for its tabs. Such a crumb is the page itself, so the back button skips it.
+   */
+  hostsPage?: boolean;
+  /** Page heading when it differs from the crumb's label, e.g. a user's name over a crumb showing the id. */
+  title?: string;
 }

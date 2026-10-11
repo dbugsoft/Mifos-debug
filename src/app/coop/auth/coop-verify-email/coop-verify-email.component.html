@@ -7,6 +7,13 @@
 -->
 
 <div class="verify-container">
+  @if (successMessage) {
+    <div class="success-banner">
+      <span class="message-icon">✓</span>
+      <span>{{ successMessage }}</span>
+    </div>
+  }
+
   <div class="verify-card">
     <h1>Verify Your Email</h1>
 
@@ -44,14 +51,8 @@
       <!-- Error -->
       @if (errorMessage) {
         <div class="error-message">
-          {{ errorMessage }}
-        </div>
-      }
-
-      <!-- Success -->
-      @if (successMessage) {
-        <div class="success-message">
-          {{ successMessage }}
+          <span class="message-icon">!</span>
+          <span>{{ errorMessage }}</span>
         </div>
       }
 

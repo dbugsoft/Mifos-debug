@@ -26,6 +26,8 @@ import { FileUploadComponent } from '../shared/file-upload/file-upload.component
 import { ThemePickerComponent } from '../shared/theme-picker/theme-picker.component';
 import { LanguageSelectorComponent } from '../shared/language-selector/language-selector.component';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { HasPermissionDirective } from '../directives/has-permission/has-permission.directive';
+import { CalendarName, CalendarPreferenceService } from '../core/bs-calendar/calendar-preference.service';
 
 /**
  * Settings component.
@@ -42,7 +44,8 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     MatExpansionPanelTitle,
     FileUploadComponent,
     ThemePickerComponent,
-    LanguageSelectorComponent
+    LanguageSelectorComponent,
+    HasPermissionDirective
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -51,6 +54,12 @@ export class SettingsComponent implements OnInit {
   private alertService = inject(AlertService);
   private translateService = inject(TranslateService);
   private destroyRef = inject(DestroyRef);
+  private calendarPreference = inject(CalendarPreferenceService);
+
+  /** The calendar setting (fineract-dbug ADR 0020): yours ('' follows the cooperative's default) and the default. */
+  readonly calendarSetting = this.calendarPreference.setting;
+  readonly myCalendar = new FormControl('');
+  readonly cooperativeCalendar = new FormControl('BS');
 
   hasChanges = false;
 
@@ -120,6 +129,7 @@ export class SettingsComponent implements OnInit {
   };
 
   ngOnInit() {
+    this.showCalendarSetting();
     this.initialValues = {
       dateFormat: this.settingsService.dateFormat,
       datetimeFormat: this.settingsService.datetimeFormat,
@@ -129,6 +139,34 @@ export class SettingsComponent implements OnInit {
     this.datetimeFormat.patchValue(this.initialValues.datetimeFormat, { emitEvent: false });
     this.decimalsToDisplay.patchValue(this.initialValues.decimals, { emitEvent: false });
     this.trackChanges();
+  }
+
+  /** Your own calendar; '' goes back to the cooperative's default. */
+  saveMyCalendar(calendar: CalendarName | ''): void {
+    this.calendarPreference.setMine(calendar || null).subscribe({
+      next: () => this.calendarSaved(),
+      error: () => this.showCalendarSetting()
+    });
+  }
+
+  saveCooperativeCalendar(calendar: CalendarName): void {
+    this.calendarPreference.setCooperativeDefault(calendar).subscribe({
+      next: () => this.calendarSaved(),
+      error: () => this.showCalendarSetting()
+    });
+  }
+
+  private calendarSaved(): void {
+    this.showCalendarSetting();
+    this.alertService.alert({
+      type: this.translateService.instant('bsCalendar.Calendar'),
+      message: this.translateService.instant('bsCalendar.Saved')
+    });
+  }
+
+  private showCalendarSetting(): void {
+    this.myCalendar.setValue(this.calendarSetting().mine ?? '', { emitEvent: false });
+    this.cooperativeCalendar.setValue(this.calendarSetting().cooperativeDefault, { emitEvent: false });
   }
 
   trackChanges(): void {

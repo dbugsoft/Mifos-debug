@@ -1,0 +1,282 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="compliance-page">
+  @if (allowed() === false) {
+    <p class="empty">{{ 'compliance.You have no compliance access' | translate }}</p>
+  } @else if (hit(); as h) {
+    @if (busy()) {
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }
+    <div class="title">
+      <h2 class="name">{{ h.ours.name }}</h2>
+      <span
+        class="chip"
+        [class.amber]="h.status === 'OPEN'"
+        [class.red]="h.status === 'CONFIRMED'"
+        [class.green]="h.status === 'NOT_A_MATCH'"
+        [class.grey]="h.status === 'CLEARED'"
+        >{{ 'compliance.screening.status.' + h.status | translate }}</span
+      >
+    </div>
+
+    @if (h.status === 'OPEN' && h.ours.member.status === 100) {
+      <p class="notice">{{ 'compliance.screening.applicationWaiting' | translate }}</p>
+    }
+    @if (h.freeze; as f) {
+      <p class="notice" [class.bad]="f.status === 'ACTIVE'">
+        {{ 'compliance.screening.freeze.' + f.status | translate }}
+        <a [routerLink]="['/compliance', 'screening', 'freezes', f.id]">{{
+          'compliance.screening.See the held funds' | translate
+        }}</a>
+      </p>
+    }
+
+    <div class="pair">
+      <section class="frame">
+        <h3 class="legend">{{ 'compliance.screening.Our record' | translate }}</h3>
+        <dl class="facts">
+          <div class="fact">
+            <dt class="fact-label">{{ 'compliance.screening.Name' | translate }}</dt>
+            <dd class="fact-value">{{ h.ours.name }}</dd>
+          </div>
+          <div class="fact">
+            <dt class="fact-label">{{ 'compliance.screening.Who' | translate }}</dt>
+            <dd class="fact-value">
+              {{ 'compliance.screening.subject.' + h.ours.type | translate }}
+              @if (h.ours.relationship) {
+                · {{ h.ours.relationship }}
+              }
+              <span class="sub">
+                <a [routerLink]="['/compliance', 'members', h.ours.member.clientId]">{{ h.ours.member.name }}</a>
+                · {{ h.ours.member.accountNo }} · {{ h.ours.member.office }}
+              </span>
+            </dd>
+          </div>
+          <div class="fact">
+            <dt class="fact-label">{{ 'compliance.screening.Date of birth' | translate }}</dt>
+            <dd class="fact-value">
+              @if (h.ours.bornOn) {
+                {{ (h.ours.bornOn | adToBs) || h.ours.bornOn }} / {{ h.ours.bornOn }}
+                {{ 'compliance.screening.AD' | translate }}
+              } @else {
+                —
+              }
+            </dd>
+          </div>
+          <div class="fact">
+            <dt class="fact-label">{{ 'compliance.screening.Documents' | translate }}</dt>
+            <dd class="fact-value">
+              @for (d of h.ours.documents ?? []; track $index) {
+                <span class="line">{{ d.type ?? '' }} {{ d.number }}</span>
+              } @empty {
+                {{ h.ours.citizenshipNo ?? '—' }}
+              }
+            </dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="frame">
+        <h3 class="legend">{{ 'compliance.screening.List entry' | translate }}</h3>
+        @if (h.entry; as e) {
+          <dl class="facts">
+            <div class="fact">
+              <dt class="fact-label">{{ 'compliance.screening.List' | translate }}</dt>
+              <dd class="fact-value">
+                {{ 'compliance.screening.source.' + e.source | translate }}
+                @if (e.listPublishedOn) {
+                  · {{ (e.listPublishedOn | adToBs) || e.listPublishedOn }}
+                }
+                @if (!e.onCurrentList) {
+                  <span class="sub">{{ 'compliance.screening.notOnCurrentList' | translate }}</span>
+                }
+              </dd>
+            </div>
+            <div class="fact">
+              <dt class="fact-label">{{ 'compliance.screening.Reference' | translate }}</dt>
+              <dd class="fact-value">{{ e.reference }}</dd>
+            </div>
+            <div class="fact">
+              <dt class="fact-label">{{ 'compliance.screening.Names' | translate }}</dt>
+              <dd class="fact-value">
+                <span class="line">{{ e.name }}</span>
+                @for (a of lines(e.aliases); track $index) {
+                  <span class="line sub">{{ a }}</span>
+                }
+                @if (e.originalScript) {
+                  <span class="line">{{ e.originalScript }}</span>
+                }
+              </dd>
+            </div>
+            <div class="fact">
+              <dt class="fact-label">{{ 'compliance.screening.Date of birth' | translate }}</dt>
+              <dd class="fact-value">{{ e.bornOn || e.bornYears || '—' }}</dd>
+            </div>
+            <div class="fact">
+              <dt class="fact-label">{{ 'compliance.screening.Nationality' | translate }}</dt>
+              <dd class="fact-value">{{ e.nationality ?? '—' }}</dd>
+            </div>
+            <div class="fact">
+              <dt class="fact-label">{{ 'compliance.screening.Documents' | translate }}</dt>
+              <dd class="fact-value">
+                @for (d of lines(e.documents); track $index) {
+                  <span class="line">{{ d }}</span>
+                } @empty {
+                  —
+                }
+              </dd>
+            </div>
+            @if (e.listedOn) {
+              <div class="fact">
+                <dt class="fact-label">{{ 'compliance.screening.Listed on' | translate }}</dt>
+                <dd class="fact-value">{{ (e.listedOn | adToBs) || e.listedOn }}</dd>
+              </div>
+            }
+            @if (e.note) {
+              <div class="fact">
+                <dt class="fact-label">{{ 'compliance.screening.Note' | translate }}</dt>
+                <dd class="fact-value note">{{ e.note }}</dd>
+              </div>
+            }
+          </dl>
+        } @else {
+          <p class="empty">{{ h.source }} · {{ h.reference }}</p>
+        }
+      </section>
+    </div>
+
+    <section class="frame">
+      <h3 class="legend">{{ 'compliance.screening.How they compare' | translate }}</h3>
+      <div class="table-scroll">
+        <table class="plain-rows">
+          <thead>
+            <tr>
+              <th>{{ 'compliance.screening.Detail' | translate }}</th>
+              <th>{{ 'compliance.screening.Ours' | translate }}</th>
+              <th>{{ 'compliance.screening.On the list' | translate }}</th>
+              <th>{{ 'compliance.screening.Result' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (c of h.compared; track c.detail) {
+              <tr>
+                <td>{{ 'compliance.screening.detail.' + c.detail | translate }}</td>
+                <td>{{ c.ours || '—' }}</td>
+                <td>{{ c.theirs || '—' }}</td>
+                <td>
+                  <span
+                    class="chip"
+                    [class.red]="c.result === 'SAME'"
+                    [class.amber]="c.result === 'CLOSE'"
+                    [class.green]="c.result === 'DIFFERENT'"
+                    [class.grey]="c.result === 'MISSING'"
+                    >{{ 'compliance.screening.result.' + c.result | translate }}</span
+                  >
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <div class="score-line">
+        <span class="score" [class.likely]="h.level === 'LIKELY'">{{ h.score.toFixed(2) }}</span>
+        <span class="hint">{{ 'compliance.screening.scoreHint.' + h.level | translate }}</span>
+      </div>
+    </section>
+
+    @if (h.status === 'OPEN' && canManage) {
+      <div class="decide">
+        <section class="box">
+          <h3>{{ 'compliance.screening.Not the same person' | translate }}</h3>
+          <mat-form-field class="full" subscriptSizing="dynamic">
+            <mat-label>{{ 'compliance.screening.Why' | translate }}</mat-label>
+            <textarea
+              matInput
+              rows="3"
+              maxlength="1000"
+              [value]="reason()"
+              (input)="reason.set($any($event.target).value)"
+            ></textarea>
+            <mat-hint>{{ 'compliance.screening.whyHint' | translate }}</mat-hint>
+          </mat-form-field>
+          <button
+            mat-stroked-button
+            color="primary"
+            type="button"
+            (click)="notAMatch()"
+            [disabled]="busy() || !reason().trim()"
+          >
+            {{ 'compliance.screening.Record not a match' | translate }}
+          </button>
+        </section>
+        <section class="box danger">
+          <h3>{{ 'compliance.screening.Confirmed: the same person' | translate }}</h3>
+          <ul>
+            <li>{{ 'compliance.screening.confirmDoes.accounts' | translate }}</li>
+            <li>{{ 'compliance.screening.confirmDoes.out' | translate }}</li>
+            <li>{{ 'compliance.screening.confirmDoes.application' | translate }}</li>
+            <li>{{ 'compliance.screening.confirmDoes.case' | translate }}</li>
+            <li>{{ 'compliance.screening.confirmDoes.release' | translate }}</li>
+          </ul>
+          <button mat-raised-button color="warn" type="button" (click)="confirm()" [disabled]="busy()">
+            {{ 'compliance.screening.Confirm match and hold funds' | translate }}
+          </button>
+        </section>
+      </div>
+    }
+
+    @if (h.status !== 'OPEN') {
+      <section class="frame">
+        <h3 class="legend">{{ 'compliance.screening.Decision' | translate }}</h3>
+        <dl class="facts">
+          <div class="fact">
+            <dt class="fact-label">{{ 'compliance.screening.Where it stands' | translate }}</dt>
+            <dd class="fact-value">
+              {{ 'compliance.screening.status.' + h.status | translate }}
+              @if (h.clearedWhy) {
+                <span class="sub">{{ 'compliance.screening.cleared.' + h.clearedWhy | translate }}</span>
+              }
+            </dd>
+          </div>
+          @if (h.decidedAt) {
+            <div class="fact">
+              <dt class="fact-label">{{ 'compliance.screening.Decided' | translate }}</dt>
+              <dd class="fact-value">
+                {{ (h.decidedAt.slice(0, 10) | adToBs) || h.decidedAt.slice(0, 10) }} ·
+                {{ h.decidedBy ?? ('compliance.risk.the system' | translate) }}
+              </dd>
+            </div>
+          }
+          @if (h.reason) {
+            <div class="fact">
+              <dt class="fact-label">{{ 'compliance.screening.Why' | translate }}</dt>
+              <dd class="fact-value note">{{ h.reason }}</dd>
+            </div>
+          }
+        </dl>
+      </section>
+    }
+
+    @if (h.others.length) {
+      <section class="frame">
+        <h3 class="legend">{{ 'compliance.screening.Other matches of this entry' | translate }}</h3>
+        <ul class="plain-list">
+          @for (o of h.others; track o.id) {
+            <li>
+              <a [routerLink]="['/compliance', 'screening', 'matches', o.id]">{{ o.subjectName }}</a>
+              · {{ o.score.toFixed(2) }}
+            </li>
+          }
+        </ul>
+      </section>
+    }
+  } @else {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
+</div>

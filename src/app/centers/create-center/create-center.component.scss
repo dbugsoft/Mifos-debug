@@ -6,14 +6,86 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+// Same width as the Create Member form and the lists.
 .container {
-  max-width: 37rem;
+  margin: 0 auto;
+  max-width: 84rem;
+  width: 90%;
+  padding-bottom: 32px;
+}
+
+// Each field keeps the width its input needs and does not stretch to fill the row; all stack on phones.
+.form-grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  column-gap: 16px;
+
+  // Fields take the widths below, not the natural width of a select or the date input.
+  mat-form-field,
+  .bs-date {
+    min-width: 0;
+  }
+
+  .field-lg {
+    flex: 0 1 280px;
+  }
+
+  .field-md {
+    flex: 0 1 160px;
+  }
+
+  .field-sm {
+    flex: 0 1 180px;
+  }
+
+  // BS/AD date: the date, calendar, BS/AD switch and the other calendar's date. Name, Office, Staff and
+  // Submitted On fit one row on a laptop.
+  .bs-date {
+    flex: 0 1 448px;
+    max-width: 100%;
+  }
+
+  // Row 1 (Name, Office, Staff) stretches to fill the row beside Submitted On.
+  .fill {
+    flex-grow: 1;
+  }
+
+  .row-break {
+    flex-basis: 100%;
+  }
+
+  .field-check {
+    flex: 0 0 auto;
+    align-self: center;
+    margin-bottom: 20px;
+  }
+}
+
+@media (width <= 600px) {
+  .form-grid mat-form-field,
+  .form-grid .bs-date {
+    flex-basis: 100%;
+  }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+// Member details and the selected members side by side, as wide as the fields above.
+.members-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: 16px;
 }
 
 .mat-table {
   display: block;
   font-family: Inter, 'Noto Sans Devanagari', sans-serif;
-  width: 50%;
 }
 
 .mat-row,

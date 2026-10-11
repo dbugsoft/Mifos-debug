@@ -1,0 +1,159 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="compliance-page">
+  @if (allowed() === false) {
+    <p class="empty">{{ 'compliance.You have no compliance access' | translate }}</p>
+  } @else if (pep(); as p) {
+    <section class="frame head">
+      <div class="title">
+        <h2 class="name">{{ p.fullName }}</h2>
+        <span
+          class="chip"
+          [class.red]="p.status === 'IN_OFFICE'"
+          [class.amber]="p.status === 'LEFT_OFFICE'"
+          [class.grey]="p.status === 'PAST_RETENTION'"
+          >{{ 'compliance.pep.status.' + p.status | translate }}</span
+        >
+      </div>
+      <dl class="facts">
+        <div class="fact">
+          <dt class="fact-label">{{ 'compliance.pep.Post' | translate }}</dt>
+          <dd class="fact-value">{{ p.post ?? '—' }}{{ p.postDetail ? ' · ' + p.postDetail : '' }}</dd>
+        </div>
+        <div class="fact">
+          <dt class="fact-label">{{ 'compliance.pep.Category' | translate }}</dt>
+          <dd class="fact-value">{{ 'compliance.pep.category.' + p.category | translate }}</dd>
+        </div>
+        <div class="fact">
+          <dt class="fact-label">{{ 'compliance.pep.In office' | translate }}</dt>
+          <dd class="fact-value">
+            @if (p.startedOn) {
+              {{ p.startedOn | adToBs }} –
+              {{ p.leftOfficeOn ? (p.leftOfficeOn | adToBs) : ('compliance.pep.now' | translate) }}
+            } @else if (p.leftOfficeOn) {
+              {{ 'compliance.pep.Left office' | translate }} {{ p.leftOfficeOn | adToBs }}
+            } @else {
+              {{ 'compliance.pep.status.IN_OFFICE' | translate }}
+            }
+          </dd>
+        </div>
+        <div class="fact">
+          <dt class="fact-label">{{ 'compliance.pep.Keep until' | translate }}</dt>
+          <dd class="fact-value">
+            {{
+              p.retainUntil ? (p.retainUntil | adToBs) || p.retainUntil : ('compliance.pep.while in office' | translate)
+            }}
+          </dd>
+        </div>
+        <div class="fact">
+          <dt class="fact-label">{{ 'compliance.pep.Citizenship number' | translate }}</dt>
+          <dd class="fact-value">{{ p.citizenshipNo ?? '—' }}</dd>
+        </div>
+        <div class="fact">
+          <dt class="fact-label">{{ 'compliance.pep.Date of birth' | translate }}</dt>
+          <dd class="fact-value">{{ p.dateOfBirth ? (p.dateOfBirth | adToBs) : '—' }}</dd>
+        </div>
+        <div class="fact">
+          <dt class="fact-label">{{ 'compliance.pep.Where from' | translate }}</dt>
+          <dd class="fact-value">
+            {{ 'compliance.pep.source.' + p.source | translate }}
+            @if (p.evidence) {
+              <span class="sub">{{ p.evidence }}</span>
+            }
+          </dd>
+        </div>
+        <div class="fact">
+          <dt class="fact-label">{{ 'compliance.pep.Recorded' | translate }}</dt>
+          <dd class="fact-value">{{ p.createdAt.slice(0, 10) | adToBs }} · {{ p.createdBy }}</dd>
+        </div>
+      </dl>
+      @if (canManage) {
+        <div class="actions">
+          <button mat-stroked-button type="button" (click)="edit()">
+            <mat-icon>edit</mat-icon>{{ 'compliance.pep.Change the record' | translate }}
+          </button>
+        </div>
+      }
+    </section>
+
+    <section class="frame">
+      <h3 class="legend">{{ 'compliance.pep.Members exposed' | translate }}</h3>
+      <p class="hint">{{ 'compliance.pep.membersHint' | translate }}</p>
+      @if (current().length) {
+        <ul class="links">
+          @for (l of current(); track l.id) {
+            <li>
+              <span>
+                <a [routerLink]="['/compliance', 'members', l.clientId]">{{ l.name }}</a>
+                <span class="sub"
+                  >{{ l.accountNo }} · {{ 'compliance.pepRelationship.' + l.relationship | translate
+                  }}{{ l.relationshipDetail ? ': ' + l.relationshipDetail : '' }}</span
+                >
+              </span>
+              @if (canManage) {
+                <button mat-button type="button" (click)="endLink(l)">{{ 'compliance.risk.End' | translate }}</button>
+              }
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="empty">{{ 'compliance.pep.noMembers' | translate }}</p>
+      }
+      @if (canManage) {
+        <div class="add">
+          @if (picked(); as m) {
+            <div class="picked">
+              <b>{{ m.name }}</b> · {{ m.accountNo }}
+              <button mat-button type="button" (click)="picked.set(null)">{{ 'kym.Remove' | translate }}</button>
+            </div>
+            <div class="row">
+              <mat-form-field>
+                <mat-label>{{ 'compliance.pep.How' | translate }}</mat-label>
+                <mat-select [value]="relationship()" (selectionChange)="relationship.set($event.value)">
+                  @for (r of ['SELF', 'FAMILY', 'ASSOCIATE']; track r) {
+                    <mat-option [value]="r">{{ 'compliance.pepRelationship.' + r | translate }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>{{ 'compliance.pep.Relationship in words' | translate }}</mat-label>
+                <input matInput maxlength="100" [value]="detail()" (input)="detail.set($any($event.target).value)" />
+              </mat-form-field>
+            </div>
+            <button mat-raised-button color="primary" type="button" (click)="link()" [disabled]="busy()">
+              {{ 'compliance.pep.Link the member' | translate }}
+            </button>
+          } @else {
+            <mifosx-kym-member-picker
+              label="compliance.pep.Find a member to link"
+              (picked)="picked.set($event)"
+            ></mifosx-kym-member-picker>
+          }
+        </div>
+      }
+      @if (ended().length) {
+        <ul class="links ended">
+          @for (l of ended(); track l.id) {
+            <li>
+              <span>
+                {{ l.name }}
+                <span class="sub"
+                  >{{ 'compliance.risk.Ended' | translate }} {{ l.endedAt!.slice(0, 10) | adToBs }}:
+                  {{ l.endReason }}</span
+                >
+              </span>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  } @else {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
+</div>

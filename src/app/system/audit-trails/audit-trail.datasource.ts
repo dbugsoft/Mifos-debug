@@ -52,7 +52,7 @@ export class AuditTrailsDataSource implements DataSource<any> {
       .getAuditTrails(filterBy, orderBy, sortOrder, pageIndex * limit, limit)
       .subscribe((auditTrails: any) => {
         this.recordsSubject.next(auditTrails.totalFilteredRecords);
-        this.auditTrailsSubject.next(auditTrails.pageItems);
+        this.auditTrailsSubject.next((auditTrails.pageItems || []).slice(0, limit));
       });
   }
 

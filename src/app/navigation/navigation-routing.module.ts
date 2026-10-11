@@ -25,7 +25,12 @@ const routes: Routes = [
     {
       path: '',
       component: NavigationComponent,
-      data: { title: 'Navigation', breadcrumb: 'Navigation' },
+      data: {
+        title: 'Navigation',
+        breadcrumb: 'Navigation',
+        parentBreadcrumb: { label: 'Member Management', url: '/member-management' },
+        hideBackLink: true
+      },
       resolve: {
         offices: OfficesResolver
       }

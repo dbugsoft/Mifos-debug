@@ -6,59 +6,35 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { ApplicationRef, Injectable, inject } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
+/**
+ * Single owner of the light/dark theme. The app always starts light; the top-bar switch turns dark mode on for the
+ * current page only, so a refresh, a new tab or signing out returns to light. The OS colour scheme is ignored
+ * (following it is what used to switch the app to dark after cancelling the print dialog).
+ * Printing always uses the light theme.
+ */
 @Injectable({
   providedIn: 'root'
 })
 export class ThemingService {
-  private ref = inject(ApplicationRef);
-
-  private darkModeOn = false;
-
-  themes = [
-    'dark-theme',
-    'light-theme'
-  ]; // <- list all themes in this array
-  theme = new BehaviorSubject('light-theme'); // <- initial theme
+  theme = new BehaviorSubject('light-theme');
 
   constructor() {
-    // Initially check if dark mode is enabled on system
-    this.darkModeOn = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    this.setDarkMode(false);
 
-    // If dark mode is enabled then directly switch to the dark-theme
-    this.setDarkMode(this.darkModeOn);
-
-    // Watch for changes of the preference
-    window.matchMedia('(prefers-color-scheme: dark)').addListener((e) => {
-      const turnOn = e.matches;
-      this.theme.next(turnOn ? 'dark-theme' : 'light-theme');
-
-      // Trigger refresh of UI
-      this.ref.tick();
-    });
+    window.addEventListener('beforeprint', () => document.body.classList.remove('dark-theme'));
+    window.addEventListener('afterprint', () => document.body.classList.toggle('dark-theme', this.isDark));
   }
 
-  isDarkMode(): boolean {
-    this.darkModeOn = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    return this.darkModeOn;
+  get isDark(): boolean {
+    return this.theme.value === 'dark-theme';
   }
 
   setDarkMode(isDarkMode: boolean) {
-    this.darkModeOn = isDarkMode;
-    if (isDarkMode) {
-      document.body.classList.add('dark-theme');
-      document.body.classList.remove('light-theme');
-      this.theme.next('dark-theme');
-    } else {
-      document.body.classList.add('light-theme');
-      document.body.classList.remove('dark-theme');
-      this.theme.next('light-theme');
-    }
-  }
-
-  setInitialDarkMode(): void {
-    this.setDarkMode(this.darkModeOn);
+    document.body.classList.toggle('dark-theme', isDarkMode);
+    document.body.classList.toggle('light-theme', !isDarkMode);
+    this.theme.next(isDarkMode ? 'dark-theme' : 'light-theme');
   }
 }

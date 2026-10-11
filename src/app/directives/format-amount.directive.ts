@@ -31,14 +31,12 @@ export class FormatAmountDirective implements OnInit {
   }
 
   @HostListener('blur', ['$event.target']) blur(target: any) {
-    target.value = this.parse(target.value);
+    target.value = this.parse(this.control.value);
   }
   @HostListener('focus', ['$event.target']) focus(target: any) {
-    if (typeof this.control.value === 'undefined') {
-      target.value = '';
-    } else {
-      target.value = this.control.value;
-    }
+    const value = this.control.value;
+    // Show an empty box for a zero default so typed digits can't be appended to it ("0" + "70" = "700").
+    target.value = value == null || value === '' || Number(value) === 0 ? '' : value;
   }
 
   ngOnInit() {

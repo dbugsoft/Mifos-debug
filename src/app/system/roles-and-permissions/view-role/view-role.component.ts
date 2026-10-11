@@ -292,7 +292,8 @@ export class ViewRoleComponent implements OnInit {
       return;
     }
     this.isSearchActive = true;
-    const lowerSearch = searchValue.toLowerCase();
+    // Trimmed, so a pasted value with a stray space still matches.
+    const lowerSearch = searchValue.trim().toLowerCase();
     this.filteredPermissions = [];
     this.groupingMatchCounts = {};
     for (const grouping of this.groupings) {
@@ -317,18 +318,21 @@ export class ViewRoleComponent implements OnInit {
   }
 
   /**
-   * Updates the filtered permissions for the currently selected grouping
+   * Updates the permissions shown while searching.
+   *
+   * The matches come from every grouping, not only the selected one. A role opens on the Special
+   * grouping, which holds five permissions, so filtering the selected grouping reported
+   * "No permissions found" for anything held elsewhere.
    */
   updateFilteredGroupPermissions() {
-    if (!this.isSearchActive || !this.permissions) {
+    if (!this.isSearchActive) {
       this.filteredGroupPermissions = [];
       return;
     }
-    const lowerSearch = this.searchText.toLowerCase();
-    this.filteredGroupPermissions = this.permissions.permissions.filter((perm) => {
-      const readableName = this.permissionName(perm.code).toLowerCase();
-      return readableName.includes(lowerSearch) || perm.code.toLowerCase().includes(lowerSearch);
-    });
+    this.filteredGroupPermissions = this.filteredPermissions.map((perm) => ({
+      code: perm.code,
+      id: perm.id
+    }));
   }
 
   /**

@@ -1,0 +1,156 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="compliance-page">
+  @if (allowed() === false) {
+    <p class="empty">{{ 'compliance.You have no compliance access' | translate }}</p>
+  } @else if (report(); as r) {
+    @if (busy()) {
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }
+    <div class="title">
+      <h2 class="name">{{ 'compliance.reports.type.' + r.type | translate }} · {{ r.label }}</h2>
+      <span class="chip" [class.green]="r.status === 'APPROVED'" [class.amber]="r.status === 'DRAFT'">{{
+        'compliance.reports.status.' + r.status | translate
+      }}</span>
+    </div>
+    @if (r.status === 'APPROVED') {
+      <p class="notice">
+        {{ 'compliance.reports.approvedNotice' | translate: { by: r.approvedBy } }}
+        {{ (r.approvedAt?.slice(0, 10) ?? '' | adToBs) || r.approvedAt?.slice(0, 10) }}
+      </p>
+    } @else {
+      <p class="hint">{{ 'compliance.reports.draftLead' | translate }}</p>
+    }
+
+    <div class="actions">
+      @if (draft && canPrepare) {
+        <button mat-raised-button color="primary" type="button" (click)="save()" [disabled]="busy() || !dirty">
+          {{ 'compliance.reports.Save the writing' | translate }}
+        </button>
+        <button mat-stroked-button type="button" (click)="regenerate()" [disabled]="busy() || dirty">
+          {{ 'compliance.reports.Generate again' | translate }}
+        </button>
+      }
+      @if (draft && canApprove) {
+        <button mat-stroked-button color="primary" type="button" (click)="approve()" [disabled]="busy() || dirty">
+          {{ 'compliance.reports.Approve' | translate }}
+        </button>
+      }
+      <button mat-button type="button" (click)="csv()"><mat-icon>download</mat-icon>CSV</button>
+      <button mat-button type="button" (click)="print()">
+        <mat-icon>print</mat-icon>{{ 'compliance.reports.Print or save as PDF' | translate }}
+      </button>
+    </div>
+
+    @for (s of r.sections; track s.key) {
+      <section class="frame">
+        <h3 class="legend">{{ sectionTitle(s) }}</h3>
+        <div class="table-scroll">
+          <table class="plain-rows">
+            <thead>
+              <tr>
+                @if (full(s)) {
+                  <th class="no">{{ 'compliance.reports.No' | translate }}</th>
+                }
+                <th>{{ 'compliance.reports.Particulars' | translate }}</th>
+                @if (full(s)) {
+                  <th class="num wide">{{ 'compliance.reports.Up to the previous year' | translate }}</th>
+                  <th class="num wide">{{ 'compliance.reports.Change this year' | translate }}</th>
+                  <th class="num">{{ 'compliance.reports.Total' | translate }}</th>
+                } @else if (textOnly(s)) {
+                  <th>{{ 'compliance.reports.Value' | translate }}</th>
+                } @else {
+                  <th class="num wide">{{ 'compliance.reports.Last year' | translate }}</th>
+                  <th class="num">{{ 'compliance.reports.This year' | translate }}</th>
+                }
+                <th class="wide">{{ 'compliance.reports.Remarks' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of s.rows; track row.key) {
+                <tr>
+                  @if (full(s)) {
+                    <td class="no">{{ row.no }}</td>
+                  }
+                  <td>
+                    @if (!full(s) && row.no) {
+                      {{ row.no }}.
+                    }
+                    {{ rowLabel(row) }}
+                    @if (!row.editable) {
+                      <span class="sub">{{ 'compliance.reports.fromTheRecords' | translate }}</span>
+                    }
+                  </td>
+                  @if (full(s) && row.kind !== 'TEXT') {
+                    <td class="num wide">{{ show(row.previous) }}</td>
+                    <td class="num wide">{{ show(row.change) }}</td>
+                    <td class="num">
+                      @if (row.editable && draft && canPrepare) {
+                        <input
+                          matInput
+                          class="edit"
+                          [value]="valueOf(row)"
+                          (input)="setValue(row.key, $any($event.target).value)"
+                          [attr.aria-label]="rowLabel(row)"
+                        />
+                      } @else {
+                        {{ show(row.total, row.kind) }}
+                      }
+                    </td>
+                  } @else if (full(s) || textOnly(s) || row.kind === 'TEXT') {
+                    <td [attr.colspan]="full(s) ? 3 : textOnly(s) ? 1 : 2">
+                      @if (row.editable && draft && canPrepare) {
+                        <textarea
+                          matInput
+                          class="edit"
+                          rows="2"
+                          maxlength="2000"
+                          [value]="valueOf(row)"
+                          (input)="setValue(row.key, $any($event.target).value)"
+                          [attr.aria-label]="rowLabel(row)"
+                        ></textarea>
+                      } @else {
+                        {{ show(row.value, row.kind) }}
+                      }
+                    </td>
+                  } @else {
+                    <td class="num wide">{{ show(row.previous) }}</td>
+                    <td class="num">{{ show(row.value, row.kind) }}</td>
+                  }
+                  <td class="wide">
+                    @if (draft && canPrepare) {
+                      <input
+                        matInput
+                        class="edit"
+                        maxlength="500"
+                        [value]="remarkOf(row)"
+                        (input)="setRemark(row.key, $any($event.target).value)"
+                        [attr.aria-label]="('compliance.reports.Remarks' | translate) + ' ' + rowLabel(row)"
+                      />
+                    } @else {
+                      {{ row.remarks ?? '' }}
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+    }
+    <p class="hint">
+      {{ 'compliance.reports.generatedOn' | translate }} {{ (r.generatedOn | adToBs) || r.generatedOn }}
+      @if (r.preparedBy) {
+        · {{ r.preparedBy }}
+      }
+    </p>
+  } @else {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
+</div>

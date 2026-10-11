@@ -9,12 +9,12 @@
 @use 'assets/styles/colours' as c;
 
 .kyc-validation-dialog {
-  --kyc-border: rgb(0 0 0 / 12%);
+  --kyc-border: rgb(var(--dk-ink-rgb, 0 0 0) / 12%);
   --kyc-thead-bg: #{c.$light-grey};
-  --kyc-row-alt-bg: rgb(0 0 0 / 2%);
+  --kyc-row-alt-bg: rgb(var(--dk-ink-rgb, 0 0 0) / 2%);
   --kyc-row-hover-bg: rgba(c.$peter-river, 0.12);
-  --kyc-text-primary: rgb(0 0 0 / 87%);
-  --kyc-text-secondary: rgb(0 0 0 / 60%);
+  --kyc-text-primary: rgb(var(--dk-ink-rgb, 0 0 0) / 87%);
+  --kyc-text-secondary: rgb(var(--dk-ink-rgb, 0 0 0) / 60%);
 
   .dialog-title {
     font-size: 16px;

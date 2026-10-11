@@ -1,0 +1,307 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+:host {
+  display: block;
+}
+
+.summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.pill--met {
+  color: var(--coop-good-ink);
+  background: var(--coop-good-soft);
+}
+
+.pill--miss {
+  color: var(--coop-bad-ink);
+  background: var(--coop-bad-soft);
+}
+
+.pill--nodata {
+  color: var(--coop-warn-ink);
+  background: var(--coop-warn-soft);
+}
+
+// ── Group tabs ──────────────────────────────────────────────────────────
+
+.tabs {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid var(--viz-grid);
+  border-radius: 10px;
+  background: var(--coop-card);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--coop-accent);
+    background: var(--coop-hover);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--coop-accent);
+    outline-offset: 2px;
+  }
+}
+
+.tab--active {
+  border-color: var(--coop-accent);
+  background: var(--coop-accent-soft);
+  box-shadow: inset 0 -3px 0 var(--coop-accent);
+}
+
+.tab__letter {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--coop-accent);
+  background: var(--coop-accent-soft);
+}
+
+.tab__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.tab__name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--viz-ink);
+  line-height: 1.25;
+}
+
+.tab__count {
+  font-size: 12px;
+  color: var(--viz-muted);
+}
+
+.group-hint {
+  margin: 12px 0 6px;
+  font-size: 12.5px;
+  color: var(--viz-ink-2);
+}
+
+// ── Indicators ──────────────────────────────────────────────────────────
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.ind {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+
+  th {
+    text-align: left;
+    font-weight: 500;
+    font-size: 12px;
+    color: var(--viz-muted);
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--viz-grid);
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 8px;
+    border-bottom: 1px solid var(--viz-grid);
+    color: var(--viz-ink);
+    vertical-align: middle;
+  }
+
+  tr:last-child td {
+    border-bottom: 0;
+  }
+}
+
+.code {
+  width: 36px;
+  font-weight: 700;
+  color: var(--coop-accent) !important;
+}
+
+.ind__name {
+  min-width: 160px;
+
+  // Inline, so a long name wraps like text with the info button at its end.
+  span {
+    display: inline;
+  }
+}
+
+.ind__tags,
+.ind__note {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+  font-size: 12px;
+}
+
+.ind__tags {
+  color: var(--coop-warn-ink);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.ind__note {
+  color: var(--viz-muted);
+}
+
+.num {
+  text-align: right !important;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.strong {
+  font-weight: 700;
+}
+
+.muted {
+  color: var(--viz-muted) !important;
+}
+
+.track-col {
+  width: 22%;
+  min-width: 120px;
+}
+
+.track {
+  position: relative;
+  display: block;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--viz-grid);
+}
+
+.track__band {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: 4px;
+  background: var(--coop-good-soft);
+  box-shadow: inset 0 0 0 1px var(--coop-good-ink);
+  opacity: 0.8;
+}
+
+.track__dot {
+  position: absolute;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--coop-card);
+  background: var(--coop-bad-ink);
+  transform: translate(-50%, -50%);
+}
+
+.track--met .track__dot {
+  background: var(--coop-good-ink);
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.status--MET {
+  color: var(--coop-good-ink);
+  background: var(--coop-good-soft);
+}
+
+.status--NOT_MET {
+  color: var(--coop-bad-ink);
+  background: var(--coop-bad-soft);
+}
+
+.status--NO_DATA {
+  color: var(--coop-warn-ink);
+  background: var(--coop-warn-soft);
+}
+
+.status--NOT_APPLICABLE {
+  color: var(--viz-muted);
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--viz-grid);
+}
+
+.status--INFO {
+  color: var(--viz-ink-2);
+  background: var(--coop-hover);
+}
+
+@media screen and (width <= 1100px) {
+  .tabs {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media screen and (width <= 760px) {
+  .tabs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hide-sm {
+    display: none;
+  }
+
+  // On a phone the status shows as its icon; the label is still read out.
+  .status__text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+
+  .status {
+    padding: 4px;
+  }
+}

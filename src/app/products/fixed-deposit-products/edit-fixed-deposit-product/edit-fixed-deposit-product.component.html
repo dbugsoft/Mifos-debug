@@ -7,13 +7,7 @@
 -->
 
 <div class="container">
-  <mat-stepper
-    orientation="vertical"
-    [linear]="false"
-    class="mat-elevation-z8"
-    labelPosition="bottom"
-    #fixedDepositProductStepper
-  >
+  <mat-stepper orientation="vertical" [linear]="false" labelPosition="bottom" #fixedDepositProductStepper>
     <ng-template matStepperIcon="number">
       <fa-icon icon="pencil-alt" size="sm"></fa-icon>
     </ng-template>
@@ -35,35 +29,45 @@
     </ng-template>
 
     <mat-step [stepControl]="fixedDepositProductDetailsForm">
-      <ng-template matStepLabel>{{ 'labels.inputs.DETAILS' | translate }}</ng-template>
+      <ng-template matStepLabel
+        ><strong>{{ 'labels.inputs.DETAILS' | translate }}</strong></ng-template
+      >
 
       <mifosx-fixed-deposit-product-details-step [fixedDepositProductsTemplate]="fixedDepositProductsTemplate">
       </mifosx-fixed-deposit-product-details-step>
     </mat-step>
 
     <mat-step [stepControl]="fixedDepositProductCurrencyForm">
-      <ng-template matStepLabel>{{ 'labels.inputs.CURRENCY' | translate }}</ng-template>
+      <ng-template matStepLabel
+        ><strong>{{ 'labels.inputs.CURRENCY' | translate }}</strong></ng-template
+      >
 
       <mifosx-fixed-deposit-product-currency-step [fixedDepositProductsTemplate]="fixedDepositProductsTemplate">
       </mifosx-fixed-deposit-product-currency-step>
     </mat-step>
 
     <mat-step [stepControl]="fixedDepositProductTermsForm">
-      <ng-template matStepLabel>{{ 'labels.inputs.TERMS' | translate }}</ng-template>
+      <ng-template matStepLabel
+        ><strong>{{ 'labels.inputs.TERMS' | translate }}</strong></ng-template
+      >
 
       <mifosx-fixed-deposit-product-terms-step [fixedDepositProductsTemplate]="fixedDepositProductsTemplate">
       </mifosx-fixed-deposit-product-terms-step>
     </mat-step>
 
     <mat-step [stepControl]="fixedDepositProductSettingsForm">
-      <ng-template matStepLabel>{{ 'labels.inputs.SETTINGS' | translate }}</ng-template>
+      <ng-template matStepLabel
+        ><strong>{{ 'labels.inputs.SETTINGS' | translate }}</strong></ng-template
+      >
 
       <mifosx-fixed-deposit-product-settings-step [fixedDepositProductsTemplate]="fixedDepositProductsTemplate">
       </mifosx-fixed-deposit-product-settings-step>
     </mat-step>
 
     <mat-step [stepControl]="fixedDepositProductInterestRateChartForm">
-      <ng-template matStepLabel>{{ 'labels.inputs.INTEREST RATE CHART' | translate }}</ng-template>
+      <ng-template matStepLabel
+        ><strong>{{ 'labels.inputs.INTEREST RATE CHART' | translate }}</strong></ng-template
+      >
 
       <mifosx-fixed-deposit-product-interest-rate-chart-step
         [fixedDepositProductsTemplate]="fixedDepositProductsTemplate"
@@ -72,7 +76,9 @@
     </mat-step>
 
     <mat-step>
-      <ng-template matStepLabel>{{ 'labels.inputs.CHARGES' | translate }}</ng-template>
+      <ng-template matStepLabel
+        ><strong>{{ 'labels.inputs.CHARGES' | translate }}</strong></ng-template
+      >
 
       <mifosx-fixed-deposit-product-charges-step
         [fixedDepositProductsTemplate]="fixedDepositProductsTemplate"
@@ -82,7 +88,9 @@
     </mat-step>
 
     <mat-step [stepControl]="fixedDepositProductAccountingForm">
-      <ng-template matStepLabel>{{ 'labels.inputs.ACCOUNTING' | translate }}</ng-template>
+      <ng-template matStepLabel
+        ><strong>{{ 'labels.inputs.ACCOUNTING' | translate }}</strong></ng-template
+      >
 
       <mifosx-fixed-deposit-product-accounting-step
         [fixedDepositProductsTemplate]="fixedDepositProductsTemplate"
@@ -94,7 +102,9 @@
 
     @if (fixedDepositProductFormValidAndNotPrinstine) {
       <mat-step state="preview" completed>
-        <ng-template matStepLabel>{{ 'labels.inputs.PREVIEW' | translate }}</ng-template>
+        <ng-template matStepLabel
+          ><strong>{{ 'labels.inputs.PREVIEW' | translate }}</strong></ng-template
+        >
         <mifosx-fixed-deposit-product-preview-step
           [fixedDepositProductsTemplate]="fixedDepositProductsTemplate"
           [chartSlabsDisplayedColumns]="fixedDepositProductInterestRateChartStep.chartSlabsDisplayedColumns"

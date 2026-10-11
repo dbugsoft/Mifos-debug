@@ -1,0 +1,108 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<!-- One tile per kind of task; the chosen one's records are listed underneath. -->
+@for (row of rows(); track row.key) {
+  <p class="tasks__caption">{{ 'coopDashboard.' + row.key | translate }}</p>
+  <div class="tasks" role="tablist" [style.--cols]="row.groups.length">
+    @for (g of row.groups; track g.code) {
+      <button
+        type="button"
+        role="tab"
+        class="task task--{{ g.tone }}"
+        [class.task--active]="selected()?.code === g.code"
+        [class.task--empty]="!g.count"
+        [attr.aria-selected]="selected()?.code === g.code"
+        [disabled]="!g.count"
+        (click)="select(g.code)"
+      >
+        <span class="task__top">
+          <span class="task__icon"><fa-icon [icon]="g.icon"></fa-icon></span>
+          <span class="task__count">{{ grouped(g.count) }}</span>
+        </span>
+        <span class="task__label">{{ 'coopDashboard.actions.' + g.code | translate }}</span>
+        <span class="task__amount">
+          @if (g.amount) {
+            NPR {{ short(g.amount) }}
+          } @else {
+            &nbsp;
+          }
+        </span>
+      </button>
+    }
+  </div>
+}
+
+@if (selected(); as g) {
+  <div class="detail" role="tabpanel">
+    <div class="detail__head">
+      <h4>
+        {{ 'coopDashboard.actions.' + g.code | translate }}
+        <mifosx-info-tip [key]="'actions.' + g.code"></mifosx-info-tip>
+      </h4>
+      <span class="detail__count">
+        {{ 'coopDashboard.showing' | translate: { shown: g.items.length, total: grouped(g.count) } }}
+        <a
+          class="detail__all"
+          [routerLink]="['/dashboard', 'tasks', g.code]"
+          [queryParams]="officeId ? { officeId: officeId } : {}"
+        >
+          {{ 'coopDashboard.View all' | translate: { count: grouped(g.count) } }}
+          <fa-icon icon="arrow-right"></fa-icon>
+        </a>
+      </span>
+    </div>
+    <div class="detail__scroll">
+      <table class="detail__table">
+        <thead>
+          <tr>
+            <th>
+              {{ (g.code === 'CASH_WITH_CASHIERS' ? 'coopDashboard.Cashier' : 'coopDashboard.Member') | translate }}
+            </th>
+            <th>{{ 'coopDashboard.Details' | translate }}</th>
+            <th class="hide-sm">{{ 'coopDashboard.Account' | translate }}</th>
+            <th>{{ 'coopDashboard.dateHeader.' + g.code | translate }}</th>
+            <th class="num">{{ 'coopDashboard.Amount' | translate }}</th>
+            <th class="go">
+              <span class="visually-hidden">{{ 'coopDashboard.Open' | translate }}</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of g.items; track item.id) {
+            <tr class="row" [routerLink]="link(item, g.code)">
+              <td class="name">
+                <a [routerLink]="link(item, g.code)">{{ item.clientName }}</a>
+              </td>
+              <td>
+                @if (g.code === 'KYC_INCOMPLETE') {
+                  {{ 'coopDashboard.missing.' + item.detail | translate }}
+                } @else {
+                  {{ item.detail }}
+                }
+              </td>
+              <td class="hide-sm muted">
+                {{ item.entity === 'client' || item.entity === 'cashier' ? '' : item.accountNo }}
+              </td>
+              <td>
+                @if (item.date) {
+                  @if (expired(item, g.code)) {
+                    <span class="badge">{{ 'coopDashboard.Expired' | translate }}</span>
+                  }
+                  <mifosx-dual-date [date]="item.date"></mifosx-dual-date>
+                }
+              </td>
+              <td class="num strong">{{ hasAmount(item) ? short(item.amount) : '' }}</td>
+              <td class="go"><fa-icon icon="chevron-right"></fa-icon></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+}

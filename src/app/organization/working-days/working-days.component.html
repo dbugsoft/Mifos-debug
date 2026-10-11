@@ -11,15 +11,13 @@
     <form [formGroup]="workingDaysForm" (ngSubmit)="submit()">
       <mat-card-content>
         <div #workingDaysFormRef class="layout-column">
-          <div class="layout-row responsive-column">
-            <mat-label class="mat-h4 flex-50">{{ 'labels.inputs.Working Days' | translate }}</mat-label>
-            <div class="flex-50 layout-column" formArrayName="recurrence">
+          <div class="working-days-section">
+            <span class="section-label">{{ 'labels.inputs.Working Days' | translate }}</span>
+            <div class="working-days-grid" formArrayName="recurrence">
               @for (day of recurrence.controls; track day; let i = $index) {
-                <div>
-                  <mat-checkbox labelPosition="after" [formControlName]="i">
-                    {{ weekDays[i].name | translateKey: 'catalogs' }}
-                  </mat-checkbox>
-                </div>
+                <mat-checkbox labelPosition="after" [formControlName]="i" class="working-day-chip">
+                  {{ weekDays[i].name | translateKey: 'catalogs' }}
+                </mat-checkbox>
               }
             </div>
           </div>

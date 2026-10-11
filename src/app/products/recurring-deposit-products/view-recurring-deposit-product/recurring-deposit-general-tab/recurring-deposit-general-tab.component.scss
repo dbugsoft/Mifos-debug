@@ -6,72 +6,74 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-@use 'assets/styles/helper';
-@use 'assets/styles/colours' as *;
+@use '../../../../shared/styles/product-summary' as *;
 
-.container {
-  width: 100%;
+@include product-summary;
+
+// Actions sit on the product title line. Absolute, not float: the summary
+// is a grid, and a grid next to a float shrinks to fit beside it.
+:host {
+  display: block;
+  position: relative;
 }
 
-.tab-container {
-  padding: 1%;
-  margin: 1%;
-}
+.product-actions {
+  position: absolute;
+  top: 16px;
+  right: 0;
+  z-index: 1;
+  display: flex;
+  gap: 8px;
 
-.mat-h3 {
-  margin-top: 10px !important;
-  font-weight: 300;
-  color: $status-approved;
-}
+  .btn-icon {
+    margin-right: 8px;
+  }
 
-.mat-elevation-z1 {
-  margin: 1em 0 1.5em;
-}
-
-.interestCarts {
-  float: right;
-}
-
-h2,
-h3,
-h4 {
-  margin: 0;
-  font-weight: 500;
-}
-
-table {
-  width: 100%;
-
-  tr.incentives-row {
-    height: 0;
-
-    > td {
-      padding: 0;
-    }
-
-    .incentives {
-      overflow: hidden;
-    }
-
-    .mat-card {
-      border-radius: 0;
-
-      > h4 {
-        font-weight: 500;
-        margin: 0.5em 0 0;
-      }
-    }
+  .caret {
+    margin-left: 8px;
   }
 }
 
-span {
-  margin: 0.5em 0;
+.menu-icon {
+  margin-right: 8px;
+  color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
 }
 
-mat-divider {
-  margin: 0 0 0.5em;
+// No card around the product: align the summary with the page header edge.
+.tab-container {
+  padding: 16px 0;
 }
 
-.margin-t {
-  margin-top: 1em;
+.mat-h2 {
+  padding-right: 216px;
+}
+
+@media (width <= 768px) {
+  .product-actions {
+    position: static;
+    justify-content: flex-end;
+    padding: 8px 8px 0;
+  }
+
+  .mat-h2 {
+    padding-right: 0;
+  }
+}
+
+// Interest chart slabs expand into an incentives row.
+table tr.incentives-row {
+  height: 0;
+
+  > td {
+    padding: 0;
+  }
+
+  .incentives {
+    overflow: hidden;
+  }
+
+  .mat-mdc-card {
+    border-radius: 0;
+    box-shadow: none;
+  }
 }

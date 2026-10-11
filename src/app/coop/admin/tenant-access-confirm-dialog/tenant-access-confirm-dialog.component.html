@@ -1,0 +1,58 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<h2 mat-dialog-title>{{ data.title }}</h2>
+
+<mat-dialog-content class="confirm-content">
+  @if (data.intro) {
+    <p class="intro">{{ data.intro }}</p>
+  }
+
+  <ul class="points">
+    @for (point of data.points; track point) {
+      <li>{{ point }}</li>
+    }
+  </ul>
+
+  <form [formGroup]="form" (ngSubmit)="confirm()" id="tenant-access-confirm-form">
+    @if (data.reason) {
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ data.reason.label }}</mat-label>
+        <textarea matInput formControlName="reason" rows="3"></textarea>
+        <mat-error>Enter at least {{ data.reason.minLength }} characters.</mat-error>
+      </mat-form-field>
+    }
+
+    @if (data.typeToConfirm) {
+      <p class="type-hint">
+        To confirm, type <code>{{ data.typeToConfirm }}</code> below.
+      </p>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Type {{ data.typeToConfirm }}</mat-label>
+        <input matInput formControlName="confirmation" autocomplete="off" spellcheck="false" />
+        <mat-error>Type {{ data.typeToConfirm }} exactly.</mat-error>
+      </mat-form-field>
+    }
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="cancel()">Cancel</button>
+
+  <button
+    mat-raised-button
+    type="submit"
+    form="tenant-access-confirm-form"
+    class="confirm-button"
+    [class.destructive]="data.destructive"
+    [disabled]="form.invalid"
+  >
+    {{ data.confirmLabel }}
+  </button>
+</mat-dialog-actions>

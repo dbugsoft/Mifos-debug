@@ -6,13 +6,46 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+// Same width as the breadcrumb, without a card around it.
 .container {
-  max-width: 37rem;
+  margin: 0 auto;
+  max-width: 84rem;
+  width: 90%;
+  padding-bottom: 32px;
+}
 
-  .content {
-    div {
-      margin: 0.8rem 0;
-      overflow-wrap: break-word;
-    }
+.page-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+// Label and value pairs; the label column is as wide as the longest label.
+.details {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  margin: 0;
+  border: 1px solid var(--dk-border, #e2e8f0);
+  border-radius: 8px;
+  overflow: hidden;
+
+  dt,
+  dd {
+    margin: 0;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--dk-border, #e2e8f0);
+    overflow-wrap: anywhere;
+  }
+
+  dt {
+    font-weight: 600;
+    color: var(--dk-text-muted, #64748b);
+    background: var(--dk-surface-2, #f8fafc);
+  }
+
+  dt:last-of-type,
+  dd:last-of-type {
+    border-bottom: none;
   }
 }

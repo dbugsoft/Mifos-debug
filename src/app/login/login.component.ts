@@ -27,7 +27,6 @@ import { Alert } from '../core/alert/alert.model';
 
 /** Custom Services */
 import { AlertService } from '../core/alert/alert.service';
-import { ThemingService } from '../shared/theme-toggle/theming.service';
 import { TranslateService } from '@ngx-translate/core';
 
 /** Environment Imports */
@@ -35,10 +34,14 @@ import { environment } from '../../environments/environment';
 import { SettingsService } from 'app/settings/settings.service';
 import { TenantSelectorComponent } from '../shared/tenant-selector/tenant-selector.component';
 import { LoginFormComponent } from './login-form/login-form.component';
-import { ResetPasswordComponent } from './reset-password/reset-password.component';
 import { TwoFactorAuthenticationComponent } from './two-factor-authentication/two-factor-authentication.component';
+import { VerifyEmailComponent } from './staff-access/verify-email/verify-email.component';
+import { ForgotPasswordComponent } from './staff-access/forgot-password/forgot-password.component';
+import { StaffAccessService } from '../core/authentication/staff-access.service';
 import { LanguageSelectorComponent } from '../shared/language-selector/language-selector.component';
+import { ThemingService } from '../shared/theme-toggle/theming.service';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { M3IconComponent } from '../shared/m3-ui/m3-icon/m3-icon.component';
 
 import { VersionService } from '../system/version.service';
 
@@ -53,9 +56,11 @@ import { VersionService } from '../system/version.service';
     ...STANDALONE_SHARED_IMPORTS,
     TenantSelectorComponent,
     LoginFormComponent,
-    ResetPasswordComponent,
     TwoFactorAuthenticationComponent,
-    LanguageSelectorComponent
+    VerifyEmailComponent,
+    ForgotPasswordComponent,
+    LanguageSelectorComponent,
+    M3IconComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -69,11 +74,13 @@ export class LoginComponent implements OnInit {
 
   private alertService = inject(AlertService);
   private settingsService = inject(SettingsService);
-  private themingService = inject(ThemingService);
   private router = inject(Router);
   private versionService = inject(VersionService);
   private translateService = inject(TranslateService);
   private destroyRef = inject(DestroyRef);
+  private themingService = inject(ThemingService);
+  /** Sign-in help steps (verify email, reset password) shown in place of the sign-in form. */
+  readonly staffAccess = inject(StaffAccessService);
 
   public environment = environment;
 
@@ -88,45 +95,30 @@ export class LoginComponent implements OnInit {
     return tenant.charAt(0).toUpperCase() + tenant.slice(1).toLowerCase();
   }
 
-  /** True if password requires a reset. */
-  resetPassword = false;
   /** True if user requires two factor authentication. */
   twoFactorAuthenticationRequired = false;
-  logoPath = 'assets/images/debug-bg.png';
-  logoPathDark = 'assets/images/debug-bg.png';
-
-  themeDarkEnabled: boolean = false;
 
   /**
-   * Subscribes to alert event of alert service and theme changes.
+   * Subscribes to alert event of alert service.
    */
   ngOnInit() {
-    this.showTenantSelector = this.calculateTenantSelectorVisibility();
-    this.updateLogo();
-    this.themeDarkEnabled = this.settingsService.themeDarkEnabled;
-    // Subscribe to theme changes
-    this.themingService.theme.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
-      this.themeDarkEnabled = this.settingsService.themeDarkEnabled;
-    });
+    // Signing in (and out) always starts in the light theme.
+    this.themingService.setDarkMode(false);
 
-    // Initialize theme based on settings
-    this.themingService.setDarkMode(!!this.settingsService.themeDarkEnabled);
+    this.staffAccess.backToSignIn();
+    this.showTenantSelector = this.calculateTenantSelectorVisibility();
 
     // Subscribe to alerts
     this.alertService.alertEvent.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((alertEvent: Alert) => {
       const alertType = alertEvent.type;
       if (alertType === this.translateService.instant('errors.auth.passwordExpired.type')) {
+        // The blocking "set a new password" dialog (opened from WebAppComponent) takes over from here.
         this.twoFactorAuthenticationRequired = false;
-        this.resetPassword = true;
       } else if (alertType === this.translateService.instant('errors.auth.twoFactor.type')) {
-        this.resetPassword = false;
         this.twoFactorAuthenticationRequired = true;
       } else if (alertType === this.translateService.instant('errors.auth.success.type')) {
-        this.resetPassword = false;
         this.twoFactorAuthenticationRequired = false;
         this.router.navigate(['/'], { replaceUrl: true });
-      } else if (alertType === this.translateService.instant('errors.tenant.changed.type')) {
-        this.updateLogo();
       }
     });
 
@@ -187,32 +179,5 @@ export class LoginComponent implements OnInit {
 
   allowServerSwitch(): boolean {
     return environment.allowServerSwitch === 'false' ? false : true;
-  }
-
-  updateLogo(): void {
-    const tenant = this.settingsService.tenantIdentifier;
-    const isTenantSpecific = tenant && tenant !== 'default';
-
-    // Set light mode logo (env override takes priority)
-    if (environment.tenantLogoUrl && environment.tenantLogoUrl.trim() !== '') {
-      this.logoPath = environment.tenantLogoUrl;
-    } else {
-      this.logoPath = isTenantSpecific ? `assets/images/${tenant}_home.png` : 'assets/images/debug-bg.png';
-    }
-
-    // Set dark mode logo (env override takes priority)
-    if (environment.tenantLogoUrlDark && environment.tenantLogoUrlDark.trim() !== '') {
-      this.logoPathDark = environment.tenantLogoUrlDark;
-    } else {
-      this.logoPathDark = isTenantSpecific ? `assets/images/${tenant}_home_dark.png` : 'assets/images/debug-bg.png';
-    }
-  }
-
-  onLogoError(): void {
-    this.logoPath = 'assets/images/debug-bg.png';
-  }
-
-  onLogoErrorDark(): void {
-    this.logoPathDark = 'assets/images/debug-bg.png';
   }
 }

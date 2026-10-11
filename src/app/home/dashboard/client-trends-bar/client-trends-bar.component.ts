@@ -305,7 +305,7 @@ export class ClientTrendsBarComponent implements OnInit {
               title: {
                 display: true,
                 text: 'Values',
-                color: '#1074B9'
+                color: '#2460b9'
               }
             }
           }

@@ -23,9 +23,14 @@ import { IdentitiesTabComponent } from './clients-view/identities-tab/identities
 import { NotesTabComponent } from './clients-view/notes-tab/notes-tab.component';
 import { DocumentsTabComponent } from './clients-view/documents-tab/documents-tab.component';
 import { DatatableTabComponent } from './clients-view/datatable-tab/datatable-tab.component';
-import { AddressTabComponent } from './clients-view/address-tab/address-tab.component';
+import { MemberAddressTabComponent } from './member-address/member-address-tab/member-address-tab.component';
 import { PersonalDataTabComponent } from './clients-view/personal-data-tab/personal-data-tab.component';
 import { ClientActionsComponent } from './clients-view/client-actions/client-actions.component';
+import { ClientMembershipResolver, MembershipTemplateResolver } from './membership/membership.resolvers';
+import { MembershipTabComponent } from './membership/membership-tab/membership-tab.component';
+import { KymTabComponent } from './kym/kym-tab/kym-tab.component';
+import { KymListComponent } from './kym/kym-list/kym-list.component';
+import { MembershipApplicationsComponent } from './membership/membership-applications/membership-applications.component';
 import { ViewChargeComponent } from './clients-view/charges/view-charge/view-charge.component';
 import { ClientPayChargesComponent } from './clients-view/charges/client-pay-charges/client-pay-charges.component';
 import { EditClientComponent } from './edit-client/edit-client.component';
@@ -60,7 +65,12 @@ const routes: Routes = [
   Route.withShell([
     {
       path: '',
-      data: { title: 'Clients', breadcrumb: 'Clients', routeParamBreadcrumb: false },
+      data: {
+        title: 'Clients',
+        breadcrumb: 'Clients',
+        routeParamBreadcrumb: false,
+        parentBreadcrumb: { label: 'Member Management', url: '/member-management' }
+      },
       children: [
         {
           path: '',
@@ -72,8 +82,26 @@ const routes: Routes = [
           component: CreateClientComponent,
           resolve: {
             clientAddressFieldConfig: ClientAddressFieldConfigurationResolver,
-            clientTemplate: ClientTemplateResolver
+            clientTemplate: ClientTemplateResolver,
+            membershipTemplate: MembershipTemplateResolver
           }
+        },
+        {
+          path: 'applications',
+          data: {
+            title: 'Membership Applications',
+            breadcrumb: 'Membership Applications',
+            routeParamBreadcrumb: false
+          },
+          component: MembershipApplicationsComponent,
+          resolve: {
+            membershipTemplate: MembershipTemplateResolver
+          }
+        },
+        {
+          path: 'kym',
+          data: { title: 'Member KYM', breadcrumb: 'Member KYM', routeParamBreadcrumb: false },
+          component: KymListComponent
         },
         {
           path: ':clientId',
@@ -82,7 +110,8 @@ const routes: Routes = [
           resolve: {
             clientViewData: ClientViewResolver,
             clientTemplateData: ClientTemplateResolver,
-            clientDatatables: ClientDatatablesResolver
+            clientDatatables: ClientDatatablesResolver,
+            membershipApplication: ClientMembershipResolver
           },
           children: [
             {
@@ -101,19 +130,29 @@ const routes: Routes = [
               }
             },
             {
+              path: 'membership',
+              component: MembershipTabComponent,
+              data: { title: 'Membership', breadcrumb: 'Membership', routeParamBreadcrumb: false },
+              resolve: {
+                clientAccountsData: ClientAccountsResolver
+              }
+            },
+            {
+              // The member's KYM (fineract-dbug #123, ADR 0039): its own component; the tab shows only with READ_KYM.
+              path: 'kym',
+              component: KymTabComponent,
+              data: { title: 'KYM', breadcrumb: 'KYM', routeParamBreadcrumb: false }
+            },
+            {
               path: 'personal-data',
               component: PersonalDataTabComponent,
               data: { title: 'Personal Data', breadcrumb: 'Personal Data', routeParamBreadcrumb: false }
             },
             {
+              // Nepal member addresses replace Fineract's generic client address (Fineract ADR-0014).
               path: 'address',
-              component: AddressTabComponent,
-              data: { title: 'Address', breadcrumb: 'Address', routeParamBreadcrumb: false },
-              resolve: {
-                clientAddressFieldConfig: ClientAddressFieldConfigurationResolver,
-                clientAddressTemplateData: ClientAddressTemplateResolver,
-                clientAddressData: ClientAddressResolver
-              }
+              component: MemberAddressTabComponent,
+              data: { title: 'Address', breadcrumb: 'Address', routeParamBreadcrumb: false }
             },
             {
               path: 'family-members',
@@ -318,7 +357,9 @@ const routes: Routes = [
     ClientChargeViewResolver,
     ClientTransactionPayResolver,
     ClientDataAndTemplateResolver,
-    ClientCollateralResolver
+    ClientCollateralResolver,
+    MembershipTemplateResolver,
+    ClientMembershipResolver
   ]
 })
 export class ClientsRoutingModule {}

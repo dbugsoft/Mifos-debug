@@ -49,7 +49,7 @@ export class GeneralTabComponent {
       const status = this.savingsAccountData.status.value;
       this.isActive = status === 'Active';
     });
-    if (this.router.url.includes('clients')) {
+    if (this.router.url.includes('members')) {
       this.entityType = 'Client';
     } else if (this.router.url.includes('groups')) {
       this.entityType = 'Group';

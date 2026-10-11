@@ -40,7 +40,9 @@ export class DocumentsTabComponent {
     this.route.data.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((data: { clientDocuments: any }) => {
       this.entityDocuments = data.clientDocuments;
     });
-    this.entityId = this.route.parent.snapshot.paramMap.get('clientId');
+    this.route.parent.paramMap
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((params) => (this.entityId = params.get('clientId')));
   }
 
   deleteDocument(documentId: string) {

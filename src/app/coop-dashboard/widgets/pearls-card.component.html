@@ -1,0 +1,108 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+@if (summary(); as s) {
+  <div class="summary">
+    <span class="pill pill--met"
+      ><fa-icon icon="check-circle"></fa-icon> {{ 'coopDashboard.pearlsMet' | translate: { count: s.met } }}</span
+    >
+    <span class="pill pill--miss"
+      ><fa-icon icon="exclamation-circle"></fa-icon>
+      {{ 'coopDashboard.pearlsNotMet' | translate: { count: s.notMet } }}</span
+    >
+    @if (s.noData) {
+      <span class="pill pill--nodata"
+        ><fa-icon icon="tags"></fa-icon> {{ 'coopDashboard.pearlsNoData' | translate: { count: s.noData } }}</span
+      >
+    }
+  </div>
+}
+
+<div class="tabs" role="tablist">
+  @for (g of groups; track g) {
+    @let c = counts(g);
+    <button
+      type="button"
+      role="tab"
+      class="tab"
+      [class.tab--active]="group() === g"
+      [attr.aria-selected]="group() === g"
+      (click)="group.set(g)"
+    >
+      <span class="tab__letter">{{ g }}</span>
+      <span class="tab__text">
+        <span class="tab__name">{{ 'coopDashboard.pearls.group.' + g | translate }}</span>
+        <span class="tab__count">
+          @if (c.total) {
+            {{ 'coopDashboard.metOf' | translate: { met: c.met, total: c.total } }}
+          } @else if (c.noData) {
+            {{ 'coopDashboard.needs tags' | translate }}
+          } @else {
+            {{ 'coopDashboard.for reference' | translate }}
+          }
+        </span>
+      </span>
+    </button>
+  }
+</div>
+
+<p class="group-hint">{{ 'coopDashboard.pearls.groupInfo.' + group() | translate }}</p>
+
+<div class="table-wrap">
+  <table class="ind">
+    <thead>
+      <tr>
+        <th class="code"></th>
+        <th>{{ 'coopDashboard.Indicator' | translate }}</th>
+        <th class="num">{{ 'coopDashboard.Value' | translate }}</th>
+        <th class="track-col hide-sm"></th>
+        <th class="num hide-sm">{{ 'coopDashboard.Goal' | translate }}</th>
+        <th>{{ 'coopDashboard.Status' | translate }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (i of rows(); track i.code) {
+        <tr>
+          <td class="code">{{ i.code }}</td>
+          <td class="ind__name">
+            <span>
+              {{ 'coopDashboard.pearls.' + i.code + '.name' | translate }}
+              <mifosx-info-tip [key]="'pearls.' + i.code"></mifosx-info-tip>
+            </span>
+            @if (i.missingTags.length) {
+              <a class="ind__tags" [routerLink]="['/accounting', 'chart-of-accounts']">
+                <fa-icon icon="tags"></fa-icon>
+                {{ 'coopDashboard.tag accounts' | translate: { tags: i.missingTags.join(', ') } }}
+              </a>
+            } @else if (i.assumedNone.length) {
+              <span class="ind__note">{{
+                'coopDashboard.counted as none' | translate: { tags: i.assumedNone.join(', ') }
+              }}</span>
+            }
+          </td>
+          <td class="num strong">{{ value(i) }}</td>
+          <td class="track-col hide-sm">
+            @if (scale(i); as sc) {
+              <span class="track" [class.track--met]="i.status === 'MET'">
+                <i class="track__band" [style.left.%]="sc.from" [style.width.%]="sc.to - sc.from"></i>
+                <i class="track__dot" [style.left.%]="sc.value"></i>
+              </span>
+            }
+          </td>
+          <td class="num muted hide-sm">{{ goal(i) ?? ('coopDashboard.pearls.' + i.code + '.goal' | translate) }}</td>
+          <td>
+            <span class="status status--{{ i.status }}">
+              <fa-icon [icon]="statusIcon[i.status]"></fa-icon>
+              <span class="status__text">{{ 'coopDashboard.pearlsStatus.' + i.status | translate }}</span>
+            </span>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

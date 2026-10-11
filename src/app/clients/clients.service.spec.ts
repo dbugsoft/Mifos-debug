@@ -191,24 +191,50 @@ describe('ClientsService', () => {
   });
 
   describe('Client Profile Image', () => {
-    it('should fetch image with responseType text and maxHeight param (GET)', async () => {
-      const mockImageData = 'data:image/png;base64,iVBOR...';
+    it('should fetch a binary thumbnail bounded in both dimensions (GET)', async () => {
+      const mockImage = new Blob(['jpeg-bytes'], { type: 'image/jpeg' });
       const resultPromise = firstValueFrom(service.getClientProfileImage('123'));
 
       const req = httpMock.expectOne((r) => r.url === '/clients/123/images' && r.method === 'GET');
+      // Fineract resizes only when both are present.
+      expect(req.request.params.get('maxWidth')).toBe('150');
       expect(req.request.params.get('maxHeight')).toBe('150');
-      expect(req.request.responseType).toBe('text');
+      expect(req.request.params.get('output')).toBe('inline_octet');
+      expect(req.request.params.has('v')).toBe(false);
+      expect(req.request.responseType).toBe('blob');
 
-      req.flush(mockImageData);
+      req.flush(mockImage);
       const result = await resultPromise;
-      expect(result).toBe(mockImageData);
+      expect(result).toBe(mockImage);
+    });
+
+    it('should step past the browser cache after this browser changed the photo', async () => {
+      const upload = firstValueFrom(
+        service.uploadClientProfileImage('123', new File(['x'], 'p.png', { type: 'image/png' }))
+      );
+      httpMock.expectOne((r) => r.url === '/clients/123/images' && r.method === 'POST').flush({ resourceId: 123 });
+      await upload;
+
+      const resultPromise = firstValueFrom(service.getClientProfileImage('123'));
+      const req = httpMock.expectOne((r) => r.url === '/clients/123/images' && r.method === 'GET');
+      expect(req.request.params.get('v')).toMatch(/^\d+$/);
+      req.flush(new Blob(['jpeg-bytes'], { type: 'image/jpeg' }));
+      await resultPromise;
+
+      // Another client's photo is unaffected.
+      const other = firstValueFrom(service.getClientProfileImage('456'));
+      const otherReq = httpMock.expectOne((r) => r.url === '/clients/456/images' && r.method === 'GET');
+      expect(otherReq.request.params.has('v')).toBe(false);
+      otherReq.flush(new Blob(['jpeg-bytes'], { type: 'image/jpeg' }));
+      await other;
     });
 
     it('should return null on 404 (catchError swallows it)', async () => {
       const resultPromise = firstValueFrom(service.getClientProfileImage('123'));
 
       const req = httpMock.expectOne((r) => r.url === '/clients/123/images' && r.method === 'GET');
-      req.flush('Not Found', { status: 404, statusText: 'Not Found' });
+      // The request asks for a Blob, so the error body must be one too.
+      req.flush(new Blob(['Not Found']), { status: 404, statusText: 'Not Found' });
 
       const result = await resultPromise;
       expect(result).toBeNull();
@@ -220,7 +246,7 @@ describe('ClientsService', () => {
       const req = httpMock.expectOne((r) => r.url === '/clients/123/images' && r.method === 'GET');
 
       const assertion = expect(resultPromise).rejects.toMatchObject({ status: 500 });
-      req.flush('Server Error', { status: 500, statusText: 'Internal Server Error' });
+      req.flush(new Blob(['Server Error']), { status: 500, statusText: 'Internal Server Error' });
 
       await assertion;
     });

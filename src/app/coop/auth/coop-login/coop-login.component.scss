@@ -6,25 +6,135 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-.coop-login-page {
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 30px;
-  background: #f5f8fa;
+/* ================================
+   Input Wrapper
+   ================================ */
+
+.input-wrapper {
+  position: relative;
+  width: 100%;
 }
+
+/* ================================
+   Input
+   ================================ */
+
+.input-wrapper input {
+  display: block;
+  width: 100%;
+  height: 48px;
+  box-sizing: border-box;
+
+  /* Space for left icon and right password icon */
+  padding: 0 48px;
+  border: 1px solid var(--dk-border, #d5dce1);
+  border-radius: 8px;
+  font-size: 15px;
+  font-family: inherit;
+  color: var(--dk-text, #1e293b);
+  background: var(--dk-surface, #fff);
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+/* Input focus */
+
+.input-wrapper input:focus {
+  border-color: var(--dk-primary, #2460b9);
+  box-shadow: 0 0 0 3px rgb(36 96 185 / 10%);
+}
+
+/* Placeholder */
+
+.input-wrapper input::placeholder {
+  color: var(--dk-text-muted, #94a3b8);
+  opacity: 1;
+}
+
+/* ================================
+   Email / Password Icon
+   ================================ */
+
+.input-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  font-size: 20px;
+  line-height: 20px;
+  color: var(--dk-text, #000);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ================================
+   Password Visibility Button
+   ================================ */
+
+.password-toggle {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--dk-text, #000);
+  cursor: pointer;
+  z-index: 2;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.password-toggle:hover {
+  background: var(--dk-surface-2, #f1f5f9);
+  color: var(--dk-text, #333);
+}
+
+.password-toggle:focus-visible {
+  outline: 2px solid var(--dk-primary, #2460b9);
+  outline-offset: 2px;
+}
+
+.password-toggle mat-icon {
+  width: 20px;
+  height: 20px;
+  font-size: 20px;
+  line-height: 20px;
+  color: var(--dk-text, #000);
+}
+
+/* ================================
+   Login Card
+   ================================ */
 
 .login-card {
   width: 100%;
   max-width: 430px;
+
+  /* Centers the card within the full-width auth panel instead of
+     it sitting flush against the panel's left edge. */
+  margin: 0 auto;
   padding: 40px;
-  background: #fff;
+  background: var(--dk-surface, #fff);
   border-radius: 12px;
   box-shadow: 0 8px 30px rgb(0 0 0 / 8%);
 }
 
-/* Header */
+/* ================================
+   Header
+   ================================ */
 
 .login-header {
   text-align: center;
@@ -33,77 +143,79 @@
 
 .login-header h1 {
   margin: 0 0 10px;
-  color: #1074b9;
+  color: var(--dk-primary, #2460b9);
   font-size: 28px;
   font-weight: 700;
 }
 
 .login-header p {
   margin: 0;
-  color: #666;
+  color: var(--dk-text-2, #666);
   font-size: 14px;
+  line-height: 1.5;
 }
 
-/* Form */
+/* ================================
+   Form
+   ================================ */
 
 .form-group {
   margin-bottom: 20px;
 }
 
+/* Labels */
+
 .form-group label {
   display: block;
   margin-bottom: 8px;
-  color: #333;
+  color: var(--dk-text, #333);
   font-size: 14px;
   font-weight: 600;
 }
 
-.form-group input {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 12px 14px;
-  border: 1px solid #d5dce1;
-  border-radius: 7px;
-  font-size: 15px;
-  outline: none;
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-.form-group input:focus {
-  border-color: #1074b9;
-  box-shadow: 0 0 0 2px rgb(16 116 185 / 10%);
-}
-
-/* Field Error */
+/* ================================
+   Field Error
+   ================================ */
 
 .field-error {
   display: block;
   margin-top: 6px;
-  color: #d32f2f;
+  color: var(--dk-danger, #d32f2f);
   font-size: 13px;
+  line-height: 1.4;
 }
 
-/* Login Button */
+/* ================================
+   Login Button
+   ================================ */
 
 .login-button {
   width: 100%;
-  padding: 13px;
+  height: 48px;
+  padding: 0 13px;
   border: none;
-  border-radius: 7px;
-  background: #1074b9;
+  border-radius: 8px;
+  background: var(--dk-fill, #2460b9);
   color: #fff;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
+  box-shadow: 0 4px 12px rgb(36 96 185 / 22%);
   transition:
     background 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease,
     opacity 0.2s ease;
 }
 
 .login-button:hover:not(:disabled) {
-  background: #0c619d;
+  background: var(--dk-fill, #0c619d);
+  box-shadow: 0 6px 16px rgb(36 96 185 / 28%);
+  transform: translateY(-1px);
+}
+
+.login-button:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .login-button:disabled {
@@ -111,40 +223,50 @@
   cursor: not-allowed;
 }
 
-/* Success */
+/* ================================
+   Success Message
+   ================================ */
 
 .success-message {
   margin-bottom: 20px;
-  padding: 12px;
+  padding: 12px 14px;
+  border-left: 3px solid var(--dk-success, #2e7d32);
   border-radius: 6px;
-  background: #e8f5e9;
-  color: #2e7d32;
+  background: var(--dk-success-soft, #e8f5e9);
+  color: var(--dk-success, #2e7d32);
   font-size: 14px;
+  line-height: 1.5;
 }
 
-/* Error */
+/* ================================
+   Error Message
+   ================================ */
 
 .error-message {
   margin-bottom: 20px;
-  padding: 12px;
+  padding: 12px 14px;
+  border-left: 3px solid var(--dk-danger, #c62828);
   border-radius: 6px;
-  background: #ffebee;
-  color: #c62828;
+  background: var(--dk-danger-soft, #ffebee);
+  color: var(--dk-danger, #c62828);
   font-size: 14px;
+  line-height: 1.5;
 }
 
-/* Register */
+/* ================================
+   Register Section
+   ================================ */
 
 .register-section {
   margin-top: 25px;
   text-align: center;
-  color: #666;
+  color: var(--dk-text-2, #666);
   font-size: 14px;
 }
 
 .register-section a {
   margin-left: 5px;
-  color: #1074b9;
+  color: var(--dk-primary, #2460b9);
   font-weight: 600;
   text-decoration: none;
 }
@@ -153,18 +275,30 @@
   text-decoration: underline;
 }
 
-/* Responsive */
+/* ================================
+   Responsive
+   ================================ */
 
 @media (width <= 500px) {
-  .coop-login-page {
-    padding: 15px;
-  }
-
   .login-card {
     padding: 25px 20px;
   }
 
   .login-header h1 {
     font-size: 24px;
+  }
+
+  .input-wrapper input {
+    height: 44px;
+    padding-left: 46px;
+    padding-right: 46px;
+  }
+
+  .input-icon {
+    left: 13px;
+  }
+
+  .password-toggle {
+    right: 6px;
   }
 }

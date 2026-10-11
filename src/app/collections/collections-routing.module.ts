@@ -21,6 +21,8 @@ const routes: Routes = [
   Route.withShell([
     {
       path: '',
+      // Collections is a sidebar group without a landing page, so its crumb is plain text.
+      data: { parentBreadcrumb: { label: 'Collections' } },
       children: [
         {
           path: 'individual-collection-sheet',
@@ -53,7 +55,8 @@ const routes: Routes = [
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  providers: [],
+  // The resolver is not providedIn root, so a route that uses it must provide it.
+  providers: [OfficesResolver],
   exports: [RouterModule]
 })
 export class CollectionsRoutingModule {}

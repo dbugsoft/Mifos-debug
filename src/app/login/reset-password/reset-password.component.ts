@@ -19,6 +19,8 @@ import { AuthenticationService } from '../../core/authentication/authentication.
 /** Custom Validators */
 import { confirmPasswordValidator } from './confirm-password.validator';
 import { PasswordsUtility } from 'app/core/utils/passwords-utility';
+import { passwordValidator } from 'app/core/utils/password.validator';
+import { PasswordRule, passwordRuleChecklist } from 'app/core/utils/password-rules';
 import { MatDivider } from '@angular/material/divider';
 import { MatFormField, MatPrefix, MatLabel, MatSuffix, MatError } from '@angular/material/form-field';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
@@ -28,6 +30,11 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Reset password component.
+ *
+ * Shown when Fineract answers a sign-in with shouldRenewPassword: an expired
+ * password, or a cooperative administrator's first sign-in with its one-time
+ * password. The rule checklist is derived from the same validator the form
+ * uses, so what is shown cannot drift from what is enforced.
  */
 @Component({
   selector: 'mifosx-reset-password',
@@ -48,12 +55,24 @@ export class ResetPasswordComponent implements OnInit {
   private authenticationService = inject(AuthenticationService);
   private passwordsUtility = inject(PasswordsUtility);
 
+  /** The validator behind the password field, reused to drive the rule checklist. */
+  private readonly validatePassword = passwordValidator();
+
   /** Reset password form group. */
   resetPasswordForm: FormGroup;
   /** Password input field type. */
   passwordInputType: string;
   /** True if loading. */
   loading = false;
+
+  /** Live state of each password rule for the value currently typed. */
+  get passwordRules(): PasswordRule[] {
+    return passwordRuleChecklist(
+      this.resetPasswordForm?.controls['password']?.value,
+      this.passwordsUtility.minPasswordLength,
+      this.validatePassword
+    );
+  }
 
   /**
    * Creates reset password form.

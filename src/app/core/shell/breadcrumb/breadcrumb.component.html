@@ -8,9 +8,15 @@
 
 <nav class="breadcrumb-wrapper" aria-label="Page navigation">
   <div class="page-header">
+    @if (backUrl) {
+      <a class="breadcrumb-back" [routerLink]="backUrl">
+        <mat-icon>arrow_back</mat-icon>
+        <span>{{ 'labels.buttons.Back to Name' | translate: { name: getTranslate(backLabel) } }}</span>
+      </a>
+    }
     <div class="title-row">
       <span #breadcrumb class="breadcrumb-title">
-        {{ getTranslate(breadcrumbs[breadcrumbs?.length - 1].label) }}
+        {{ breadcrumbs[breadcrumbs?.length - 1].title || getTranslate(breadcrumbs[breadcrumbs?.length - 1].label) }}
       </span>
     </div>
 

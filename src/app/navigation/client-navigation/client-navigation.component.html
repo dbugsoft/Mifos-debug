@@ -12,7 +12,8 @@
     <div class="mat-typography">
       <mat-card-title>
         <h2>
-          {{ clientData.displayName }}
+          <!-- The name opens the member's profile (User Manual: Navigation Tool). -->
+          <a class="profile-link" [routerLink]="['/members', clientData.id, 'general']">{{ clientData.displayName }}</a>
           <span [className]="clientData.status.code | statusLookup">
             <fa-icon
               matTooltip="{{ clientData.status.value }}"

@@ -39,6 +39,8 @@ import { PopoverService } from '../../configuration-wizard/popover/popover.servi
 import { ConfigurationWizardService } from '../../configuration-wizard/configuration-wizard.service';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { MatIcon } from '@angular/material/icon';
+import { MatPrefix } from '@angular/material/form-field';
 
 @Component({
   selector: 'mifosx-saving-products',
@@ -59,7 +61,9 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     MatHeaderRow,
     MatRowDef,
     MatRow,
-    MatPaginator
+    MatPaginator,
+    MatIcon,
+    MatPrefix
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })

@@ -52,25 +52,15 @@
   }
 
   @if (formfield.controlType === 'datepicker') {
-    <mat-form-field class="flex-fill" Fill (click)="datePicker.open()">
-      <mat-label>{{ formfield.label }}</mat-label>
-      <input
-        matInput
-        [matDatepicker]="datePicker"
-        [min]="formfield.minDate"
-        [max]="formfield.maxDate"
-        [formControlName]="formfield.controlName"
-        [required]="formfield.required"
-      />
-      <mat-datepicker-toggle matSuffix [for]="datePicker"></mat-datepicker-toggle>
-      <mat-datepicker #datePicker></mat-datepicker>
-      @if (form.controls[formfield.controlName].hasError('required')) {
-        <mat-error>
-          {{ formfield.label }} {{ 'labels.commons.is' | translate }}
-          <strong>{{ 'labels.commons.required' | translate }}</strong>
-        </mat-error>
-      }
-    </mat-form-field>
+    <!-- BS/AD date in its standard layout: the other calendar's date shows as a hint under the field, which
+         fits a dialog's width (the inline layout of the page forms needs more room). -->
+    <mifosx-nepali-date-input
+      class="bs-date"
+      [label]="formfield.label"
+      [formControlName]="formfield.controlName"
+      [minDate]="formfield.minDate"
+      [maxDate]="formfield.maxDate"
+    />
   }
 
   @if (formfield.controlType === 'datetimepicker') {

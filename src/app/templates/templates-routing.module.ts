@@ -29,7 +29,11 @@ const routes: Routes = [
   Route.withShell([
     {
       path: '',
-      data: { title: 'Templates', breadcrumb: 'Templates' },
+      data: {
+        title: 'Templates',
+        breadcrumb: 'Templates',
+        parentBreadcrumb: { label: 'Admin', url: '/administration' }
+      },
       children: [
         {
           path: '',

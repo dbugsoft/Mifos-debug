@@ -6,13 +6,44 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+// Same width as the breadcrumb and the lists.
 .container {
-  max-width: 37rem;
+  margin: 0 auto;
+  max-width: 84rem;
+  width: 90%;
+  padding-bottom: 32px;
+}
 
-  .content {
-    div {
-      margin: 0.8rem 0;
-      overflow-wrap: break-word;
-    }
+// Each field keeps the width its input needs; all stack on phones.
+.form-grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  column-gap: 16px;
+
+  mat-form-field {
+    min-width: 0;
   }
+
+  .field-md {
+    flex: 0 1 240px;
+  }
+
+  // Day counts are a few digits.
+  .field-xs {
+    flex: 0 1 120px;
+  }
+}
+
+@media (width <= 600px) {
+  .form-grid mat-form-field {
+    flex-basis: 100%;
+  }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 24px;
 }

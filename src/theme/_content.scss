@@ -14,14 +14,14 @@
 
   mifosx-view-bulk-import {
     .cover {
-      background-color: white;
+      background-color: var(--dk-surface, white);
       margin-top: 1%;
     }
   }
 
   mifosx-clients {
     .status {
-      color: black;
+      color: var(--dk-text, black);
     }
   }
 
@@ -93,7 +93,7 @@
       }
 
       .navigation-tabs {
-        background-color: #f2f2f2;
+        background-color: var(--dk-surface-2, #f2f2f2);
         overflow: auto;
       }
 

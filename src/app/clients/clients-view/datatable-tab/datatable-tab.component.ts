@@ -31,7 +31,9 @@ export class DatatableTabComponent {
   multiRowDatatableFlag: boolean;
 
   constructor() {
-    this.entityId = this.route.parent.parent.snapshot.paramMap.get('clientId');
+    this.route.parent.parent.paramMap
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((params) => (this.entityId = params.get('clientId')));
 
     this.route.data.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((data: { clientDatatable: any }) => {
       this.entityDatatable = data.clientDatatable;

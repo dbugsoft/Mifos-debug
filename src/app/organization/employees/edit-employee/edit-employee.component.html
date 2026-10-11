@@ -71,10 +71,6 @@
             <input matInput formControlName="mobileNo" />
           </mat-form-field>
 
-          <mat-checkbox labelPosition="before" formControlName="isActive">
-            {{ 'labels.inputs.Active' | translate }}
-          </mat-checkbox>
-
           <mat-form-field (click)="joiningDatePicker.open()">
             <mat-label>{{ 'labels.inputs.Joining Date' | translate }}</mat-label>
             <input
@@ -94,6 +90,10 @@
               </mat-error>
             }
           </mat-form-field>
+
+          <mat-checkbox labelPosition="before" formControlName="isActive">
+            {{ 'labels.inputs.Active' | translate }}
+          </mat-checkbox>
         </div>
       </mat-card-content>
 

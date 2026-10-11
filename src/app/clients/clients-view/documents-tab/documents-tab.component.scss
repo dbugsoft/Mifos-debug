@@ -6,22 +6,37 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-.tab-container {
-  padding: 1%;
-  margin: 1%;
+@use '../member-tab' as *;
 
-  h3 {
-    margin: 1% auto;
-  }
+// The shared documents component (also used by loans and savings) in the member page's look, here only.
+:host ::ng-deep {
+  @include member-tab;
+  @include framed-section($dark: false, $box: '.tab-container', $title: '> .layout-row.align-start-center h3');
 
-  table {
-    width: 100%;
+  .tab-container {
+    // Title left, Add right.
+    > .layout-row.align-start-center {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
 
-    .document-action-button {
-      min-width: 26px;
-      padding: 0 6px;
-      margin: 4px;
-      line-height: 25px;
+      > h3,
+      > div {
+        flex: 0 1 auto;
+      }
+
+      .f-right {
+        float: none;
+      }
+    }
+
+    .document-card {
+      border-radius: 12px;
     }
   }
+}
+
+:host-context(.dark-theme) ::ng-deep .tab-container {
+  --legend-bg: #424242;
 }

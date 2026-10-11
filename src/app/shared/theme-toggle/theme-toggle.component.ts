@@ -6,49 +6,27 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { ChangeDetectionStrategy, Component, OnChanges, OnInit, SimpleChanges, inject } from '@angular/core';
-import { ThemingService } from './theming.service';
-import { SettingsService } from 'app/settings/settings.service';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { AsyncPipe } from '@angular/common';
 import { MatIconButton } from '@angular/material/button';
-import { M3IconComponent } from '../m3-ui/m3-icon/m3-icon.component';
-import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { MatIcon } from '@angular/material/icon';
+import { MatTooltip } from '@angular/material/tooltip';
+import { TranslatePipe } from '@ngx-translate/core';
+import { ThemingService } from './theming.service';
 
+/** Top-bar button that switches between the light and dark theme. */
 @Component({
   selector: 'mifosx-theme-toggle',
   templateUrl: './theme-toggle.component.html',
-  styleUrls: ['./theme-toggle.component.scss'],
   imports: [
-    ...STANDALONE_SHARED_IMPORTS,
+    AsyncPipe,
     MatIconButton,
-    M3IconComponent
+    MatIcon,
+    MatTooltip,
+    TranslatePipe
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ThemeToggleComponent implements OnInit, OnChanges {
-  private themingService = inject(ThemingService);
-  private settingsService = inject(SettingsService);
-
-  darkModeOn: boolean;
-
-  ngOnInit(): void {
-    this.darkModeOn = !!this.settingsService.themeDarkEnabled;
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    this.darkModeOn = !!this.settingsService.themeDarkEnabled;
-  }
-
-  /**
-   * Toggle between light and dark themes
-   * This method handles the complete theme switching process:
-   * 1. Toggles the local state
-   * 2. Persists the preference to settings
-   */
-  toggleTheme() {
-    // Step 1: Toggle the dark mode state
-    this.darkModeOn = !this.darkModeOn;
-    // Step 2: Persist the theme preference to localStorage via settings service
-    this.settingsService.setThemeDarkEnabled(this.darkModeOn);
-    this.themingService.setDarkMode(this.darkModeOn);
-  }
+export class ThemeToggleComponent {
+  themingService = inject(ThemingService);
 }

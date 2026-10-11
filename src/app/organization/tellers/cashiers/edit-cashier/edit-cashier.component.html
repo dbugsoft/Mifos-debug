@@ -56,8 +56,8 @@
             <mat-label>{{ 'labels.inputs.From' | translate }}</mat-label>
             <input
               matInput
-              [min]="minDate"
-              [max]="maxDate"
+              [min]="tellerStartDate || minDate"
+              [max]="tellerEndDate || maxDate"
               [matDatepicker]="fromDatePicker"
               required
               formControlName="startDate"
@@ -76,8 +76,8 @@
             <mat-label>{{ 'labels.inputs.To' | translate }}</mat-label>
             <input
               matInput
-              [min]="editCashierForm.value.startDate"
-              [max]="maxDate"
+              [min]="toDateMin"
+              [max]="tellerEndDate || maxDate"
               [matDatepicker]="toDatePicker"
               required
               formControlName="endDate"
@@ -91,6 +91,10 @@
               </mat-error>
             }
           </mat-form-field>
+
+          @if (tellerDateRangeHint) {
+            <div class="flex-100 teller-date-hint">{{ tellerDateRangeHint }}</div>
+          }
 
           @if (!editCashierForm.value.isFullDay) {
             <div class="flex-48 layout-row gap-10px">

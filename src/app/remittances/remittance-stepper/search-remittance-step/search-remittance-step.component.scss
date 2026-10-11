@@ -23,12 +23,12 @@
   gap: 8px;
   padding: 12px 16px;
   margin: 8px 0;
-  background-color: #fdecea;
+  background-color: var(--dk-danger-soft, #fdecea);
   border-radius: 4px;
-  color: #611a15;
+  color: var(--dk-danger, #611a15);
 
   mat-icon {
-    color: #f44336;
+    color: var(--dk-danger, #f44336);
     font-size: 20px;
     width: 20px;
     height: 20px;
@@ -41,13 +41,13 @@
   gap: 12px;
   padding: 16px;
   margin: 12px 0;
-  background-color: #fff3e0;
+  background-color: var(--dk-warning-soft, #fff3e0);
   border-radius: 4px;
-  border-left: 4px solid #ff9800;
-  color: #e65100;
+  border-left: 4px solid var(--dk-warning, #ff9800);
+  color: var(--dk-warning, #e65100);
 
   mat-icon {
-    color: #ff9800;
+    color: var(--dk-warning, #ff9800);
     font-size: 24px;
     width: 24px;
     height: 24px;

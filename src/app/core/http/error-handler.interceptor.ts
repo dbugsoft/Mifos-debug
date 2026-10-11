@@ -8,7 +8,14 @@
 
 /** Angular Imports */
 import { Injectable, inject } from '@angular/core';
-import { HttpEvent, HttpInterceptor, HttpHandler, HttpRequest, HttpErrorResponse } from '@angular/common/http';
+import {
+  HttpContextToken,
+  HttpEvent,
+  HttpInterceptor,
+  HttpHandler,
+  HttpRequest,
+  HttpErrorResponse
+} from '@angular/common/http';
 
 /** rxjs Imports */
 import { Observable, throwError } from 'rxjs';
@@ -21,9 +28,14 @@ import { environment } from '../../../environments/environment';
 import { Logger } from '../logger/logger.service';
 import { AlertService } from '../alert/alert.service';
 import { TranslateService } from '@ngx-translate/core';
+import { PasswordRenewalService, isPasswordOutdatedError } from '../authentication/password-renewal.service';
+import { isHandledSignInRefusal, isStaffAccessUrl } from '../authentication/staff-access.service';
 
 /** Initialize Logger */
 const log = new Logger('ErrorHandlerInterceptor');
+
+/** Set on a request whose caller handles every failure itself, so no global alert is shown. */
+export const SILENT_ERRORS = new HttpContextToken<boolean>(() => false);
 
 /**
  * Http Request interceptor to add a default error handler to requests.
@@ -32,6 +44,7 @@ const log = new Logger('ErrorHandlerInterceptor');
 export class ErrorHandlerInterceptor implements HttpInterceptor {
   private alertService = inject(AlertService);
   private translate = inject(TranslateService);
+  private passwordRenewal = inject(PasswordRenewalService);
   private databaseErrorCodes: string[] = [
     'error.msg.data.integrity.issue.entity.duplicated',
     'error.msg.data.integrity.issue'
@@ -60,12 +73,58 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
   }
 
   private handleError(response: HttpErrorResponse, request: HttpRequest<any>): Observable<HttpEvent<any>> {
+    if (request.context.get(SILENT_ERRORS)) {
+      return throwError(() => response);
+    }
     const status = response.status;
     const errorBody = this.parseErrorBody(response.error);
 
-    // Translate top-level globalisation code if present
+    // A sign-in whose password must be changed first (FINERACT-2003) is not an error for the user:
+    // AuthenticationService.login() turns it into the password renewal flow. No generic alert.
+    if (status === 403 && errorBody?.shouldRenewPassword === true) {
+      return throwError(() => response);
+    }
+
+    // Email verification and password reset by code (fineract-dbug ADR 0019) explain their own errors on the sign-in
+    // card, and so does a sign-in refused because the account is locked or its email is not yet verified.
+    if (isStaffAccessUrl(request.url) || isHandledSignInRefusal(request.url, errorBody)) {
+      return throwError(() => response);
+    }
+
+    // A signed-in user whose password must now be changed (error.msg.password.outdated): open the blocking
+    // "set a new password" dialog instead of showing a generic error for every refused call.
+    if (isPasswordOutdatedError(errorBody)) {
+      this.passwordRenewal.require();
+      return throwError(() => response);
+    }
+
+    // A duplicate client identifier document key: the backend's defaultUserMessage names the
+    // other client (and their branch, and this same document key), which must never be shown -
+    // the Identities dialog already shows its own safe, generic message for this, so skip the
+    // generic global alert entirely rather than have it show the raw message here.
+    if (
+      status === 403 &&
+      errorBody?.errors?.[0]?.userMessageGlobalisationCode === 'error.msg.clientIdentifier.identityKey.duplicate'
+    ) {
+      return throwError(() => response);
+    }
+
+    // A duplicate client identifier document type: the Identities tab already shows its own
+    // banner for this (and highlights the existing row), so skip the generic global alert to
+    // avoid showing the same thing twice.
+    if (
+      status === 403 &&
+      errorBody?.errors?.[0]?.userMessageGlobalisationCode === 'error.msg.clientIdentifier.type.duplicate'
+    ) {
+      return throwError(() => response);
+    }
+
+    // Translate top-level globalisation code if present.
+    // Never fall back to response.message: for a non-Fineract body (proxy HTML, gateway timeout) it is the raw
+    // "Http failure response for <url>" transport string, which leaks the internal API URL. Branches below
+    // supply a translated generic message instead.
     const rawTopLevelMessage = errorBody?.defaultUserMessage || errorBody?.developerMessage;
-    let topLevelMessage = rawTopLevelMessage || response.message;
+    let topLevelMessage = rawTopLevelMessage || null;
     if (errorBody?.userMessageGlobalisationCode) {
       const topCode = errorBody.userMessageGlobalisationCode;
       const translated = this.translate.instant(topCode, errorBody || {});
@@ -75,11 +134,14 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
     }
 
     // Translate nested globalisation code if present
+    const firstError = errorBody?.errors?.[0];
     let nestedMessage: string | null = null;
-    if (errorBody?.errors?.[0]?.userMessageGlobalisationCode) {
-      const nestedCode = errorBody.errors[0].userMessageGlobalisationCode;
-      const translated = this.translate.instant(nestedCode, errorBody.errors[0] || {});
-      nestedMessage = translated !== nestedCode ? translated : errorBody.errors[0].defaultUserMessage || null;
+    let nestedTranslated: string | null = null;
+    if (firstError?.userMessageGlobalisationCode) {
+      const nestedCode = firstError.userMessageGlobalisationCode;
+      const translated = this.translate.instant(nestedCode, firstError);
+      nestedTranslated = translated !== nestedCode ? translated : null;
+      nestedMessage = nestedTranslated || firstError.defaultUserMessage || null;
     }
 
     // Combine both messages if both exist and are distinct.
@@ -92,21 +154,17 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
         : nestedMessage
       : topLevelMessage;
     let parameterName: string | null = null;
-    if (response.error.errors) {
-      if (response.error.errors[0]) {
-        if (
-          response.error.errors[0].userMessageGlobalisationCode &&
-          this.databaseErrorCodes.indexOf(response.error.errors[0].userMessageGlobalisationCode) > -1
-        ) {
-          errorMessage = this.translate.instant('errors.error.msg.data.integrity.issue');
-        } else {
-          errorMessage =
-            response.error.errors[0].defaultUserMessage.replace(/\\./g, ' ') ||
-            response.error.errors[0].developerMessage.replace(/\\./g, ' ');
-        }
+    if (firstError) {
+      if (this.databaseErrorCodes.includes(firstError.userMessageGlobalisationCode)) {
+        errorMessage = this.translate.instant('errors.error.msg.data.integrity.issue');
+      } else {
+        errorMessage =
+          nestedTranslated ||
+          (firstError.defaultUserMessage || firstError.developerMessage)?.replace(/\\./g, ' ') ||
+          errorMessage;
       }
-      if ('parameterName' in errorBody.errors[0]) {
-        parameterName = errorBody.errors[0].parameterName;
+      if ('parameterName' in firstError) {
+        parameterName = firstError.parameterName;
       }
     }
     const isClientImage404 = status === 404 && request.url.includes('/clients/') && request.url.includes('/images');
@@ -149,6 +207,22 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
           message: errorMessage || this.translate.instant('errors.error.resource.not.found.message')
         });
       }
+    } else if (status === 413) {
+      // Fineract's UploadSizeLimitFilter and the nginx proxy both answer 413 for an oversized upload.
+      this.alertService.alert({
+        type: this.translate.instant('errors.error.file.too.large.type'),
+        message: errorMessage || this.translate.instant('errors.error.file.too.large.message')
+      });
+    } else if (status === 0) {
+      this.alertService.alert({
+        type: this.translate.instant('errors.http.connection.title'),
+        message: this.translate.instant('errors.http.connection.message')
+      });
+    } else if (status >= 502 && status <= 504) {
+      this.alertService.alert({
+        type: this.translate.instant('errors.http.serviceUnavailable.title'),
+        message: errorMessage || this.translate.instant('errors.http.serviceUnavailable.message')
+      });
     } else if (status === 500) {
       this.alertService.alert({
         type: this.translate.instant('errors.error.server.internal.type'),

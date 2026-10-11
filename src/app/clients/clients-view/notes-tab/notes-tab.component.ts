@@ -7,7 +7,7 @@
  */
 
 /** Angular Imports */
-import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 
@@ -37,6 +37,7 @@ export class NotesTabComponent implements OnInit {
   private clientsService = inject(ClientsService);
   private authenticationService = inject(AuthenticationService);
   private destroyRef = inject(DestroyRef);
+  private changeDetectorRef = inject(ChangeDetectorRef);
 
   /** Client ID */
   entityId: string;
@@ -51,7 +52,9 @@ export class NotesTabComponent implements OnInit {
    * @param {AuthenticationService} authenticationService Authentication Service
    */
   constructor() {
-    this.entityId = this.route.parent.snapshot.params['clientId'];
+    this.route.parent.paramMap
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((params) => (this.entityId = params.get('clientId')));
     this.addNote = this.addNote.bind(this);
     this.editNote = this.editNote.bind(this);
     this.deleteNote = this.deleteNote.bind(this);
@@ -73,7 +76,10 @@ export class NotesTabComponent implements OnInit {
    */
   editNote(noteId: string, noteContent: any, index: number) {
     this.clientsService.editClientNote(this.entityId, noteId, noteContent).subscribe(() => {
-      this.entityNotes[index].note = noteContent.note;
+      this.entityNotes = this.entityNotes.map((note: any, i: number) =>
+        i === index ? { ...note, note: noteContent.note } : note
+      );
+      this.changeDetectorRef.markForCheck();
     });
   }
 
@@ -84,7 +90,8 @@ export class NotesTabComponent implements OnInit {
    */
   deleteNote(noteId: string, index: number) {
     this.clientsService.deleteClientNote(this.entityId, noteId).subscribe(() => {
-      this.entityNotes.splice(index, 1);
+      this.entityNotes = this.entityNotes.filter((note: any, i: number) => i !== index);
+      this.changeDetectorRef.markForCheck();
     });
   }
 
@@ -93,12 +100,16 @@ export class NotesTabComponent implements OnInit {
    */
   addNote(noteContent: any) {
     this.clientsService.createClientNote(this.entityId, noteContent).subscribe((response: any) => {
-      this.entityNotes.push({
-        id: response.resourceId,
-        createdByUsername: this.username,
-        createdOn: new Date(),
-        note: noteContent.note
-      });
+      this.entityNotes = [
+        ...this.entityNotes,
+        {
+          id: response.resourceId,
+          createdByUsername: this.username,
+          createdOn: new Date(),
+          note: noteContent.note
+        }
+      ];
+      this.changeDetectorRef.markForCheck();
     });
   }
 }

@@ -8,10 +8,18 @@
 
 /* eslint-disable @angular-eslint/prefer-inject */
 /** Angular Imports */
-import { ChangeDetectionStrategy, Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  SimpleChanges
+} from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import { Subscription, forkJoin } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 import { MatButtonToggle, MatButtonToggleGroup } from '@angular/material/button-toggle';
 /** Custom Services */
 import { AuthenticationService } from 'app/core/authentication/authentication.service';
@@ -50,13 +58,15 @@ export class DashboardEngineComponent implements OnInit, OnChanges, OnDestroy {
   widgetStateMap: Record<string, AnalyticsWidgetState> = {};
 
   private filtersSubscription?: Subscription;
-  private loadSubscription?: Subscription;
+  /** In-flight widget loads (including retries) for the current filters */
+  private widgetLoads = new Subscription();
 
   constructor(
     private formBuilder: UntypedFormBuilder,
     private authenticationService: AuthenticationService,
     private analyticsDataSourceService: AnalyticsDataSourceService,
-    private analyticsVisibilityService: AnalyticsVisibilityService
+    private analyticsVisibilityService: AnalyticsVisibilityService,
+    private changeDetectorRef: ChangeDetectorRef
   ) {}
   get metricWidgets(): AnalyticsWidgetDefinition[] {
     return this.visibleWidgets.filter((widget) => widget.type === 'metric');
@@ -107,9 +117,7 @@ export class DashboardEngineComponent implements OnInit, OnChanges, OnDestroy {
       this.filtersSubscription.unsubscribe();
     }
 
-    if (this.loadSubscription) {
-      this.loadSubscription.unsubscribe();
-    }
+    this.widgetLoads.unsubscribe();
   }
 
   reloadDashboard(forceRefresh: boolean = false): void {
@@ -121,54 +129,33 @@ export class DashboardEngineComponent implements OnInit, OnChanges, OnDestroy {
       this.analyticsDataSourceService.clearCache();
     }
 
-    if (this.loadSubscription) {
-      this.loadSubscription.unsubscribe();
-    }
+    // Drop loads for the previous filters so late responses cannot overwrite newer ones
+    this.widgetLoads.unsubscribe();
+    this.widgetLoads = new Subscription();
 
     const filters = this.filtersForm.getRawValue() as AnalyticsFilters;
-    this.widgetStateMap = this.visibleWidgets.reduce(
-      (accumulator, widget) => ({
-        ...accumulator,
-        [widget.id]: {
-          loading: true,
-          empty: false
-        }
-      }),
-      {}
-    );
+    this.visibleWidgets.forEach((widget) => this.loadWidget(widget, filters));
+  }
 
-    this.loadSubscription = forkJoin(
-      this.visibleWidgets.map((widget) =>
-        this.analyticsDataSourceService.loadWidget(widget, filters).pipe(
-          map((state) => ({
-            widgetId: widget.id,
-            state
-          }))
-        )
-      )
-    ).subscribe({
-      next: (results) => {
-        this.widgetStateMap = results.reduce(
-          (accumulator, result) => ({
-            ...accumulator,
-            [result.widgetId]: result.state
-          }),
-          {}
-        );
-      },
-      error: () => {
-        this.widgetStateMap = this.visibleWidgets.reduce(
-          (accumulator, widget) => ({
-            ...accumulator,
-            [widget.id]: {
-              loading: false,
-              empty: true
-            }
-          }),
-          {}
-        );
-      }
-    });
+  retryWidget(widget: AnalyticsWidgetDefinition): void {
+    this.loadWidget(widget, this.filtersForm.getRawValue() as AnalyticsFilters);
+  }
+
+  /** Loads a single widget; each widget renders as soon as its own data arrives. */
+  private loadWidget(widget: AnalyticsWidgetDefinition, filters: AnalyticsFilters): void {
+    this.setWidgetState(widget.id, { loading: true, empty: false });
+    this.widgetLoads.add(
+      this.analyticsDataSourceService.loadWidget(widget, filters).subscribe({
+        next: (state) => this.setWidgetState(widget.id, state),
+        error: () => this.setWidgetState(widget.id, { loading: false, empty: false, error: true })
+      })
+    );
+  }
+
+  private setWidgetState(widgetId: string, state: AnalyticsWidgetState): void {
+    this.widgetStateMap = { ...this.widgetStateMap, [widgetId]: state };
+    // OnPush: results arrive asynchronously, so the view must be marked dirty explicitly
+    this.changeDetectorRef.markForCheck();
   }
 
   private resolveDefaultOfficeId(): number | null {

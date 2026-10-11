@@ -6,19 +6,48 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+// Same frameless form as Create Group and Create Center: each field as wide as what it holds.
 .container {
-  max-width: 37em;
-  padding: 20px;
+  margin: 0 auto;
+  max-width: 84rem;
+  width: 90%;
+  padding-bottom: 32px;
+}
 
-  .margin-v {
-    margin: 1em 0;
+.form-grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  column-gap: 16px;
+
+  mat-form-field,
+  .bs-date {
+    min-width: 0;
   }
 
-  .margin-b {
-    margin: 0 0 1em;
+  // Wide enough for an office, staff, group or center name; the pick lists do not stretch to fill the row.
+  .field-md {
+    flex: 0 1 240px;
   }
 
-  .margin-t {
-    margin-top: 1em;
+  // BS/AD date: the date, calendar, BS/AD switch and the other calendar's date. All five fields share one row
+  // on a laptop.
+  .bs-date {
+    flex: 0 0 448px;
+    max-width: 100%;
+  }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+@media (width <= 600px) {
+  .form-grid mat-form-field,
+  .form-grid .bs-date {
+    flex-basis: 100%;
   }
 }

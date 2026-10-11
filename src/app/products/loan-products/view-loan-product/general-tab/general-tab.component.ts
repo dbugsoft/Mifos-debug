@@ -6,13 +6,15 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, OnInit, ViewChild, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { LoanProduct } from '../../models/loan-product.model';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { LoanProductSummaryComponent } from '../../common/loan-product-summary/loan-product-summary.component';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { LoanProductBaseComponent } from '../../common/loan-product-base.component';
+import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
+import { exportProductJson, exportProductPdf } from 'app/shared/utils/product-export.util';
 
 @Component({
   selector: 'mifosx-general-tab',
@@ -21,7 +23,10 @@ import { LoanProductBaseComponent } from '../../common/loan-product-base.compone
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
     FaIconComponent,
-    LoanProductSummaryComponent
+    LoanProductSummaryComponent,
+    MatMenu,
+    MatMenuItem,
+    MatMenuTrigger
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -29,6 +34,8 @@ export class GeneralTabComponent extends LoanProductBaseComponent implements OnI
   private route = inject(ActivatedRoute);
 
   loanProduct: LoanProduct;
+  /** Rendered product summary; the PDF is built from it so it matches the screen. */
+  @ViewChild('summary', { read: ElementRef }) summary: ElementRef<HTMLElement>;
   useDueForRepaymentsConfigurations = false;
 
   constructor() {
@@ -47,14 +54,14 @@ export class GeneralTabComponent extends LoanProductBaseComponent implements OnI
   }
 
   exportDefinition(): void {
-    const product = this.loanProduct;
-    delete product['id'];
-    const fileName: string = product.name.replace(' ', '_') + '.json';
-    const link = document.createElement('a');
-    link.setAttribute('href', 'data:text/plain;charset=utf-u,' + encodeURIComponent(JSON.stringify(product, null, 2)));
-    link.setAttribute('download', fileName);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    exportProductJson(this.loanProduct);
+  }
+
+  exportPdf(): void {
+    exportProductPdf(
+      this.summary.nativeElement,
+      this.loanProduct.name,
+      `${this.getProductTypeLabel(false)} | ${this.loanProduct.shortName}`
+    );
   }
 }

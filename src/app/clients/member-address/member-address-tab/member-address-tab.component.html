@@ -1,0 +1,103 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<section class="tab-container mat-typography" aria-labelledby="member-address-heading">
+  <h3 id="member-address-heading">{{ 'labels.heading.Address' | translate }}</h3>
+
+  @if (loadFailed()) {
+    <div class="banner banner-error" role="alert">
+      <fa-icon icon="exclamation-triangle"></fa-icon>
+      <span>{{ 'clients.memberAddress.errors.addressesUnavailable' | translate }}</span>
+      <button mat-stroked-button type="button" (click)="load()">
+        {{ 'clients.memberAddress.actions.retry' | translate }}
+      </button>
+    </div>
+  } @else if (addresses() === null) {
+    <mat-progress-bar mode="indeterminate" [attr.aria-label]="'clients.memberAddress.labels.loading' | translate">
+    </mat-progress-bar>
+  } @else {
+    @if (missingPermanent()) {
+      <div class="banner banner-warning" role="status" data-testid="missing-permanent">
+        <fa-icon icon="exclamation-triangle"></fa-icon>
+        <span>{{ 'clients.memberAddress.hints.permanentMissing' | translate }}</span>
+      </div>
+    }
+
+    <div class="address-cards">
+      @for (card of cards(); track card.type) {
+        <mat-card appearance="outlined" class="address-card" [attr.data-testid]="'address-card-' + card.type">
+          <mat-card-header>
+            <fa-icon mat-card-avatar class="card-icon" [icon]="card.icon"></fa-icon>
+            <mat-card-title>{{ 'clients.memberAddress.titles.' + card.type | translate }}</mat-card-title>
+            <mat-card-subtitle>
+              {{
+                (card.required ? 'clients.memberAddress.labels.required' : 'clients.memberAddress.labels.optional')
+                  | translate
+              }}
+            </mat-card-subtitle>
+          </mat-card-header>
+
+          <mat-card-content class="card-body">
+            @if (card.address; as address) {
+              @if (address.sameAsPermanent) {
+                <p class="follows-tag">
+                  <fa-icon icon="link" size="sm"></fa-icon>
+                  {{ 'clients.memberAddress.labels.sameAsPermanent' | translate }}
+                </p>
+              }
+              <mifosx-member-address-summary [address]="address"></mifosx-member-address-summary>
+            } @else {
+              <p class="empty">{{ 'clients.memberAddress.labels.notRecorded' | translate }}</p>
+            }
+          </mat-card-content>
+
+          <mat-card-actions align="end">
+            @if (card.address) {
+              <span
+                [matTooltip]="card.removeBlockedReason ? (card.removeBlockedReason | translate) : ''"
+                *mifosxHasPermission="'DELETE_NEPALCLIENTADDRESS'"
+              >
+                <button
+                  mat-button
+                  color="warn"
+                  type="button"
+                  [disabled]="!!card.removeBlockedReason"
+                  (click)="remove(card)"
+                  [attr.data-testid]="'remove-' + card.type"
+                >
+                  <fa-icon icon="trash" class="m-r-10"></fa-icon>{{ 'labels.buttons.Delete' | translate }}
+                </button>
+              </span>
+              <button
+                mat-stroked-button
+                color="primary"
+                type="button"
+                (click)="open(card)"
+                *mifosxHasPermission="'UPDATE_NEPALCLIENTADDRESS'"
+                [attr.data-testid]="'edit-' + card.type"
+              >
+                <fa-icon icon="edit" class="m-r-10"></fa-icon>{{ 'labels.buttons.Edit' | translate }}
+              </button>
+            } @else {
+              <button
+                mat-raised-button
+                color="primary"
+                type="button"
+                (click)="open(card)"
+                *mifosxHasPermission="'CREATE_NEPALCLIENTADDRESS'"
+                [attr.data-testid]="'add-' + card.type"
+              >
+                <fa-icon icon="plus" class="m-r-10"></fa-icon>{{ 'labels.buttons.Add' | translate }}
+              </button>
+            }
+          </mat-card-actions>
+        </mat-card>
+      }
+    </div>
+  }
+</section>

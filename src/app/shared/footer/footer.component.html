@@ -28,16 +28,17 @@
     }
   </div>
 } @else {
-  <!-- Default mode for Shell -->
-  <div class="footer-shell" ngClass="{{ styleClass }}">
-    <span class="footer-copyright">
-      &copy; {{ currentYear }} {{ 'APP_NAME' | translate }}. All rights reserved. Developed by
-      <a href="https://dibugsoft.com/" target="_blank" rel="noopener noreferrer">Debugsoft</a>
-    </span>
+  <!-- Default mode for Shell: same blue bar as the login page footer -->
+  <footer class="footer-shell" ngClass="{{ styleClass }}">
+    <span>&copy; {{ currentYear }} {{ 'APP_NAME' | translate }}. All rights reserved.</span>
     @if (isBusinessDateDefined) {
-      <span class="footer-business-date">
+      <span>
         {{ 'labels.text.Current Business Date' | translate }}: <b>{{ businessDate | date: 'EEEE, MMMM dd, y' }}</b>
       </span>
     }
-  </div>
+    <span>
+      Developed by:
+      <a href="https://dibugsoft.com/" target="_blank" rel="noopener noreferrer">DEBUGSOFT P. LTD.</a>
+    </span>
+  </footer>
 }

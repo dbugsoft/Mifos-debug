@@ -56,6 +56,8 @@ export class ClientPreviewStepComponent {
   @Input() clientTemplate: any;
   /** Client Object */
   @Input() client: any;
+  /** Membership application: the member starts pending, so "Active" is not shown (fineract-dbug ADR 0023) */
+  @Input() membershipMode = false;
 
   /** Form submission event */
   @Output() submitEvent = new EventEmitter();

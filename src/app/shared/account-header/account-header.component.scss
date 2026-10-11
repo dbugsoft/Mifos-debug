@@ -7,7 +7,7 @@
  */
 
 .header {
-  background-color: var(--md-sys-color-primary, #1074b9) !important;
+  background-color: var(--md-sys-color-primary, var(--dk-fill, #2460b9)) !important;
   color: var(--md-sys-color-on-primary, #fff) !important;
 
   .mat-mdc-card-title,

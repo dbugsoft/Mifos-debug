@@ -16,6 +16,8 @@ import { SharesService } from 'app/shares/shares.service';
 import { SettingsService } from 'app/settings/settings.service';
 import { Dates } from 'app/core/utils/dates';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { filter, switchMap } from 'rxjs';
+import { SourceOfFundsService } from 'app/compliance/source-of-funds/source-of-funds.service';
 
 /**
  * Apply Shares Component
@@ -36,6 +38,7 @@ export class ApplySharesComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private settingsService = inject(SettingsService);
+  private sourceOfFunds = inject(SourceOfFundsService);
 
   /** Shares account data. */
   sharesAccountData: any;
@@ -110,8 +113,16 @@ export class ApplySharesComponent implements OnInit {
       dateFormat,
       locale
     };
-    this.sharesService.executeSharesAccountCommand(this.accountId, 'applyadditionalshares', data).subscribe(() => {
-      this.router.navigate(['../../'], { relativeTo: this.route });
-    });
+    // shares worth the line or more first ask where the money comes from (fineract-dbug #132, #137)
+    const amount = Number(data.requestedShares) * Number(data.unitPrice || 0);
+    this.sourceOfFunds
+      .ensureDeclared('SHARE', { accountId: this.accountId }, amount)
+      .pipe(
+        filter((declared) => declared),
+        switchMap(() => this.sharesService.executeSharesAccountCommand(this.accountId, 'applyadditionalshares', data))
+      )
+      .subscribe(() => {
+        this.router.navigate(['../../'], { relativeTo: this.route });
+      });
   }
 }

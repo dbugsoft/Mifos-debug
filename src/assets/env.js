@@ -17,6 +17,8 @@
   window["env"]["apiVersion"] = '';
   window["env"]["apiActuator"] = '';
 
+  // Leave empty so the tenant is resolved from the current host by coop-config.ts.
+  // Setting a value here is truthy and permanently overrides subdomain detection.
   window["env"]["fineractPlatformTenantId"] = '';
   window["env"]["fineractPlatformTenantIds"] = '';
 
@@ -37,6 +39,10 @@
 
   // Display or not the Server Selector
   window['env']['allowServerSwitch'] = '';
+
+  // Block the sign-in page on hostnames that map to no cooperative (src/environments/coop-config.ts).
+  // Leave false for deployments served from a bare IP address or a shared host.
+  window['env']['blockUnmappedHosts'] = false;
 
   // Display or not the BackEnd Info
   window['env']['displayBackEndInfo'] = '';

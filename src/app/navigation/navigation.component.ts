@@ -7,7 +7,15 @@
  */
 
 /** Angular Imports */
-import { ChangeDetectionStrategy, Component, OnInit, ViewChild, inject, DestroyRef } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  OnInit,
+  ViewChild,
+  inject,
+  DestroyRef
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -22,6 +30,7 @@ import { CenterNavigationComponent } from './center-navigation/center-navigation
 import { GroupNavigationComponent } from './group-navigation/group-navigation.component';
 import { ClientNavigationComponent } from './client-navigation/client-navigation.component';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 
 /**
  * Navigation component.
@@ -36,12 +45,15 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     StaffNavigationComponent,
     CenterNavigationComponent,
     GroupNavigationComponent,
-    ClientNavigationComponent
+    ClientNavigationComponent,
+    FaIconComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NavigationComponent implements OnInit {
   private navigationService = inject(NavigationService);
+  /** OnPush: the pickers and details arrive over HTTP, so each response marks the view for a redraw. */
+  private cdr = inject(ChangeDetectorRef);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
@@ -128,6 +140,7 @@ export class NavigationComponent implements OnInit {
         } else {
           this.employeeSelector.disable();
         }
+        this.cdr.markForCheck();
       });
     });
   }
@@ -153,6 +166,7 @@ export class NavigationComponent implements OnInit {
           } else {
             this.centerSelector.disable();
           }
+          this.cdr.markForCheck();
         });
       }
     });
@@ -177,14 +191,17 @@ export class NavigationComponent implements OnInit {
           } else {
             this.groupSelector.disable();
           }
+          this.cdr.markForCheck();
         });
         this.selectedItemAccounts = null;
         this.navigationService.getCenterAccounts(centerId).subscribe((centerAccounts: any) => {
           this.selectedItemAccounts = centerAccounts;
+          this.cdr.markForCheck();
         });
         this.selectedItemSummary = null;
         this.navigationService.getCenterSummary(centerId).subscribe((centerSummary: any) => {
           this.selectedItemSummary = centerSummary[0];
+          this.cdr.markForCheck();
         });
       }
     });
@@ -207,10 +224,12 @@ export class NavigationComponent implements OnInit {
           } else {
             this.clientSelector.disable();
           }
+          this.cdr.markForCheck();
         });
         this.selectedItemAccounts = null;
         this.navigationService.getGroupAccounts(groupId).subscribe((groupAccounts: any) => {
           this.selectedItemAccounts = groupAccounts;
+          this.cdr.markForCheck();
         });
       }
     });
@@ -226,9 +245,11 @@ export class NavigationComponent implements OnInit {
         this.navigationService.getClient(clientId).subscribe((client: any) => {
           this.selectedItem = client;
           this.selectedItem.itemType = 'client';
+          this.cdr.markForCheck();
         });
         this.navigationService.getClientAccounts(clientId).subscribe((clientAccounts: any) => {
           this.selectedItemAccounts = clientAccounts;
+          this.cdr.markForCheck();
         });
       }
     });

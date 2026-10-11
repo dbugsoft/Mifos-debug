@@ -6,7 +6,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-.disabled-item {
-  pointer-events: none; // Prevent clicks
-  opacity: 0.5; // Greyed out effect
+// Same cards as the Products and Admin pages.
+@use '../home/card-menu/card-menu.component';
+
+// Manage Surveys is not available yet: shown, but greyed out and not clickable.
+.management-card--disabled {
+  pointer-events: none;
+  opacity: 0.5;
 }

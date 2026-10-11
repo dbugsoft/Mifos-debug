@@ -22,6 +22,7 @@ import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { MatCard, MatCardHeader, MatCardContent, MatCardTitle } from '@angular/material/card';
 import { Chart, registerables } from 'chart.js';
+import { applyChartTheme } from 'app/shared/utils/chart-theme.util';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 Chart.register(...registerables);
@@ -132,6 +133,7 @@ export class LoanAccountDashboardComponent implements OnInit, AfterViewInit, OnD
     );
     const outstandingPercentage = Math.max(0, 100 - repaidPercentage);
 
+    applyChartTheme();
     this.statusChart = new Chart(ctx, {
       type: 'doughnut',
       data: {
@@ -236,6 +238,7 @@ export class LoanAccountDashboardComponent implements OnInit, AfterViewInit, OnD
       }
     });
 
+    applyChartTheme();
     this.paymentsChart = new Chart(ctx, {
       type: 'bar',
       data: {

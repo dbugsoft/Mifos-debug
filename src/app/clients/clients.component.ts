@@ -7,7 +7,16 @@
  */
 
 /** Angular Imports. */
-import { ChangeDetectionStrategy, Component, DestroyRef, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+  inject,
+  signal
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
@@ -25,7 +34,6 @@ import {
   MatRowDef,
   MatRow
 } from '@angular/material/table';
-import { MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 
 /** rxjs Imports */
@@ -42,6 +50,8 @@ import { AccountNumberComponent } from '../shared/account-number/account-number.
 import { ExternalIdentifierComponent } from '../shared/external-identifier/external-identifier.component';
 import { StatusLookupPipe } from '../pipes/status-lookup.pipe';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { MembershipService } from './membership/membership.service';
+import { KymService } from './kym/kym.service';
 
 export const DEBOUNCE_MS = 500;
 
@@ -71,7 +81,6 @@ export const DEBOUNCE_MS = 500;
     MatRow,
     MatPaginator,
     StatusLookupPipe,
-    MatIconButton,
     MatIcon
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -79,6 +88,11 @@ export const DEBOUNCE_MS = 500;
 export class ClientsComponent implements OnInit, OnDestroy {
   private clientService = inject(ClientsService);
   private destroyRef = inject(DestroyRef);
+  private membershipService = inject(MembershipService);
+  /** With the share-first rule on, a new member is a membership application (fineract-dbug ADR 0023) */
+  readonly shareFirstRule = signal<boolean | null>(null);
+  /** The incomplete-KYM list (fineract-dbug #190) */
+  readonly canReadKym = inject(KymService).canRead();
 
   private searchInput$ = new Subject<string>();
   private clientsRequestSub: Subscription | null = null;
@@ -127,6 +141,10 @@ export class ClientsComponent implements OnInit, OnDestroy {
   @ViewChild(MatSort) sort: MatSort;
 
   ngOnInit() {
+    this.membershipService
+      .templateOrNull()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((template) => this.shareFirstRule.set(!!template?.settings.shareFirstEnabled));
     this.searchInput$
       .pipe(debounceTime(DEBOUNCE_MS), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
       .subscribe((value) => {

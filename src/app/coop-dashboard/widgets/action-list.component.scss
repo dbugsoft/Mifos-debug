@@ -1,0 +1,283 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+:host {
+  display: block;
+}
+
+// ── Task tiles ──────────────────────────────────────────────────────────
+
+.tasks {
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 5), minmax(0, 1fr));
+  gap: 10px;
+}
+
+.tasks__caption {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--viz-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+
+  .tasks + & {
+    margin-top: 16px;
+  }
+}
+
+@media screen and (width <= 1100px) {
+  .tasks {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  }
+}
+
+.task {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  border: 1px solid var(--viz-grid);
+  border-radius: 10px;
+  background: var(--coop-card);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    background 0.15s,
+    box-shadow 0.15s;
+
+  &:hover:not(:disabled) {
+    border-color: var(--coop-accent);
+    background: var(--coop-hover);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--coop-accent);
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    cursor: default;
+  }
+}
+
+.task--active {
+  border-color: var(--coop-accent);
+  background: var(--coop-accent-soft);
+  box-shadow: inset 0 -3px 0 var(--coop-accent);
+}
+
+.task--empty {
+  opacity: 0.5;
+}
+
+.task__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.task__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.task--urgent .task__icon {
+  color: var(--coop-bad-ink);
+  background: var(--coop-bad-soft);
+}
+
+.task--soon .task__icon {
+  color: var(--coop-warn-ink);
+  background: var(--coop-warn-soft);
+}
+
+.task--info .task__icon {
+  color: var(--coop-accent);
+  background: var(--coop-accent-soft);
+}
+
+.task__count {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--viz-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.task--urgent:not(.task--empty) .task__count {
+  color: var(--coop-bad-ink);
+}
+
+.task__label {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--viz-ink);
+  min-height: 2.6em;
+}
+
+.task__amount {
+  font-size: 12px;
+  color: var(--viz-muted);
+}
+
+// ── Records of the chosen task ──────────────────────────────────────────
+
+.detail {
+  margin-top: 16px;
+  border-top: 1px solid var(--viz-grid);
+  padding-top: 12px;
+}
+
+.detail__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+
+  h4 {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--viz-ink);
+  }
+}
+
+.detail__count {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--viz-muted);
+}
+
+.detail__all {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--coop-accent);
+  background: var(--coop-accent-soft);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  fa-icon {
+    font-size: 11px;
+  }
+}
+
+.detail__scroll {
+  overflow-x: auto;
+}
+
+.detail__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+
+  th {
+    text-align: left;
+    font-weight: 500;
+    font-size: 12px;
+    color: var(--viz-muted);
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--viz-grid);
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--viz-grid);
+    color: var(--viz-ink);
+    white-space: nowrap;
+  }
+
+  tr:last-child td {
+    border-bottom: 0;
+  }
+}
+
+.row {
+  cursor: pointer;
+
+  &:hover td {
+    background: var(--coop-hover);
+  }
+}
+
+.name a {
+  color: var(--coop-accent);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.num {
+  text-align: right !important;
+  font-variant-numeric: tabular-nums;
+}
+
+.strong {
+  font-weight: 600;
+}
+
+.muted {
+  color: var(--viz-muted) !important;
+}
+
+.badge {
+  display: inline-block;
+  margin-right: 6px;
+  padding: 0 6px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--coop-bad-ink);
+  background: var(--coop-bad-soft);
+}
+
+.go {
+  width: 20px;
+  color: var(--viz-muted);
+  font-size: 11px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+@media screen and (width <= 760px) {
+  .tasks {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hide-sm {
+    display: none;
+  }
+}

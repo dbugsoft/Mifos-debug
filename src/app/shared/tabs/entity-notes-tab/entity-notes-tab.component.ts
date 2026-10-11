@@ -9,10 +9,6 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit, ViewChild, inject } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { ClientsService } from 'app/clients/clients.service';
-import { GroupsService } from 'app/groups/groups.service';
-import { LoansService } from 'app/loans/loans.service';
-import { SavingsService } from 'app/savings/savings.service';
 import { DeleteDialogComponent } from 'app/shared/delete-dialog/delete-dialog.component';
 import { FormDialogComponent } from 'app/shared/form-dialog/form-dialog.component';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
@@ -35,10 +31,6 @@ import { TranslateService } from '@ngx-translate/core';
 })
 export class EntityNotesTabComponent implements OnInit {
   private formBuilder = inject(UntypedFormBuilder);
-  private savingsService = inject(SavingsService);
-  private loansService = inject(LoansService);
-  private clientsService = inject(ClientsService);
-  private groupsService = inject(GroupsService);
   private dialog = inject(MatDialog);
   private translateService = inject(TranslateService);
 
@@ -91,7 +83,7 @@ export class EntityNotesTabComponent implements OnInit {
       }
     });
     editNoteDialogRef.afterClosed().subscribe((response: any) => {
-      if (response.data && response.data.value.note !== noteContent) {
+      if (response?.data && response.data.value.note !== noteContent) {
         this.callbackEdit(noteId, response.data.value, index);
       }
     });
@@ -103,7 +95,7 @@ export class EntityNotesTabComponent implements OnInit {
       data: { deleteContext: `${noteLabel}: ${this.entityNotes[index].note}` }
     });
     deleteNoteDialogRef.afterClosed().subscribe((response: any) => {
-      if (response.delete) {
+      if (response?.delete) {
         this.callbackDelete(noteId, index);
       }
     });

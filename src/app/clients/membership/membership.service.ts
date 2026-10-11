@@ -1,0 +1,131 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
+import { Observable, catchError, map, of } from 'rxjs';
+import { AuthenticationService } from 'app/core/authentication/authentication.service';
+import {
+  MembersWithoutShares,
+  MembershipApplication,
+  MembershipApplyRequest,
+  MembershipApproveRequest,
+  MembershipRejectRequest,
+  MembershipSettings,
+  MembershipSettingsView,
+  MembershipStatus,
+  MembershipTemplate
+} from './membership.models';
+
+/**
+ * Membership applications (fineract-dbug ADR 0023; the settings, ADR 0035): a person becomes a member by buying shares. Applying creates a
+ * pending client; approving activates the member, opens the member savings account and buys the shares in one step.
+ */
+@Injectable({ providedIn: 'root' })
+export class MembershipService {
+  private http = inject(HttpClient);
+  private authenticationService = inject(AuthenticationService);
+
+  /**
+   * Whether the signed-in user may read memberships. Checked before calling, because the global error handler
+   * shows an alert for every refused call, and a user without the permission should simply see the old screens.
+   */
+  canRead(): boolean {
+    const permissions: string[] = this.authenticationService.getCredentials()?.permissions ?? [];
+    return [
+      'ALL_FUNCTIONS',
+      'ALL_FUNCTIONS_READ',
+      'READ_MEMBERSHIP'
+    ].some((p) => permissions.includes(p));
+  }
+
+  template(): Observable<MembershipTemplate> {
+    return this.http.get<MembershipTemplate>('/nepal/memberships/template');
+  }
+
+  /**
+   * The template when this user may read memberships, else null. Membership mode is on when
+   * {@code template.settings.shareFirstEnabled}; a user without READ_MEMBERSHIP works as before.
+   */
+  templateOrNull(): Observable<MembershipTemplate | null> {
+    return this.canRead() ? this.template().pipe(catchError(() => of(null))) : of(null);
+  }
+
+  apply(request: MembershipApplyRequest): Observable<MembershipApplication> {
+    return this.http.post<MembershipApplication>('/nepal/memberships', request);
+  }
+
+  list(status: MembershipStatus): Observable<MembershipApplication[]> {
+    return this.http.get<MembershipApplication[]>('/nepal/memberships', {
+      params: new HttpParams().set('status', status.toLowerCase())
+    });
+  }
+
+  /** The member's latest application whatever its status, or null when there is none (or the user may not read it). */
+  forClient(clientId: number | string): Observable<MembershipApplication | null> {
+    return this.history(clientId).pipe(map((applications) => applications[0] ?? null));
+  }
+
+  /** Every application of the member, newest first; empty when there is none (or the user may not read them). */
+  history(clientId: number | string): Observable<MembershipApplication[]> {
+    if (!this.canRead()) {
+      return of([]);
+    }
+    return this.http
+      .get<MembershipApplication[]>('/nepal/memberships', {
+        params: new HttpParams().set('clientId', String(clientId))
+      })
+      .pipe(catchError(() => of([])));
+  }
+
+  get(id: number): Observable<MembershipApplication> {
+    return this.http.get<MembershipApplication>(`/nepal/memberships/${id}`);
+  }
+
+  approve(id: number, request: MembershipApproveRequest): Observable<MembershipApplication> {
+    return this.http.post<MembershipApplication>(`/nepal/memberships/${id}`, request, {
+      params: new HttpParams().set('command', 'approve')
+    });
+  }
+
+  reject(id: number, request: MembershipRejectRequest): Observable<MembershipApplication> {
+    return this.http.post<MembershipApplication>(`/nepal/memberships/${id}`, request, {
+      params: new HttpParams().set('command', 'reject')
+    });
+  }
+
+  /** Whether the signed-in user holds one of these permissions, or all functions. */
+  can(...permissions: string[]): boolean {
+    const held: string[] = this.authenticationService.getCredentials()?.permissions ?? [];
+    return [
+      'ALL_FUNCTIONS',
+      ...permissions
+    ].some((p) => held.includes(p));
+  }
+
+  /**
+   * Whether the signed-in user may decide this application: with "a different person must approve" on, not the
+   * person who entered it (the server refuses that too).
+   */
+  mayDecide(application: MembershipApplication, settings: MembershipSettings | null | undefined): boolean {
+    const me = this.authenticationService.getCredentials()?.userId;
+    return !settings?.separateApprover || application.submittedById == null || application.submittedById !== me;
+  }
+
+  membersWithoutShares(): Observable<MembersWithoutShares> {
+    return this.http.get<MembersWithoutShares>('/nepal/memberships/members-without-shares');
+  }
+
+  settings(): Observable<MembershipSettingsView> {
+    return this.http.get<MembershipSettingsView>('/nepal/memberships/settings');
+  }
+
+  updateSettings(settings: Partial<MembershipSettings>): Observable<MembershipSettingsView> {
+    return this.http.put<MembershipSettingsView>('/nepal/memberships/settings', settings);
+  }
+}

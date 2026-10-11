@@ -21,7 +21,7 @@
   gap: 8px;
   margin: 20px 0 12px;
   padding-bottom: 8px;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--dk-border, #e0e0e0);
 
   mat-icon {
     font-size: 20px;
@@ -71,7 +71,7 @@
   margin: 16px 0;
   padding: 16px;
   border-radius: 8px;
-  background-color: var(--mdc-theme-surface, rgb(0 0 0 / 4%));
+  background-color: var(--mdc-theme-surface, rgb(var(--dk-ink-rgb, 0 0 0) / 4%));
 
   .search-instruction {
     margin: 0 0 12px;
@@ -89,9 +89,9 @@
     gap: 8px;
     margin-top: 8px;
     padding: 8px 12px;
-    background-color: var(--mdc-theme-error-container, #ffebee);
+    background-color: var(--mdc-theme-error-container, var(--dk-danger-soft, #ffebee));
     border-radius: 4px;
-    color: var(--mdc-theme-on-error-container, #c62828);
+    color: var(--mdc-theme-on-error-container, var(--dk-danger, #c62828));
     font-size: 13px;
 
     mat-icon {
@@ -115,7 +115,7 @@
       font-size: 24px;
       width: 24px;
       height: 24px;
-      color: var(--mdc-theme-primary, #4caf50);
+      color: var(--mdc-theme-primary, var(--dk-success, #4caf50));
     }
 
     .client-info {
@@ -150,7 +150,7 @@
     flex-wrap: wrap;
     gap: 12px;
     font-size: 12px;
-    color: #666;
+    color: var(--dk-text-2, #666);
 
     .account-no,
     .external-id {

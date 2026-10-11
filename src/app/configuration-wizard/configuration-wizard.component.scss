@@ -22,7 +22,7 @@
   padding: 16px 0 0 !important;
   margin: 0 !important;
   justify-content: center;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid var(--dk-border, #e0e0e0);
 
   button {
     min-width: 180px;
@@ -38,7 +38,7 @@
     text-align: center;
     font-size: 16px;
     margin: 0 0 32px;
-    color: #555;
+    color: var(--dk-text-2, #555);
   }
 
   .buttons-grid {
@@ -70,7 +70,7 @@
       font-size: 14px;
       font-weight: 500;
       margin: 0 0 12px;
-      color: var(--md-sys-color-on-surface, #333);
+      color: var(--md-sys-color-on-surface, var(--dk-text, #333));
     }
 
     mat-progress-bar {

@@ -10,6 +10,7 @@
 import { ChangeDetectionStrategy, Component, OnInit, ViewChild, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { MatPaginator } from '@angular/material/paginator';
+import { MatIcon } from '@angular/material/icon';
 import { MatSort, MatSortHeader } from '@angular/material/sort';
 import {
   MatTableDataSource,
@@ -51,7 +52,8 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     MatHeaderRow,
     MatRowDef,
     MatRow,
-    MatPaginator
+    MatPaginator,
+    MatIcon
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })

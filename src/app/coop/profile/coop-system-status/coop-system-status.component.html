@@ -1,0 +1,137 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+@if (!loading && status) {
+  @switch (status.status) {
+    @case ('ACTIVE') {
+      <div class="activation-welcome-page">
+        <div class="activation-hero">
+          <span class="hero-icon" aria-hidden="true">✓</span>
+          <h1 class="hero-title" id="system-status-title">Congratulations!</h1>
+          <p class="hero-subtitle">
+            Your cooperative system is ready. Sign in to your cooperative's banking system with the details below.
+          </p>
+        </div>
+
+        <section class="activation-details-card" aria-labelledby="system-status-title">
+          <dl class="sign-in-details">
+            <div class="detail">
+              <dt>Web address</dt>
+              <dd>
+                @if (status.frontendUrl) {
+                  <a class="sign-in-link" [href]="status.frontendUrl" target="_blank" rel="noopener noreferrer">
+                    {{ status.frontendUrl }}
+                  </a>
+                } @else {
+                  <span class="muted">Not set yet. Please contact the registry.</span>
+                }
+              </dd>
+            </div>
+
+            <div class="detail">
+              <dt>Username</dt>
+              <dd class="copyable">
+                <code>{{ status.tenantAdminUsername || '—' }}</code>
+                @if (status.tenantAdminUsername) {
+                  <button type="button" class="copy-button" (click)="copyUsername()">
+                    {{ copied ? 'Copied' : 'Copy' }}
+                  </button>
+                }
+              </dd>
+            </div>
+
+            <div class="detail">
+              <dt>Password</dt>
+              <dd>The password of this registry account</dd>
+            </div>
+          </dl>
+
+          <ul class="guidance">
+            <li>
+              You will be asked to choose a new password straight away. After that, the two passwords are separate.
+            </li>
+            <li>Create a separate user for each staff member instead of sharing the administrator login.</li>
+            <li>We will never ask for your password by email or phone.</li>
+          </ul>
+        </section>
+
+        <div class="activation-actions">
+          <button type="button" class="welcome-next-button" (click)="next.emit()">Next</button>
+        </div>
+      </div>
+    }
+    @case ('PROVISIONED') {
+      <div class="activation-welcome-page">
+        <div class="activation-hero">
+          <span class="hero-icon pending" aria-hidden="true">⏳</span>
+          <h1 class="hero-title">Approved: your system is being prepared</h1>
+          <p class="hero-subtitle">We will email you the sign-in details as soon as it is ready.</p>
+        </div>
+
+        <div class="activation-actions centered">
+          <button type="button" class="welcome-next-button" (click)="next.emit()">Next</button>
+        </div>
+      </div>
+    }
+    @case ('PENDING') {
+      <section class="system-status-card info">
+        <div class="card-heading">
+          <span class="card-icon" aria-hidden="true">⌛</span>
+          <div>
+            <h2>Your application is being reviewed</h2>
+            <p>We will let you know once it has been verified.</p>
+          </div>
+        </div>
+      </section>
+    }
+    @case ('REJECTED') {
+      <section class="system-status-card danger">
+        <div class="card-heading">
+          <span class="card-icon" aria-hidden="true">!</span>
+          <div>
+            <h2>Your application was not approved</h2>
+            <p>Please contact the registry for details.</p>
+          </div>
+        </div>
+      </section>
+    }
+    @case ('WITHDRAWN') {
+      <section class="system-status-card muted-card">
+        <div class="card-heading">
+          <span class="card-icon" aria-hidden="true">–</span>
+          <div>
+            <h2>You withdrew this application</h2>
+          </div>
+        </div>
+      </section>
+    }
+    @case ('NO_PROFILE') {
+      <div class="activation-welcome-page">
+        <div class="activation-hero">
+          <span class="hero-icon onboarding" aria-hidden="true">🏢</span>
+          <h1 class="hero-title" id="onboarding-welcome-title">Welcome to COFMIS</h1>
+          <p class="hero-subtitle">
+            Welcome to your cooperative management workspace. Let's get your cooperative set up by providing a few
+            essential details.
+          </p>
+        </div>
+
+        <section class="activation-details-card" aria-labelledby="onboarding-welcome-title">
+          <h2 class="onboarding-card-title">Complete Your Cooperative Profile</h2>
+          <p class="onboarding-card-text">
+            Provide your cooperative's basic information, contact details, and registration information to get started.
+          </p>
+        </section>
+
+        <div class="activation-actions">
+          <button type="button" class="welcome-next-button" (click)="next.emit()">Get Started</button>
+        </div>
+      </div>
+    }
+  }
+}

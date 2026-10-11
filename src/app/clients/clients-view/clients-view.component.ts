@@ -7,11 +7,19 @@
  */
 
 /** Angular Imports */
-import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  OnInit,
+  inject,
+  signal,
+  TemplateRef,
+  ViewChild
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { environment } from '../../../environments/environment';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { DomSanitizer } from '@angular/platform-browser';
 import { MatDialog } from '@angular/material/dialog';
 
 /** Custom Dialogs */
@@ -39,17 +47,31 @@ import {
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatTooltip } from '@angular/material/tooltip';
 import { NgClass } from '@angular/common';
-import { EntityNameComponent } from '../../shared/entity-name/entity-name.component';
 import { MatMenuTrigger, MatMenu, MatMenuItem } from '@angular/material/menu';
 import { MatIcon } from '@angular/material/icon';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
-import { AccountNumberComponent } from '../../shared/account-number/account-number.component';
-import { ExternalIdentifierComponent } from '../../shared/external-identifier/external-identifier.component';
 import { MatTabNav, MatTabLink, MatTabNavPanel } from '@angular/material/tabs';
 import { StatusLookupPipe } from '../../pipes/status-lookup.pipe';
 import { DateFormatPipe } from '../../pipes/date-format.pipe';
+import { AdToBsPipe } from '../../pipes/ad-to-bs.pipe';
+import { MatDivider } from '@angular/material/divider';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { formatTabLabel } from 'app/shared/utils/format-tab-label.util';
+
+import { MembershipApplication, MembershipTemplate } from '../membership/membership.models';
+import { MembershipService } from '../membership/membership.service';
+import { MembershipDeadlineComponent } from '../membership/membership-deadline/membership-deadline.component';
+import {
+  MembershipDecisionData,
+  MembershipDecisionDialogComponent
+} from '../membership/membership-decision-dialog/membership-decision-dialog.component';
+import { openApplyDialog, reloadMemberPage } from '../membership/membership-tab/membership-tab.component';
+import { ClientActionNotifierService } from './client-actions/client-action-notifier.service';
+import { KymService } from '../kym/kym.service';
+import { KymChipComponent } from '../kym/kym-chip/kym-chip.component';
+import { ExtraChecksChipComponent } from 'app/compliance/risk/extra-checks-chip/extra-checks-chip.component';
+import { CasesService } from 'app/compliance/cases/cases.service';
+import { raiseConcern } from 'app/compliance/cases/raise-concern';
 
 @Component({
   selector: 'mifosx-clients-view',
@@ -63,14 +85,11 @@ import { formatTabLabel } from 'app/shared/utils/format-tab-label.util';
     MatTooltip,
     MatCardTitle,
     NgClass,
-    EntityNameComponent,
     MatIconButton,
     MatMenuTrigger,
     MatIcon,
     FaIconComponent,
     MatCardSubtitle,
-    AccountNumberComponent,
-    ExternalIdentifierComponent,
     MatMenu,
     MatMenuItem,
     MatTabNav,
@@ -79,7 +98,12 @@ import { formatTabLabel } from 'app/shared/utils/format-tab-label.util';
     MatTabNavPanel,
     RouterOutlet,
     StatusLookupPipe,
-    DateFormatPipe
+    DateFormatPipe,
+    MembershipDeadlineComponent,
+    KymChipComponent,
+    ExtraChecksChipComponent,
+    AdToBsPipe,
+    MatDivider
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -88,6 +112,11 @@ export class ClientsViewComponent implements OnInit {
   /**
    * Mask a string, keeping first and last letter, masking the rest with *
    */
+  /** Opens the member's photo at full size. */
+  openPhoto() {
+    this.dialog.open(this.photoPreview, { maxWidth: '90vw', panelClass: 'photo-preview-dialog' });
+  }
+
   maskName(name: string): string {
     if (!name) return '';
     return name
@@ -137,25 +166,142 @@ export class ClientsViewComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private clientsService = inject(ClientsService);
-  private _sanitizer = inject(DomSanitizer);
   dialog = inject(MatDialog);
   private destroyRef = inject(DestroyRef);
 
   clientViewData: any;
   clientDatatables: any;
-  clientImage: any;
+  /** The member's membership application, if any (fineract-dbug ADR 0023) */
+  readonly membershipApplication = signal<MembershipApplication | null>(null);
+  /** Whether the share-first rule is on; only looked up for a pending or refused client */
+  readonly shareFirstRule = signal(false);
+  /** The membership settings and products; only looked up for a pending or refused client (fineract-dbug ADR 0035) */
+  readonly membershipTemplate = signal<MembershipTemplate | null>(null);
+  private membershipService = inject(MembershipService);
+  private notifier = inject(ClientActionNotifierService);
+  private casesService = inject(CasesService);
+  /**
+   * blob: URL of the client's photo, or null when there is none.
+   * A signal, because this component is OnPush: a plain field set in the HTTP callback would not
+   * re-render the template, and the placeholder would stay until something else marked the view dirty.
+   */
+  readonly clientImage = signal<string | null>(null);
+  /** Full-size view of the member's photo. */
+  @ViewChild('photoPreview') photoPreview: TemplateRef<unknown>;
   clientTemplateData: any;
 
   constructor() {
     this.route.data
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((data: { clientViewData: any; clientTemplateData: any; clientDatatables: any }) => {
-        this.clientViewData = data.clientViewData;
-        this.clientDatatables = this.filterDatatablesByClientSubtype(
-          data.clientDatatables,
-          data.clientViewData?.legalForm?.id
-        );
-        this.clientTemplateData = data.clientTemplateData;
+      .subscribe(
+        (data: {
+          clientViewData: any;
+          clientTemplateData: any;
+          clientDatatables: any;
+          membershipApplication: MembershipApplication | null;
+        }) => {
+          this.clientViewData = data.clientViewData;
+          this.membershipApplication.set(data.membershipApplication ?? null);
+          const status = data.clientViewData?.status?.value;
+          if (status === 'Pending' || status === 'Rejected') {
+            this.membershipService.templateOrNull().subscribe((template) => {
+              this.membershipTemplate.set(template);
+              this.shareFirstRule.set(!!template?.settings.shareFirstEnabled);
+            });
+          }
+          this.clientDatatables = this.filterDatatablesByClientSubtype(
+            data.clientDatatables,
+            data.clientViewData?.legalForm?.id
+          );
+          this.clientTemplateData = data.clientTemplateData;
+        }
+      );
+  }
+
+  /** A pending applicant: the board decides through the application, not through Fineract's own actions. */
+  get applicationPending(): boolean {
+    return this.membershipApplication()?.status === 'PENDING';
+  }
+
+  /** Every member has a Membership tab for users who may read memberships, with or without an application on record. */
+  readonly canReadMembership = this.membershipService.canRead();
+  readonly canReadKym = inject(KymService).canRead();
+
+  /** Approve and Refuse are offered, unless "a different person must approve" is on and this user entered it. */
+  get canDecideMembership(): boolean {
+    const application = this.membershipApplication();
+    return (
+      application?.status === 'PENDING' &&
+      this.membershipService.mayDecide(application, this.membershipTemplate()?.settings)
+    );
+  }
+
+  /** A refused person applies again on their existing record (their citizenship number is unique). */
+  get canApplyAgain(): boolean {
+    return (
+      this.clientViewData?.status?.value === 'Rejected' &&
+      !!this.membershipTemplate()?.shareProducts.length &&
+      (this.shareFirstRule() || !!this.membershipApplication()) &&
+      this.membershipService.can('CREATE_MEMBERSHIP')
+    );
+  }
+
+  /** A client pending from before the rule gets an application with its original date (administrators). */
+  get canEnterExisting(): boolean {
+    return (
+      this.clientViewData?.status?.value === 'Pending' &&
+      !this.applicationPending &&
+      this.shareFirstRule() &&
+      !!this.membershipTemplate()?.shareProducts.length &&
+      this.membershipService.can('ENTER_MEMBERSHIP')
+    );
+  }
+
+  /** Tells the compliance officer what was noticed (fineract-dbug #133); the answer is only that it was sent. */
+  raiseConcern(): void {
+    raiseConcern(this.dialog, this.casesService, this.clientViewData.id).subscribe(
+      (sent) => sent && this.notifier.notify('compliance.concern.sent')
+    );
+  }
+
+  applyForMembership(mode: 'again' | 'existing'): void {
+    const template = this.membershipTemplate();
+    if (!template) {
+      return;
+    }
+    openApplyDialog(this.dialog, {
+      template,
+      clientId: this.clientViewData.id,
+      name: this.clientViewData.displayName,
+      mode,
+      previous: this.membershipApplication()
+    }).subscribe((taken) => {
+      if (taken) {
+        this.notifier.notify('membership.messages.applicationTaken');
+        reloadMemberPage(this.router, taken.clientId);
+      }
+    });
+  }
+
+  decideMembership(decision: 'approve' | 'reject'): void {
+    const application = this.membershipApplication();
+    if (!application) {
+      return;
+    }
+    this.dialog
+      .open<MembershipDecisionDialogComponent, MembershipDecisionData>(MembershipDecisionDialogComponent, {
+        data: { application, decision },
+        width: '560px',
+        maxWidth: 'calc(100vw - 32px)'
+      })
+      .afterClosed()
+      .subscribe((decided?: MembershipApplication) => {
+        if (decided) {
+          this.notifier.notify(
+            decision === 'approve' ? 'membership.messages.approved' : 'membership.messages.rejected'
+          );
+          reloadMemberPage(this.router, decided.clientId);
+        }
       });
   }
 
@@ -172,21 +318,32 @@ export class ClientsViewComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.clientsService.getClientProfileImage(this.clientViewData.id).subscribe({
-      next: (base64Image: any) => {
-        // If base64Image is null, client has no profile image
-        if (base64Image) {
-          this.clientImage = this._sanitizer.bypassSecurityTrustResourceUrl(base64Image);
-        } else {
-          this.clientImage = null;
+    // A blob: URL points at memory held for this page; release it when the page goes away.
+    this.destroyRef.onDestroy(() => this.releaseClientImage());
+    this.clientsService
+      .getClientProfileImage(this.clientViewData.id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (image: Blob | null) => {
+          this.releaseClientImage();
+          // A null image means the client has no profile image. A blob: URL passes Angular's URL
+          // sanitizer as it is, so no bypassSecurityTrust call is needed.
+          this.clientImage.set(image ? URL.createObjectURL(image) : null);
+        },
+        error: (error: any) => {
+          // Handle any unexpected errors
+          console.error('Error loading client profile image:', error);
+          this.releaseClientImage();
         }
-      },
-      error: (error: any) => {
-        // Handle any unexpected errors
-        console.error('Error loading client profile image:', error);
-        this.clientImage = null;
-      }
-    });
+      });
+  }
+
+  private releaseClientImage() {
+    const url = this.clientImage();
+    if (url) {
+      URL.revokeObjectURL(url);
+      this.clientImage.set(null);
+    }
   }
 
   isActive(): boolean {

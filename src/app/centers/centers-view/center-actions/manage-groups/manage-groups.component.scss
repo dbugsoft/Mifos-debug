@@ -20,7 +20,7 @@
   .mat-row,
   .mat-header-row {
     display: flex;
-    border-bottom: 1px solid var(--border-color-light, #eee);
+    border-bottom: 1px solid var(--border-color-light, var(--dk-border, #eee));
     color: var(--text-color, inherit);
     font-weight: 500;
     align-items: center;
@@ -40,7 +40,7 @@
     padding-left: 0;
     margin-bottom: 0;
     font-weight: 500;
-    border-bottom: 2px solid var(--border-color-light, #eee);
+    border-bottom: 2px solid var(--border-color-light, var(--dk-border, #eee));
     padding-bottom: 1rem;
   }
 
@@ -49,7 +49,7 @@
     margin-bottom: 1rem;
     padding: 1.5rem;
     box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
-    border: 1px solid var(--border-color, #ddd);
+    border: 1px solid var(--border-color, var(--dk-border, #ddd));
     border-radius: 8px;
     transition:
       background-color 0.3s ease,
@@ -67,7 +67,7 @@
     margin-bottom: 1rem;
     padding: 1.5rem;
     box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
-    border: 1px solid var(--border-color, #ddd);
+    border: 1px solid var(--border-color, var(--dk-border, #ddd));
     border-radius: 8px;
     transition:
       background-color 0.3s ease,

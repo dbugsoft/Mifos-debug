@@ -12,11 +12,11 @@ table {
 
 // TODO: CONFIGURE THESE CLASSES GLOBALLY
 .is-differential {
-  color: #32cd32;
+  color: var(--dk-success, #32cd32);
 }
 
 .not-is-differential {
-  color: #f44366;
+  color: var(--dk-danger, #f44366);
 }
 
 .content {

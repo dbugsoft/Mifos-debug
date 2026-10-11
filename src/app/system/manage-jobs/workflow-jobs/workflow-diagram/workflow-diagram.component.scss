@@ -16,7 +16,7 @@
     min-width: 150;
     display: block;
     fill: #d7dada;
-    border: #000;
+    border: var(--dk-border-strong, #000);
 
     .name {
       font-size: 12px;
@@ -34,13 +34,13 @@
   .link-midpoint {
     ellipse {
       fill: white;
-      stroke: black;
+      stroke: var(--dk-text, black);
       stroke-width: 1;
     }
 
     text {
       stroke: transparent;
-      fill: black;
+      fill: var(--dk-text, black);
       text-anchor: middle;
       font-size: 8px;
     }

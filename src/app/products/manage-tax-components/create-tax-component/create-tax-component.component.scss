@@ -6,6 +6,66 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+// Same width as the breadcrumb and the lists.
 .container {
-  max-width: 37rem;
+  margin: 0 auto;
+  max-width: 84rem;
+  width: 90%;
+  padding-bottom: 32px;
+}
+
+// Each field keeps the width its input needs; all stack on phones.
+.form-grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  column-gap: 16px;
+
+  mat-form-field,
+  mifosx-gl-account-selector,
+  .bs-date {
+    min-width: 0;
+  }
+
+  .field-xs {
+    flex: 0 1 120px;
+  }
+
+  .field-sm {
+    flex: 0 1 180px;
+  }
+
+  .field-md {
+    flex: 0 1 200px;
+  }
+
+  .field-lg {
+    flex: 0 1 280px;
+  }
+
+  .field-account {
+    flex: 0 1 320px;
+  }
+
+  // BS/AD date, as on the Collection Sheet: the date, calendar, BS/AD switch and the other calendar's date need
+  // 400px, so it does not shrink (a narrower field cut the dates off).
+  .bs-date {
+    flex: 0 0 448px;
+    max-width: 100%;
+  }
+}
+
+@media (width <= 600px) {
+  .form-grid mat-form-field,
+  .form-grid mifosx-gl-account-selector,
+  .form-grid .bs-date {
+    flex-basis: 100%;
+  }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 24px;
 }

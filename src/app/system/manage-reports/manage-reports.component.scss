@@ -16,9 +16,28 @@ table {
 
 // TODO: CONFIGURE THESE CLASSES GLOBALLY
 .true {
-  color: #32cd32;
+  color: var(--dk-success, #32cd32);
 }
 
 .false {
-  color: #f44366;
+  color: var(--dk-danger, #f44366);
+}
+
+.mat-elevation-z8 {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.mat-mdc-header-row {
+  background-color: var(--dk-fill, #1074b9);
+}
+
+.mat-mdc-header-cell {
+  color: #fff;
+  font-weight: 600;
+  border-right: 1px solid rgb(255 255 255 / 25%);
+}
+
+.mat-mdc-header-cell:last-of-type {
+  border-right: 0;
 }

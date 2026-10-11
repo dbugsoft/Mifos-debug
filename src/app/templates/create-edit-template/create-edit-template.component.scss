@@ -6,20 +6,68 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+// Same width as the breadcrumb and the lists.
+.container {
+  margin: 0 auto;
+  max-width: 84rem;
+  width: 90%;
+  padding-bottom: 32px;
+}
+
+// Each field keeps the width its input needs and does not stretch to fill the row; all stack on phones.
+.form-grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  column-gap: 16px;
+
+  mat-form-field {
+    min-width: 0;
+  }
+
+  .field-sm {
+    flex: 0 1 180px;
+  }
+
+  .field-md {
+    flex: 0 1 240px;
+  }
+
+  .field-lg {
+    flex: 0 1 280px;
+  }
+
+  .field-xl {
+    flex: 0 1 480px;
+  }
+}
+
+@media (width <= 600px) {
+  .form-grid mat-form-field {
+    flex-basis: 100%;
+  }
+}
+
+section {
+  margin-top: 16px;
+}
+
+// Advanced Options and Add/Remove are as tall as the fields beside them.
+.advanced-options-wrapper button,
+.mapper-button {
+  height: var(--mat-form-field-container-height, 48px);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 24px;
+}
+
 // Advanced Options button wrapper - aligns with Name field above
 .advanced-options-wrapper {
   margin-bottom: 16px;
-}
-
-// Mapper row styling - adds space between Advanced Options button and Mapper Key field
-.mapper-row {
-  margin-top: 16px;
-  margin-bottom: 8px;
-
-  // Ensure buttons don't touch the right border
-  .mapper-button {
-    margin-left: 8px;
-  }
 }
 
 // Editor wrapper - prevents CKEditor from touching borders on left and right
@@ -34,7 +82,7 @@
   }
 
   .required-asterisk {
-    color: #f44336;
+    color: var(--dk-danger, #f44336);
   }
 
   // CKEditor container spacing
@@ -49,9 +97,4 @@
       }
     }
   }
-}
-
-// Ensure mat-card-content has consistent padding
-mat-card-content {
-  padding: 16px;
 }

@@ -101,7 +101,7 @@ export class SharesAccountViewComponent implements OnInit {
 
   ngOnInit() {
     this.setConditionalButtons();
-    if (this.router.url.includes('clients')) {
+    if (this.router.url.includes('members')) {
       this.entityType = 'Client';
     } else if (this.router.url.includes('groups')) {
       this.entityType = 'Group';

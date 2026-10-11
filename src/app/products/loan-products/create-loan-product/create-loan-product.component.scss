@@ -6,10 +6,15 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+@use '../../../shared/styles/compact-stepper' as *;
+
+@include compact-stepper;
+
 .container {
-  max-width: 86rem;
-  width: 96%;
-  padding-bottom: 30px;
+  margin: 0 auto;
+  max-width: 84rem;
+  width: 90%;
+  padding-bottom: 32px;
 }
 
 fa-icon {

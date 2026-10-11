@@ -16,53 +16,9 @@ import { Route } from '../core/route/route.service';
 /** Custom Components */
 import { HomeComponent } from './home.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { CardMenuComponent, MenuCard } from './card-menu/card-menu.component';
-
-/** Cards for the Member Management landing page. */
-const memberManagementCards: MenuCard[] = [
-  { label: 'labels.menus.Clients', icon: 'users', path: ['/members'], permission: 'READ_CLIENT' },
-  { label: 'labels.menus.Groups', icon: 'sitemap', path: ['/groups'], permission: 'READ_GROUP' },
-  { label: 'labels.menus.Centers', icon: 'building', path: ['/centers'], permission: 'READ_CENTER' }
-];
-
-/** Cards for the Reports landing page. */
-const reportsCards: MenuCard[] = [
-  { label: 'labels.menus.All', icon: 'list-ul', path: ['/reports'], permission: 'READ_REPORT' },
-  { label: 'labels.menus.Clients', icon: 'users', path: [
-      '/reports',
-      'Client'
-    ], permission: 'READ_REPORT' },
-  { label: 'labels.menus.Loans', icon: 'hand-holding-usd', path: [
-      '/reports',
-      'Loan'
-    ], permission: 'READ_REPORT' },
-  { label: 'labels.menus.Savings', icon: 'money-bill-wave', path: [
-      '/reports',
-      'Savings'
-    ], permission: 'READ_REPORT' },
-  { label: 'labels.menus.Funds', icon: 'money-bill', path: [
-      '/reports',
-      'Fund'
-    ], permission: 'READ_REPORT' },
-  {
-    label: 'labels.menus.Accounting',
-    icon: 'money-bill-alt',
-    path: [
-      '/reports',
-      'Accounting'
-    ],
-    permission: 'READ_REPORT'
-  }
-];
-
-/** Cards for the Admin landing page. */
-const adminCards: MenuCard[] = [
-  { label: 'labels.menus.Users', icon: 'users', path: ['/appusers'], permission: 'READ_USER' },
-  { label: 'labels.menus.Organization', icon: 'building', path: ['/organization'], permission: 'READ_OFFICE' },
-  { label: 'labels.menus.System', icon: 'cogs', path: ['/system'], permission: 'READ_CONFIGURATION' },
-  { label: 'labels.menus.Products', icon: 'tags', path: ['/products'], permission: 'READ_PRODUCT' },
-  { label: 'labels.menus.Templates', icon: 'file-alt', path: ['/templates'], permission: 'READ_TEMPLATE' }
-];
+import { TaskListComponent } from 'app/coop-dashboard/task-list/task-list.component';
+import { CardMenuComponent } from './card-menu/card-menu.component';
+import { adminCards, memberManagementCards, reportsCards } from 'app/core/shell/sidenav/nav-items';
 
 /** Custom Resolvers */
 import { OfficesResolver } from '../accounting/common-resolvers/offices.resolver';
@@ -72,7 +28,7 @@ const routes: Routes = [
   Route.withShell([
     {
       path: '',
-      redirectTo: '/member-management',
+      redirectTo: '/dashboard',
       pathMatch: 'full'
     },
     {
@@ -112,11 +68,22 @@ const routes: Routes = [
     },
     {
       path: 'dashboard',
-      component: DashboardComponent,
       data: { title: 'Dashboard', breadcrumb: 'Dashboard' },
-      resolve: {
-        offices: OfficesResolver
-      }
+      children: [
+        {
+          path: '',
+          component: DashboardComponent,
+          resolve: {
+            offices: OfficesResolver
+          }
+        },
+        {
+          // Every record of one "needs attention" task (fineract-dbug ADR 0021)
+          path: 'tasks/:code',
+          component: TaskListComponent,
+          data: { title: 'Needs attention', breadcrumb: 'Needs attention' }
+        }
+      ]
     }
   ])
 ];

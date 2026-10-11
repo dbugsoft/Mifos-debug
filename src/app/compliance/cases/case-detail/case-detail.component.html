@@ -1,0 +1,216 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="compliance-page">
+  @if (allowed() === false) {
+    <p class="empty">{{ 'compliance.You have no compliance access' | translate }}</p>
+  } @else if (item(); as k) {
+    @if (busy()) {
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }
+    <section class="frame head">
+      <div class="title">
+        <h2 class="name">{{ k.reference }}</h2>
+        <span
+          class="chip"
+          [class.blue]="k.status === 'OPEN'"
+          [class.amber]="k.status === 'DECIDED_REPORT'"
+          [class.green]="k.status === 'FILED'"
+          [class.grey]="k.status === 'DECIDED_NO_REPORT'"
+          >{{ 'compliance.case.status.' + k.status | translate }}{{ k.reportType ? ' · ' + k.reportType : '' }}</span
+        >
+        @if (k.status === 'DECIDED_REPORT' && k.daysLeft !== undefined) {
+          <mifosx-due-chip [daysLeft]="k.daysLeft"></mifosx-due-chip>
+        }
+      </div>
+      <p class="summary">{{ k.summary }}</p>
+      <dl class="facts">
+        <div class="fact">
+          <dt class="fact-label">{{ 'compliance.Member' | translate }}</dt>
+          <dd class="fact-value">
+            @if (k.clientId) {
+              <a [routerLink]="['/compliance', 'members', k.clientId]">{{ k.name }}</a> · {{ k.accountNo }}
+            } @else {
+              {{ k.name ?? '—' }}
+            }
+          </dd>
+        </div>
+        <div class="fact">
+          <dt class="fact-label">{{ 'compliance.case.Opened' | translate }}</dt>
+          <dd class="fact-value">{{ k.openedAt.slice(0, 10) | adToBs }} · {{ k.openedBy }}</dd>
+        </div>
+        @if (k.decidedOn) {
+          <div class="fact">
+            <dt class="fact-label">{{ 'compliance.case.Decision' | translate }}</dt>
+            <dd class="fact-value">
+              {{ k.decisionReason }}
+              <span class="sub"
+                >{{ k.decidedOn | adToBs }} · {{ k.decidedBy
+                }}{{ k.suspicion ? ' · ' + ('compliance.case.suspicion.' + k.suspicion | translate) : '' }}</span
+              >
+            </dd>
+          </div>
+        }
+        @if (k.reportDueOn) {
+          <div class="fact">
+            <dt class="fact-label">{{ 'compliance.case.Report due' | translate }}</dt>
+            <dd class="fact-value">{{ k.reportDueOn | adToBs }}</dd>
+          </div>
+        }
+      </dl>
+      @if (canManage && k.status === 'OPEN') {
+        <div class="actions">
+          <button mat-raised-button color="primary" type="button" (click)="decide()" [disabled]="busy()">
+            {{ 'compliance.case.Decide' | translate }}
+          </button>
+        </div>
+      }
+    </section>
+
+    @if (k.status === 'DECIDED_REPORT' || k.status === 'FILED') {
+      <section class="frame">
+        <h3 class="legend">{{ 'compliance.case.goAML report' | translate }}</h3>
+        @if (report(); as r) {
+          <dl class="facts">
+            <div class="fact">
+              <dt class="fact-label">{{ 'compliance.case.Report' | translate }}</dt>
+              <dd class="fact-value">{{ r.reference }} · {{ 'compliance.reportStatus.' + r.status | translate }}</dd>
+            </div>
+            @if (r.fiuReference) {
+              <div class="fact">
+                <dt class="fact-label">{{ 'compliance.case.FIU reference' | translate }}</dt>
+                <dd class="fact-value">{{ r.fiuReference }}</dd>
+              </div>
+            }
+          </dl>
+          @if (r.problems.length) {
+            <div class="notice">
+              <span>{{ 'compliance.case.Before it can be sent' | translate }}</span>
+              <ul>
+                @for (p of r.problems; track $index) {
+                  <li>{{ p }}</li>
+                }
+              </ul>
+            </div>
+          }
+          @if (canFile) {
+            <div class="actions">
+              <button mat-stroked-button type="button" (click)="downloadXml(r)">
+                <mat-icon>download</mat-icon>{{ 'compliance.case.Download the file' | translate }}
+              </button>
+              @if (r.status === 'DRAFT' || r.status === 'READY') {
+                <button mat-stroked-button type="button" (click)="rebuild(r)" [disabled]="busy()">
+                  {{ 'compliance.case.Rebuild' | translate }}
+                </button>
+              }
+              @if (r.status === 'READY') {
+                <button mat-raised-button color="primary" type="button" (click)="sent(r)" [disabled]="busy()">
+                  {{ 'compliance.case.Record as sent' | translate }}
+                </button>
+              }
+            </div>
+          }
+        } @else if (canFile && k.status === 'DECIDED_REPORT') {
+          <div class="frame-head">
+            <p class="hint">{{ 'compliance.case.makeLead' | translate }}</p>
+            <button mat-raised-button color="primary" type="button" (click)="makeReport()" [disabled]="busy()">
+              {{ 'compliance.case.Make the goAML report' | translate: { type: k.reportType } }}
+            </button>
+          </div>
+        }
+      </section>
+    }
+
+    <section class="frame">
+      <h3 class="legend">{{ 'compliance.case.Alerts' | translate }}</h3>
+      @if (k.alerts.length) {
+        <ul class="plain-list">
+          @for (a of k.alerts; track a.id) {
+            <li>
+              <a [routerLink]="['/compliance', 'alerts', a.id]">{{ 'compliance.alert.rule.' + a.rule | translate }}</a>
+              <span class="sub">{{ a.detail }}</span>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="empty">{{ 'compliance.case.noAlerts' | translate }}</p>
+      }
+    </section>
+
+    <section class="frame">
+      <h3 class="legend">{{ 'compliance.case.Notes' | translate }}</h3>
+      @if (canManage) {
+        <div class="add-note">
+          <mat-form-field class="full" subscriptSizing="dynamic">
+            <mat-label>{{ 'compliance.case.Write a note' | translate }}</mat-label>
+            <textarea
+              matInput
+              rows="2"
+              maxlength="4000"
+              [value]="note()"
+              (input)="note.set($any($event.target).value)"
+            ></textarea>
+          </mat-form-field>
+          <button mat-stroked-button type="button" (click)="addNote()" [disabled]="busy() || !note().trim()">
+            {{ 'compliance.risk.Add' | translate }}
+          </button>
+        </div>
+      }
+      <ul class="plain-list">
+        @for (n of k.notes; track n.id) {
+          <li>
+            {{ n.note }}
+            <span class="sub">{{ n.writtenBy }} · {{ n.writtenAt.slice(0, 10) | adToBs }}</span>
+          </li>
+        }
+      </ul>
+    </section>
+
+    <section class="frame">
+      <h3 class="legend">{{ 'compliance.case.Documents' | translate }}</h3>
+      <p class="hint">{{ 'compliance.case.documentsHint' | translate }}</p>
+      @if (canManage) {
+        <div class="actions">
+          <button mat-stroked-button type="button" (click)="picker.click()" [disabled]="busy()">
+            <mat-icon>upload</mat-icon>{{ 'compliance.case.Add a document' | translate }}
+          </button>
+          <input #picker type="file" hidden accept="image/*,application/pdf" (change)="upload($event)" />
+        </div>
+      }
+      <ul class="plain-list">
+        @for (d of k.documents; track d.id) {
+          <li class="with-action">
+            <span>
+              {{ d.fileName }}
+              <span class="sub">{{ d.uploadedBy }} · {{ d.uploadedAt.slice(0, 10) | adToBs }}</span>
+            </span>
+            <button mat-button type="button" (click)="download(d.id, d.fileName)">
+              {{ 'compliance.case.Download' | translate }}
+            </button>
+          </li>
+        }
+      </ul>
+    </section>
+
+    <section class="frame">
+      <h3 class="legend">{{ 'compliance.case.What was done' | translate }}</h3>
+      <ul class="plain-list">
+        @for (s of k.steps; track $index) {
+          <li>
+            {{ 'compliance.case.step.' + s.action | translate }}
+            <span class="sub"
+              >{{ s.by ?? ('compliance.risk.the system' | translate) }} · {{ s.at.slice(0, 10) | adToBs }}</span
+            >
+          </li>
+        }
+      </ul>
+    </section>
+  } @else {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
+</div>

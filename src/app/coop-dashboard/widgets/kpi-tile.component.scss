@@ -1,0 +1,173 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+:host {
+  display: block;
+}
+
+.kpi {
+  position: relative;
+  height: 100%;
+  min-height: 138px;
+  box-sizing: border-box;
+  padding: 16px 16px 40px;
+  border-radius: 12px;
+  background: var(--coop-card);
+  box-shadow: var(--coop-shadow);
+  overflow: hidden;
+}
+
+.kpi__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.kpi__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--coop-accent-soft);
+  color: var(--coop-accent);
+  font-size: 13px;
+}
+
+.kpi__info {
+  margin-left: auto;
+}
+
+.kpi__label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--viz-ink-2);
+}
+
+.kpi__value {
+  margin-top: 10px;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--viz-ink);
+  letter-spacing: -0.01em;
+}
+
+.kpi__unit {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--viz-ink-2);
+  margin-left: 2px;
+}
+
+.kpi__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  font-size: 12px;
+}
+
+.kpi__change {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-weight: 600;
+
+  fa-icon {
+    font-size: 10px;
+  }
+}
+
+.kpi__change--good {
+  color: var(--coop-good-ink);
+  background: var(--coop-good-soft);
+}
+
+.kpi__change--bad {
+  color: var(--coop-bad-ink);
+  background: var(--coop-bad-soft);
+}
+
+.kpi__note {
+  color: var(--viz-muted);
+}
+
+.kpi__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+.kpi__status--good {
+  color: var(--coop-good-ink);
+  background: var(--coop-good-soft);
+}
+
+.kpi__status--warning {
+  color: var(--coop-warn-ink);
+  background: var(--coop-warn-soft);
+}
+
+.kpi__status--critical {
+  color: var(--coop-bad-ink);
+  background: var(--coop-bad-soft);
+}
+
+.kpi__spark {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 6px;
+  width: 100%;
+  height: 30px;
+}
+
+.kpi__spark-line {
+  fill: none;
+  stroke: var(--viz-1);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+  stroke-linejoin: round;
+}
+
+.kpi__spark-area {
+  fill: var(--viz-1);
+  opacity: 0.1;
+}
+
+.kpi__spark-hit {
+  fill: transparent;
+  cursor: default;
+}
+
+.kpi__shimmer {
+  height: 52px;
+  margin-top: 14px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, var(--coop-shimmer-a) 25%, var(--coop-shimmer-b) 37%, var(--coop-shimmer-a) 63%);
+  background-size: 400% 100%;
+  animation: kpi-shimmer 1.2s ease-in-out infinite;
+}
+
+@keyframes kpi-shimmer {
+  0% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0 50%;
+  }
+}

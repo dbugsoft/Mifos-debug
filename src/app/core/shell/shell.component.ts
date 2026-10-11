@@ -8,12 +8,21 @@
 
 /** Angular Imports */
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  OnInit,
+  ViewChild,
+  inject
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NavigationEnd, Router } from '@angular/router';
 
 /** rxjs Imports */
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { filter, map } from 'rxjs/operators';
 
 /** Custom Services */
 import { ProgressBarService } from '../progress-bar/progress-bar.service';
@@ -25,6 +34,16 @@ import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
 import { ContentComponent } from './content/content.component';
 import { FooterComponent } from '../../shared/footer/footer.component';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+
+const COLLAPSED_KEY = 'mifosXSidenavCollapsed';
+
+function readCollapsed(): boolean {
+  try {
+    return localStorage.getItem(COLLAPSED_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
 
 /**
  * Shell component.
@@ -53,13 +72,16 @@ export class ShellComponent implements OnInit {
   private progressBarService = inject(ProgressBarService);
   private cdr = inject(ChangeDetectorRef);
   private destroyRef = inject(DestroyRef);
+  private router = inject(Router);
 
   /** Subscription to breakpoint observer for handset. */
   isHandset$: Observable<boolean> = this.breakpointObserver
     .observe(Breakpoints.Handset)
     .pipe(map((result) => result.matches));
-  /** Sets the initial state of sidenav as collapsed. Not collapsed if false. */
-  sidenavCollapsed = true;
+  /** Whether the sidenav shows icons only; remembered across sessions. */
+  sidenavCollapsed = readCollapsed();
+  /** The scrolling page area beside the sidenav. */
+  @ViewChild(MatSidenavContent) private pageArea: MatSidenavContent;
   /** Progress bar mode. */
   progressBarMode: string;
 
@@ -71,6 +93,13 @@ export class ShellComponent implements OnInit {
       this.progressBarMode = mode;
       this.cdr.detectChanges();
     });
+    // Only the page area scrolls, which the router's window scroll reset doesn't reach.
+    this.router.events
+      .pipe(
+        filter((event) => event instanceof NavigationEnd),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe(() => this.pageArea?.scrollTo({ top: 0 }));
   }
 
   /**
@@ -79,6 +108,11 @@ export class ShellComponent implements OnInit {
    */
   toggleCollapse($event: boolean) {
     this.sidenavCollapsed = $event;
+    try {
+      localStorage.setItem(COLLAPSED_KEY, $event ? '1' : '0');
+    } catch {
+      // The choice just won't be remembered.
+    }
     this.cdr.detectChanges();
   }
 }

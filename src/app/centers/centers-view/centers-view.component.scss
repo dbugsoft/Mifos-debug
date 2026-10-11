@@ -13,7 +13,7 @@
 
     div,
     ng-template > div {
-      background-color: #0a6aac;
+      background-color: var(--dk-fill, #0a6aac);
 
       p {
         color: white;
@@ -26,7 +26,7 @@
 .meetingDetails {
   float: right;
   margin-right: 10px;
-  border: 1px black solid;
+  border: 1px var(--dk-border-strong, black) solid;
   padding: 10px;
 }
 

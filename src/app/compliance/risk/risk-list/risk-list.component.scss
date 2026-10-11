@@ -1,0 +1,52 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+@use '../../compliance' as compliance;
+@use '../risk' as risk;
+
+@include compliance.page;
+@include risk.plain-rows;
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+
+  mat-button-toggle-group {
+    flex-wrap: wrap;
+  }
+
+  .search {
+    width: 320px;
+    max-width: 100%;
+  }
+}
+
+.table-scroll table.plain-rows {
+  min-width: 560px;
+}
+
+// On a phone the reasons move under the name, so the table fits.
+table.plain-rows .narrow {
+  display: none;
+}
+
+@media (width <= 600px) {
+  .table-scroll table.plain-rows {
+    min-width: 0;
+
+    .wide {
+      display: none;
+    }
+
+    .narrow {
+      display: block;
+    }
+  }
+}

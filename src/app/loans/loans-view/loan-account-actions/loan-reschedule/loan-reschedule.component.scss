@@ -20,7 +20,7 @@
   flex-wrap: wrap;
   gap: 8px;
   font-size: 0.75rem;
-  color: rgb(0 0 0 / 70%);
+  color: rgb(var(--dk-ink-rgb, 0 0 0) / 70%);
   line-height: 1.5;
 }
 
@@ -32,7 +32,7 @@
 .trigger-installment-details {
   display: inline;
   font-size: 0.75rem;
-  color: rgb(0 0 0 / 70%);
+  color: rgb(var(--dk-ink-rgb, 0 0 0) / 70%);
 }
 
 :host-context(.dark-theme) {
@@ -60,8 +60,8 @@
   gap: 8px;
   margin-top: 10px;
   padding: 12px 16px;
-  background-color: #f5f5f5;
-  border: 1px solid #e0e0e0;
+  background-color: var(--dk-surface-2, #f5f5f5);
+  border: 1px solid var(--dk-border, #e0e0e0);
   border-radius: 4px;
   box-sizing: border-box;
   overflow: hidden;
@@ -76,7 +76,7 @@
 }
 
 .penalty-date {
-  color: rgb(0 0 0 / 70%);
+  color: rgb(var(--dk-ink-rgb, 0 0 0) / 70%);
   white-space: nowrap;
 }
 

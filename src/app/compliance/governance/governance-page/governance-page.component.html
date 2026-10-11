@@ -1,0 +1,292 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="compliance-page">
+  @if (allowed() === false) {
+    <p class="empty">{{ 'compliance.You have no compliance access' | translate }}</p>
+  } @else if (data(); as g) {
+    @if (busy()) {
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }
+    @if (g.prompts.length) {
+      <ul class="prompts">
+        @for (p of g.prompts; track p.code) {
+          <li class="notice" [class.bad]="p.level === 'BAD'">
+            {{
+              'compliance.governance.prompt.' + p.code
+                | translate: { date: p.dueOn ? (p.dueOn | adToBs) || p.dueOn : '' }
+            }}
+          </li>
+        }
+      </ul>
+    }
+
+    <section class="frame">
+      <h2 class="legend">{{ 'compliance.governance.Compliance officer' | translate }}</h2>
+      @if (officer(); as o) {
+        <dl class="facts">
+          <div class="fact">
+            <dt class="fact-label">{{ 'compliance.governance.Name' | translate }}</dt>
+            <dd class="fact-value">
+              {{ o.name }}
+              <span class="sub">{{ o.phone ?? '' }} {{ o.email ?? '' }}</span>
+            </dd>
+          </div>
+          <div class="fact">
+            <dt class="fact-label">{{ 'compliance.governance.Appointed on' | translate }}</dt>
+            <dd class="fact-value">
+              {{ (o.appointedOn | adToBs) || o.appointedOn }}
+              <span class="sub">{{ o.boardDecision ?? '' }}</span>
+            </dd>
+          </div>
+          <div class="fact">
+            <dt class="fact-label">{{ 'compliance.governance.FIU-Nepal told' | translate }}</dt>
+            <dd class="fact-value">
+              @if (o.notifiedFiuOn) {
+                {{ (o.notifiedFiuOn | adToBs) || o.notifiedFiuOn }}
+              } @else if (canManage) {
+                <button mat-stroked-button type="button" (click)="notified(o, 'FIU')">
+                  {{ 'compliance.governance.Record the date' | translate }}
+                </button>
+              } @else {
+                —
+              }
+            </dd>
+          </div>
+          <div class="fact">
+            <dt class="fact-label">{{ 'compliance.governance.Department told' | translate }}</dt>
+            <dd class="fact-value">
+              @if (o.notifiedDepartmentOn) {
+                {{ (o.notifiedDepartmentOn | adToBs) || o.notifiedDepartmentOn }}
+              } @else if (canManage) {
+                <button mat-stroked-button type="button" (click)="notified(o, 'DEPARTMENT')">
+                  {{ 'compliance.governance.Record the date' | translate }}
+                </button>
+              } @else {
+                —
+              }
+            </dd>
+          </div>
+        </dl>
+      } @else {
+        <p class="empty">{{ 'compliance.governance.noOfficer' | translate }}</p>
+      }
+      @if (canManage) {
+        <div class="actions">
+          <button mat-stroked-button color="primary" type="button" (click)="appoint()" [disabled]="busy()">
+            {{
+              (officer() ? 'compliance.governance.Record a new officer' : 'compliance.governance.Record the officer')
+                | translate
+            }}
+          </button>
+        </div>
+      }
+      @if (pastOfficers().length) {
+        <details class="earlier">
+          <summary>{{ 'compliance.governance.Earlier officers' | translate }}</summary>
+          <ul class="plain-list">
+            @for (o of pastOfficers(); track o.id) {
+              <li>
+                {{ o.name }}
+                <span class="sub"
+                  >{{ (o.appointedOn | adToBs) || o.appointedOn }} – {{ (o.endedOn ?? '' | adToBs) || o.endedOn }}</span
+                >
+              </li>
+            }
+          </ul>
+        </details>
+      }
+    </section>
+
+    <section class="frame">
+      <h2 class="legend">{{ 'compliance.governance.Board reviews' | translate }}</h2>
+      <p class="hint">
+        {{ 'compliance.governance.reviewsLead' | translate }}
+        @if (g.reviewDueOn) {
+          {{ 'compliance.governance.Next due' | translate }} {{ (g.reviewDueOn | adToBs) || g.reviewDueOn }}.
+        }
+      </p>
+      @if (canManage) {
+        <div class="actions top">
+          <button mat-stroked-button color="primary" type="button" (click)="recordReview()" [disabled]="busy()">
+            {{ 'compliance.governance.Record a board review' | translate }}
+          </button>
+        </div>
+      }
+      <ul class="plain-list">
+        @for (r of g.reviews; track r.id) {
+          <li>
+            <button mat-button type="button" (click)="showReview(r)">
+              {{ (r.metOn | adToBs) || r.metOn }} · {{ r.minuteReference ?? '' }}
+            </button>
+            <span class="sub"
+              >{{ 'compliance.governance.Period' | translate }} {{ (r.periodFrom | adToBs) || r.periodFrom }} –
+              {{ (r.periodTo | adToBs) || r.periodTo }}</span
+            >
+            @if (review()?.id === r.id) {
+              @if (review()?.notes) {
+                <p class="note">{{ review()?.notes }}</p>
+              }
+              <dl class="pack">
+                @for (k of packKeys(); track k) {
+                  <div>
+                    <dt class="sub">{{ 'compliance.governance.pack.' + k | translate }}</dt>
+                    <dd>
+                      <b>{{ review()?.pack?.[k] }}</b>
+                    </dd>
+                  </div>
+                }
+              </dl>
+            }
+          </li>
+        } @empty {
+          <li class="empty">{{ 'compliance.governance.noReviews' | translate }}</li>
+        }
+      </ul>
+    </section>
+
+    <section class="frame">
+      <h2 class="legend">{{ 'compliance.governance.Action plan' | translate }}</h2>
+      @if (canManage) {
+        <div class="actions top">
+          <button mat-stroked-button type="button" (click)="planPicker.click()">
+            <mat-icon>attach_file</mat-icon
+            >{{ planFile()?.name ?? ('compliance.governance.Choose a document (optional)' | translate) }}
+          </button>
+          <input #planPicker type="file" hidden accept="image/*,application/pdf" (change)="pick('plan', $event)" />
+          <button mat-stroked-button color="primary" type="button" (click)="addPlan()" [disabled]="busy()">
+            {{ 'compliance.governance.Add the action plan' | translate }}
+          </button>
+        </div>
+      }
+      <ul class="plain-list">
+        @for (p of g.plans; track p.id) {
+          <li class="with-action">
+            <span>
+              <b>{{ label(p.fiscalYear) }}</b> · {{ p.summary }}
+              <span class="sub"
+                >{{ p.approvedOn ? (p.approvedOn | adToBs) || p.approvedOn : '' }} {{ p.boardDecision ?? '' }}</span
+              >
+            </span>
+            @if (p.fileName && canDownload) {
+              <button mat-button type="button" (click)="download('plans', p.id, p.fileName)">
+                <mat-icon>download</mat-icon>{{ p.fileName }}
+              </button>
+            }
+          </li>
+        } @empty {
+          <li class="empty">{{ 'compliance.governance.noPlans' | translate }}</li>
+        }
+      </ul>
+    </section>
+
+    <section class="frame">
+      <h2 class="legend">{{ 'compliance.governance.Self-declarations' | translate }}</h2>
+      @if (canManage) {
+        <div class="actions top">
+          <button mat-stroked-button type="button" (click)="declarationPicker.click()">
+            <mat-icon>attach_file</mat-icon
+            >{{ declarationFile()?.name ?? ('compliance.governance.Choose a document (optional)' | translate) }}
+          </button>
+          <input
+            #declarationPicker
+            type="file"
+            hidden
+            accept="image/*,application/pdf"
+            (change)="pick('declaration', $event)"
+          />
+          <button mat-stroked-button color="primary" type="button" (click)="addDeclaration()" [disabled]="busy()">
+            {{ 'compliance.governance.Record a declaration' | translate }}
+          </button>
+        </div>
+      }
+      <ul class="plain-list">
+        @for (d of g.declarations; track d.id) {
+          <li class="with-action">
+            <span>
+              <b>{{ d.personName }}</b> · {{ 'compliance.governance.role.' + d.role | translate }}
+              <span class="sub">{{ (d.declaredOn | adToBs) || d.declaredOn }} {{ d.note ?? '' }}</span>
+            </span>
+            @if (d.fileName && canDownload) {
+              <button mat-button type="button" (click)="download('declarations', d.id, d.fileName)">
+                <mat-icon>download</mat-icon>{{ d.fileName }}
+              </button>
+            }
+          </li>
+        } @empty {
+          <li class="empty">{{ 'compliance.governance.noDeclarations' | translate }}</li>
+        }
+      </ul>
+    </section>
+
+    @if (g.staffActions) {
+      <section class="frame">
+        <h2 class="legend">{{ 'compliance.governance.Recommendations about staff' | translate }}</h2>
+        @if (canManage) {
+          <div class="actions top">
+            <button mat-stroked-button color="primary" type="button" (click)="recommend()" [disabled]="busy()">
+              {{ 'compliance.governance.Recommend action about staff' | translate }}
+            </button>
+          </div>
+        }
+        <ul class="plain-list">
+          @for (a of g.staffActions; track a.id) {
+            <li class="with-action">
+              <span>
+                <b>{{ a.staffName }}</b> · {{ a.recommendation }}
+                <span class="sub"
+                  >{{ (a.recommendedOn | adToBs) || a.recommendedOn }} ·
+                  {{ 'compliance.governance.to.' + a.recommendedTo | translate }}</span
+                >
+                @if (a.outcome) {
+                  <span class="sub"
+                    >{{ 'compliance.governance.Done' | translate }}: {{ a.outcome }}
+                    {{ (a.outcomeOn ?? '' | adToBs) || a.outcomeOn }}</span
+                  >
+                }
+              </span>
+              @if (!a.outcome && canManage) {
+                <button mat-stroked-button type="button" (click)="outcome(a)">
+                  {{ 'compliance.governance.Record what was done' | translate }}
+                </button>
+              }
+            </li>
+          } @empty {
+            <li class="empty">{{ 'compliance.governance.noRecommendations' | translate }}</li>
+          }
+        </ul>
+      </section>
+    }
+
+    <section class="frame">
+      <h2 class="legend">{{ 'compliance.governance.Training' | translate }}</h2>
+      @if (canManage) {
+        <div class="actions top">
+          <button mat-stroked-button color="primary" type="button" (click)="addTraining()" [disabled]="busy()">
+            {{ 'compliance.governance.Record training' | translate }}
+          </button>
+        </div>
+      }
+      <ul class="plain-list">
+        @for (t of g.trainings; track t.id) {
+          <li>
+            <b>{{ t.topic }}</b> · {{ 'compliance.governance.audience.' + t.audience | translate }}
+            @if (t.attendees) {
+              · {{ t.attendees }} {{ 'compliance.governance.people' | translate }}
+            }
+            <span class="sub">{{ (t.heldOn | adToBs) || t.heldOn }} {{ t.givenBy ?? '' }}</span>
+          </li>
+        } @empty {
+          <li class="empty">{{ 'compliance.governance.noTraining' | translate }}</li>
+        }
+      </ul>
+    </section>
+  } @else {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
+</div>

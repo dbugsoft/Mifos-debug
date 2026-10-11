@@ -6,8 +6,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { Component, effect, inject } from '@angular/core';
-
+import { Component, EventEmitter, Output, effect, inject } from '@angular/core';
+import { MatStepperModule } from '@angular/material/stepper';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
@@ -31,8 +31,11 @@ import { CoopAuthService } from '../../services/coop-auth.service';
 import { CoopTokenService } from '../../services/coop-token.service';
 
 import { CoopLocation, CoopProfile, CoopProfileService } from '../../services/coop-profile.service';
+import { CoopDocumentService } from '../../services/coop-document.service';
 import { CoopNavbarComponent } from '../../coop-navbar/coop-navbar.component';
+import { CoopSystemStatusComponent } from '../coop-system-status/coop-system-status.component';
 import { locationsQueryOptions, profileQueryOptions } from '../../queries/coop-profile.queries';
+import { myDocumentsQueryOptions } from '../../queries/coop-document.queries';
 import { coopQueryKeys } from '../../queries/coop-query-keys';
 import { extractCoopErrorMessage } from '../../queries/coop-error.util';
 
@@ -48,9 +51,9 @@ import { extractCoopErrorMessage } from '../../queries/coop-error.util';
     MatInputModule,
     MatButtonModule,
     MatSelectModule,
-    RouterLink,
-    RouterLinkActive,
-    CoopNavbarComponent
+    MatStepperModule,
+    CoopNavbarComponent,
+    CoopSystemStatusComponent
   ],
 
   templateUrl: './coop-profile.component.html',
@@ -65,6 +68,8 @@ export class CoopProfileComponent {
   private fb = inject(FormBuilder);
 
   private coopProfileService = inject(CoopProfileService);
+
+  private documentService = inject(CoopDocumentService);
 
   private router = inject(Router);
 
@@ -81,6 +86,16 @@ export class CoopProfileComponent {
   private profileQuery = injectQuery(() => profileQueryOptions(this.coopProfileService));
 
   private locationsQuery = injectQuery(() => locationsQueryOptions(this.coopProfileService));
+
+  /**
+   * The applicant's own uploaded documents - whether this is
+   * non-empty is what `hasSubmittedDocuments` below is derived from.
+   * Using a query here (rather than a one-off subscribe) means a
+   * transient failure on the very first load after login is retried
+   * automatically instead of leaving `hasSubmittedDocuments` stuck at
+   * `false` until the user happens to revisit the Documents step.
+   */
+  private documentsQuery = injectQuery(() => myDocumentsQueryOptions(this.documentService));
 
   private createProfileMutation = injectMutation(() => ({
     mutationFn: (profile: CoopProfile) => firstValueFrom(this.coopProfileService.createProfile(profile)),
@@ -107,10 +122,40 @@ export class CoopProfileComponent {
   }));
 
   // =====================================================
+  // STEPPER
+  // =====================================================
+
+  /**
+   * Emitted by the "Next" button (see `onNextClick`) once the profile
+   * save this component already does succeeds - lets the profile
+   * stepper shell advance to Documents without duplicating any of
+   * this component's own validation/save logic.
+   */
+  @Output()
+  nextStep = new EventEmitter<void>();
+
+  /**
+   * Emitted by the "Back" button, shown only when `profileStatus` is
+   * ACTIVE - lets the stepper shell return to the full-page activation
+   * welcome (Congratulations) screen. PENDING/PROVISIONED profiles have
+   * no such button, since their status is already shown inline above
+   * this form (see `mifosx-coop-system-status` in the template).
+   */
+  @Output()
+  previousStep = new EventEmitter<void>();
+
+  // =====================================================
   // UI STATE
   // =====================================================
 
   isSubmitting = false;
+
+  /**
+   * True for the 3s the success banner is shown after a save, before
+   * the stepper's "Next" advances - keeps the button disabled so a
+   * second click can't fire during that wait.
+   */
+  isAdvancing = false;
 
   successMessage = '';
 
@@ -134,6 +179,23 @@ export class CoopProfileComponent {
   isActive = false;
   profileStatus = '';
 
+  /**
+   * True once the applicant has uploaded at least one document in the
+   * Documents step - the signal that the two-step registration was
+   * actually completed, not just the General Information step. The
+   * backend already creates a PENDING record as soon as General
+   * Information is saved (see `onNextClick`/`onSubmit`), so without
+   * this check, clicking Next then Back would surface "PENDING"
+   * before the user has finished the form at all. Read directly off
+   * `documentsQuery` (rather than copied into a field by an effect)
+   * so it reflects the query's own retry/refetch results the moment
+   * they land, including on the very first load after login.
+   */
+  get hasSubmittedDocuments(): boolean {
+    return (this.documentsQuery.data()?.length ?? 0) > 0;
+  }
+
+  private originalProfile: CoopProfile | null = null;
   // =====================================================
   // LOCATION DATA
   // =====================================================
@@ -156,6 +218,17 @@ export class CoopProfileComponent {
     return this.locationsQuery.isPending();
   }
 
+  /**
+   * True only while the profile (and its address dropdown data) are
+   * being fetched for the very first time - drives the shimmer
+   * skeleton. Becomes false as soon as either query settles
+   * (success or error), matching how the existing effects already
+   * treat isPending() as "no usable data yet".
+   */
+  get initialLoading(): boolean {
+    return this.profileQuery.isPending() || this.locationsQuery.isPending();
+  }
+
   // =====================================================
   // PROFILE FORM
   // =====================================================
@@ -168,12 +241,18 @@ export class CoopProfileComponent {
 
     nameNp: [
       '',
-      Validators.required
+      [
+        Validators.required,
+        Validators.pattern(/^[\u0900-\u097F\s।,()-]+$/)
+      ]
     ],
 
     nameEn: [
       '',
-      Validators.required
+      [
+        Validators.required,
+        Validators.pattern(/^[A-Za-z]+(?:[A-Za-z&.]+| [A-Za-z&.]+)*$/)
+      ]
     ],
 
     dateOfRegistered: [
@@ -183,7 +262,10 @@ export class CoopProfileComponent {
 
     panNo: [
       '',
-      Validators.required
+      [
+        Validators.required,
+        Validators.pattern(/^\d{9}$/)
+      ]
     ],
 
     provinceId: [
@@ -202,11 +284,15 @@ export class CoopProfileComponent {
     ],
 
     wardNo: [
-      null as number | null
+      null as number | null,
+      Validators.required
     ],
 
     tole: [
-      ''
+      '',
+      [
+        Validators.pattern(/^[A-Za-z]+(?: [A-Za-z]+)*$/)
+      ]
     ],
 
     houseNo: [
@@ -215,14 +301,40 @@ export class CoopProfileComponent {
 
     mobilePhone: [
       '',
-      Validators.required
+      [
+        Validators.required,
+        Validators.pattern(/^(97|98)\d{8}$/)
+      ]
     ],
 
     officePhone: [
       ''
     ],
+    totalMaleMembers: [
+      0,
+      [
+        Validators.required,
+        Validators.min(0)
+      ]
+    ],
 
-    logoUrl: [
+    totalFemaleMembers: [
+      0,
+      [
+        Validators.required,
+        Validators.min(0)
+      ]
+    ],
+
+    totalOtherMembers: [
+      0,
+      [
+        Validators.required,
+        Validators.min(0)
+      ]
+    ],
+
+    webUrl: [
       ''
     ],
 
@@ -253,16 +365,35 @@ export class CoopProfileComponent {
       const profile = this.profileQuery.data();
 
       if (profile) {
+        // Keep the original server data for change detection.
+        this.originalProfile = structuredClone(profile);
+
         this.profileForm.patchValue(profile);
 
-        // patchValue() should not make the form dirty.
         this.profileForm.markAsPristine();
 
         this.isEditMode = true;
 
         this.profileStatus = profile.status ?? '';
-
         this.isActive = profile.status === 'ACTIVE' || profile.status === 'PROVISIONED';
+
+        // ================================================
+        // PROFILE EDIT MODE BASED ON STATUS
+        // ================================================
+
+        if (this.isActive) {
+          // PROVISIONED / ACTIVE
+          // Existing profile is view-only.
+          this.profileForm.disable({
+            emitEvent: false
+          });
+        } else {
+          // PENDING
+          // Existing profile can still be edited.
+          this.profileForm.enable({
+            emitEvent: false
+          });
+        }
 
         if (this.locations.length > 0) {
           this.buildLocationDropdowns(profile);
@@ -276,9 +407,17 @@ export class CoopProfileComponent {
         if (this.isNoProfileError(this.profileQuery.error())) {
           this.isEditMode = false;
 
+          this.profileStatus = '';
+
+          this.isActive = false;
+
+          // New profile must be editable.
+          this.profileForm.enable({
+            emitEvent: false
+          });
+
           return;
         }
-
         this.errorMessage = extractCoopErrorMessage(this.profileQuery.error(), 'Unable to load cooperative profile.');
       }
     });
@@ -544,6 +683,332 @@ export class CoopProfileComponent {
 
     this.setWards(localLevelId);
   }
+  //English Name Validation
+  onEnglishKeydown(event: KeyboardEvent): void {
+    const allowedKeys = [
+      'Backspace',
+      'Delete',
+      'ArrowLeft',
+      'ArrowRight',
+      'ArrowUp',
+      'ArrowDown',
+      'Home',
+      'End',
+      'Tab'
+    ];
+
+    // Editing/navigation keys
+    if (allowedKeys.includes(event.key)) {
+      return;
+    }
+
+    // Ctrl/Cmd shortcuts: copy, paste, cut, select all
+    if (event.ctrlKey || event.metaKey) {
+      return;
+    }
+
+    // English letters
+    if (/^[A-Za-z]$/.test(event.key)) {
+      return;
+    }
+
+    // Space
+    if (event.key === ' ') {
+      return;
+    }
+
+    // Allowed special characters
+    if (event.key === '&' || event.key === '.') {
+      return;
+    }
+
+    // Everything else blocked
+    event.preventDefault();
+  }
+  onEnglishInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+
+    const englishOnly = input.value.replace(/[^A-Za-z &.]/g, '');
+
+    if (input.value !== englishOnly) {
+      input.value = englishOnly;
+
+      this.profileForm.get('nameEn')?.setValue(englishOnly, { emitEvent: false });
+    }
+  }
+
+  onNepaliKeydown(event: KeyboardEvent): void {
+    const allowedKeys = [
+      'Backspace',
+      'Delete',
+      'ArrowLeft',
+      'ArrowRight',
+      'ArrowUp',
+      'ArrowDown',
+      'Home',
+      'End',
+      'Tab'
+    ];
+
+    // Backspace, delete, arrow keys etc. allow
+    if (allowedKeys.includes(event.key)) {
+      return;
+    }
+
+    // Ctrl+C, Ctrl+V, Ctrl+A, Cmd+C, Cmd+V etc.
+    if (event.ctrlKey || event.metaKey) {
+      return;
+    }
+
+    // Space allow
+    if (event.key === ' ') {
+      return;
+    }
+
+    // Nepali Unicode characters allow
+    if (/[\u0900-\u097F]/.test(event.key)) {
+      return;
+    }
+
+    // Everything else block
+    event.preventDefault();
+  }
+  onNepaliInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+
+    // Keep only Nepali Unicode characters, spaces and allowed punctuation
+    const nepaliOnly = input.value.replace(/[^\u0900-\u097F\s।,()-]/g, '');
+
+    if (input.value !== nepaliOnly) {
+      input.value = nepaliOnly;
+
+      this.profileForm.get('nameNp')?.setValue(nepaliOnly, { emitEvent: false });
+    }
+  }
+  //date format
+  onDateInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+
+    let value = input.value.replace(/\D/g, '');
+
+    // Maximum 8 digits: YYYYMMDD
+    value = value.substring(0, 8);
+
+    let formatted = value;
+
+    if (value.length >= 4) {
+      formatted = value.substring(0, 4) + '-';
+
+      if (value.length > 4) {
+        formatted += value.substring(4, 6);
+      }
+
+      if (value.length >= 6) {
+        formatted += '-';
+
+        if (value.length > 6) {
+          formatted += value.substring(6, 8);
+        }
+      }
+    }
+
+    this.profileForm.get('dateOfRegistered')?.setValue(formatted, { emitEvent: false });
+  }
+
+  onDateKeydown(event: KeyboardEvent): void {
+    const input = event.target as HTMLInputElement;
+
+    if (event.key === 'Backspace') {
+      const cursorPosition = input.selectionStart ?? 0;
+
+      // If cursor is immediately after "-", delete the "-" and
+      // allow the previous digit to be deleted naturally.
+      if (cursorPosition > 0 && input.value.charAt(cursorPosition - 1) === '-') {
+        event.preventDefault();
+
+        const newValue = input.value.substring(0, cursorPosition - 1) + input.value.substring(cursorPosition);
+
+        this.profileForm.get('dateOfRegistered')?.setValue(newValue, { emitEvent: false });
+
+        setTimeout(() => {
+          input.setSelectionRange(cursorPosition - 1, cursorPosition - 1);
+        });
+      }
+    }
+  }
+  //Pan key
+  onPanKeydown(event: KeyboardEvent): void {
+    const allowedKeys = [
+      'Backspace',
+      'Delete',
+      'ArrowLeft',
+      'ArrowRight',
+      'ArrowUp',
+      'ArrowDown',
+      'Home',
+      'End',
+      'Tab'
+    ];
+
+    if (allowedKeys.includes(event.key)) {
+      return;
+    }
+
+    // Copy, paste, cut, select all
+    if (event.ctrlKey || event.metaKey) {
+      return;
+    }
+
+    // Only digits 0-9
+    if (/^\d$/.test(event.key)) {
+      return;
+    }
+
+    // Block everything else
+    event.preventDefault();
+  }
+
+  onPanInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+
+    const digitsOnly = input.value.replace(/\D/g, '').slice(0, 9);
+
+    if (input.value !== digitsOnly) {
+      input.value = digitsOnly;
+
+      this.profileForm.get('panNo')?.setValue(digitsOnly, { emitEvent: false });
+    }
+  }
+
+  // Member count fields: plain text inputs (digits only) instead of
+  // type="number", which shows native spin-button arrows.
+  onMemberCountKeydown(event: KeyboardEvent): void {
+    const allowedKeys = [
+      'Backspace',
+      'Delete',
+      'ArrowLeft',
+      'ArrowRight',
+      'ArrowUp',
+      'ArrowDown',
+      'Home',
+      'End',
+      'Tab'
+    ];
+
+    if (allowedKeys.includes(event.key)) {
+      return;
+    }
+
+    if (event.ctrlKey || event.metaKey) {
+      return;
+    }
+
+    if (/^\d$/.test(event.key)) {
+      return;
+    }
+
+    event.preventDefault();
+  }
+
+  onMemberCountInput(event: Event, controlName: 'totalMaleMembers' | 'totalFemaleMembers' | 'totalOtherMembers'): void {
+    const input = event.target as HTMLInputElement;
+
+    const digitsOnly = input.value.replace(/\D/g, '');
+
+    if (input.value !== digitsOnly) {
+      input.value = digitsOnly;
+    }
+
+    this.profileForm.get(controlName)?.setValue(digitsOnly === '' ? 0 : Number(digitsOnly), { emitEvent: false });
+  }
+
+  //Tole validation
+  onToleKeydown(event: KeyboardEvent): void {
+    const allowedKeys = [
+      'Backspace',
+      'Delete',
+      'ArrowLeft',
+      'ArrowRight',
+      'ArrowUp',
+      'ArrowDown',
+      'Home',
+      'End',
+      'Tab'
+    ];
+
+    if (allowedKeys.includes(event.key)) {
+      return;
+    }
+
+    // Copy, paste, cut, select all
+    if (event.ctrlKey || event.metaKey) {
+      return;
+    }
+
+    // English letters only
+    if (/^[A-Za-z]$/.test(event.key)) {
+      return;
+    }
+
+    // Space
+    if (event.key === ' ') {
+      return;
+    }
+
+    event.preventDefault();
+  }
+  onToleInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+
+    const lettersOnly = input.value.replace(/[^A-Za-z ]/g, '');
+
+    if (input.value !== lettersOnly) {
+      input.value = lettersOnly;
+
+      this.profileForm.get('tole')?.setValue(lettersOnly, { emitEvent: false });
+    }
+  }
+  //Mobile number validation
+  onMobileKeydown(event: KeyboardEvent): void {
+    const allowedKeys = [
+      'Backspace',
+      'Delete',
+      'ArrowLeft',
+      'ArrowRight',
+      'ArrowUp',
+      'ArrowDown',
+      'Home',
+      'End',
+      'Tab'
+    ];
+
+    if (allowedKeys.includes(event.key)) {
+      return;
+    }
+
+    // Copy, paste, cut, select all
+    if (event.ctrlKey || event.metaKey) {
+      return;
+    }
+
+    // Numbers only
+    if (/^\d$/.test(event.key)) {
+      return;
+    }
+
+    event.preventDefault();
+  }
+  onMobileInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+
+    const numbersOnly = input.value.replace(/\D/g, '').slice(0, 10);
+
+    if (input.value !== numbersOnly) {
+      input.value = numbersOnly;
+
+      this.profileForm.get('mobilePhone')?.setValue(numbersOnly, { emitEvent: false });
+    }
+  }
 
   onLogoSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -622,30 +1087,60 @@ export class CoopProfileComponent {
   private getChangedFields(): Partial<CoopProfile> {
     const changedFields: Partial<CoopProfile> = {};
 
-    const rawValue = this.profileForm.getRawValue();
+    const current = this.profileForm.getRawValue() as Partial<CoopProfile>;
 
-    Object.keys(this.profileForm.controls).forEach((key) => {
-      const controlKey = key as keyof CoopProfile;
+    if (!this.originalProfile) {
+      return changedFields;
+    }
 
-      const control = this.profileForm.get(controlKey);
+    const fields = [
+      'coopRegdNo',
+      'nameNp',
+      'nameEn',
+      'dateOfRegistered',
+      'panNo',
+      'provinceId',
+      'districtId',
+      'localLevelId',
+      'wardNo',
+      'tole',
+      'houseNo',
+      'mobilePhone',
+      'officePhone',
+      'totalMaleMembers',
+      'totalFemaleMembers',
+      'totalOtherMembers',
+      'webUrl',
+      'about',
+      'remarks'
+    ] as const;
 
-      if (control?.dirty) {
-        (changedFields as any)[controlKey] = (rawValue as any)[controlKey];
+    for (const field of fields) {
+      const currentValue = current[field];
+      const originalValue = this.originalProfile[field];
+
+      if (String(currentValue ?? '') !== String(originalValue ?? '')) {
+        changedFields[field] = currentValue as never;
       }
-    });
+    }
+
+    console.log('ORIGINAL PROFILE:', this.originalProfile);
+    console.log('CURRENT PROFILE:', current);
+    console.log('CHANGED FIELDS:', changedFields);
 
     return changedFields;
   }
-
   // =====================================================
   // SUBMIT
   // =====================================================
 
-  onSubmit(): void {
-    if (this.isActive) {
-      return;
-    }
-
+  /**
+   * `onSuccess` is optional and only used by the profile stepper's "Next"
+   * button, which needs to know when the save actually completed before it
+   * advances to the Documents step. The plain form submit (`(ngSubmit)`)
+   * calls this with no argument, so its behavior is unchanged.
+   */
+  onSubmit(onSuccess?: () => void): void {
     this.successMessage = '';
 
     this.errorMessage = '';
@@ -653,6 +1148,23 @@ export class CoopProfileComponent {
     // -----------------------------------------------
     // VALIDATION
     // -----------------------------------------------
+    // Runs unconditionally - including when `isActive` - so the
+    // stepper's "Next" button can never advance past invalid/empty
+    // required fields regardless of profile status.
+
+    // ================================================
+    // READ-ONLY PROFILE
+    // ================================================
+
+    if (this.isActive) {
+      onSuccess?.();
+
+      return;
+    }
+
+    // ================================================
+    // VALIDATION
+    // ================================================
 
     if (this.profileForm.invalid) {
       this.profileForm.markAllAsTouched();
@@ -676,7 +1188,7 @@ export class CoopProfileComponent {
       if (Object.keys(changedFields).length === 0) {
         this.isSubmitting = false;
 
-        this.successMessage = 'No changes to save.';
+        onSuccess?.();
 
         return;
       }
@@ -689,9 +1201,11 @@ export class CoopProfileComponent {
         onSuccess: () => {
           this.isSubmitting = false;
 
-          this.successMessage = 'Cooperative profile updated successfully.';
+          this.successMessage = 'Profile updated successfully.';
 
           this.profileForm.markAsPristine();
+
+          this.advanceAfterSuccessMessage(onSuccess);
         },
 
         onError: (error) => {
@@ -719,6 +1233,8 @@ export class CoopProfileComponent {
         this.isEditMode = true;
 
         this.profileForm.markAsPristine();
+
+        this.advanceAfterSuccessMessage(onSuccess);
       },
 
       onError: (error) => {
@@ -727,5 +1243,43 @@ export class CoopProfileComponent {
         this.errorMessage = extractCoopErrorMessage(error, 'Unable to create profile. Please try again.');
       }
     });
+  }
+
+  /**
+   * Keeps the green `.success-message` banner on screen for 3s before
+   * calling `onSuccess` - a single "Next" click both saves and advances,
+   * but advancing instantly made the save look like it hadn't happened
+   * (the page changes before the confirmation is even readable). The
+   * button stays disabled (`isAdvancing`) for that same window so a
+   * second click can't fire mid-wait.
+   */
+  private advanceAfterSuccessMessage(onSuccess?: () => void): void {
+    this.isAdvancing = true;
+
+    setTimeout(() => {
+      this.isAdvancing = false;
+
+      onSuccess?.();
+    }, 3000);
+  }
+
+  // =====================================================
+  // NEXT (STEPPER)
+  // =====================================================
+
+  /**
+   * `onSubmit` already does everything this button needs - validation
+   * (stays put + shows errors if invalid), the isActive shortcut, the
+   * "no changes" shortcut, and the actual create/update call - so this
+   * only needs to pass a callback for what happens once all of that
+   * succeeds. Re-checking validity or re-computing changed fields here
+   * would just duplicate that logic and risk them drifting apart.
+   */
+  onNextClick(): void {
+    this.onSubmit(() => this.nextStep.emit());
+  }
+
+  goBack(): void {
+    this.previousStep.emit();
   }
 }

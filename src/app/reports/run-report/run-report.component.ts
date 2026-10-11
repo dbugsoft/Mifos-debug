@@ -10,11 +10,14 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
+import { finalize } from 'rxjs/operators';
 import { AbstractControl, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 
 /** Custom Services */
 import { ReportsService } from '../reports.service';
 import { SettingsService } from 'app/settings/settings.service';
+import { AuthenticationService } from 'app/core/authentication/authentication.service';
+import { ReportPreferencesService } from '../report-preferences.service';
 
 /** Custom Models */
 import { ReportParameter } from '../common-models/report-parameter.model';
@@ -22,17 +25,24 @@ import { SelectOption } from '../common-models/select-option.model';
 import { Dates } from 'app/core/utils/dates';
 import { GlobalConfiguration } from 'app/system/configurations/global-configurations-tab/configuration.model';
 
-import * as ExcelJS from 'exceljs';
-import { AlertService } from 'app/core/alert/alert.service';
-import { TranslateService } from '@ngx-translate/core';
 import { NgSwitch, NgSwitchCase } from '@angular/common';
 import { MatCheckbox } from '@angular/material/checkbox';
-import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { TableAndSmsComponent } from './table-and-sms/table-and-sms.component';
 import { ChartComponent } from './chart/chart.component';
 import { PentahoComponent } from './pentaho/pentaho.component';
 import { BirtComponent } from './birt/birt.component';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { MatIcon } from '@angular/material/icon';
+import { MatIconButton } from '@angular/material/button';
+import { MatTooltip } from '@angular/material/tooltip';
+
+/** Report types light enough to run as soon as they open. */
+const AUTO_RUN_TYPES = [
+  'Table',
+  'Chart'
+];
+/** Select option id Fineract uses for "All". */
+const ALL_OPTION_ID = '-1';
 
 /**
  * Run report component.
@@ -46,21 +56,23 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     NgSwitch,
     NgSwitchCase,
     MatCheckbox,
-    FaIconComponent,
     TableAndSmsComponent,
     ChartComponent,
     PentahoComponent,
-    BirtComponent
+    BirtComponent,
+    MatIcon,
+    MatIconButton,
+    MatTooltip
   ]
 })
 export class RunReportComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private reportsService = inject(ReportsService);
   private settingsService = inject(SettingsService);
-  private alertService = inject(AlertService);
-  private translateService = inject(TranslateService);
   private dateUtils = inject(Dates);
   private destroyRef = inject(DestroyRef);
+  private authenticationService = inject(AuthenticationService);
+  private preferences = inject(ReportPreferencesService);
 
   /** Minimum date allowed. */
   minDate = new Date(2000, 0, 1);
@@ -83,8 +95,14 @@ export class RunReportComponent implements OnInit {
   /** Static Form control for decimal places in output */
   decimalChoice = new FormControl();
 
-  /** Toggles Report form */
-  isCollapsed = false;
+  /** Whether the report has been run, which shows the output. */
+  hasRun = false;
+  /** Select option requests still in flight; defaults and auto-run wait for them. */
+  private pendingOptions = 0;
+  /** Set until the first automatic run has been attempted. */
+  private autoRunPending = false;
+  /** Set on destroy, so option requests torn down by leaving the page don't trigger a run. */
+  private destroyed = false;
   /** Toggles  Table output. */
   hideTable = true;
   /** Toggles Chart output */
@@ -100,8 +118,6 @@ export class RunReportComponent implements OnInit {
   exportToS3Repository: string;
   outputTypeOptions: any[] = [];
 
-  isProcessing = false;
-
   /**
    * Fetches report specifications from route params and retrieves report parameters data from `resolve`.
    * @param {ActivatedRoute} route ActivatedRoute.
@@ -113,9 +129,10 @@ export class RunReportComponent implements OnInit {
     this.report.name = this.route.snapshot.params['name'];
     this.route.queryParams
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((queryParams: { type: any; id: any }) => {
+      .subscribe((queryParams: { type: any; id: any; category: string }) => {
         this.report.type = queryParams.type;
         this.report.id = queryParams.id;
+        this.report.category = queryParams.category;
       });
     this.route.data
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -159,8 +176,102 @@ export class RunReportComponent implements OnInit {
    * Creates and sets the run report form.
    */
   ngOnInit() {
+    this.destroyRef.onDestroy(() => (this.destroyed = true));
     this.maxDate = this.settingsService.maxAllowedDate;
+    this.autoRunPending = this.canAutoRun();
     this.createRunReportForm();
+    this.applyDefaults();
+    this.maybeAutoRun();
+  }
+
+  /** Whether this report runs as soon as it opens. */
+  canAutoRun(): boolean {
+    return AUTO_RUN_TYPES.includes(this.report.type);
+  }
+
+  /** Where back leads: the reports tab the report was opened from. */
+  get backLink(): string[] {
+    return this.report.category ? [
+          '/reports',
+          this.report.category
+        ] : ['/reports'];
+  }
+
+  /** Whether this report is one of the user's favourites. */
+  get isFavourite(): boolean {
+    return this.preferences.isFavourite(this.report.id);
+  }
+
+  /** Stars or unstars this report. */
+  toggleFavourite() {
+    this.preferences.toggleFavourite(this.report.id);
+  }
+
+  /**
+   * Fills the non-select parameters: date ranges default to this month, single dates to today,
+   * text to the parameter's default value. Selects get theirs once their options load.
+   */
+  applyDefaults() {
+    this.paramData.forEach((param: ReportParameter) => {
+      const control = this.reportForm.get(param.name);
+      if (!control || control.value) {
+        return;
+      }
+      if (param.displayType === 'date') {
+        const today = this.maxDate && this.maxDate < new Date() ? new Date(this.maxDate) : new Date();
+        control.setValue(
+          this.isStartDateParam(param) && !this.isEndDateParam(param)
+            ? new Date(today.getFullYear(), today.getMonth(), 1)
+            : today
+        );
+      } else if (param.displayType === 'text' && param.defaultVal != null && param.defaultVal !== '') {
+        control.setValue(param.defaultVal);
+      }
+    });
+    if (this.isPentahoReport() || this.isBirtReport()) {
+      this.reportForm.get('outputType' as string)?.setValue('PDF');
+    }
+  }
+
+  /**
+   * Picks a select parameter's value from its loaded options, keeping the current choice when it is still offered.
+   * Otherwise: the user's own office for office parameters, the parameter's default, "All", or the only option.
+   * @param {ReportParameter} param Select parameter whose options just loaded.
+   */
+  applySelectDefault(param: ReportParameter) {
+    const control = this.reportForm.get(param.name);
+    const options: SelectOption[] = param.selectOptions || [];
+    if (!control || !options.length) {
+      return;
+    }
+    const byId = (id: any) =>
+      id != null && id !== '' ? options.find((option) => String(option.id) === String(id)) : undefined;
+    const isOfficeParam = `${param.name}${param.variable}`.toLowerCase().includes('officeid');
+    const choice =
+      byId(control.value?.id) ??
+      (isOfficeParam ? byId(this.authenticationService.getCredentials()?.officeId) : undefined) ??
+      byId(param.defaultVal) ??
+      byId(ALL_OPTION_ID) ??
+      (options.length === 1 ? options[0] : undefined);
+    if (choice && choice !== control.value) {
+      control.setValue(choice);
+    }
+  }
+
+  /**
+   * Runs the report once every select has its options, if it is light enough and every parameter has a value.
+   * Otherwise leaves the filters open with the missing ones marked.
+   */
+  maybeAutoRun() {
+    if (this.destroyed || !this.autoRunPending || this.pendingOptions > 0) {
+      return;
+    }
+    this.autoRunPending = false;
+    if (this.reportForm.valid) {
+      this.run();
+    } else {
+      this.reportForm.markAllAsTouched();
+    }
   }
 
   /**
@@ -335,7 +446,7 @@ export class RunReportComponent implements OnInit {
             } else {
               this.reportForm.addControl(child.name, new FormControl('', Validators.required));
             }
-            if (child.displayType === 'select') {
+            if (child.displayType === 'select' && option) {
               const inputstring = `${child.name}?${param.inputName}=${option.id}`;
               this.fetchSelectOptions(child, inputstring);
             }
@@ -350,12 +461,26 @@ export class RunReportComponent implements OnInit {
    * @param {string} inputstring url substring for API call.
    */
   fetchSelectOptions(param: ReportParameter, inputstring: string) {
-    this.reportsService.getSelectOptions(inputstring).subscribe((options: SelectOption[]) => {
-      param.selectOptions = options;
-      if (param.selectAll === 'Y') {
-        param.selectOptions.push({ id: '-1', name: 'All' });
-      }
-    });
+    this.pendingOptions++;
+    this.reportsService
+      .getSelectOptions(inputstring)
+      .pipe(
+        finalize(() => {
+          this.pendingOptions--;
+          if (this.destroyed) {
+            return;
+          }
+          this.maybeAutoRun();
+        }),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe((options: SelectOption[]) => {
+        param.selectOptions = options;
+        if (param.selectAll === 'Y') {
+          param.selectOptions.push({ id: ALL_OPTION_ID as any, name: 'All' });
+        }
+        this.applySelectDefault(param);
+      });
   }
 
   /**
@@ -412,7 +537,6 @@ export class RunReportComponent implements OnInit {
    * Core run report functionality.
    */
   run() {
-    this.isCollapsed = true;
     const userResponseValues = this.formatUserResponse(this.reportForm.value);
     let formData = {
       ...userResponseValues
@@ -433,6 +557,8 @@ export class RunReportComponent implements OnInit {
     } else {
       formData['exportS3'] = false;
     }
+    this.hasRun = true;
+    this.preferences.addRecent(this.report.id);
     this.dataObject = {
       formData: formData,
       report: this.report,
@@ -453,82 +579,5 @@ export class RunReportComponent implements OnInit {
         this.hideBirt = false;
         break;
     }
-  }
-
-  runReportAndExport($event: Event): void {
-    $event.stopPropagation();
-    this.isProcessing = true;
-    const userResponseValues = this.formatUserResponse(this.reportForm.value);
-
-    const reportName = this.report.name;
-    const payload = {
-      ...userResponseValues,
-      decimalChoice: this.decimalChoice.value
-      // exportCSV: true
-    };
-    this.reportsService.getRunReportData(reportName, payload).subscribe((res: any) => {
-      if (res.data.length > 0) {
-        this.alertService.alert({
-          type: this.translateService.instant('errors.report.type'),
-          message: this.translateService.instant('errors.report.generated', { reportName })
-        });
-
-        const displayedColumns: string[] = [];
-        res.columnHeaders.forEach((header: any) => {
-          displayedColumns.push(header.columnName);
-        });
-
-        this.exportToXLS(reportName, res.data, displayedColumns);
-      } else {
-        this.alertService.alert({
-          type: this.translateService.instant('errors.report.type'),
-          message: this.translateService.instant('errors.report.generatedNoData', { reportName })
-        });
-      }
-      this.isProcessing = false;
-    });
-  }
-
-  async exportToXLS(reportName: string, csvData: any, displayedColumns: string[]): Promise<void> {
-    const fileName = `${reportName}.xlsx`;
-
-    // Format data for ExcelJS
-    const data = csvData.map((object: any) => {
-      const row: Record<string, any> = {};
-      for (let i = 0; i < displayedColumns.length; i++) {
-        row[displayedColumns[i]] = object.row[i];
-      }
-      return row;
-    });
-
-    // Create workbook and worksheet
-    const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet('report');
-
-    // Add header
-    worksheet.addRow(displayedColumns);
-
-    // Add data rows
-    data.forEach((rowObj: any) => {
-      worksheet.addRow(displayedColumns.map((col) => rowObj[col]));
-    });
-
-    // Write to buffer and trigger download
-    const buffer = await workbook.xlsx.writeBuffer();
-    const blob = new Blob([buffer], {
-      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    });
-
-    // Native download logic (no FileSaver)
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = fileName;
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(() => {
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    }, 0);
   }
 }

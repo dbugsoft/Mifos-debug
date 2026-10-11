@@ -18,6 +18,7 @@ import { SettingsService } from 'app/settings/settings.service';
 import { Dates } from 'app/core/utils/dates';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { NepaliDateInputComponent } from 'app/shared/nepali-date-input/nepali-date-input.component';
 
 /**
  * Add Family Member Component
@@ -28,7 +29,8 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
   styleUrls: ['./add-family-member.component.scss'],
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
-    MatCheckbox
+    MatCheckbox,
+    NepaliDateInputComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -47,6 +49,15 @@ export class AddFamilyMemberComponent implements OnInit {
   minAge = 0;
   /** Add family member form. */
   addFamilyMemberForm: FormGroup;
+
+  /**
+   * The date of birth in Bikram Sambat, 'YYYY-MM-DD', as the picker reported it.
+   *
+   * It is posted as dateOfBirthBs so the server stores the date the user actually chose rather
+   * than one the browser converted. It is held outside the form because the form control carries
+   * the AD Date that the age calculation needs.
+   */
+  dateOfBirthBs: string | null = null;
   /** Add family member template. */
   addFamilyMemberTemplate: any;
   /** Client ID */
@@ -164,6 +175,7 @@ export class AddFamilyMemberComponent implements OnInit {
 
     const data = {
       ...formValue,
+      ...(prevDateOfBirth && this.dateOfBirthBs ? { dateOfBirthBs: this.dateOfBirthBs } : {}),
       dateFormat,
       locale
     };

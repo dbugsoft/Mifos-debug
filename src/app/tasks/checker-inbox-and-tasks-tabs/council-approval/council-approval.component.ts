@@ -36,6 +36,7 @@ import { SettingsService } from 'app/settings/settings.service';
 import { Dates } from 'app/core/utils/dates';
 import { TranslateService } from '@ngx-translate/core';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { MatIcon } from '@angular/material/icon';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { FormatNumberPipe } from '../../../pipes/format-number.pipe';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
@@ -84,6 +85,7 @@ interface ResolverData {
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
     FaIconComponent,
+    MatIcon,
     MatTable,
     MatColumnDef,
     MatHeaderCellDef,

@@ -1,0 +1,68 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<h2 mat-dialog-title>
+  {{
+    (isEdit ? 'clients.memberAddress.dialog.editTitle' : 'clients.memberAddress.dialog.addTitle')
+      | translate: { type: ('clients.memberAddress.types.' + data.addressType | translate) }
+  }}
+</h2>
+
+<mat-dialog-content class="dialog-content">
+  @if (isTemporary) {
+    <div class="same-as-permanent">
+      <mat-slide-toggle [formControl]="sameAsPermanent" data-testid="same-as-permanent">
+        {{ 'clients.memberAddress.labels.sameAsPermanent' | translate }}
+      </mat-slide-toggle>
+      @if (!canFollowPermanent) {
+        <p class="hint">{{ 'clients.memberAddress.hints.addPermanentFirst' | translate }}</p>
+      }
+    </div>
+  }
+
+  @if (followingPermanent() && data.permanentAddress) {
+    <div class="following">
+      <p class="hint">{{ 'clients.memberAddress.hints.followsPermanent' | translate }}</p>
+      <mifosx-member-address-summary [address]="data.permanentAddress"></mifosx-member-address-summary>
+    </div>
+  } @else {
+    @if (locations(); as index) {
+      <mifosx-member-address-fields
+        [form]="form"
+        [locations]="index"
+        [savedLocalLevelCode]="savedLocalLevelCode"
+      ></mifosx-member-address-fields>
+    } @else if (loadFailed()) {
+      <div class="load-failed" role="alert">
+        <p>{{ 'clients.memberAddress.errors.locationsUnavailable' | translate }}</p>
+        <button mat-stroked-button type="button" (click)="loadLocations()">
+          {{ 'clients.memberAddress.actions.retry' | translate }}
+        </button>
+      </div>
+    } @else {
+      <mat-progress-bar mode="indeterminate" [attr.aria-label]="'clients.memberAddress.labels.loading' | translate">
+      </mat-progress-bar>
+    }
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" mat-dialog-close [disabled]="saving()">
+    {{ 'labels.buttons.Cancel' | translate }}
+  </button>
+  <button
+    mat-raised-button
+    color="primary"
+    type="button"
+    (click)="save()"
+    [disabled]="!canSave()"
+    data-testid="save-address"
+  >
+    {{ (saving() ? 'clients.memberAddress.actions.saving' : 'clients.memberAddress.actions.save') | translate }}
+  </button>
+</mat-dialog-actions>

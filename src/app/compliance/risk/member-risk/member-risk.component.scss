@@ -1,0 +1,128 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+@use '../../compliance' as compliance;
+@use '../risk' as risk;
+
+@include compliance.page;
+@include risk.plain-rows;
+
+.head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px 16px;
+  padding-top: 16px;
+
+  .name {
+    margin: 0;
+    font-size: 1.35rem;
+  }
+
+  .grade {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: flex-start;
+    justify-content: flex-end;
+  }
+
+  .facts,
+  .actions {
+    grid-column: 1 / -1;
+  }
+}
+
+.chip.big {
+  padding: 2px 12px;
+  font-size: 0.875rem;
+  line-height: 24px;
+}
+
+.sub {
+  display: block;
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.frame-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.reasons,
+.plain-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    padding: 8px 0;
+    border-bottom: 1px solid rgb(127 127 127 / 15%);
+  }
+
+  li:last-child {
+    border-bottom: none;
+  }
+}
+
+.reasons li {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr) auto;
+  gap: 4px 12px;
+  align-items: start;
+
+  .basis {
+    color: var(--mat-sys-on-surface-variant);
+    font-size: 0.75rem;
+    white-space: nowrap;
+  }
+}
+
+.plain-list li.with-action {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.plain-list.ended {
+  opacity: 0.75;
+}
+
+.table-scroll table.plain-rows {
+  min-width: 480px;
+}
+
+@media (width <= 600px) {
+  .head {
+    grid-template-columns: minmax(0, 1fr);
+
+    .grade {
+      justify-content: flex-start;
+    }
+  }
+
+  .reasons li {
+    grid-template-columns: max-content minmax(0, 1fr);
+
+    .basis {
+      grid-column: 2;
+    }
+  }
+}

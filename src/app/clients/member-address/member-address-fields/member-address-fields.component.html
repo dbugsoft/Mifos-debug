@@ -1,0 +1,105 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="address-fields" [formGroup]="form()">
+  <mat-form-field appearance="outline">
+    <mat-label>{{ 'clients.memberAddress.fields.province' | translate }}</mat-label>
+    <mat-select formControlName="provinceCode" data-testid="address-province">
+      @for (province of provinces(); track province.code) {
+        <mat-option [value]="province.code">{{ label(province) }}</mat-option>
+      }
+    </mat-select>
+    @if (form().controls.provinceCode.hasError('required')) {
+      <mat-error>{{ 'clients.memberAddress.errors.provinceRequired' | translate }}</mat-error>
+    }
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>{{ 'clients.memberAddress.fields.district' | translate }}</mat-label>
+    <mat-select formControlName="districtCode" data-testid="address-district">
+      @for (district of districts(); track district.code) {
+        <mat-option [value]="district.code">{{ label(district) }}</mat-option>
+      }
+    </mat-select>
+    @if (form().controls.districtCode.disabled) {
+      <mat-hint>{{ 'clients.memberAddress.hints.chooseProvinceFirst' | translate }}</mat-hint>
+    }
+    @if (form().controls.districtCode.hasError('required')) {
+      <mat-error>{{ 'clients.memberAddress.errors.districtRequired' | translate }}</mat-error>
+    }
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>{{ 'clients.memberAddress.fields.localLevel' | translate }}</mat-label>
+    <mat-select formControlName="localLevelCode" data-testid="address-local-level">
+      @for (localLevel of localLevels(); track localLevel.code) {
+        <mat-option [value]="localLevel.code">
+          {{ label(localLevel) }}
+          @if (!localLevel.active) {
+            <span class="inactive">· {{ 'clients.memberAddress.labels.noLongerInUse' | translate }}</span>
+          }
+        </mat-option>
+      }
+    </mat-select>
+    @if (form().controls.localLevelCode.disabled) {
+      <mat-hint>{{ 'clients.memberAddress.hints.chooseDistrictFirst' | translate }}</mat-hint>
+    }
+    @if (form().controls.localLevelCode.hasError('required')) {
+      <mat-error>{{ 'clients.memberAddress.errors.localLevelRequired' | translate }}</mat-error>
+    }
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>{{ 'clients.memberAddress.fields.ward' | translate }}</mat-label>
+    <mat-select formControlName="wardNo" data-testid="address-ward">
+      @for (ward of wards(); track ward) {
+        <mat-option [value]="ward">{{ ward }}</mat-option>
+      }
+    </mat-select>
+    @if (form().controls.wardNo.disabled) {
+      <mat-hint>{{ 'clients.memberAddress.hints.chooseLocalLevelFirst' | translate }}</mat-hint>
+    }
+    @if (form().controls.wardNo.hasError('required')) {
+      <mat-error>{{ 'clients.memberAddress.errors.wardRequired' | translate }}</mat-error>
+    }
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>{{ 'clients.memberAddress.fields.tole' | translate }}</mat-label>
+    <input
+      matInput
+      formControlName="tole"
+      [maxlength]="limits.toleMaxLength"
+      autocomplete="off"
+      data-testid="address-tole"
+    />
+    <mat-hint>{{ 'clients.memberAddress.hints.optional' | translate }}</mat-hint>
+    @if (form().controls.tole.hasError('maxlength')) {
+      <mat-error>
+        {{ 'clients.memberAddress.errors.tooLong' | translate: { max: limits.toleMaxLength } }}
+      </mat-error>
+    }
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>{{ 'clients.memberAddress.fields.houseNumber' | translate }}</mat-label>
+    <input
+      matInput
+      formControlName="houseNumber"
+      [maxlength]="limits.houseNumberMaxLength"
+      autocomplete="off"
+      data-testid="address-house-number"
+    />
+    <mat-hint>{{ 'clients.memberAddress.hints.optional' | translate }}</mat-hint>
+    @if (form().controls.houseNumber.hasError('maxlength')) {
+      <mat-error>
+        {{ 'clients.memberAddress.errors.tooLong' | translate: { max: limits.houseNumberMaxLength } }}
+      </mat-error>
+    }
+  </mat-form-field>
+</div>

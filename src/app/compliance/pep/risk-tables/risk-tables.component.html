@@ -1,0 +1,162 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="compliance-page">
+  @if (allowed() === false) {
+    <p class="empty">{{ 'compliance.You have no compliance access' | translate }}</p>
+  } @else {
+    @if (busy()) {
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }
+    <p class="hint">{{ 'compliance.tables.lead' | translate }}</p>
+    @if (canEdit) {
+      <div class="regrade">
+        <button mat-stroked-button color="primary" type="button" (click)="regrade()" [disabled]="busy()">
+          {{ 'compliance.tables.Regrade everyone now' | translate }}
+        </button>
+        @if (regraded() !== null) {
+          <span class="hint">{{ 'compliance.tables.regraded' | translate: { count: regraded() } }}</span>
+        }
+      </div>
+    }
+
+    <section class="frame">
+      <h2 class="legend">{{ 'compliance.tables.Occupations' | translate }}</h2>
+      <div class="table-scroll">
+        <table class="grid">
+          <thead>
+            <tr>
+              <th>{{ 'compliance.tables.Occupation' | translate }}</th>
+              <th>{{ 'compliance.risk.Grade' | translate }}</th>
+              <th>{{ 'compliance.tables.Political post' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (o of occupations(); track o.occupationId) {
+              <tr>
+                <td>
+                  {{ o.occupation }}
+                  @if (o.updatedBy) {
+                    <span class="sub">{{ o.updatedBy }}</span>
+                  }
+                </td>
+                <td>
+                  @if (canEdit) {
+                    <mat-form-field subscriptSizing="dynamic" class="grade">
+                      <mat-select
+                        [value]="o.grade ?? ''"
+                        (selectionChange)="setOccupation(o, $event.value, o.pepOccupation)"
+                        [aria-label]="o.occupation"
+                      >
+                        <mat-option value="">{{ 'compliance.tables.No grade' | translate }}</mat-option>
+                        @for (g of grades; track g) {
+                          <mat-option [value]="g">{{ 'compliance.grade.' + g | translate }}</mat-option>
+                        }
+                      </mat-select>
+                    </mat-form-field>
+                  } @else {
+                    {{ o.grade ? ('compliance.grade.' + o.grade | translate) : '—' }}
+                  }
+                </td>
+                <td>
+                  <mat-checkbox
+                    [checked]="o.pepOccupation"
+                    [disabled]="!canEdit || o.grade !== 'HIGH' || busy()"
+                    (change)="setOccupation(o, o.grade, $event.checked)"
+                    [aria-label]="o.occupation"
+                  ></mat-checkbox>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <p class="hint">{{ 'compliance.tables.politicalHint' | translate }}</p>
+    </section>
+
+    <section class="frame">
+      <h2 class="legend">{{ 'compliance.tables.Areas' | translate }}</h2>
+      @if (areas().length) {
+        <ul class="areas">
+          @for (a of areas(); track a.level + a.code) {
+            <li>
+              <span>
+                <b>{{ a.name ?? a.code }}</b> · {{ 'compliance.grade.' + a.grade | translate }}
+                <span class="sub"
+                  >{{ 'compliance.tables.level.' + a.level | translate }}{{ a.note ? ' · ' + a.note : '' }}</span
+                >
+              </span>
+              @if (canEdit) {
+                <button mat-button type="button" (click)="removeArea(a)" [disabled]="busy()">
+                  {{ 'kym.Remove' | translate }}
+                </button>
+              }
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="empty">{{ 'compliance.tables.noAreas' | translate }}</p>
+      }
+      @if (canEdit && !canReadPlaces) {
+        <p class="hint">{{ 'compliance.tables.needsPlaces' | translate }}</p>
+      } @else if (canEdit) {
+        <div class="add-area">
+          <mat-form-field subscriptSizing="dynamic">
+            <mat-label>{{ 'compliance.tables.Province' | translate }}</mat-label>
+            <mat-select
+              [value]="province()"
+              (selectionChange)="province.set($event.value); district.set(null); localLevel.set(null)"
+            >
+              @for (p of provinces(); track p.code) {
+                <mat-option [value]="p.code">{{ p.nameEn }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field subscriptSizing="dynamic">
+            <mat-label>{{ 'compliance.tables.District' | translate }}</mat-label>
+            <mat-select [value]="district()" (selectionChange)="district.set($event.value); localLevel.set(null)">
+              @for (d of districts(); track d.code) {
+                <mat-option [value]="d.code">{{ d.nameEn }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field subscriptSizing="dynamic">
+            <mat-label>{{ 'compliance.tables.Local level' | translate }}</mat-label>
+            <mat-select [value]="localLevel()" (selectionChange)="localLevel.set($event.value)">
+              <mat-option [value]="null">{{ 'compliance.tables.The whole district' | translate }}</mat-option>
+              @for (l of localLevels(); track l.code) {
+                <mat-option [value]="l.code">{{ l.nameEn }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field subscriptSizing="dynamic">
+            <mat-label>{{ 'compliance.risk.Grade' | translate }}</mat-label>
+            <mat-select [value]="areaGrade()" (selectionChange)="areaGrade.set($event.value)">
+              @for (g of grades; track g) {
+                <mat-option [value]="g">{{ 'compliance.grade.' + g | translate }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field subscriptSizing="dynamic" class="note">
+            <mat-label>{{ 'compliance.risk.Note' | translate }}</mat-label>
+            <input matInput maxlength="500" [value]="areaNote()" (input)="areaNote.set($any($event.target).value)" />
+          </mat-form-field>
+          <button
+            mat-raised-button
+            color="primary"
+            type="button"
+            (click)="addArea()"
+            [disabled]="busy() || !district()"
+          >
+            {{ 'compliance.risk.Add' | translate }}
+          </button>
+        </div>
+      }
+    </section>
+  }
+</div>

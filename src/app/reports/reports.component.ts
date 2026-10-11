@@ -26,6 +26,39 @@ import {
 } from '@angular/material/table';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { DragScrollDirective } from 'app/directives/drag-scroll.directive';
+import { MatIcon } from '@angular/material/icon';
+import { MatIconButton } from '@angular/material/button';
+import { MatTooltip } from '@angular/material/tooltip';
+import { ReportPreferencesService } from './report-preferences.service';
+
+/** Route param for reports that have no category. */
+export const UNCATEGORIZED = 'Others';
+/** Route param for the user's favourite reports. */
+export const FAVOURITES = 'favourites';
+/** Route param for the user's recently run reports. */
+export const RECENT = 'recent';
+
+/** Order of the core Fineract categories in the tab bar; other categories follow alphabetically. */
+const CATEGORY_ORDER = [
+  'Client',
+  'Loan',
+  'Savings',
+  'Fund',
+  'Accounting'
+];
+
+/** A tab in the reports category bar. */
+export interface ReportCategory {
+  /** Route param and filter value. */
+  name: string;
+  /** Number of reports in the category. */
+  count: number;
+  /** Translation key, set for the favourites and recent shortcuts. */
+  labelKey?: string;
+  /** Material icon, set for the favourites and recent shortcuts. */
+  icon?: string;
+}
 
 /**
  * Reports component.
@@ -48,7 +81,11 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     MatHeaderRow,
     MatRowDef,
     MatRow,
-    MatPaginator
+    MatPaginator,
+    MatIcon,
+    MatIconButton,
+    MatTooltip,
+    DragScrollDirective
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -56,16 +93,19 @@ export class ReportsComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
+  private preferences = inject(ReportPreferencesService);
 
   /** Reports data. */
   reportsData: any;
   /** Report category filter. */
   filter: string;
+  /** Categories shown as tabs. */
+  categories: ReportCategory[] = [];
   /** Columns to be displayed in reports table. */
   displayedColumns: string[] = [
+    'favourite',
     'reportName',
-    'reportType',
-    'reportCategory'
+    'reportType'
   ];
   /** Data source for reports table. */
   dataSource = new MatTableDataSource();
@@ -93,44 +133,135 @@ export class ReportsComponent implements OnInit {
    *Sets and filters the reports table by category.
    */
   ngOnInit() {
+    this.setCategories();
+    if (!this.filter && this.categories.length) {
+      this.router.navigate(
+        [
+          '/reports',
+          this.categories[0].name
+        ],
+        { replaceUrl: true }
+      );
+      return;
+    }
     this.setReports();
-    this.filterReportsByCategory();
+    this.setCustomFilterPredicate();
   }
 
   /**
-   * Switches filterPredicate if filterValue is not null.
+   * Filters the reports of the selected tab by a search string.
    * @param {string} filterValue filter string for mat-table.
    */
   applyFilter(filterValue: string) {
-    if (filterValue.length) {
-      this.setCustomFilterPredicate();
-      this.dataSource.filter = filterValue.trim().toLowerCase();
-    } else {
-      this.filterReportsByCategory();
-    }
+    this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
   /**
    * Initializes the data source, paginator and sorter for reports table.
    */
   setReports() {
-    this.dataSource = new MatTableDataSource(this.reportsData);
+    this.dataSource = new MatTableDataSource(this.reportsInView());
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
   }
 
   /**
-   * Filters the data source only for report category passed in route params.
+   * Reports of the selected tab; the shortcuts keep their own order (most recent first for recent).
    */
-  filterReportsByCategory() {
-    this.dataSource.filterPredicate = (data: any, filter: string) => {
-      return data.reportCategory === filter;
-    };
-    this.dataSource.filter = this.filter;
+  reportsInView(): any[] {
+    const reports: any[] = this.reportsData || [];
+    if (this.filter === FAVOURITES || this.filter === RECENT) {
+      const ids = this.filter === FAVOURITES ? this.preferences.favourites : this.preferences.recent;
+      return ids.map((id) => reports.find((report) => report.id === id)).filter(Boolean);
+    }
+    return reports.filter((report) => this.categoryOf(report) === this.filter);
   }
 
   /**
-   *  Filters Reports for filter value string and report category.
+   * Sets the tabs: favourites and recent (when they have reports, or are open), then the categories.
+   */
+  setCategories() {
+    const reports: any[] = this.reportsData || [];
+    const exists = (id: number) => reports.some((report) => report.id === id);
+    const shortcuts: ReportCategory[] = [
+      {
+        name: FAVOURITES,
+        count: this.preferences.favourites.filter(exists).length,
+        labelKey: 'labels.text.Favourites',
+        icon: 'star'
+      },
+      {
+        name: RECENT,
+        count: this.preferences.recent.filter(exists).length,
+        labelKey: 'labels.text.Recent',
+        icon: 'history'
+      }
+    ].filter((shortcut) => shortcut.count > 0 || shortcut.name === this.filter);
+    this.categories = [
+      ...shortcuts,
+      ...this.buildCategories(reports)
+    ];
+  }
+
+  /**
+   * @param {any} report Report.
+   * @returns {boolean} Whether the report is one of the user's favourites.
+   */
+  isFavourite(report: any): boolean {
+    return this.preferences.isFavourite(report.id);
+  }
+
+  /**
+   * Stars or unstars a report without opening it.
+   * @param {Event} event Click event, stopped so the row link doesn't fire.
+   * @param {any} report Report.
+   */
+  toggleFavourite(event: Event, report: any) {
+    event.stopPropagation();
+    this.preferences.toggleFavourite(report.id);
+    this.setCategories();
+    if (this.filter === FAVOURITES) {
+      this.dataSource.data = this.reportsInView();
+    }
+  }
+
+  /**
+   * Groups reports into categories with counts, core categories first and uncategorized last.
+   * @param {any[]} reports Reports.
+   */
+  buildCategories(reports: any[]): ReportCategory[] {
+    const counts = new Map<string, number>();
+    reports.forEach((report) => {
+      const name = this.categoryOf(report);
+      counts.set(name, (counts.get(name) || 0) + 1);
+    });
+    const rank = (name: string) => {
+      if (name === UNCATEGORIZED) {
+        return CATEGORY_ORDER.length + 1;
+      }
+      const index = CATEGORY_ORDER.indexOf(name);
+      return index === -1 ? CATEGORY_ORDER.length : index;
+    };
+    return Array.from(
+      counts,
+      ([
+        name,
+        count
+      ]) => ({ name, count })
+    ).sort((a, b) => rank(a.name) - rank(b.name) || a.name.localeCompare(b.name));
+  }
+
+  /**
+   * Category of a report, as used in the route param.
+   * @param {any} report Report.
+   */
+  categoryOf(report: any): string {
+    const category = report.reportCategory;
+    return !category || category === '(NULL)' || category.trim() === '' ? UNCATEGORIZED : category;
+  }
+
+  /**
+   *  Filters Reports for filter value string.
    */
   setCustomFilterPredicate() {
     this.dataSource.filterPredicate = (data: any, filter: string) => {
@@ -145,19 +276,13 @@ export class ReportsComponent implements OnInit {
         .toLowerCase();
       /** Transform the filter by converting it to lowercase and removing whitespace. */
       const transformedFilter = filter.trim().toLowerCase();
-      /* Seperates filter for All reports page.*/
-
-      if (this.filter) {
-        return dataStr.indexOf(transformedFilter) !== -1 && data.reportCategory === this.filter;
-      } else {
-        return dataStr.indexOf(transformedFilter) !== -1;
-      }
+      return dataStr.indexOf(transformedFilter) !== -1;
     };
   }
 
   getCategoryKey(category: string): string {
-    if (!category || category === '(NULL)' || category.trim() === '') {
-      return 'labels.text.withoutCategory';
+    if (!category || category === '(NULL)' || category === UNCATEGORIZED || category.trim() === '') {
+      return 'labels.text.Others';
     }
 
     if (category.startsWith('labels.text.')) {

@@ -1,0 +1,161 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="compliance-page">
+  @if (allowed() === false) {
+    <p class="empty">{{ 'compliance.You have no compliance access' | translate }}</p>
+  } @else if (alert(); as a) {
+    @if (busy()) {
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }
+    <section class="frame head">
+      <div class="title">
+        <h2 class="name">{{ 'compliance.alert.rule.' + a.rule | translate }}</h2>
+        <span class="chip" [class.blue]="isOpen" [class.grey]="!isOpen">{{
+          'compliance.alert.status.' + a.status | translate
+        }}</span>
+      </div>
+      <p class="detail">{{ a.detail }}</p>
+      <dl class="facts">
+        <div class="fact">
+          <dt class="fact-label">{{ 'compliance.Member' | translate }}</dt>
+          <dd class="fact-value">
+            @if (a.clientId) {
+              <a [routerLink]="['/compliance', 'members', a.clientId]">{{ a.name }}</a> · {{ a.accountNo }}
+            } @else {
+              {{ a.concern?.personName ?? ('compliance.alert.Not a member' | translate) }}
+            }
+          </dd>
+        </div>
+        @if (a.grade) {
+          <div class="fact">
+            <dt class="fact-label">{{ 'compliance.risk.Grade' | translate }}</dt>
+            <dd class="fact-value">{{ 'compliance.grade.' + a.grade | translate }}</dd>
+          </div>
+        }
+        @if (a.amount !== null) {
+          <div class="fact">
+            <dt class="fact-label">{{ 'compliance.Amount' | translate }}</dt>
+            <dd class="fact-value">
+              {{ 'kym.Rs' | translate }} {{ a.amount | formatNumber }}
+              @if (a.threshold) {
+                <span class="sub">{{ 'compliance.alert.line' | translate }} {{ a.threshold | formatNumber }}</span>
+              }
+            </dd>
+          </div>
+        }
+        <div class="fact">
+          <dt class="fact-label">{{ 'compliance.alert.Found' | translate }}</dt>
+          <dd class="fact-value">{{ a.createdAt.slice(0, 10) | adToBs }}</dd>
+        </div>
+        @if (a.closeReason) {
+          <div class="fact">
+            <dt class="fact-label">{{ 'compliance.alert.Closed because' | translate }}</dt>
+            <dd class="fact-value">
+              {{ a.closeReason }} <span class="sub">{{ a.closedBy }}</span>
+            </dd>
+          </div>
+        }
+        @if (a.caseId) {
+          <div class="fact">
+            <dt class="fact-label">{{ 'compliance.case.Case' | translate }}</dt>
+            <dd class="fact-value">
+              <a [routerLink]="['/compliance', 'cases', a.caseId]">{{ 'compliance.case.Open the case' | translate }}</a>
+            </dd>
+          </div>
+        }
+      </dl>
+      @if (canManage && isOpen) {
+        <div class="actions">
+          @if (a.status === 'NEW') {
+            <button mat-stroked-button type="button" (click)="review()" [disabled]="busy()">
+              {{ 'compliance.alert.Start the review' | translate }}
+            </button>
+          }
+          <button mat-raised-button color="primary" type="button" (click)="openCase()" [disabled]="busy()">
+            {{ 'compliance.case.Open a case' | translate }}
+          </button>
+          @if (openCases().length) {
+            <mat-form-field class="add-to" subscriptSizing="dynamic">
+              <mat-label>{{ 'compliance.case.Add to an open case' | translate }}</mat-label>
+              <mat-select (selectionChange)="addToCase($event.value)">
+                @for (k of openCases(); track k.id) {
+                  <mat-option [value]="k.id">{{ k.reference }} · {{ k.name ?? '' }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          }
+          <button mat-stroked-button type="button" (click)="close()" [disabled]="busy()">
+            {{ 'compliance.alert.Close: no report needed' | translate }}
+          </button>
+        </div>
+      }
+    </section>
+
+    @if (a.concern; as c) {
+      <section class="frame">
+        <h3 class="legend">
+          {{ (c.attempted ? 'compliance.alert.Attempted transaction' : 'compliance.alert.Staff concern') | translate }}
+        </h3>
+        <p>{{ c.what }}</p>
+        <p class="sub">
+          {{ c.raisedBy }} · {{ c.raisedAt.slice(0, 10) | adToBs }}
+          @if (c.amount) {
+            · {{ 'kym.Rs' | translate }} {{ c.amount | formatNumber }}
+          }
+        </p>
+      </section>
+    }
+
+    @if (a.movements.length) {
+      <section class="frame">
+        <h3 class="legend">{{ 'compliance.alert.Transactions' | translate }}</h3>
+        <div class="table-scroll">
+          <table class="plain-rows">
+            <thead>
+              <tr>
+                <th>{{ 'compliance.Transaction date' | translate }}</th>
+                <th>{{ 'compliance.alert.Kind' | translate }}</th>
+                <th class="num">{{ 'compliance.Amount' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (m of a.movements; track m.id) {
+                <tr>
+                  <td>{{ m.date | adToBs }}</td>
+                  <td>
+                    {{ 'compliance.alert.kind.' + m.kind | translate }}
+                    <span class="sub">{{ m.paymentType ?? '' }}</span>
+                  </td>
+                  <td class="num">{{ m.amount | formatNumber }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+    }
+
+    @if (a.earlier?.length) {
+      <section class="frame">
+        <h3 class="legend">{{ 'compliance.alert.Earlier alerts' | translate }}</h3>
+        <ul class="plain-list">
+          @for (e of a.earlier; track e.id) {
+            <li>
+              <a [routerLink]="['/compliance', 'alerts', e.id]">{{ 'compliance.alert.rule.' + e.rule | translate }}</a>
+              · {{ 'compliance.alert.status.' + e.status | translate }}
+              <span class="sub">{{ e.detail }}</span>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+  } @else {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
+</div>

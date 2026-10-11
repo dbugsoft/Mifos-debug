@@ -23,6 +23,7 @@ import { GroupsService } from './groups.service';
 
 /** Custom Data Source */
 import { GroupsDataSource } from './groups.datasource';
+import { MatIcon } from '@angular/material/icon';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import {
   MatTable,
@@ -50,6 +51,7 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
     MatCheckbox,
+    MatIcon,
     FaIconComponent,
     MatTable,
     MatSort,
@@ -79,6 +81,7 @@ export class GroupsComponent implements OnInit, AfterViewInit {
   name = new UntypedFormControl();
   /** Columns to be displayed in groups table. */
   displayedColumns = [
+    'sno',
     'name',
     'accountNo',
     'externalId',

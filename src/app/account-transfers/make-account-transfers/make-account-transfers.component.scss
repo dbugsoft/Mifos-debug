@@ -20,10 +20,10 @@
 .section-title {
   font-size: 1.25rem;
   font-weight: 600;
-  color: var(--md-sys-color-on-surface, #333);
+  color: var(--md-sys-color-on-surface, var(--dk-text, #333));
   margin: 0 0 1rem;
   padding-bottom: 0.5rem;
-  border-bottom: 1px solid rgb(0 0 0 / 12%);
+  border-bottom: 1px solid rgb(var(--dk-ink-rgb, 0 0 0) / 12%);
 
   &.transfer-heading {
     font-weight: 700;
@@ -48,7 +48,7 @@
   border-radius: 4px;
 
   &:hover {
-    background-color: rgb(0 0 0 / 4%);
+    background-color: rgb(var(--dk-ink-rgb, 0 0 0) / 4%);
   }
 }
 
@@ -149,25 +149,25 @@ mat-divider {
   }
 
   .cancel-button {
-    background-color: #f5f5f5;
-    color: rgb(0 0 0 / 87%);
+    background-color: var(--dk-surface-2, #f5f5f5);
+    color: rgb(var(--dk-ink-rgb, 0 0 0) / 87%);
     box-shadow: 0 1px 3px rgb(0 0 0 / 12%);
 
     &:hover {
-      background-color: #e0e0e0;
+      background-color: var(--dk-surface-2, #e0e0e0);
       box-shadow: 0 2px 5px rgb(0 0 0 / 18%);
     }
   }
 
   .primary-button {
-    background-color: #f5f5f5;
-    color: rgb(0 0 0 / 87%);
+    background-color: var(--dk-surface-2, #f5f5f5);
+    color: rgb(var(--dk-ink-rgb, 0 0 0) / 87%);
     font-weight: normal;
     border: none;
     box-shadow: none;
 
     &:hover {
-      background-color: #e0e0e0;
+      background-color: var(--dk-surface-2, #e0e0e0);
       box-shadow: 0 2px 5px rgb(0 0 0 / 18%);
     }
   }
@@ -188,11 +188,11 @@ mat-divider {
   margin-bottom: 1rem;
 
   &.success {
-    color: #4caf50;
+    color: var(--dk-success, #4caf50);
   }
 
   &.error {
-    color: #f44336;
+    color: var(--dk-danger, #f44336);
   }
 }
 
@@ -203,11 +203,11 @@ mat-divider {
 }
 
 .success-text {
-  color: #4caf50;
+  color: var(--dk-success, #4caf50);
 }
 
 .error-text {
-  color: #f44336;
+  color: var(--dk-danger, #f44336);
 }
 
 .status-message {
@@ -331,19 +331,19 @@ body.dark-theme {
 
 // Form field errors
 ::ng-deep mat-form-field.error-warn.mat-form-field-invalid .mat-form-field-ripple {
-  background-color: #000000de !important;
+  background-color: rgb(var(--dk-ink-rgb, 0 0 0) / 87.1%) !important;
 }
 
 ::ng-deep mat-form-field.error-warn.mat-form-field-invalid .mat-form-field-label {
-  color: #0009 !important;
+  color: rgb(var(--dk-ink-rgb, 0 0 0) / 60%) !important;
 
   .mat-form-field-required-marker {
-    color: #0009 !important;
+    color: rgb(var(--dk-ink-rgb, 0 0 0) / 60%) !important;
   }
 }
 
 ::ng-deep mat-form-field.error-warn.mat-form-field-invalid .mat-error {
-  color: #0009 !important;
+  color: rgb(var(--dk-ink-rgb, 0 0 0) / 60%) !important;
 }
 
 ::ng-deep .mat-form-field-flex {
@@ -355,7 +355,7 @@ body.dark-theme {
 }
 
 .readonly-field {
-  background-color: rgb(0 0 0 / 2%);
+  background-color: rgb(var(--dk-ink-rgb, 0 0 0) / 2%);
   cursor: not-allowed;
 }
 

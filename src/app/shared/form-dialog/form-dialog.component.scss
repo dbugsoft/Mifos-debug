@@ -34,3 +34,9 @@
     }
   }
 }
+
+// Material drops the content's top padding after a title, and the content scrolls,
+// so the first field's floating label was clipped in half. Give it room.
+.mat-mdc-dialog-title + .mat-mdc-dialog-content {
+  padding-top: 8px;
+}

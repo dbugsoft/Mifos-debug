@@ -8,35 +8,39 @@
 
 @if (loans && loans.length > 0) {
   <div class="tab-container mat-typography">
-    <div class="tasks-header">
-      <mat-form-field class="tasks-search-field">
-        <input
-          #filterInput
-          matInput
-          placeholder="{{ 'labels.text.Filter by name' | translate }}"
-          (keyup)="applyFilter(filterInput.value)"
-        />
-      </mat-form-field>
-      <button
-        mat-raised-button
-        color="success"
-        *mifosxHasPermission="'APPROVE_LOANRESCHEDULE'"
-        (click)="bulkLoanReschedule('Approve')"
-        class="tasks-action-btn"
-      >
-        <fa-icon icon="check" class="m-r-10"></fa-icon>{{ 'labels.buttons.Approve' | translate }}
-      </button>
-      <button
-        mat-raised-button
-        color="reject"
-        *mifosxHasPermission="'APPROVE_LOANRESCHEDULE'"
-        (click)="bulkLoanReschedule('Reject')"
-        class="tasks-action-btn"
-      >
-        <fa-icon icon="times" class="m-r-10"></fa-icon>{{ 'labels.buttons.Reject' | translate }}
-      </button>
+    <div class="list-toolbar">
+      <div class="toolbar-left">
+        <mat-form-field class="search-field" appearance="outline" subscriptSizing="dynamic">
+          <mat-icon matPrefix>search</mat-icon>
+          <input
+            #filterInput
+            matInput
+            placeholder="{{ 'labels.text.Filter by name' | translate }}"
+            (keyup)="applyFilter(filterInput.value)"
+          />
+        </mat-form-field>
+      </div>
+      <div class="toolbar-right">
+        <button
+          mat-raised-button
+          color="primary"
+          *mifosxHasPermission="'APPROVE_LOANRESCHEDULE'"
+          (click)="bulkLoanReschedule('Approve')"
+          class="tasks-action-btn"
+        >
+          <fa-icon icon="check" class="btn-icon"></fa-icon>{{ 'labels.buttons.Approve' | translate }}
+        </button>
+        <button
+          mat-stroked-button
+          *mifosxHasPermission="'APPROVE_LOANRESCHEDULE'"
+          (click)="bulkLoanReschedule('Reject')"
+          class="tasks-action-btn"
+        >
+          <fa-icon icon="times" class="btn-icon"></fa-icon>{{ 'labels.buttons.Reject' | translate }}
+        </button>
+      </div>
     </div>
-    <table mat-table [dataSource]="dataSource">
+    <table mat-table [dataSource]="dataSource" class="members-table">
       <ng-container matColumnDef="select">
         <th mat-header-cell *matHeaderCellDef>
           <mat-checkbox
@@ -98,10 +102,8 @@
 }
 
 @if (loans?.length === 0) {
-  <div class="alert">
-    <div class="message">
-      <i class="fa fa-exclamation-circle alert-check"></i>
-      {{ 'labels.text.No pending rescheduled loan available for this account' | translate }}
-    </div>
+  <div class="empty-state">
+    <fa-icon icon="tasks" size="2x" class="empty-icon"></fa-icon>
+    <p>{{ 'labels.text.No pending rescheduled loan available for this account' | translate }}</p>
   </div>
 }

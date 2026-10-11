@@ -1,0 +1,141 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="compliance-page">
+  @if (allowed() === false) {
+    <p class="empty">{{ 'compliance.You have no compliance access' | translate }}</p>
+  } @else {
+    <div class="filters">
+      <mat-button-toggle-group [value]="view()" (change)="show($event.value)">
+        <mat-button-toggle value="REGISTER">{{ 'compliance.pep.The register' | translate }}</mat-button-toggle>
+        <mat-button-toggle value="SUGGESTIONS">{{ 'compliance.pep.To check' | translate }}</mat-button-toggle>
+      </mat-button-toggle-group>
+      <span class="grow"></span>
+      @if (canManage) {
+        <button mat-raised-button color="primary" type="button" (click)="add()">
+          <mat-icon>person_add</mat-icon>{{ 'compliance.pep.Add a person' | translate }}
+        </button>
+      }
+    </div>
+
+    <p class="hint">
+      {{ (view() === 'REGISTER' ? 'compliance.pep.registerLead' : 'compliance.pep.suggestionsLead') | translate }}
+    </p>
+
+    @if (loading()) {
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }
+
+    @if (view() === 'REGISTER') {
+      <div class="filters">
+        <mat-form-field class="search" subscriptSizing="dynamic">
+          <mat-label>{{ 'compliance.pep.Search' | translate }}</mat-label>
+          <input matInput [value]="search()" (input)="search.set($any($event.target).value)" (keydown.enter)="load()" />
+        </mat-form-field>
+        <mat-form-field class="status" subscriptSizing="dynamic">
+          <mat-label>{{ 'compliance.pep.Status' | translate }}</mat-label>
+          <mat-select [value]="status()" (selectionChange)="status.set($event.value); load()">
+            @for (s of statuses; track s) {
+              <mat-option [value]="s">{{ 'compliance.pep.status.' + s | translate }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        <button mat-stroked-button type="button" (click)="load()">{{ 'compliance.pep.Find' | translate }}</button>
+      </div>
+      <section class="frame">
+        <h2 class="legend">{{ 'compliance.pep.The register' | translate }}</h2>
+        @if (register().length) {
+          <div class="table-scroll">
+            <table class="plain-rows">
+              <thead>
+                <tr>
+                  <th>{{ 'compliance.pep.Person' | translate }}</th>
+                  <th class="wide">{{ 'compliance.pep.Post' | translate }}</th>
+                  <th>{{ 'compliance.pep.Status' | translate }}</th>
+                  <th class="wide">{{ 'compliance.pep.Members exposed' | translate }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (p of register(); track p.id) {
+                  <tr class="row" tabindex="0" (click)="open(p)" (keydown.enter)="open(p)">
+                    <td>
+                      {{ p.fullName }}
+                      @if (p.citizenshipNo) {
+                        <span class="sub">{{ p.citizenshipNo }}</span>
+                      }
+                      <span class="sub narrow">{{ p.post ?? p.postDetail }} · {{ p.members }}</span>
+                    </td>
+                    <td class="wide">
+                      {{ p.post ?? p.postDetail }}
+                      @if (p.post && p.postDetail) {
+                        <span class="sub">{{ p.postDetail }}</span>
+                      }
+                    </td>
+                    <td>
+                      <span
+                        class="chip"
+                        [class.red]="p.status === 'IN_OFFICE'"
+                        [class.amber]="p.status === 'LEFT_OFFICE'"
+                        [class.grey]="p.status === 'PAST_RETENTION'"
+                        >{{ 'compliance.pep.status.' + p.status | translate }}</span
+                      >
+                      @if (p.retainUntil) {
+                        <span class="sub"
+                          >{{ 'compliance.pep.keptUntil' | translate }}
+                          {{ (p.retainUntil | adToBs) || p.retainUntil }}</span
+                        >
+                      }
+                    </td>
+                    <td class="wide">{{ p.members }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        } @else if (!loading()) {
+          <p class="empty">{{ 'compliance.pep.emptyRegister' | translate }}</p>
+        }
+      </section>
+    } @else {
+      <section class="frame">
+        <h2 class="legend">{{ 'compliance.pep.To check' | translate }}</h2>
+        @if (suggestions().length) {
+          <ul class="suggestions">
+            @for (s of suggestions(); track s.suggestionKey) {
+              <li>
+                <div class="what">
+                  <b>{{ s.fullName }}</b>
+                  <span class="sub">{{ s.post ?? '' }}</span>
+                  <span class="sub"
+                    >{{ 'compliance.pep.from.' + s.from | translate }} · {{ s.memberName }} ({{ s.accountNo }}){{
+                      s.relationship === 'SELF'
+                        ? ''
+                        : ', ' + (s.relationshipDetail ?? ('compliance.pepRelationship.' + s.relationship | translate))
+                    }}</span
+                  >
+                </div>
+                @if (canManage) {
+                  <div class="actions">
+                    <button mat-stroked-button color="primary" type="button" (click)="add(s)">
+                      {{ 'compliance.pep.Add to the register' | translate }}
+                    </button>
+                    <button mat-button type="button" (click)="dismiss(s)">
+                      {{ 'compliance.pep.Not a politically exposed person' | translate }}
+                    </button>
+                  </div>
+                }
+              </li>
+            }
+          </ul>
+        } @else if (!loading()) {
+          <p class="empty">{{ 'compliance.pep.emptySuggestions' | translate }}</p>
+        }
+      </section>
+    }
+  }
+</div>

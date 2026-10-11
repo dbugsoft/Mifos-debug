@@ -218,13 +218,14 @@ body.dark-theme {
     filter: invert(100%);
   }
 
-  a:any-link {
-    color: #0098ff !important;
+  // Not the sidebar or menu items: they are white on the blue sidebar / plain menu text, not links in prose.
+  a:any-link:not(.sidebar a, .mat-mdc-menu-item) {
+    color: #e0e0e0 !important;
   }
 
   span.breadcrumb-link {
     a {
-      color: #0098ff !important;
+      color: #e0e0e0 !important;
     }
   }
 
@@ -261,7 +262,7 @@ body.dark-theme {
     }
 
     .business-date {
-      color: #0098ff;
+      color: #e0e0e0;
     }
   }
 
@@ -310,7 +311,7 @@ body.dark-theme {
 
     .preview-overlay {
       background: rgb(45 45 45 / 95%);
-      color: #0098ff;
+      color: #e0e0e0;
     }
 
     .placeholder {
@@ -378,7 +379,7 @@ body.dark-theme {
     }
 
     .created-by {
-      color: #0098ff;
+      color: #e0e0e0;
     }
 
     .created-date {

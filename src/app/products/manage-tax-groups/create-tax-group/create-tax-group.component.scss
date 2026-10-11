@@ -6,8 +6,74 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+// Same width as the breadcrumb and the lists.
 .container {
-  max-width: 37rem;
+  margin: 0 auto;
+  max-width: 84rem;
+  width: 90%;
+  padding-bottom: 32px;
+}
+
+// Each field keeps the width its input needs; all stack on phones.
+.form-grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  column-gap: 16px;
+
+  mat-form-field,
+  mifosx-gl-account-selector {
+    min-width: 0;
+  }
+
+  .field-xs {
+    flex: 0 1 120px;
+  }
+
+  .field-sm {
+    flex: 0 1 180px;
+  }
+
+  .field-md {
+    flex: 0 1 200px;
+  }
+
+  .field-lg {
+    flex: 0 1 280px;
+  }
+
+  .field-account {
+    flex: 0 1 320px;
+  }
+
+  .row-break {
+    flex-basis: 100%;
+  }
+}
+
+@media (width <= 600px) {
+  .form-grid mat-form-field,
+  .form-grid mifosx-gl-account-selector {
+    flex-basis: 100%;
+  }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 8px 0;
+
+  h3 {
+    margin: 0;
+  }
 }
 
 table {

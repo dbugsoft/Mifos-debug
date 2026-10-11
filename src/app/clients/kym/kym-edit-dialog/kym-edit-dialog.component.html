@@ -1,0 +1,327 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<h2 mat-dialog-title>{{ 'kym.Update KYM' | translate }}</h2>
+<form [formGroup]="form" (ngSubmit)="save()">
+  <mat-dialog-content>
+    <p class="lead">{{ 'kym.editLead' | translate }}</p>
+
+    <h4 id="kym-family">{{ 'kym.Family and occupation' | translate }}</h4>
+    <div class="row">
+      <mat-form-field>
+        <mat-label>{{ 'kym.field.maritalStatus' | translate }}</mat-label>
+        <mat-select formControlName="maritalStatus">
+          @for (m of maritalStatuses; track m) {
+            <mat-option [value]="m">{{ 'kym.marital.' + m | translate }}</mat-option>
+          }
+        </mat-select>
+        @if (form.value.maritalStatus === 'MARRIED') {
+          <mat-hint>{{ 'kym.spouseHint' | translate }}</mat-hint>
+        }
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>{{ 'kym.field.familyType' | translate }}</mat-label>
+        <mat-select formControlName="familyType">
+          @for (t of familyTypes; track t) {
+            <mat-option [value]="t">{{ 'kym.familyType.' + t | translate }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <div class="row">
+      <mat-form-field>
+        <mat-label>{{ 'kym.field.occupation' | translate }}</mat-label>
+        <mat-select formControlName="occupationId">
+          @for (p of data.professions; track p.id) {
+            <mat-option [value]="p.id">{{ p.name }}</mat-option>
+          }
+        </mat-select>
+        @if (!data.professions.length) {
+          <mat-hint>{{ 'kym.noProfessions' | translate }}</mat-hint>
+        }
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>{{ 'kym.field.occupationDetail' | translate }}</mat-label>
+        <input matInput formControlName="occupationDetail" />
+      </mat-form-field>
+    </div>
+    <mat-checkbox formControlName="noPan">{{ 'kym.noPanLabel' | translate }}</mat-checkbox>
+    <mat-form-field class="full">
+      <mat-label>{{ 'kym.field.guardianName' | translate }}</mat-label>
+      <input matInput formControlName="guardianName" />
+      <mat-hint>{{ 'kym.guardianHint' | translate }}</mat-hint>
+    </mat-form-field>
+
+    <h4 id="kym-pep">{{ 'kym.field.pep' | translate }}</h4>
+    <mat-radio-group formControlName="pepDeclared" class="yes-no">
+      <mat-radio-button [value]="true">{{ 'kym.Yes' | translate }}</mat-radio-button>
+      <mat-radio-button [value]="false">{{ 'kym.No' | translate }}</mat-radio-button>
+    </mat-radio-group>
+    @if (form.value.pepDeclared) {
+      <div class="row three">
+        <mat-form-field>
+          <mat-label>{{ 'kym.field.pepName' | translate }}</mat-label>
+          <input matInput formControlName="pepName" />
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>{{ 'kym.field.pepRelationship' | translate }}</mat-label>
+          <input matInput formControlName="pepRelationship" />
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>{{ 'kym.field.pepPost' | translate }}</mat-label>
+          <input matInput formControlName="pepPost" />
+        </mat-form-field>
+      </div>
+    }
+
+    <h4 id="kym-living">{{ 'kym.Living and membership' | translate }}</h4>
+    <mat-radio-group formControlName="workingAreaResidence" class="yes-no">
+      <span class="q">{{ 'kym.field.workingAreaResidence' | translate }}</span>
+      <mat-radio-button value="PERMANENT">{{ 'kym.residence.PERMANENT' | translate }}</mat-radio-button>
+      <mat-radio-button value="TEMPORARY">{{ 'kym.residence.TEMPORARY' | translate }}</mat-radio-button>
+    </mat-radio-group>
+    <div class="row">
+      <mat-form-field>
+        <mat-label>{{ 'kym.field.timeInWorkingArea' | translate }}</mat-label>
+        <input matInput formControlName="timeInWorkingArea" />
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>{{ 'kym.field.votingPollingPlace' | translate }}</mat-label>
+        <input matInput formControlName="votingPollingPlace" />
+      </mat-form-field>
+    </div>
+    <mat-form-field class="full">
+      <mat-label>{{ 'kym.field.purposeOfJoining' | translate }}</mat-label>
+      <textarea matInput formControlName="purposeOfJoining" rows="2"></textarea>
+    </mat-form-field>
+
+    <h4 id="kym-coops">{{ 'kym.Other cooperatives' | translate }}</h4>
+    <mat-radio-group formControlName="otherCoopMember" class="yes-no">
+      <span class="q">{{ 'kym.field.otherCoop' | translate }}</span>
+      <mat-radio-button [value]="true">{{ 'kym.Yes' | translate }}</mat-radio-button>
+      <mat-radio-button [value]="false">{{ 'kym.No' | translate }}</mat-radio-button>
+    </mat-radio-group>
+    @if (form.value.otherCoopMember) {
+      <mat-form-field class="full">
+        <mat-label>{{ 'kym.field.otherCoopPurpose' | translate }}</mat-label>
+        <input matInput formControlName="otherCoopPurpose" />
+      </mat-form-field>
+    }
+    <mat-radio-group formControlName="familyOtherCoopMember" class="yes-no">
+      <span class="q">{{ 'kym.field.familyOtherCoop' | translate }}</span>
+      <mat-radio-button [value]="true">{{ 'kym.Yes' | translate }}</mat-radio-button>
+      <mat-radio-button [value]="false">{{ 'kym.No' | translate }}</mat-radio-button>
+    </mat-radio-group>
+    @if (form.value.familyOtherCoopMember) {
+      <mat-form-field class="full">
+        <mat-label>{{ 'kym.field.familyOtherCoopPurpose' | translate }}</mat-label>
+        <input matInput formControlName="familyOtherCoopPurpose" />
+      </mat-form-field>
+    }
+    @if (form.value.otherCoopMember || form.value.familyOtherCoopMember || otherCoops.length) {
+      <div formArrayName="otherCoops">
+        @for (row of otherCoops.controls; track $index; let i = $index) {
+          <div class="list-row" [formGroupName]="i">
+            <mat-form-field class="narrow">
+              <mat-label>{{ 'kym.Whose' | translate }}</mat-label>
+              <mat-select formControlName="whose">
+                <mat-option value="OWN">{{ 'kym.whose.OWN' | translate }}</mat-option>
+                <mat-option value="FAMILY">{{ 'kym.whose.FAMILY' | translate }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+            @if (row.value.whose === 'FAMILY') {
+              <mat-form-field>
+                <mat-label>{{ 'kym.Name' | translate }}</mat-label>
+                <input matInput formControlName="personName" />
+              </mat-form-field>
+              <mat-form-field class="narrow">
+                <mat-label>{{ 'kym.Relationship' | translate }}</mat-label>
+                <input matInput formControlName="relationship" />
+              </mat-form-field>
+            }
+            <mat-form-field class="wide">
+              <mat-label>{{ 'kym.Cooperative' | translate }}</mat-label>
+              <input matInput formControlName="coopNameAddress" />
+            </mat-form-field>
+            <mat-form-field class="narrow">
+              <mat-label>{{ 'kym.Membership number' | translate }}</mat-label>
+              <input matInput formControlName="membershipNo" />
+            </mat-form-field>
+            <button
+              mat-icon-button
+              type="button"
+              (click)="otherCoops.removeAt(i)"
+              [attr.aria-label]="'kym.Remove' | translate"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        }
+      </div>
+      <button
+        mat-button
+        type="button"
+        (click)="otherCoops.push(coopRow(form.value.otherCoopMember ? 'OWN' : 'FAMILY'))"
+      >
+        <mat-icon>add</mat-icon>{{ 'kym.Add a cooperative' | translate }}
+      </button>
+    }
+
+    <h4 id="kym-here">{{ 'kym.field.familyHere' | translate }}</h4>
+    <mat-radio-group formControlName="familyInThisCoop" class="yes-no">
+      <mat-radio-button [value]="true">{{ 'kym.Yes' | translate }}</mat-radio-button>
+      <mat-radio-button [value]="false">{{ 'kym.No' | translate }}</mat-radio-button>
+    </mat-radio-group>
+    @if (form.value.familyInThisCoop) {
+      @for (p of familyHere(); track p.clientId; let i = $index) {
+        <div class="person">
+          <span>{{ p.name }} · {{ p.accountNo }}</span>
+          <mat-form-field class="narrow">
+            <mat-label>{{ 'kym.Relationship' | translate }}</mat-label>
+            <input matInput [value]="p.relationship ?? ''" (change)="setRelationship(i, $any($event.target).value)" />
+          </mat-form-field>
+          <button
+            mat-icon-button
+            type="button"
+            (click)="remove('familyHere', i)"
+            [attr.aria-label]="'kym.Remove' | translate"
+          >
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      }
+      <mifosx-kym-member-picker [exclude]="data.clientId" (picked)="addFamilyHere($event)"></mifosx-kym-member-picker>
+    }
+
+    <h4 id="kym-income">{{ 'kym.Income and transactions' | translate }}</h4>
+    <mat-form-field class="full">
+      <mat-label>{{ 'kym.field.incomeBand' | translate }}</mat-label>
+      <mat-select formControlName="incomeBand">
+        @for (b of incomeBands; track b) {
+          <mat-option [value]="b">{{ 'kym.band.' + b | translate }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    @if ((form.value.incomeBand && form.value.incomeBand !== 'UP_TO_4_LAKH') || incomeSources.length) {
+      <p class="hint">{{ 'kym.incomeSourcesHint' | translate }}</p>
+      <div formArrayName="incomeSources">
+        @for (row of incomeSources.controls; track $index; let i = $index) {
+          <div class="list-row" [formGroupName]="i">
+            <mat-form-field>
+              <mat-label>{{ 'kym.Source of income' | translate }}</mat-label>
+              <mat-select formControlName="heading">
+                @for (h of incomeHeadings; track h) {
+                  <mat-option [value]="h">{{ 'kym.heading.' + h | translate }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field class="wide">
+              <mat-label>{{ 'kym.Details' | translate }}</mat-label>
+              <input matInput formControlName="detail" />
+            </mat-form-field>
+            <mat-form-field class="narrow">
+              <mat-label>{{ 'kym.Last year (Rs)' | translate }}</mat-label>
+              <input matInput type="number" min="0" formControlName="amount" />
+            </mat-form-field>
+            <button
+              mat-icon-button
+              type="button"
+              (click)="incomeSources.removeAt(i)"
+              [attr.aria-label]="'kym.Remove' | translate"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        }
+      </div>
+      <button mat-button type="button" (click)="incomeSources.push(incomeRow())">
+        <mat-icon>add</mat-icon>{{ 'kym.Add a source' | translate }}
+      </button>
+    }
+    <div class="row three" id="kym-money">
+      <mat-form-field>
+        <mat-label>{{ 'kym.field.expectedTransactionsYear' | translate }}</mat-label>
+        <input matInput type="number" min="0" formControlName="expectedTransactionsYear" />
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>{{ 'kym.field.expectedDepositYear' | translate }}</mat-label>
+        <input matInput type="number" min="0" formControlName="expectedDepositYear" />
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>{{ 'kym.field.expectedBorrowing' | translate }}</mat-label>
+        <input matInput type="number" min="0" formControlName="expectedBorrowing" />
+        <mat-hint>{{ 'kym.zeroIfNone' | translate }}</mat-hint>
+      </mat-form-field>
+    </div>
+
+    <h4 id="kym-owner">{{ 'kym.Beneficial owners' | translate }}</h4>
+    <mat-radio-group formControlName="someoneElseDirects" class="yes-no">
+      <span class="q">{{ 'kym.field.someoneElseDirects' | translate }}</span>
+      <mat-radio-button [value]="true">{{ 'kym.Yes' | translate }}</mat-radio-button>
+      <mat-radio-button [value]="false">{{ 'kym.No' | translate }}</mat-radio-button>
+    </mat-radio-group>
+    @if (form.value.someoneElseDirects) {
+      <p class="hint">{{ 'kym.ownerAfterSave' | translate }}</p>
+    }
+
+    <h4 id="kym-recommend">{{ 'kym.field.recommenders' | translate }}</h4>
+    <mat-checkbox formControlName="foundingMember">{{ 'kym.Founding member' | translate }}</mat-checkbox>
+    @if (!form.value.foundingMember) {
+      @for (p of recommenders(); track p.clientId; let i = $index) {
+        <div class="person">
+          <span>{{ p.name }} · {{ p.accountNo }}</span>
+          <button
+            mat-icon-button
+            type="button"
+            (click)="remove('recommenders', i)"
+            [attr.aria-label]="'kym.Remove' | translate"
+          >
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      }
+      @if (recommenders().length < 2) {
+        <mifosx-kym-member-picker
+          label="kym.Find a recommending member"
+          [exclude]="data.clientId"
+          (picked)="addRecommender($event)"
+        ></mifosx-kym-member-picker>
+      }
+    }
+
+    <h4 id="kym-declare">{{ 'kym.Declaration' | translate }}</h4>
+    <mat-checkbox formControlName="declarationAccepted">{{ 'kym.declarationLabel' | translate }}</mat-checkbox>
+    <mat-form-field class="full">
+      <mat-label>{{ 'kym.field.remarks' | translate }}</mat-label>
+      <textarea matInput formControlName="remarks" rows="2"></textarea>
+    </mat-form-field>
+
+    <div class="confirm">
+      <mat-checkbox formControlName="inPerson">{{ 'kym.inPersonLabel' | translate }}</mat-checkbox>
+      <mifosx-nepali-date-input
+        formControlName="changeHappenedOn"
+        [label]="'kym.changeHappenedOn' | translate"
+        [maxDate]="today"
+      ></mifosx-nepali-date-input>
+      <p class="hint">{{ 'kym.lateHint' | translate }}</p>
+    </div>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-raised-button type="button" mat-dialog-close [disabled]="busy()">
+      {{ 'labels.buttons.Cancel' | translate }}
+    </button>
+    <button
+      mat-raised-button
+      color="primary"
+      type="submit"
+      [disabled]="busy() || form.invalid || !(changed() | keyvalue).length"
+    >
+      {{ 'kym.Save' | translate }}
+    </button>
+  </mat-dialog-actions>
+</form>

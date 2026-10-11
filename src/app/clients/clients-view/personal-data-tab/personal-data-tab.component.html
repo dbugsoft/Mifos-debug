@@ -71,7 +71,7 @@
         @if (clientViewData.dateOfBirth) {
           <div class="data-item">
             <span class="label">{{ 'labels.inputs.Date of Birth' | translate }}</span>
-            <span class="value">{{ clientViewData.dateOfBirth | adToBs }}</span>
+            <span class="value"><mifosx-dual-date [date]="clientViewData.dateOfBirth"></mifosx-dual-date></span>
             <span class="value-sub">{{ clientViewData.dateOfBirth | dateFormat }}</span>
           </div>
         }
@@ -98,7 +98,7 @@
         @if (clientViewData.dateOfBirth) {
           <div class="data-item">
             <span class="label">{{ 'labels.inputs.Incorporation Date' | translate }}</span>
-            <span class="value">{{ clientViewData.dateOfBirth | adToBs }}</span>
+            <span class="value"><mifosx-dual-date [date]="clientViewData.dateOfBirth"></mifosx-dual-date></span>
             <span class="value-sub">{{ clientViewData.dateOfBirth | dateFormat }}</span>
           </div>
         }

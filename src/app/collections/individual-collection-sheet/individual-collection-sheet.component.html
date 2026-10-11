@@ -7,7 +7,8 @@
 -->
 
 @if (!isCollapsed) {
-  <mat-card class="container">
+  <!-- Same frameless, compact form as the Collection Sheet. -->
+  <form class="container params" [formGroup]="collectionSheetForm" (ngSubmit)="previewCollectionSheet()">
     @if (noData) {
       <div class="alert">
         <div class="message">
@@ -16,64 +17,50 @@
         </div>
       </div>
     }
-    <form [formGroup]="collectionSheetForm" (ngSubmit)="previewCollectionSheet()">
-      <div class="layout-row-wrap gap-2percent responsive-column align-start-center">
-        <mat-form-field class="flex-98">
-          <mat-label>{{ 'labels.inputs.Branch Office' | translate }}</mat-label>
-          <mat-select formControlName="officeId" required>
-            @for (office of officesData; track office) {
-              <mat-option [value]="office.id">
-                {{ office.name }}
-              </mat-option>
-            }
-          </mat-select>
-          @if (collectionSheetForm.controls.officeId.hasError('required')) {
-            <mat-error>
-              {{ 'labels.inputs.Branch Office' | translate }} {{ 'labels.commons.is' | translate }}
-              <strong>{{ 'labels.commons.required' | translate }}</strong>
-            </mat-error>
+    <div class="form-grid">
+      <mat-form-field class="field-md">
+        <mat-label>{{ 'labels.inputs.Branch Office' | translate }}</mat-label>
+        <mat-select formControlName="officeId" required>
+          @for (office of officesData; track office.id) {
+            <mat-option [value]="office.id">{{ office.name }}</mat-option>
           }
-        </mat-form-field>
-        <mat-form-field class="flex-98" (click)="transactionDatePicker.open()">
-          <mat-label>{{ 'labels.inputs.Repayment Date' | translate }}</mat-label>
-          <input
-            matInput
-            [min]="minDate"
-            [max]="maxDate"
-            [matDatepicker]="transactionDatePicker"
-            required
-            formControlName="transactionDate"
-          />
-          <mat-datepicker-toggle matSuffix [for]="transactionDatePicker"></mat-datepicker-toggle>
-          <mat-datepicker #transactionDatePicker></mat-datepicker>
-          @if (collectionSheetForm.controls.transactionDate.hasError('required')) {
-            <mat-error>
-              {{ 'labels.inputs.Repayment Date' | translate }} {{ 'labels.commons.is' | translate }}
-              <strong>{{ 'labels.commons.required' | translate }}</strong>
-            </mat-error>
+        </mat-select>
+        @if (collectionSheetForm.controls.officeId.hasError('required')) {
+          <mat-error>
+            {{ 'labels.inputs.Branch Office' | translate }} {{ 'labels.commons.is' | translate }}
+            <strong>{{ 'labels.commons.required' | translate }}</strong>
+          </mat-error>
+        }
+      </mat-form-field>
+
+      <mifosx-nepali-date-input
+        class="bs-date"
+        [inline]="true"
+        label="Repayment Date"
+        formControlName="transactionDate"
+        [minDate]="minDate"
+        [maxDate]="maxDate"
+      />
+
+      <mat-form-field class="field-md">
+        <mat-label>{{ 'labels.inputs.Staff' | translate }}</mat-label>
+        <mat-select formControlName="staffId">
+          @for (loanOfficer of loanOfficerData; track loanOfficer.id) {
+            <mat-option [value]="loanOfficer.id">{{ loanOfficer.displayName }}</mat-option>
           }
-        </mat-form-field>
-        <mat-form-field class="flex-98">
-          <mat-label>{{ 'labels.inputs.Staff' | translate }}</mat-label>
-          <mat-select formControlName="staffId">
-            @for (loanOfficer of loanOfficerData; track loanOfficer) {
-              <mat-option [value]="loanOfficer.id">
-                {{ loanOfficer.displayName }}
-              </mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-      </div>
-      <mat-card-actions class="layout-row align-center gap-5px responsive-column">
-        <button type="button" mat-raised-button [routerLink]="['../']">
-          {{ 'labels.buttons.Cancel' | translate }}
-        </button>
-        <button mat-raised-button color="primary" [disabled]="!collectionSheetForm.valid">
-          <fa-icon icon="search" class="m-r-10"></fa-icon> {{ 'labels.buttons.Collection Sheet' | translate }}
-        </button>
-      </mat-card-actions>
-    </form>
-  </mat-card>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" mat-raised-button [routerLink]="['../']">
+        {{ 'labels.buttons.Cancel' | translate }}
+      </button>
+      <button mat-raised-button color="primary" [disabled]="!collectionSheetForm.valid">
+        <fa-icon icon="search" class="m-r-10"></fa-icon> {{ 'labels.buttons.Collection Sheet' | translate }}
+      </button>
+    </div>
+  </form>
 }
 
 <div class="showcollectionsheet">

@@ -13,7 +13,9 @@
  */
 export function extractCoopErrorMessage(error: unknown, fallback: string): string {
   const httpError = error as
-    { error?: { message?: string; error?: string; defaultUserMessage?: string } } | null | undefined;
+    | { error?: { message?: string; error?: string; defaultUserMessage?: string } }
+    | null
+    | undefined;
 
   return httpError?.error?.message || httpError?.error?.error || httpError?.error?.defaultUserMessage || fallback;
 }

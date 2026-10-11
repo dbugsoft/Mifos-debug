@@ -12,7 +12,7 @@ $header-bg: #f8fafc;
 $row-hover: #f1f5f9;
 $text-primary: #1e293b;
 $text-muted: #64748b;
-$brand-blue: #1074b9;
+$brand-blue: #2460b9;
 
 // ===== Card Container — same width/centering as .breadcrumb-wrapper so left edge aligns with the vertical line =====
 .container {
@@ -33,11 +33,12 @@ $brand-blue: #1074b9;
   margin-bottom: 20px;
   flex-wrap: wrap;
 
+  // Search and checkbox keep one row; the buttons drop below them when the row is full.
   .toolbar-left {
     display: flex;
     align-items: center;
     gap: 16px;
-    flex: 1;
+    flex: 1 1 auto;
     min-width: 0;
     flex-wrap: wrap;
 
@@ -70,7 +71,7 @@ $brand-blue: #1074b9;
     mat-checkbox {
       white-space: nowrap;
       flex-shrink: 0;
-      color: $text-muted;
+      color: var(--dk-text-muted, #{$text-muted});
       font-size: 0.875rem;
     }
   }
@@ -78,8 +79,11 @@ $brand-blue: #1074b9;
   .toolbar-right {
     display: flex;
     align-items: center;
-    gap: 10px;
-    flex-shrink: 0;
+    justify-content: flex-end;
+    gap: 8px;
+    flex: 0 1 auto;
+    flex-wrap: wrap;
+    margin-left: auto;
 
     .btn-icon {
       margin-right: 6px;
@@ -90,13 +94,13 @@ $brand-blue: #1074b9;
 // ===== Table =====
 .members-table {
   width: 100%;
-  border: 1px solid $border;
+  border: 1px solid var(--dk-border, #{$border});
   border-radius: 8px;
   overflow: hidden;
 
   // Header row
   .mat-mdc-header-row {
-    background: $brand-blue;
+    background: var(--dk-fill, #{$brand-blue});
     border-bottom: none;
   }
 
@@ -112,13 +116,13 @@ $brand-blue: #1074b9;
   td.mat-mdc-cell {
     padding: 14px 16px;
     font-size: 0.875rem;
-    color: $text-primary;
-    border-bottom: 1px solid $border;
+    color: var(--dk-text, #{$text-primary});
+    border-bottom: 1px solid var(--dk-border, #{$border});
   }
 
   // Alternating row colors
   .mat-mdc-row:nth-child(even) {
-    background: #fafafa;
+    background: var(--dk-surface-2, #fafafa);
   }
 
   .mat-mdc-row:last-child td {
@@ -130,7 +134,7 @@ $brand-blue: #1074b9;
     transition: background 0.15s ease;
 
     &:hover {
-      background: $row-hover !important;
+      background: var(--dk-surface-2, #{$row-hover}) !important;
     }
   }
 
@@ -138,7 +142,7 @@ $brand-blue: #1074b9;
   .sno-col {
     width: 56px;
     min-width: 56px;
-    color: $text-muted;
+    color: var(--dk-text-muted, #{$text-muted});
     font-size: 0.8rem;
     text-align: center;
   }
@@ -146,7 +150,7 @@ $brand-blue: #1074b9;
   // Clickable name cell
   .name-cell {
     font-weight: 500;
-    color: $brand-blue;
+    color: var(--dk-primary, #{$brand-blue});
     cursor: pointer;
 
     &:hover {
@@ -173,9 +177,9 @@ $brand-blue: #1074b9;
 
 // ===== Paginator =====
 mat-paginator {
-  border-top: 1px solid $border;
+  border-top: 1px solid var(--dk-border, #{$border});
   font-size: 0.8rem;
-  color: $text-muted;
+  color: var(--dk-text-muted, #{$text-muted});
 }
 
 // ===== Progress Bar =====
@@ -190,7 +194,7 @@ mat-progress-bar {
   align-items: center;
   justify-content: center;
   padding: 48px 24px;
-  color: $text-muted;
+  color: var(--dk-text-muted, #{$text-muted});
   gap: 12px;
 
   .empty-icon {
@@ -245,7 +249,19 @@ table {
     }
 
     .toolbar-right {
-      justify-content: flex-end;
+      margin-left: 0;
+
+      // Buttons share the width, two or three to a row.
+      button {
+        flex: 1 1 140px;
+      }
     }
+  }
+
+  // Wide tables scroll sideways instead of squeezing their columns.
+  .members-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
   }
 }

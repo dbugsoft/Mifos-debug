@@ -5,3 +5,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
+
+@use '../../../shared/styles/compact-stepper' as *;
+
+@include compact-stepper($uniform-grid: true);
+
+// Edit renders inside the product view, which already frames the page (90%, max 84rem);
+// framing again here would indent it twice. Fill the view instead.
+.container {
+  width: 100%;
+  max-width: none;
+  padding-bottom: 32px;
+}

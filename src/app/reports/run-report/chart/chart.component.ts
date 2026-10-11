@@ -7,7 +7,19 @@
  */
 
 /** Angular Imports */
-import { ChangeDetectionStrategy, Component, OnChanges, Input, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  OnChanges,
+  Input,
+  inject
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Subject, of } from 'rxjs';
+import { catchError, switchMap } from 'rxjs/operators';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 /** Custom Services */
 import { ReportsService } from '../../reports.service';
@@ -17,6 +29,7 @@ import { ChartData } from '../../common-models/chart-data.model';
 
 /** Charting Imports */
 import { Chart, registerables } from 'chart.js';
+import { applyChartTheme } from 'app/shared/utils/chart-theme.util';
 import { MatButtonToggleGroup, MatButtonToggle } from '@angular/material/button-toggle';
 import { NgStyle } from '@angular/common';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
@@ -35,12 +48,15 @@ Chart.register(...registerables);
     ...STANDALONE_SHARED_IMPORTS,
     MatButtonToggleGroup,
     MatButtonToggle,
-    NgStyle
+    NgStyle,
+    MatProgressSpinner
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ChartComponent implements OnChanges {
   private reportsService = inject(ReportsService);
+  private destroyRef = inject(DestroyRef);
+  private cdr = inject(ChangeDetectorRef);
 
   /** Run Report Data */
   @Input() dataObject: any;
@@ -51,6 +67,31 @@ export class ChartComponent implements OnChanges {
   hideOutput = true;
   /** Data object for witching charts in view. */
   inputData: ChartData;
+  /** A run is in flight; the earlier chart stays visible underneath the spinner. */
+  loading = false;
+  /** Runs to fetch; switchMap cancels a run superseded by a newer one. */
+  private runs = new Subject<any>();
+
+  constructor() {
+    this.runs
+      .pipe(
+        switchMap((dataObject: any) =>
+          this.reportsService
+            .getChartRunReportData(dataObject.report.name, dataObject.formData)
+            .pipe(catchError(() => of(null)))
+        ),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe((response: ChartData | null) => {
+        if (response) {
+          this.inputData = response;
+          this.setPieChart(this.inputData);
+          this.hideOutput = false;
+        }
+        this.loading = false;
+        this.cdr.markForCheck();
+      });
+  }
 
   /**
    * Fetches run report data post changes in run report form.
@@ -60,13 +101,8 @@ export class ChartComponent implements OnChanges {
   }
 
   getRunReportData() {
-    this.reportsService
-      .getChartRunReportData(this.dataObject.report.name, this.dataObject.formData)
-      .subscribe((response: ChartData) => {
-        this.inputData = response;
-        this.setPieChart(this.inputData);
-        this.hideOutput = false;
-      });
+    this.loading = true;
+    this.runs.next(this.dataObject);
   }
 
   /**
@@ -77,6 +113,7 @@ export class ChartComponent implements OnChanges {
     if (this.chart) {
       this.chart.destroy();
     }
+    applyChartTheme();
     this.chart = new Chart('output', {
       type: 'pie',
       data: {
@@ -108,6 +145,7 @@ export class ChartComponent implements OnChanges {
     if (this.chart) {
       this.chart.destroy();
     }
+    applyChartTheme();
     this.chart = new Chart('output', {
       type: 'bar',
       data: {

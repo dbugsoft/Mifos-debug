@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { ChangeDetectionStrategy, Component, OnInit, inject, DestroyRef } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CollectionsService } from '../collections.service';
@@ -14,6 +14,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { SettingsService } from 'app/settings/settings.service';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { NepaliDateInputComponent } from 'app/shared/nepali-date-input/nepali-date-input.component';
 
 import { OrganizationService } from 'app/organization/organization.service';
 import { CentersService } from 'app/centers/centers.service';
@@ -28,7 +29,8 @@ import { Logger } from 'app/core/logger/logger.service';
   styleUrl: './collection-sheet.component.scss',
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
-    FaIconComponent
+    FaIconComponent,
+    NepaliDateInputComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -43,6 +45,8 @@ export class CollectionSheetComponent implements OnInit {
   private settingsService = inject(SettingsService);
   private dateUtils = inject(Dates);
   private destroyRef = inject(DestroyRef);
+  /** OnPush: the staff, centers and groups arrive over HTTP, so each response marks the view for a redraw. */
+  private cdr = inject(ChangeDetectorRef);
 
   /** Offices Data */
   officesData: any;
@@ -118,12 +122,15 @@ export class CollectionSheetComponent implements OnInit {
         this.officeId = officeId;
         this.organizationService.getStaffs(officeId).subscribe((response: any) => {
           this.loanOfficerData = response;
+          this.cdr.markForCheck();
         });
         this.organizationService.getCenters(officeId).subscribe((response: any) => {
           this.centersData = response;
+          this.cdr.markForCheck();
         });
         this.organizationService.getGroups(officeId).subscribe((response: any) => {
           this.groupsData = response;
+          this.cdr.markForCheck();
         });
       });
   }

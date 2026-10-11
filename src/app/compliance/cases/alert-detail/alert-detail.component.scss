@@ -1,0 +1,68 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+@use '../../compliance' as compliance;
+@use '../../risk/risk' as risk;
+
+@include compliance.page;
+@include risk.plain-rows;
+
+.head {
+  padding-top: 16px;
+
+  .title {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    align-items: center;
+  }
+
+  .name {
+    margin: 0;
+    font-size: 1.25rem;
+  }
+
+  .detail {
+    margin: 8px 0 12px;
+  }
+}
+
+.sub {
+  display: block;
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: center;
+  margin-top: 8px;
+
+  .add-to {
+    width: 260px;
+    max-width: 100%;
+  }
+}
+
+.plain-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    padding: 8px 0;
+    border-bottom: 1px solid rgb(127 127 127 / 15%);
+  }
+}
+
+table.plain-rows .num {
+  text-align: right;
+  white-space: nowrap;
+}

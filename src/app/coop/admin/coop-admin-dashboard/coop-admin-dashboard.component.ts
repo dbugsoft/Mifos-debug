@@ -23,7 +23,12 @@ import { MatChipsModule } from '@angular/material/chips';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { QueryClient, injectQuery } from '@tanstack/angular-query-experimental';
 
-import { CoopAdminRegistration, CoopAdminService, CoopAdminStatus } from '../../services/coop-admin.service';
+import {
+  CoopAdminRegistration,
+  CoopAdminService,
+  CoopAdminStatus,
+  CoopAdminStats
+} from '../../services/coop-admin.service';
 import { CoopAuthService } from '../../services/coop-auth.service';
 import { CoopTokenService } from '../../services/coop-token.service';
 import { adminListQueryOptions, adminStatsQueryOptions } from '../../queries/coop-admin.queries';
@@ -89,6 +94,9 @@ export class CoopAdminDashboardComponent {
     50
   ];
 
+  /** Fixed row count for the table shimmer skeleton (initial load only). */
+  readonly skeletonRows = Array.from({ length: 6 });
+
   pageSize = signal(20);
   currentPage = signal(1);
 
@@ -117,8 +125,17 @@ export class CoopAdminDashboardComponent {
 
   private cooperativesQuery = injectQuery(() => adminListQueryOptions(this.coopAdminService, this.queryParams()));
 
-  get stats() {
-    return this.statsQuery.data() ?? null;
+  get stats(): CoopAdminStats {
+    const data = this.statsQuery.data();
+
+    return {
+      UNVERIFIED_EMAIL: data?.UNVERIFIED_EMAIL ?? 0,
+      PENDING: data?.PENDING ?? 0,
+      PROVISIONED: data?.PROVISIONED ?? 0,
+      ACTIVE: data?.ACTIVE ?? 0,
+      REJECTED: data?.REJECTED ?? 0,
+      WITHDRAWN: data?.WITHDRAWN ?? 0
+    };
   }
 
   get statsLoading(): boolean {
@@ -139,6 +156,19 @@ export class CoopAdminDashboardComponent {
 
   get listLoading(): boolean {
     return this.cooperativesQuery.isFetching();
+  }
+
+  /**
+   * True only while the cooperative list has never loaded (no
+   * placeholder/previous-page data available yet) - drives the
+   * full table shimmer skeleton. adminListQueryOptions() keeps the
+   * previous page's data visible via placeholderData while a
+   * search/filter/pagination change is in flight, so isPending()
+   * stays false (and the existing table stays on screen) for every
+   * refetch after the very first one.
+   */
+  get cooperativesInitialLoading(): boolean {
+    return this.cooperativesQuery.isPending();
   }
 
   get listError(): string {
@@ -215,9 +245,10 @@ export class CoopAdminDashboardComponent {
   }
 
   viewDetails(cooperative: CoopAdminRegistration): void {
+    // appUserId, not id: every admin endpoint addresses a cooperative by its registry account id.
     this.router.navigate([
       '/coop/admin',
-      cooperative.id
+      cooperative.appUserId
     ]);
   }
 

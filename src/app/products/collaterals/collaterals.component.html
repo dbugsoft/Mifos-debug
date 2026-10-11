@@ -6,25 +6,28 @@
   file, You can obtain one at http://mozilla.org/MPL/2.0/.
 -->
 
-<div class="container m-b-20 layout-row align-end gap-20px">
-  <button mat-raised-button color="primary" [routerLink]="['create']" *mifosxHasPermission="'CREATE_CHARGE'">
-    <fa-icon icon="plus" class="m-r-10"></fa-icon>
-    {{ 'labels.text.Create Collateral' | translate }}
-  </button>
-</div>
-
 <div class="container">
-  <div class="layout-row gap-20px">
-    <mat-form-field class="flex-fill">
-      <mat-label>{{ 'labels.inputs.Filter' | translate }}</mat-label>
-      <input matInput (keyup)="applyFilter($event.target.value)" />
-    </mat-form-field>
+  <div class="list-toolbar">
+    <div class="toolbar-left">
+      <mat-form-field class="search-field" appearance="outline" subscriptSizing="dynamic">
+        <mat-icon matPrefix>search</mat-icon>
+        <input matInput [placeholder]="'labels.inputs.Filter' | translate" (keyup)="applyFilter($event.target.value)" />
+      </mat-form-field>
+    </div>
+
+    <div class="toolbar-right">
+      <button mat-raised-button color="primary" [routerLink]="['create']" *mifosxHasPermission="'CREATE_CHARGE'">
+        <fa-icon icon="plus" class="btn-icon"></fa-icon>
+        {{ 'labels.text.Create Collateral' | translate }}
+      </button>
+    </div>
   </div>
-  <div class="mat-elevation-z8">
-    <table mat-table [dataSource]="dataSource" matSort>
+
+  <div>
+    <table mat-table [dataSource]="dataSource" matSort class="members-table">
       <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'labels.inputs.Name' | translate }}</th>
-        <td mat-cell *matCellDef="let collateral">{{ collateral.name }}</td>
+        <td mat-cell *matCellDef="let collateral" class="name-cell">{{ collateral.name }}</td>
       </ng-container>
 
       <ng-container matColumnDef="quality">

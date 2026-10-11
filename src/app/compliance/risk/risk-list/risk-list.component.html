@@ -1,0 +1,123 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="compliance-page">
+  @if (allowed() === false) {
+    <p class="empty">{{ 'compliance.You have no compliance access' | translate }}</p>
+  } @else {
+    <div class="filters">
+      <mat-button-toggle-group
+        [value]="view()"
+        (change)="show($event.value)"
+        [attr.aria-label]="'compliance.Show' | translate"
+      >
+        @for (v of views; track v) {
+          <mat-button-toggle [value]="v">{{ 'compliance.risk.view.' + v | translate }}</mat-button-toggle>
+        }
+      </mat-button-toggle-group>
+      <mat-form-field class="search" subscriptSizing="dynamic">
+        <mat-label>{{ 'compliance.risk.Search' | translate }}</mat-label>
+        <input matInput [value]="search()" (input)="search.set($any($event.target).value)" />
+      </mat-form-field>
+    </div>
+
+    <p class="hint">{{ 'compliance.risk.lead.' + view() | translate }}</p>
+
+    @if (loading()) {
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }
+
+    <section class="frame">
+      <h2 class="legend">{{ 'compliance.risk.view.' + view() | translate }}</h2>
+      @if (view() === 'EDD') {
+        @if (visibleEdd().length) {
+          <div class="table-scroll">
+            <table class="blue plain-rows">
+              <thead>
+                <tr>
+                  <th>{{ 'compliance.Member' | translate }}</th>
+                  <th>{{ 'compliance.risk.Why' | translate }}</th>
+                  <th>{{ 'compliance.risk.Next review' | translate }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (e of visibleEdd(); track e.id) {
+                  <tr class="row" tabindex="0" (click)="open(e.clientId)" (keydown.enter)="open(e.clientId)">
+                    <td>
+                      {{ e.name }}
+                      <span class="sub">{{ e.accountNo }}</span>
+                    </td>
+                    <td>
+                      {{ e.why }}
+                      <span class="sub">{{ 'compliance.risk.Opened on' | translate }} {{ e.openedOn | adToBs }}</span>
+                    </td>
+                    <td>{{ e.nextReviewOn | adToBs }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        } @else if (!loading()) {
+          <p class="empty">{{ 'compliance.risk.empty.EDD' | translate }}</p>
+        }
+      } @else {
+        @if (visibleRows().length) {
+          <div class="table-scroll">
+            <table class="blue plain-rows">
+              <thead>
+                <tr>
+                  <th>{{ 'compliance.Member' | translate }}</th>
+                  <th>{{ 'compliance.risk.Grade' | translate }}</th>
+                  <th class="wide">{{ 'compliance.risk.Why' | translate }}</th>
+                  <th class="wide">{{ 'compliance.risk.Next review' | translate }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (r of visibleRows(); track r.clientId) {
+                  <tr class="row" tabindex="0" (click)="open(r.clientId)" (keydown.enter)="open(r.clientId)">
+                    <td>
+                      {{ r.name }}
+                      <span class="sub">{{ r.accountNo }} · {{ r.office }}</span>
+                      <span class="sub narrow">
+                        @for (b of bases(r); track b; let last = $last) {
+                          {{ 'compliance.basis.' + b | translate }}{{ last ? '' : ' · ' }}
+                        }
+                      </span>
+                    </td>
+                    <td>
+                      <span
+                        class="chip"
+                        [class.red]="r.grade === 'HIGH'"
+                        [class.amber]="r.grade === 'MEDIUM'"
+                        [class.green]="r.grade === 'NORMAL'"
+                        >{{ 'compliance.grade.' + r.grade | translate }}</span
+                      >
+                      @if (r.overrideGrade) {
+                        <span class="sub">{{ 'compliance.risk.Set by the officer' | translate }}</span>
+                      }
+                    </td>
+                    <td class="wide">
+                      @for (b of bases(r); track b; let last = $last) {
+                        {{ 'compliance.basis.' + b | translate }}{{ last ? '' : ' · ' }}
+                      }
+                    </td>
+                    <td class="wide">
+                      {{ r.nextReviewOn ? (r.nextReviewOn | adToBs) : '—' }}
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        } @else if (!loading()) {
+          <p class="empty">{{ 'compliance.risk.empty.' + view() | translate }}</p>
+        }
+      }
+    </section>
+  }
+</div>

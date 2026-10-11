@@ -8,14 +8,24 @@
 
 <form [formGroup]="recurringDepositProductInterestRateChartForm">
   <div class="layout-row-wrap gap-2px responsive-column">
-    <h3 class="mat-h3 flex-83">{{ 'labels.heading.Interest Rate Charts' | translate }}</h3>
-
     <div class="flex-13 layout-row align-start-center">
-      <button type="button" mat-raised-button color="primary" (click)="addChart()">
+      <button
+        type="button"
+        mat-raised-button
+        color="primary"
+        matTooltip="{{ 'tooltips.The interest rate chart' | translate }}"
+        (click)="addChart()"
+      >
         <fa-icon icon="plus" class="m-r-10"></fa-icon>
         {{ 'labels.buttons.Add' | translate }}
       </button>
     </div>
+
+    @if (!charts.length) {
+      <p class="flex-98 no-chart">
+        {{ 'labels.heading.It is required to add at least one Interest Rate Chart' | translate }}
+      </p>
+    }
 
     @for (chart of charts.controls; track chart; let chartIndex = $index) {
       <div class="flex-fill layout-row-wrap responsive-column" formArrayName="charts">
@@ -53,30 +63,21 @@
               </mat-error>
             }
           </mat-form-field>
-          <mat-form-field class="flex-48 m-r-5" (click)="validFromDatePicker.open()">
-            <mat-label>{{ 'labels.inputs.From Date' | translate }}</mat-label>
-            <input
-              matInput
-              [min]="minDate"
-              [max]="maxDate"
-              [matDatepicker]="validFromDatePicker"
+          <div class="flex-fill layout-row-wrap content-sized">
+            <mifosx-nepali-date-input
+              [inline]="true"
+              [label]="'labels.inputs.From Date' | translate"
               formControlName="fromDate"
-              required
+              [minDate]="minDate"
+              [maxDate]="maxDate"
             />
-            <mat-datepicker-toggle matSuffix [for]="validFromDatePicker"></mat-datepicker-toggle>
-            <mat-datepicker #validFromDatePicker></mat-datepicker>
-            <mat-error>
-              {{ 'labels.inputs.From Date' | translate }} {{ 'labels.commons.is' | translate }}
-              <strong>{{ 'labels.commons.required' | translate }}</strong>
-            </mat-error>
-          </mat-form-field>
-          <mat-form-field class="flex-48 m-r-5" (click)="endDatePicker.open()">
-            <mat-label>{{ 'labels.inputs.End Date' | translate }}</mat-label>
-            <input matInput [min]="minDate" [max]="maxDate" [matDatepicker]="endDatePicker" formControlName="endDate" />
-            <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
-            <mat-datepicker #endDatePicker></mat-datepicker>
-          </mat-form-field>
-          <div class="flex-31 layout-row align-between align-items-center">
+            <mifosx-nepali-date-input
+              [inline]="true"
+              [label]="'labels.inputs.End Date' | translate"
+              formControlName="endDate"
+              [minDate]="minDate"
+              [maxDate]="maxDate"
+            />
             <mat-checkbox labelPosition="before" formControlName="isPrimaryGroupingByAmount">
               {{ 'labels.inputs.Is primary grouping by amount?' | translate }}
             </mat-checkbox>

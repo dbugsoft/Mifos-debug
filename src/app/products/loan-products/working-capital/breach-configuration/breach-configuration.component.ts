@@ -7,6 +7,7 @@
  */
 import { ChangeDetectionStrategy, Component, inject, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
+import { MatIcon } from '@angular/material/icon';
 import { MatSort, MatSortHeader } from '@angular/material/sort';
 import {
   MatTableDataSource,
@@ -52,6 +53,7 @@ import { MatDialog } from '@angular/material/dialog';
     MatRowDef,
     MatRow,
     MatPaginator,
+    MatIcon,
     FormatNumberPipe
   ],
   changeDetection: ChangeDetectionStrategy.OnPush

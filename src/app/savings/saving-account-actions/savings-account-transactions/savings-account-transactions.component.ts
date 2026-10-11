@@ -12,7 +12,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormGroup, FormBuilder, Validators, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { MatStepper, MatStepperModule } from '@angular/material/stepper';
-import { finalize } from 'rxjs';
+import { EMPTY, finalize, of, switchMap } from 'rxjs';
+import { SourceOfFundsService } from 'app/compliance/source-of-funds/source-of-funds.service';
 
 /** Custom Services */
 import { SavingsService } from '../../savings.service';
@@ -52,6 +53,7 @@ export class SavingsAccountTransactionsComponent implements OnInit {
   private savingsService = inject(SavingsService);
   private settingsService = inject(SettingsService);
   private destroyRef = inject(DestroyRef);
+  private sourceOfFunds = inject(SourceOfFundsService);
 
   /** Minimum Due Date allowed. */
   minDate = new Date(2000, 0, 1);
@@ -186,9 +188,24 @@ export class SavingsAccountTransactionsComponent implements OnInit {
       locale
     };
     data['transactionAmount'] = data['transactionAmount'] * 1;
-    this.savingsService
-      .executeSavingsAccountTransactionsCommand(this.savingAccountId, this.transactionCommand, data)
-      .pipe(finalize(() => (this.isSubmitting = false)))
+    // a deposit of the line or more first asks where the money comes from (fineract-dbug #132, #137)
+    const declared$ =
+      this.transactionCommand === 'deposit'
+        ? this.sourceOfFunds.ensureDeclared('SAVINGS', { accountId: this.savingAccountId }, data['transactionAmount'])
+        : of(true);
+    declared$
+      .pipe(
+        switchMap((declared) =>
+          declared
+            ? this.savingsService.executeSavingsAccountTransactionsCommand(
+                this.savingAccountId,
+                this.transactionCommand,
+                data
+              )
+            : EMPTY
+        ),
+        finalize(() => (this.isSubmitting = false))
+      )
       .subscribe((res) => {
         this.transactionResponse = res;
         this.stepper.next();

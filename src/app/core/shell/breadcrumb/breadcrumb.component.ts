@@ -35,6 +35,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { MatIcon } from '@angular/material/icon';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { formatTabLabel } from 'app/shared/utils/format-tab-label.util';
+import { normalizeBreadcrumbUrl } from 'app/shared/utils/breadcrumb-url.util';
 
 /**
  * Route data property to generate breadcrumb using a static string.
@@ -65,12 +66,33 @@ const routeResolveBreadcrumb = 'routeResolveBreadcrumb';
  */
 const routeAddBreadcrumbLink = 'addBreadcrumbLink';
 /**
+ * Route data property to put a parent page crumb before this route's own, for sections whose
+ * landing page lives in another module. Read from the route config only, so children do not inherit it.
+ *
+ * Example- parentBreadcrumb: { label: 'Member Management', url: '/member-management' }
+ */
+const routeParentBreadcrumb = 'parentBreadcrumb';
+/**
  * Route data property to hide the breadcrumb trail (the `home › ...` line)
  * while still showing the page title. Useful for top-level landing pages.
  *
  * Example- hideBreadcrumbTrail: true
  */
 const routeHideBreadcrumbTrail = 'hideBreadcrumbTrail';
+/**
+ * Route data property to hide the "Back to ..." link, for pages reached from the sidebar.
+ *
+ * Example- hideBackLink: true
+ */
+const routeHideBackLink = 'hideBackLink';
+/**
+ * Route data property: a function of the route's data giving the page heading, when the heading should differ
+ * from the crumb (the crumb shows the id, the heading the name). Read from the route config only, so child
+ * pages such as Edit keep their own heading.
+ *
+ * Example- pageTitle: (data) => `${data.user.firstname} ${data.user.lastname}`
+ */
+const routePageTitle = 'pageTitle';
 
 /**
  * Generate breadcrumbs dynamically via route configuration.
@@ -98,6 +120,10 @@ export class BreadcrumbComponent implements AfterViewInit {
   breadcrumbs: Breadcrumb[];
   /** Whether the breadcrumb trail (the `home › ...` line) should be hidden for the current route. */
   hideTrail = false;
+  /** Link of the nearest navigable parent breadcrumb, used by the back button. */
+  backUrl: string | null = null;
+  /** Label of that parent breadcrumb, e.g. the member's name. */
+  backLabel = '';
   /* Reference of breadcrumb */
   @ViewChild('breadcrumb') breadcrumb: ElementRef<any>;
   /* Template for popover on breadcrumb */
@@ -136,6 +162,7 @@ export class BreadcrumbComponent implements AfterViewInit {
           childrenRoutes.forEach((route) => {
             currentRoute = route;
             breadcrumbLabel = false;
+            let isClientCrumb = false;
 
             if (route.outlet !== 'primary') {
               return;
@@ -170,7 +197,7 @@ export class BreadcrumbComponent implements AfterViewInit {
                 const routeData: Data = route.snapshot.data;
                 if (routeData.breadcrumb === 'Clients') {
                   breadcrumbLabel = this.printableValue(routeData.clientViewData.displayName);
-                  currentUrl += `/general`;
+                  isClientCrumb = true;
                 } else if (routeData.breadcrumb === 'Groups') {
                   breadcrumbLabel = routeData.groupViewData.name;
                 } else if (routeData.breadcrumb === 'Centers') {
@@ -241,22 +268,29 @@ export class BreadcrumbComponent implements AfterViewInit {
                 }
               }
             }
-            if (url !== undefined) {
-              if (url.length > 8 && url.search(`/clients/`) > 0) {
-                const replaceGeneral = `/general/`;
-                let currentUrlTemp = url.replace(replaceGeneral, `/`);
-                currentUrlTemp = currentUrlTemp.replace(`//`, `/`);
-                currentUrlTemp += `/general`;
-                const replaceDoubleSlash = `/general/general`;
-                currentUrlTemp = currentUrlTemp.replace(replaceDoubleSlash, `/general`);
-                url = currentUrlTemp;
-              }
+            if (typeof url === 'string' && url) {
+              url = normalizeBreadcrumbUrl(url, isClientCrumb);
             }
 
             const breadcrumb: Breadcrumb = {
               label: breadcrumbLabel,
-              url: url
+              url: url,
+              // The view may sit on the route itself (members) or on its empty-path child (groups, centers).
+              hostsPage: [
+                route,
+                route.firstChild?.routeConfig?.path === '' ? route.firstChild : null
+              ].some((hosting) => !!(hosting?.routeConfig?.component || hosting?.routeConfig?.loadComponent))
             };
+
+            const pageTitle = route.routeConfig?.data?.[routePageTitle];
+            if (typeof pageTitle === 'function') {
+              breadcrumb.title = pageTitle(route.snapshot.data);
+            }
+
+            const parentBreadcrumb: Breadcrumb | undefined = route.routeConfig?.data?.[routeParentBreadcrumb];
+            if (parentBreadcrumb) {
+              this.breadcrumbs.push(parentBreadcrumb);
+            }
 
             if (breadcrumbLabel) {
               this.breadcrumbs.push(breadcrumb);
@@ -264,8 +298,27 @@ export class BreadcrumbComponent implements AfterViewInit {
           });
         }
         this.hideTrail = !!(currentRoute?.snapshot?.data && currentRoute.snapshot.data[routeHideBreadcrumbTrail]);
+        this.setBackLink();
+        if (currentRoute?.snapshot?.data?.[routeHideBackLink]) {
+          this.backUrl = null;
+        }
         this.cdr.markForCheck();
       });
+  }
+
+  /**
+   * Link of the nearest parent breadcrumb that is navigable, or null on top level pages.
+   */
+  private setBackLink(): void {
+    const currentUrl = this.router.url.split('?')[0];
+    const parents = this.breadcrumbs
+      .slice(0, -1)
+      // Not the page itself: the same url, or a view that shows this page inside it (a tab). A sibling
+      // page such as a member's Edit keeps the member as its parent.
+      .filter((crumb) => typeof crumb.url === 'string' && crumb.url && crumb.url !== currentUrl && !crumb.hostsPage);
+    const parent = parents.length ? parents[parents.length - 1] : null;
+    this.backUrl = parent ? parent.url : null;
+    this.backLabel = parent ? (parent.title ?? parent.label) : '';
   }
 
   printableValue(value: string): string {

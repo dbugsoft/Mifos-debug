@@ -13,6 +13,7 @@ import { Router } from '@angular/router';
 /** Custom Services */
 import { Logger } from '../logger/logger.service';
 import { AuthenticationService } from './authentication.service';
+import { PasswordRenewalService } from './password-renewal.service';
 
 /** Initialize logger */
 const log = new Logger('AuthenticationGuard');
@@ -24,13 +25,20 @@ const log = new Logger('AuthenticationGuard');
 export class AuthenticationGuard {
   private router = inject(Router);
   private authenticationService = inject(AuthenticationService);
+  private passwordRenewal = inject(PasswordRenewalService);
 
   /**
    * Ensures route access is authorized only when user is authenticated, otherwise redirects to login.
+   * While a password change is required, no route may be entered: the blocking dialog stays in front.
    *
    * @returns {boolean} True if user is authenticated.
    */
   canActivate(): boolean {
+    if (this.passwordRenewal.required) {
+      log.debug('Password change required, navigation blocked');
+      return false;
+    }
+
     if (this.authenticationService.isAuthenticated()) {
       return true;
     }

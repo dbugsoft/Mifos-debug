@@ -25,8 +25,8 @@ import {
 import { MatDivider } from '@angular/material/divider';
 import { MatStepperPrevious, MatStepperNext } from '@angular/material/stepper';
 import { FindPipe } from '../../../pipes/find.pipe';
-import { DateFormatPipe } from '../../../pipes/date-format.pipe';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { AdToBsPipe } from 'app/pipes/ad-to-bs.pipe';
 
 /**
  * Client Family Members Step
@@ -47,7 +47,7 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     MatStepperPrevious,
     MatStepperNext,
     FindPipe,
-    DateFormatPipe
+    AdToBsPipe
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -69,7 +69,7 @@ export class ClientFamilyMembersStepComponent {
         context: this.translateService.instant('labels.buttons.Add'),
         options: this.clientTemplate.familyMemberOptions
       },
-      width: '44rem'
+      width: '52rem'
     });
     addFamilyMemberDialogRef.afterClosed().subscribe((response: any) => {
       if (response.member) {
@@ -90,7 +90,7 @@ export class ClientFamilyMembersStepComponent {
         member: member,
         options: this.clientTemplate.familyMemberOptions
       },
-      width: '42rem'
+      width: '52rem'
     });
     addFamilyMemberDialogRef.afterClosed().subscribe((response: any) => {
       if (response.member) {

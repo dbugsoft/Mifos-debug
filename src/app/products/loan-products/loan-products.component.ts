@@ -15,6 +15,7 @@ import {
   ElementRef,
   ViewChild,
   AfterViewInit,
+  ChangeDetectorRef,
   inject
 } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
@@ -46,8 +47,11 @@ import { SettingsService } from 'app/settings/settings.service';
 import { ErrorHandlerService } from 'app/core/error-handler/error-handler.service';
 import { ImportLoanProductDialogComponent } from './import-loan-product-dialog/import-loan-product-dialog.component';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
-import { MatTooltip } from '@angular/material/tooltip';
 import { MatMenu, MatMenuTrigger, MatMenuItem } from '@angular/material/menu';
+import { MatButtonToggleGroup, MatButtonToggle } from '@angular/material/button-toggle';
+import { MatIcon } from '@angular/material/icon';
+import { MatPrefix } from '@angular/material/form-field';
+import { MatProgressBar } from '@angular/material/progress-bar';
 import { StatusLookupPipe } from '../../pipes/status-lookup.pipe';
 import { DateFormatPipe } from '../../pipes/date-format.pipe';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
@@ -70,7 +74,6 @@ import { LoanProductBaseComponent } from './common/loan-product-base.component';
     MatSortHeader,
     MatCellDef,
     MatCell,
-    MatTooltip,
     MatHeaderRowDef,
     MatHeaderRow,
     MatRowDef,
@@ -79,6 +82,11 @@ import { LoanProductBaseComponent } from './common/loan-product-base.component';
     MatMenu,
     MatMenuTrigger,
     MatMenuItem,
+    MatButtonToggleGroup,
+    MatButtonToggle,
+    MatIcon,
+    MatPrefix,
+    MatProgressBar,
     StatusLookupPipe,
     DateFormatPipe
   ],
@@ -92,8 +100,10 @@ export class LoanProductsComponent extends LoanProductBaseComponent implements O
   private productsService = inject(ProductsService);
   private settingsService = inject(SettingsService);
   private errorHandler = inject(ErrorHandlerService);
+  private cdr = inject(ChangeDetectorRef);
 
   loanProductSelector = new UntypedFormControl();
+  isLoading = false;
 
   loanProductsData: any;
   displayedColumns: string[] = [
@@ -138,7 +148,9 @@ export class LoanProductsComponent extends LoanProductBaseComponent implements O
     this.dataSource = new MatTableDataSource(this.loanProductsData);
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
-    this.loanProductSelector.patchValue(this.loanProductOptions[0].type);
+    const productType = this.route.snapshot.queryParamMap.get('productType');
+    const selected = this.loanProductOptions.find((option: any) => option.type === productType);
+    this.loanProductSelector.patchValue((selected || this.loanProductOptions[0]).type);
     this.fetchProducts();
   }
 
@@ -209,7 +221,8 @@ export class LoanProductsComponent extends LoanProductBaseComponent implements O
    */
   openImportDialog(): void {
     const importDialogRef = this.dialog.open(ImportLoanProductDialogComponent, {
-      width: '50rem'
+      width: '32rem',
+      maxWidth: '95vw'
     });
 
     importDialogRef.afterClosed().subscribe((response: any) => {
@@ -249,17 +262,18 @@ export class LoanProductsComponent extends LoanProductBaseComponent implements O
         };
 
         // Call API to create loan product with proper error handling
-        const productType = this.loanProductSelector.value === LOAN_PRODUCT_TYPE.LOAN ? '' : 'workingcapital';
+        const productPath = this.loanProductService.loanProductPath;
         this.productsService
-          .createLoanProduct(productType, payload)
+          .createLoanProduct(productPath, payload)
           .pipe(
-            switchMap(() => this.productsService.getLoanProducts(productType)),
+            switchMap(() => this.productsService.getLoanProducts(productPath)),
             catchError((error) => this.errorHandler.handleError(error, 'Loan Product Import'))
           )
           .subscribe({
             next: (data: any) => {
               this.loanProductsData = data;
               this.dataSource.data = this.loanProductsData;
+              this.cdr.markForCheck();
               this.errorHandler.showSuccess('Loan product imported successfully!');
             },
             error: () => {
@@ -285,13 +299,18 @@ export class LoanProductsComponent extends LoanProductBaseComponent implements O
     }
     this.loanProductsData = [];
     this.dataSource.data = this.loanProductsData;
+    this.isLoading = true;
     this.productsService.getLoanProducts(this.loanProductService.loanProductPath).subscribe({
       next: (data: any) => {
         this.loanProductsData = data;
         this.dataSource.data = this.loanProductsData;
+        this.isLoading = false;
+        this.cdr.markForCheck();
       },
       error: () => {
         // Error already handled by ErrorHandlerService
+        this.isLoading = false;
+        this.cdr.markForCheck();
       }
     });
   }

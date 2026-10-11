@@ -43,6 +43,9 @@
   // Display or not the Server Selector
   window['env']['allowServerSwitch'] = '$MIFOS_ALLOW_SERVER_SWITCH_SELECTOR';
 
+  // Block the sign-in page on hostnames that map to no cooperative ('true' to enable)
+  window['env']['blockUnmappedHosts'] = '$MIFOS_BLOCK_UNMAPPED_HOSTS';
+
   // Display or not the BackEnd Info
   window['env']['displayBackEndInfo'] = '$MIFOS_DISPLAY_BACKEND_INFO';
 

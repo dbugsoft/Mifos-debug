@@ -46,6 +46,7 @@ import { TasksService } from '../../tasks.service';
 import { SettingsService } from 'app/settings/settings.service';
 import { Dates } from 'app/core/utils/dates';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { MatIcon } from '@angular/material/icon';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { AccountsFilterPipe } from '../../../pipes/accounts-filter.pipe';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
@@ -57,6 +58,7 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
     FaIconComponent,
+    MatIcon,
     MatTable,
     MatColumnDef,
     MatHeaderCellDef,

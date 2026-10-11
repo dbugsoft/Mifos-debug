@@ -8,11 +8,11 @@
 
 /* eslint-disable @angular-eslint/prefer-inject */
 /** Angular Imports */
-import { ChangeDetectionStrategy, Component, OnInit, HostListener, HostBinding, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, HostListener, OnDestroy, inject } from '@angular/core';
 import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { MatSnackBar, MatSnackBarRef } from '@angular/material/snack-bar';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 
 /** rxjs Imports */
 import { merge, Subscription, Subject } from 'rxjs';
@@ -29,6 +29,11 @@ import { Logger } from './core/logger/logger.service';
 import { ThemeStorageService } from './shared/theme-picker/theme-storage.service';
 import { AlertService } from './core/alert/alert.service';
 import { AuthenticationService } from './core/authentication/authentication.service';
+import { PasswordRenewalService } from './core/authentication/password-renewal.service';
+import { BsCalendarService } from './core/bs-calendar/bs-calendar.service';
+import { CalendarPreferenceService } from './core/bs-calendar/calendar-preference.service';
+import { ForcePasswordChangeDialogComponent } from './login/force-password-change-dialog/force-password-change-dialog.component';
+import { FORCE_PASSWORD_CHANGE_DIALOG_CONFIG } from './login/force-password-change-dialog/force-password-change-dialog.config';
 import { SettingsService } from './settings/settings.service';
 import { DocumentationLinksService } from 'app/shared/services/documentation-links.service';
 import { IdleTimeoutService } from './home/timeout-dialog/idle-timeout.service';
@@ -105,6 +110,11 @@ export class WebAppComponent implements OnInit, OnDestroy {
   private authSubscription: Subscription;
   private destroy$ = new Subject<void>();
 
+  private passwordRenewal = inject(PasswordRenewalService);
+  private bsCalendar = inject(BsCalendarService);
+  private calendarPreference = inject(CalendarPreferenceService);
+  private passwordRenewalDialog: MatDialogRef<ForcePasswordChangeDialogComponent> | null = null;
+
   /**
    * @param {Router} router Router for navigation.
    * @param {ActivatedRoute} activatedRoute Activated Route.
@@ -129,14 +139,13 @@ export class WebAppComponent implements OnInit, OnDestroy {
     private alertService: AlertService,
     private settingsService: SettingsService,
     private authenticationService: AuthenticationService,
+    // Injected so the saved/OS theme is applied at startup.
     private themingService: ThemingService,
     private dateUtils: Dates,
     private idle: IdleTimeoutService,
     private dialog: MatDialog,
     private documentationLinks: DocumentationLinksService
   ) {}
-
-  @HostBinding('class') public cssClass: string;
 
   /**
    * Initial Setup:
@@ -151,17 +160,25 @@ export class WebAppComponent implements OnInit, OnDestroy {
    */
 
   ngOnInit() {
-    this.themingService.theme.subscribe((value: string) => {
-      this.cssClass = value;
-    });
-    this.themingService.setInitialDarkMode();
-    this.themingService.setDarkMode(!!this.settingsService.themeDarkEnabled);
-
     // Setup logger
     if (environment.production) {
       Logger.enableProductionMode();
     }
     log.debug('init');
+
+    // Blocking "set a new password" dialog whenever Fineract requires a password change (FINERACT-2003),
+    // whether at sign-in or mid-session. It can only be left by changing the password or signing out.
+    this.passwordRenewal.required$.pipe(takeUntil(this.destroy$)).subscribe((required) => {
+      if (required && !this.passwordRenewalDialog) {
+        this.passwordRenewalDialog = this.dialog.open(
+          ForcePasswordChangeDialogComponent,
+          FORCE_PASSWORD_CHANGE_DIALOG_CONFIG
+        );
+        this.passwordRenewalDialog.afterClosed().subscribe(() => (this.passwordRenewalDialog = null));
+      } else if (!required && this.passwordRenewalDialog) {
+        this.passwordRenewalDialog.close();
+      }
+    });
 
     // Setup translations
     this.translateService.addLangs(environment.supportedLanguages.split(','));
@@ -189,7 +206,7 @@ export class WebAppComponent implements OnInit, OnDestroy {
         takeUntil(this.destroy$)
       )
       .subscribe(() => {
-        this.titleService.setTitle('COIMS');
+        this.titleService.setTitle('COFMIS');
       });
 
     // Stores top 100 user activites as local storage object.
@@ -205,8 +222,17 @@ export class WebAppComponent implements OnInit, OnDestroy {
       localStorage.setItem('mifosXLocation', JSON.stringify(activities));
     });
 
+    // The BS calendar table and calendar setting (fineract-dbug ADR 0020): once for a session that's already open, and
+    // after every completed sign-in.
+    if (this.authenticationService.isAuthenticated()) {
+      this.loadCalendarSettings();
+    }
+
     // Setup alerts with hover behavior
     this.alertService.alertEvent.subscribe((alertEvent: Alert) => {
+      if (alertEvent.type === this.translateService.instant('errors.auth.success.type')) {
+        this.loadCalendarSettings();
+      }
       const snackBarRef = this.snackBar.open(
         `${alertEvent.message}`,
         this.translateService.instant('labels.buttons.Close'),
@@ -232,11 +258,16 @@ export class WebAppComponent implements OnInit, OnDestroy {
     if (!this.settingsService.servers) {
       this.settingsService.setServers(environment.baseApiUrls.split(','));
     }
-    // Set the Tenant Identifier(s) list from the env var
-    if (!localStorage.getItem('mifosXTenantIdentifier')) {
+    // Set the Tenant Identifier(s) list from the env var.
+    // The tenant is resolved from the current host (see coop-config.ts), so it has to win over a
+    // value left in localStorage by an earlier visit; only a tenant the current configuration
+    // still offers is kept, since that is one the user picked from the tenant selector.
+    const configuredTenants = environment.fineractPlatformTenantIds.split(',').map((tenantId) => tenantId.trim());
+    const storedTenant = this.settingsService.tenantIdentifier;
+    if (!storedTenant || !configuredTenants.includes(storedTenant)) {
       this.settingsService.setTenantIdentifier(environment.fineractPlatformTenantId || 'default');
     }
-    this.settingsService.setTenantIdentifiers(environment.fineractPlatformTenantIds.split(','));
+    this.settingsService.setTenantIdentifiers(configuredTenants);
 
     // Subscribe to session timeout If IdleTimeout is higher than 0 (zero)
     if (environment.session.timeout.idleTimeout > 0) {
@@ -259,6 +290,11 @@ export class WebAppComponent implements OnInit, OnDestroy {
         }, 1000);
       });
     }
+  }
+
+  private loadCalendarSettings(): void {
+    this.bsCalendar.refreshFromServer();
+    this.calendarPreference.load();
   }
 
   /**

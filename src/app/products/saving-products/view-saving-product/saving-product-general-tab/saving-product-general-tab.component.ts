@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, ViewChild, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Accounting } from 'app/core/utils/accounting';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
@@ -27,6 +27,9 @@ import { ViewSavingsAccountingDetailsComponent } from '../../../../shared/accoun
 import { FormatNumberPipe } from '../../../../pipes/format-number.pipe';
 import { YesnoPipe } from '../../../../pipes/yesno.pipe';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
+import { TranslateService } from '@ngx-translate/core';
+import { exportProductJson, exportProductPdf } from 'app/shared/utils/product-export.util';
 
 @Component({
   selector: 'mifosx-saving-product-general-tab',
@@ -48,15 +51,21 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     MatRow,
     ViewSavingsAccountingDetailsComponent,
     FormatNumberPipe,
-    YesnoPipe
+    YesnoPipe,
+    MatMenu,
+    MatMenuItem,
+    MatMenuTrigger
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SavingProductGeneralTabComponent {
   private route = inject(ActivatedRoute);
   private accounting = inject(Accounting);
+  private translateService = inject(TranslateService);
 
   savingProduct: any;
+  /** Rendered product summary; the PDF is built from it so it matches the screen. */
+  @ViewChild('summary') summary: ElementRef<HTMLElement>;
 
   chargesDisplayedColumns: string[] = [
     'name',
@@ -85,5 +94,17 @@ export class SavingProductGeneralTabComponent {
 
   isAccrualAccounting(): boolean {
     return this.accounting.isAccrualAccounting(this.savingProduct.accountingRule);
+  }
+
+  exportDefinition(): void {
+    exportProductJson(this.savingProduct);
+  }
+
+  exportPdf(): void {
+    exportProductPdf(
+      this.summary.nativeElement,
+      this.savingProduct.name,
+      `${this.translateService.instant('labels.inputs.Savings Product')} | ${this.savingProduct.shortName}`
+    );
   }
 }

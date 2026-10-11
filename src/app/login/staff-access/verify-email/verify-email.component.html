@@ -1,0 +1,85 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+<h2 class="step-title">{{ 'staffAccess.verify.Verify your email' | translate }}</h2>
+
+@if (!sent()) {
+  <p class="step-lead">
+    {{ 'staffAccess.verify.Intro' | translate }}
+    <strong>{{ maskedEmail() }}</strong>
+  </p>
+} @else {
+  <p class="step-lead">
+    {{ 'staffAccess.verify.Enter the code sent to' | translate }}
+    <strong>{{ maskedEmail() }}</strong>
+  </p>
+}
+
+@if (error(); as message) {
+  <p class="step-notice error" role="alert">{{ message }}</p>
+}
+@if (info(); as message) {
+  <p class="step-notice info" role="status">{{ message }}</p>
+}
+
+@if (!sent()) {
+  <mifosx-m3-button
+    variant="filled"
+    class="step-submit"
+    [fullWidth]="true"
+    [disabled]="loading()"
+    [label]="'staffAccess.verify.Send code' | translate"
+    (click)="sendCode()"
+  >
+    @if (loading()) {
+      <mat-spinner [diameter]="20" class="button-spinner"></mat-spinner>
+    }
+  </mifosx-m3-button>
+} @else {
+  <form class="step-form" [formGroup]="codeForm" (ngSubmit)="confirm()">
+    <mat-form-field class="step-field" appearance="fill">
+      <mat-label>{{ 'staffAccess.common.6-digit code' | translate }}</mat-label>
+      <input
+        matInput
+        class="code-input"
+        formControlName="code"
+        inputmode="numeric"
+        autocomplete="one-time-code"
+        maxlength="6"
+      />
+      <mifosx-m3-icon matIconPrefix name="pin"></mifosx-m3-icon>
+      <mat-hint>{{ 'staffAccess.common.Code valid for' | translate: { minutes: validMinutes() } }}</mat-hint>
+      @if (codeForm.controls.code.invalid) {
+        <mat-error>{{ 'staffAccess.common.Enter the 6 digits' | translate }}</mat-error>
+      }
+    </mat-form-field>
+
+    <mifosx-m3-button
+      variant="filled"
+      type="submit"
+      class="step-submit"
+      [fullWidth]="true"
+      [disabled]="loading()"
+      [label]="'staffAccess.verify.Verify and sign in' | translate"
+    >
+      @if (loading()) {
+        <mat-spinner [diameter]="20" class="button-spinner"></mat-spinner>
+      }
+    </mifosx-m3-button>
+  </form>
+}
+
+<div class="step-links">
+  <button type="button" class="text-link" (click)="backToSignIn()" [disabled]="loading()">
+    {{ 'staffAccess.common.Back to sign in' | translate }}
+  </button>
+  @if (sent()) {
+    <button type="button" class="text-link" (click)="sendCode()" [disabled]="loading()">
+      {{ 'staffAccess.common.Send a new code' | translate }}
+    </button>
+  }
+</div>

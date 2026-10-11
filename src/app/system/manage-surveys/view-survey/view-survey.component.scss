@@ -37,7 +37,7 @@
 }
 
 #response tr:hover {
-  background-color: #ddd;
+  background-color: var(--dk-surface-2, #ddd);
 }
 
 mat-card-header {

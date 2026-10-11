@@ -16,7 +16,7 @@ mat-card {
   border-radius: 12px;
   box-shadow: 0 4px 20px rgb(0 0 0 / 5%);
   padding: 10px;
-  background-color: var(--md-sys-color-surface, #fff);
+  background-color: var(--md-sys-color-surface, var(--dk-surface, #fff));
 }
 
 .mat-mdc-nav-list {
@@ -30,7 +30,7 @@ mat-card {
     transition: all 0.2s ease-in-out;
 
     &:hover {
-      background-color: rgb(16 116 185 / 5%);
+      background-color: rgb(var(--dk-tint-rgb, 36 96 185) / 5%);
       transform: translateX(4px);
     }
 
@@ -46,7 +46,7 @@ mat-card {
       overflow: hidden;
 
       mat-icon {
-        color: var(--md-sys-color-primary, #1074b9);
+        color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
         display: flex;
         align-items: center;
         justify-content: center;
@@ -62,12 +62,12 @@ mat-card {
 
         .menu-title {
           font-weight: 500;
-          color: var(--md-sys-color-on-surface, #1a1c1e);
+          color: var(--md-sys-color-on-surface, var(--dk-text, #1a1c1e));
           line-height: 1.2;
         }
 
         .menu-explanation {
-          color: var(--md-sys-color-on-surface-variant, #44474e);
+          color: var(--md-sys-color-on-surface-variant, var(--dk-text-2, #44474e));
           font-size: 13px;
           margin-top: 6px;
           line-height: 1.4;
@@ -92,7 +92,7 @@ mat-card {
       height: 40px;
 
       &:focus-visible {
-        outline: 2px solid var(--md-sys-color-primary, #1074b9);
+        outline: 2px solid var(--md-sys-color-primary, var(--dk-primary, #2460b9));
         outline-offset: 2px;
         border-radius: 8px;
       }
@@ -101,7 +101,7 @@ mat-card {
         display: flex;
         align-items: center;
         justify-content: center;
-        color: var(--md-sys-color-outline, #74777f);
+        color: var(--md-sys-color-outline, var(--dk-text-muted, #74777f));
         transition:
           transform 0.2s ease,
           color 0.2s ease;
@@ -109,11 +109,11 @@ mat-card {
 
       fa-icon.rotated {
         transform: rotate(180deg);
-        color: var(--md-sys-color-primary, #1074b9);
+        color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
       }
 
       &:hover fa-icon {
-        color: var(--md-sys-color-primary, #1074b9);
+        color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
       }
     }
   }
@@ -148,11 +148,11 @@ mat-card {
       color: var(--md-sys-color-outline, #939099);
 
       &.rotated {
-        color: var(--md-sys-color-primary, #a8c8ff);
+        color: var(--md-sys-color-primary, #e0e0e0);
       }
 
       &:hover {
-        color: var(--md-sys-color-primary, #a8c8ff);
+        color: var(--md-sys-color-primary, #e0e0e0);
       }
     }
   }

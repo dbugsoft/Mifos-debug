@@ -10,7 +10,7 @@
   padding: 16px 24px;
 
   h2 {
-    color: #4caf50;
+    color: var(--dk-success, #4caf50);
     margin-top: 24px;
     margin-bottom: 16px;
     font-size: 1.5rem;
@@ -18,7 +18,7 @@
   }
 
   h3 {
-    color: #4caf50;
+    color: var(--dk-success, #4caf50);
     margin-top: 20px;
     margin-bottom: 12px;
     font-size: 1.2rem;
@@ -28,12 +28,12 @@
   p {
     line-height: 1.6;
     margin-bottom: 12px;
-    color: var(--md-sys-color-on-surface-variant, #555);
+    color: var(--md-sys-color-on-surface-variant, var(--dk-text-2, #555));
   }
 
   // stylelint-disable-next-line selector-pseudo-element-no-unknown
   ::ng-deep a {
-    color: #4caf50;
+    color: var(--dk-success, #4caf50);
     text-decoration: none;
 
     &:hover {
@@ -48,7 +48,7 @@
     li {
       margin-bottom: 8px;
       line-height: 1.5;
-      color: var(--md-sys-color-on-surface-variant, #555);
+      color: var(--md-sys-color-on-surface-variant, var(--dk-text-2, #555));
     }
   }
 }
@@ -67,7 +67,7 @@
 
     // stylelint-disable-next-line selector-pseudo-element-no-unknown
     ::ng-deep a {
-      color: #0098ff;
+      color: #e0e0e0;
     }
 
     ul li {

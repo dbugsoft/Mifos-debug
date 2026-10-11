@@ -1,0 +1,112 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="container kym-list">
+  @if (!canRead) {
+    <p class="empty-note">{{ 'kym.noPermission' | translate }}</p>
+  } @else {
+    <p class="lead">{{ 'kym.list.lead.' + status() | translate }}</p>
+
+    <mat-card>
+      <mat-card-content>
+        <div class="bar">
+          <mat-form-field class="search" subscriptSizing="dynamic">
+            <mat-label>{{ 'kym.list.Search' | translate }}</mat-label>
+            <input matInput [value]="search()" (input)="search.set($any($event.target).value)" />
+          </mat-form-field>
+          <mat-form-field class="office" subscriptSizing="dynamic">
+            <mat-label>{{ 'kym.list.Office' | translate }}</mat-label>
+            <mat-select [value]="officeId() ?? 0" (selectionChange)="show(null, $event.value || null)">
+              <mat-option [value]="0">{{ 'kym.list.All my offices' | translate }}</mat-option>
+              @for (o of offices(); track o.id) {
+                <mat-option [value]="o.id">{{ o.nameDecorated }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <nav mat-tab-nav-bar [tabPanel]="panel" class="tabs">
+          @for (s of statuses; track s) {
+            <a mat-tab-link [active]="status() === s" (click)="show(s)" (keydown.enter)="show(s)" tabindex="0">
+              {{ 'kym.list.tab.' + s | translate }}
+            </a>
+          }
+        </nav>
+        <mat-tab-nav-panel #panel>
+          <div class="table-wrap">
+            <table class="list">
+              <thead>
+                <tr>
+                  <th class="wide">{{ 'kym.list.SNo' | translate }}</th>
+                  <th>{{ 'kym.list.Member' | translate }}</th>
+                  <th class="wide">{{ 'labels.inputs.Account No' | translate }}</th>
+                  <th class="wide">{{ 'kym.list.Office' | translate }}</th>
+                  <th>
+                    {{ (status() === 'COMPLETE' ? 'kym.list.Status' : 'kym.list.What is missing') | translate }}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (r of visible(); track r.clientId; let i = $index) {
+                  <tr (click)="open(r)" (keydown.enter)="open(r)" tabindex="0" class="row">
+                    <td class="wide">{{ i + 1 }}</td>
+                    <td>
+                      <b>{{ r.name }}</b>
+                      @if (r.organisation) {
+                        <span class="tag">{{ 'kym.list.Organisation' | translate }}</span>
+                      }
+                      @if (r.level === 'SIMPLIFIED') {
+                        <span class="tag">{{ 'kym.Simplified' | translate }}</span>
+                      }
+                      <span class="sub narrow">{{ r.accountNo }} · {{ r.office }}</span>
+                    </td>
+                    <td class="num wide">{{ r.accountNo }}</td>
+                    <td class="wide">{{ r.office }}</td>
+                    <td>
+                      @if (r.status === 'INCOMPLETE') {
+                        <span class="count">{{ 'kym.itemsMissing' | translate: { count: r.missing ?? '?' } }}</span>
+                        @if (missingText(r); as words) {
+                          <span class="sub">{{ words }}</span>
+                        }
+                      } @else {
+                        <span
+                          class="chip"
+                          [class.blue]="r.status === 'COMPLETE'"
+                          [class.green]="r.status === 'VERIFIED'"
+                          >{{ 'kym.status.' + r.status | translate }}</span
+                        >
+                      }
+                      @if (r.nextReviewOn && (status() === 'REVIEW_DUE' || status() === 'BLOCKED')) {
+                        <span class="sub">{{
+                          'kym.list.reviewWasDue' | translate: { date: (r.nextReviewOn | dateFormat) }
+                        }}</span>
+                      }
+                    </td>
+                  </tr>
+                } @empty {
+                  <tr>
+                    <td colspan="5" class="empty">
+                      {{ (loading() ? 'kym.Loading' : 'kym.list.empty.' + status()) | translate }}
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+          @if (more()) {
+            <div class="more">
+              <button mat-stroked-button color="primary" type="button" (click)="load(true)" [disabled]="loading()">
+                {{ 'kym.list.Show more' | translate }}
+              </button>
+            </div>
+          }
+        </mat-tab-nav-panel>
+      </mat-card-content>
+    </mat-card>
+  }
+</div>

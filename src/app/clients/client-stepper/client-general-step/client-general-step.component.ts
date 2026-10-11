@@ -16,6 +16,7 @@ import {
   Input,
   OnInit,
   Output,
+  ViewChild,
   inject
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -31,10 +32,11 @@ import { SettingsService } from 'app/settings/settings.service';
 import { MatDivider } from '@angular/material/divider';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 import { MatCheckbox } from '@angular/material/checkbox';
-import { MatStepperPrevious, MatStepperNext } from '@angular/material/stepper';
+import { MatStepperNext } from '@angular/material/stepper';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { NepaliDateInputComponent } from 'app/shared/nepali-date-input/nepali-date-input.component';
+import { MembershipCitizenshipComponent } from '../../membership/membership-citizenship/membership-citizenship.component';
 
 /**
  * Create Client Component
@@ -49,14 +51,22 @@ import { NepaliDateInputComponent } from 'app/shared/nepali-date-input/nepali-da
     MatDivider,
     CdkTextareaAutosize,
     MatCheckbox,
-    MatStepperPrevious,
     FaIconComponent,
     MatStepperNext,
-    NepaliDateInputComponent
+    NepaliDateInputComponent,
+    MembershipCitizenshipComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ClientGeneralStepComponent implements OnInit {
+  /** The date of birth in BS as typed (fineract-dbug ADR 0020), kept only when it was entered in BS. */
+  dateOfBirthBsValue: string | null = null;
+  dateOfBirthCalendar: 'BS' | 'AD' | null = null;
+
+  get dateOfBirthBs(): string | null {
+    return this.dateOfBirthCalendar === 'BS' ? this.dateOfBirthBsValue : null;
+  }
+
   private formBuilder = inject(FormBuilder);
   private dateUtils = inject(Dates);
   private settingsService = inject(SettingsService);
@@ -77,6 +87,33 @@ export class ClientGeneralStepComponent implements OnInit {
 
   /** Client Template */
   @Input() clientTemplate: any;
+  /**
+   * With the share-first rule on (fineract-dbug ADR 0023) the member starts pending and becomes active, with the member
+   * savings account, when the board approves; so Active, Activation Date and Open Savings Account are not asked.
+   */
+  @Input() membershipMode = false;
+  /** The citizenship fields, present on a membership application */
+  @ViewChild(MembershipCitizenshipComponent) citizenship?: MembershipCitizenshipComponent;
+
+  /**
+   * The step is complete: the client form, and on a person's membership application the citizenship too (an
+   * organisation has none, fineract-dbug ADR 0042).
+   */
+  get valid(): boolean {
+    return this.createClientForm.valid && (!this.membershipMode || this.isOrganisation || !!this.citizenship?.value());
+  }
+
+  /** Legal form Entity: an organisation (another cooperative, a company, a group, an institution). */
+  get isOrganisation(): boolean {
+    return this.createClientForm?.value?.legalFormId === LegalFormId.ENTITY;
+  }
+
+  /** A click on the greyed-out Next turns every missing required field red, so it is clear what blocks the step. */
+  showMissingFields(): void {
+    if (this.valid) return;
+    this.createClientForm.markAllAsTouched();
+    this.citizenship?.showErrors();
+  }
   /** Create Client Form */
   createClientForm: FormGroup;
 
@@ -141,7 +178,10 @@ export class ClientGeneralStepComponent implements OnInit {
       genderId: [''],
       mobileNo: [
         '',
-        Validators.pattern(/^\d{10}$/)
+        [
+          Validators.required,
+          Validators.pattern(/^\d{10}$/)
+        ]
       ],
       emailAddress: [
         '',
@@ -271,6 +311,9 @@ export class ClientGeneralStepComponent implements OnInit {
     const locale = this.settingsService.language.code;
     for (const key in generalDetails) {
       if (generalDetails[key] === '' || key === 'addSavings') {
+        delete generalDetails[key];
+      }
+      if (this.membershipMode && (key === 'active' || key === 'activationDate' || key === 'savingsProductId')) {
         delete generalDetails[key];
       }
     }

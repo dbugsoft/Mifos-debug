@@ -170,7 +170,7 @@ export class LoansViewComponent extends LoanProductBaseComponent implements OnIn
       }
     }
     this.setConditionalButtons();
-    if (this.router.url.includes('clients')) {
+    if (this.router.url.includes('members')) {
       this.entityType = 'Client';
     } else if (this.router.url.includes('groups')) {
       this.entityType = 'Group';

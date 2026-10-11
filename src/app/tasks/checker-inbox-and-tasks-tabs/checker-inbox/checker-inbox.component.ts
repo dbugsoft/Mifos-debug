@@ -27,6 +27,7 @@ import {
 } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
+import { MatIconButton } from '@angular/material/button';
 
 /** Custom Services */
 import { TasksService } from '../../tasks.service';
@@ -40,6 +41,7 @@ import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { DateFormatPipe } from '../../../pipes/date-format.pipe';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { NepaliDateInputComponent } from 'app/shared/nepali-date-input/nepali-date-input.component';
 
 @Component({
   selector: 'mifosx-checker-inbox',
@@ -60,7 +62,9 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     MatRowDef,
     MatRow,
     DateFormatPipe,
-    MatIcon
+    MatIcon,
+    MatIconButton,
+    NepaliDateInputComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })

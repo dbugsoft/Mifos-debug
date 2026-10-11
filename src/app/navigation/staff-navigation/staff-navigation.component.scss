@@ -11,11 +11,11 @@
 }
 
 .true {
-  color: #32cd32;
+  color: var(--dk-success, #32cd32);
 }
 
 .false {
-  color: #f44366;
+  color: var(--dk-danger, #f44366);
 }
 
 h2 {

@@ -1,0 +1,45 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+// Shared by the Checker Inbox & Tasks tabs, on top of the list layout of the Loan Products list.
+
+.tab-container {
+  padding-top: 16px;
+}
+
+// Same 36px control height as the Loan Products list.
+.list-toolbar .search-field {
+  --mat-form-field-container-height: 36px;
+  --mat-form-field-container-vertical-padding: 6px;
+}
+
+.group-heading {
+  margin: 24px 0 8px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.members-table {
+  margin-bottom: 16px;
+
+  th.mat-mdc-header-cell,
+  td.mat-mdc-cell {
+    padding: 8px 16px;
+  }
+
+  th.mat-mdc-header-cell + th.mat-mdc-header-cell {
+    border-left: 1px solid rgb(255 255 255 / 35%);
+  }
+
+  // Select-all checkbox on the blue header.
+  th mat-checkbox {
+    --mat-checkbox-unselected-icon-color: #fff;
+    --mat-checkbox-unselected-hover-icon-color: var(--dk-surface, #fff);
+    --mat-checkbox-unselected-focus-icon-color: #fff;
+  }
+}

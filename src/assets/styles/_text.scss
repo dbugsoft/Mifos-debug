@@ -19,7 +19,7 @@ body {
   font-family: Inter, 'Noto Sans Devanagari', sans-serif;
   font-weight: 400;
   font-size: 14px;
-  color: rgb(0 0 0 / 87%);
+  color: rgb(var(--dk-ink-rgb, 0 0 0) / 87%);
   line-height: 1.5;
   letter-spacing: normal;
 }
@@ -219,19 +219,19 @@ body {
 }
 
 .text-rgb-2 {
-  color: rgb(0 0 0 / 20%);
+  color: rgb(var(--dk-ink-rgb, 0 0 0) / 20%);
 }
 
 .text-rgb-3 {
-  color: rgb(0 0 0 / 30%);
+  color: rgb(var(--dk-ink-rgb, 0 0 0) / 30%);
 }
 
 .text-rgb-4 {
-  color: rgb(0 0 0 / 40%);
+  color: rgb(var(--dk-ink-rgb, 0 0 0) / 40%);
 }
 
 .text-rgb-5 {
-  color: rgb(0 0 0 / 50%);
+  color: rgb(var(--dk-ink-rgb, 0 0 0) / 50%);
 }
 
 .no-ul,

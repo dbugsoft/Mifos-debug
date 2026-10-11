@@ -21,10 +21,7 @@ import { Router } from '@angular/router';
 /** Custom Services */
 import { ConfigurationWizardService } from '../configuration-wizard/configuration-wizard.service';
 import { PopoverService } from '../configuration-wizard/popover/popover.service';
-import { MatNavList, MatListItem } from '@angular/material/list';
-import { MatIcon } from '@angular/material/icon';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
-import { MatLine } from '@angular/material/grid-list';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
@@ -36,11 +33,7 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
   styleUrls: ['./products.component.scss'],
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
-    MatNavList,
-    MatListItem,
-    MatIcon,
-    FaIconComponent,
-    MatLine
+    FaIconComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -74,7 +67,6 @@ export class ProductsComponent implements AfterViewInit {
   /* Template for popover on recurring deposit products */
   @ViewChild('templateRecurringDepositProducts') templateRecurringDepositProducts: TemplateRef<any>;
   // Initialize an array of 13 boolean values, all set to false
-  arrowBooleans: boolean[] = new Array(13).fill(false);
 
   /**
    * To show popover.
@@ -240,10 +232,5 @@ export class ProductsComponent implements AfterViewInit {
     this.configurationWizardService.showRecurringDepositProducts = false;
     this.configurationWizardService.showFixedDepositProductsList = true;
     this.router.navigate(['/products/fixed-deposit-products']);
-  }
-
-  arrowBooleansToggle(arrowNumber: number) {
-    // Toggle the boolean value at the given index
-    this.arrowBooleans[arrowNumber] = !this.arrowBooleans[arrowNumber];
   }
 }

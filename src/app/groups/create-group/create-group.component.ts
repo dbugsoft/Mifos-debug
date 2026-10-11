@@ -25,9 +25,8 @@ import { Dates } from 'app/core/utils/dates';
 import { MatOption, MatAutocompleteTrigger, MatAutocomplete } from '@angular/material/autocomplete';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatIconButton, MatButton } from '@angular/material/button';
+import { NepaliDateInputComponent } from 'app/shared/nepali-date-input/nepali-date-input.component';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
-import { MatNavList, MatListSubheaderCssMatStyler } from '@angular/material/list';
-import { MatLine } from '@angular/material/grid-list';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
@@ -44,9 +43,7 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     MatAutocomplete,
     MatIconButton,
     FaIconComponent,
-    MatNavList,
-    MatListSubheaderCssMatStyler,
-    MatLine
+    NepaliDateInputComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })

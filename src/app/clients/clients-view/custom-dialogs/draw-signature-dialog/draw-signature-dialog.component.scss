@@ -7,7 +7,7 @@
  */
 
 .signature-canvas-container {
-  border: 1px solid #ccc;
+  border: 1px solid var(--dk-border, #ccc);
   border-radius: 4px;
   margin: 0 auto;
   width: 100%;

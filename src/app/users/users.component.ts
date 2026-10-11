@@ -16,11 +16,13 @@ import {
   ViewChild,
   AfterViewInit,
   inject,
-  DestroyRef
+  DestroyRef,
+  signal
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MatPaginator } from '@angular/material/paginator';
+import { MatIcon } from '@angular/material/icon';
 import { MatSort, MatSortHeader } from '@angular/material/sort';
 import {
   MatTableDataSource,
@@ -44,6 +46,7 @@ import { PopoverService } from '../configuration-wizard/popover/popover.service'
 import { ConfigurationWizardService } from '../configuration-wizard/configuration-wizard.service';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { LoginStatus, StaffLoginService } from './staff-login.service';
 
 /**
  * Users component.
@@ -67,7 +70,8 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     MatHeaderRow,
     MatRowDef,
     MatRow,
-    MatPaginator
+    MatPaginator,
+    MatIcon
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -77,6 +81,7 @@ export class UsersComponent implements OnInit, AfterViewInit {
   private configurationWizardService = inject(ConfigurationWizardService);
   private popoverService = inject(PopoverService);
   private destroyRef = inject(DestroyRef);
+  private staffLogins = inject(StaffLoginService);
 
   /** Users data. */
   usersData: any;
@@ -91,6 +96,8 @@ export class UsersComponent implements OnInit, AfterViewInit {
   ];
   /** Data source for users table. */
   dataSource: MatTableDataSource<any>;
+  /** Sign-in state by user id, for the Locked and Email-not-verified badges (fineract-dbug ADR 0019). */
+  loginStatus = signal(new Map<number, LoginStatus>());
 
   /** Paginator for users table. */
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
@@ -132,6 +139,27 @@ export class UsersComponent implements OnInit, AfterViewInit {
    */
   ngOnInit() {
     this.setUsers();
+    this.loadLoginStatus();
+  }
+
+  /** Only for administrators allowed to see it; the list works the same without it. */
+  private loadLoginStatus() {
+    if (!this.staffLogins.canRead()) {
+      return;
+    }
+    this.staffLogins
+      .statuses()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((statuses) =>
+        this.loginStatus.set(
+          new Map(
+            statuses.map((status) => [
+              status.userId,
+              status
+            ])
+          )
+        )
+      );
   }
 
   /**

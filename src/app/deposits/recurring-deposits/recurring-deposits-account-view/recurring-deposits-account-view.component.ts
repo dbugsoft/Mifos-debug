@@ -109,7 +109,7 @@ export class RecurringDepositsAccountViewComponent implements OnInit {
       this.savingsDatatables = data.savingsDatatables;
       this.currency = this.recurringDepositsAccountData.currency;
       this.isprematureAllowed = data.recurringDepositsAccountData.maturityDate != null;
-      if (this.router.url.includes('clients')) {
+      if (this.router.url.includes('members')) {
         this.entityType = 'Client';
       } else if (this.router.url.includes('groups')) {
         this.entityType = 'Group';

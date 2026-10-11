@@ -8,6 +8,7 @@
 
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   ElementRef,
   Input,
@@ -32,6 +33,13 @@ import { DocumentPreviewService } from 'app/shared/services/document-preview.ser
 import { Observable } from 'rxjs';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { DualDateComponent } from 'app/shared/dual-date/dual-date.component';
+
+/** A date as yyyy-MM-dd, or null. */
+function isoDate(date: Date | null | undefined): string | null {
+  if (!date) return null;
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
 
 @Component({
   selector: 'mifosx-entity-documents-tab',
@@ -40,7 +48,8 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
   standalone: true,
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
-    FaIconComponent
+    FaIconComponent,
+    DualDateComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -50,6 +59,7 @@ export class EntityDocumentsTabComponent implements OnInit, OnDestroy {
   private loansService = inject(LoansService);
   private clientsService = inject(ClientsService);
   private documentPreviewService = inject(DocumentPreviewService);
+  private changeDetectorRef = inject(ChangeDetectorRef);
 
   @ViewChild('lightboxRoot', { static: true }) lightboxRoot: ElementRef<HTMLElement>;
 
@@ -87,7 +97,8 @@ export class EntityDocumentsTabComponent implements OnInit, OnDestroy {
   uploadDocument(): void {
     const uploadDocumentDialogRef = this.dialog.open(UploadDocumentDialogComponent, {
       data: { documentIdentifier: false, entityType: '' },
-      width: '33rem'
+      width: '56rem',
+      maxWidth: '95vw'
     });
     uploadDocumentDialogRef.afterClosed().subscribe((dialogResponse: any) => {
       if (dialogResponse) {
@@ -95,6 +106,12 @@ export class EntityDocumentsTabComponent implements OnInit, OnDestroy {
         formData.append('name', dialogResponse.fileName);
         formData.append('file', dialogResponse.file);
         formData.append('description', dialogResponse.description);
+        // Issue and expiry dates (fineract-dbug ADR 0020): strictly yyyy-MM-dd, and left out when blank, because the
+        // server can't read an empty date.
+        const issuanceDate = isoDate(dialogResponse.issuanceDate);
+        const expiryDate = isoDate(dialogResponse.expiryDate);
+        if (issuanceDate) formData.append('issuanceDate', issuanceDate);
+        if (expiryDate) formData.append('expiryDate', expiryDate);
         this.callbackUpload(formData).subscribe((res: any) => {
           const newDocument = {
             id: res.resourceId,
@@ -102,10 +119,13 @@ export class EntityDocumentsTabComponent implements OnInit, OnDestroy {
             parentEntityId: this.entityId,
             name: dialogResponse.fileName,
             description: dialogResponse.description,
+            issuanceDate: issuanceDate,
+            expiryDate: expiryDate,
             fileName: dialogResponse.file.name
           };
           this.entityDocuments.push(newDocument);
           this.setThumbnail(newDocument);
+          this.changeDetectorRef.markForCheck();
         });
       }
     });
@@ -116,7 +136,7 @@ export class EntityDocumentsTabComponent implements OnInit, OnDestroy {
       data: { deleteContext: `Document: ${name}` }
     });
     deleteDocumentDialogRef.afterClosed().subscribe((response: any) => {
-      if (response.delete) {
+      if (response?.delete) {
         this.callbackDelete(documentId);
         const index = this.entityDocuments.findIndex((doc: any) => doc.id === documentId);
         if (index !== -1) {
@@ -124,8 +144,43 @@ export class EntityDocumentsTabComponent implements OnInit, OnDestroy {
         }
         this.documentPreviewService.release(documentId);
         delete this.previewThumbnails[documentId];
+        this.changeDetectorRef.markForCheck();
       }
     });
+  }
+
+  downloadDocument(document: any): void {
+    this.getDownloadObservable(document.id).subscribe((blob: Blob) => {
+      const objectUrl = URL.createObjectURL(blob);
+      const anchor = window.document.createElement('a');
+      anchor.href = objectUrl;
+      anchor.download = document.fileName || document.name || 'document';
+      anchor.click();
+      // Revoking straight after click() can cancel the download in some browsers.
+      setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+    });
+  }
+
+  /** Upper-case extension of the stored file ("PDF"), or '' when there is none. */
+  fileExtension(document: any): string {
+    const match = /\.([a-z0-9]{1,5})$/i.exec(document.fileName || '');
+    return match ? match[1].toUpperCase() : '';
+  }
+
+  fileIcon(document: any): string {
+    switch (this.fileExtension(document)) {
+      case 'PDF':
+        return 'file-pdf';
+      case 'DOC':
+      case 'DOCX':
+        return 'file-word';
+      case 'XLS':
+      case 'XLSX':
+      case 'CSV':
+        return 'file-excel';
+      default:
+        return 'file';
+    }
   }
 
   isPreviewable(document: any): boolean {
@@ -224,6 +279,7 @@ export class EntityDocumentsTabComponent implements OnInit, OnDestroy {
       .then((preview) => {
         if (preview.type === 'image') {
           this.previewThumbnails[document.id] = preview.url;
+          this.changeDetectorRef.markForCheck();
         }
       })
       .catch((): void => undefined);

@@ -30,7 +30,7 @@ export class CallbackComponent implements OnInit {
       const success = await this.authenticationService.handleOAuthCallback();
 
       if (success) {
-        this.router.navigate(['/home']);
+        this.router.navigate(['/dashboard']);
       } else {
         this.alertService.alert({
           type: this.translateService.instant('errors.auth.callbackFailed.type'),

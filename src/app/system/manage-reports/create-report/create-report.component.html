@@ -11,7 +11,7 @@
     <form [formGroup]="reportForm" (ngSubmit)="submit()">
       <mat-card-content>
         <div class="layout-row-wrap responsive-column gap-2percent">
-          <mat-form-field class="flex-100">
+          <mat-form-field class="flex-32">
             <mat-label>{{ 'labels.inputs.Report Name' | translate }}</mat-label>
             <input matInput required formControlName="reportName" />
             @if (reportForm.controls.reportName.hasError('required')) {
@@ -22,7 +22,7 @@
             }
           </mat-form-field>
 
-          <mat-form-field class="flex-48">
+          <mat-form-field class="flex-32">
             <mat-label>{{ 'labels.inputs.Report Type' | translate }}</mat-label>
             <mat-select required formControlName="reportType">
               @for (allowedReportType of reportTemplateData.allowedReportTypes; track allowedReportType) {
@@ -39,7 +39,7 @@
             }
           </mat-form-field>
 
-          <mat-form-field class="flex-48">
+          <mat-form-field class="flex-32">
             <mat-label>{{ 'labels.inputs.Report Sub Type' | translate }}</mat-label>
             <mat-select formControlName="reportSubType">
               @for (allowedReportSubType of reportTemplateData.allowedReportSubTypes; track allowedReportSubType) {
@@ -50,7 +50,7 @@
             </mat-select>
           </mat-form-field>
 
-          <mat-form-field class="flex-48">
+          <mat-form-field class="flex-32">
             <mat-label>{{ 'labels.inputs.Report Category' | translate }}</mat-label>
             <mat-select formControlName="reportCategory">
               @for (reportCategoryType of reportCategoryTypeOptions; track reportCategoryType) {
@@ -61,13 +61,13 @@
             </mat-select>
           </mat-form-field>
 
-          <div class="flex-48">
+          <div class="flex-32">
             <mat-checkbox labelPosition="after" formControlName="useReport">
               {{ 'labels.inputs.User Report (UI)' | translate }}
             </mat-checkbox>
           </div>
 
-          <mat-form-field class="flex-100">
+          <mat-form-field class="flex-32">
             <mat-label>{{ 'labels.inputs.Description' | translate }}</mat-label>
             <textarea matInput formControlName="description" cdkTextareaAutosize cdkAutosizeMinRows="2"></textarea>
           </mat-form-field>

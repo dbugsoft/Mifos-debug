@@ -6,119 +6,89 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+@use '../shared/styles/list-layout' as *;
+
+// No cards: the page lines up with the breadcrumb, like the Members list.
 .container {
-  max-width: 37rem;
-  padding: 0.25rem 1rem 1rem;
+  padding: 0;
+  background: none;
+  box-shadow: none;
+}
 
-  mat-card {
-    margin-bottom: 1rem;
-    padding: 1.5rem;
-    box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
-    border: 1px solid var(--border-color, #ddd);
-    border-radius: 6px;
-    background-color: var(--card-background, #fff);
-    transition:
-      background-color 0.3s ease,
-      border-color 0.3s ease;
+.list-toolbar {
+  margin-bottom: 16px;
+}
 
-    .layout-row-wrap {
-      display: grid;
-      grid-template-columns: 50% 50%;
-      gap: 1rem;
+// Label / value pairs, three to a row (two on tablets, one on phones), as on the Navigation page.
+.details {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(110px, max-content) minmax(0, 1fr));
+  margin-bottom: 24px;
+  border: 1px solid var(--dk-border, #e2e8f0);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--dk-surface, #fff);
 
-      .info-box {
-        display: flex;
-        flex-direction: column;
-        padding: 0.75rem;
-        border: 1px solid var(--border-color, #ddd);
-        border-radius: 6px;
-        background-color: var(--info-box-background, #fff);
-        transition: background-color 0.3s ease;
-
-        .header {
-          font-weight: 600;
-          margin-bottom: 0.5rem;
-          font-size: 1.1rem;
-          color: var(--header-color, inherit);
-        }
-      }
-    }
+  .label,
+  .value {
+    padding: 10px 16px;
+    font-size: 0.875rem;
+    border-bottom: 1px solid var(--dk-border, #e2e8f0);
+    overflow-wrap: anywhere;
   }
 
-  .content {
-    div {
-      margin: 1rem 0;
-      overflow-wrap: break-word;
-      color: var(--text-color, inherit);
-
-      &.header {
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-        font-size: 1.1rem;
-        color: var(--header-color, inherit);
-      }
-    }
+  .label {
+    font-weight: 500;
+    color: var(--dk-text-muted, #64748b);
+    background: var(--dk-surface-2, #f8fafc);
   }
 
-  table {
-    width: 100%;
-    margin-top: 1rem;
-    border-collapse: collapse;
+  .value {
+    color: var(--dk-text, #1e293b);
+  }
+}
 
-    th {
-      font-weight: 600;
-      text-align: left;
-      color: var(--table-header-color, inherit);
-      background-color: var(--table-header-bg, transparent);
-    }
+.members-table {
+  th.mat-mdc-header-cell,
+  td.mat-mdc-cell {
+    padding: 8px 16px;
+  }
 
-    td {
-      padding: 0.75rem;
-      border: 1px solid var(--border-color, #ddd);
-      color: var(--text-color, inherit);
-    }
+  th.mat-mdc-header-cell + th.mat-mdc-header-cell {
+    border-left: 1px solid rgb(255 255 255 / 35%);
+  }
 
-    tr:hover {
-      background-color: var(--table-hover-bg, #f9f9f9);
+  .name-cell {
+    cursor: default;
+
+    &:hover {
+      text-decoration: none;
     }
   }
 }
 
-.container table th,
-.container table td {
-  border-top: 1px solid var(--border-color, rgb(0 0 0 / 12%));
+@media (width <= 1100px) {
+  .details {
+    grid-template-columns: repeat(2, minmax(110px, max-content) minmax(0, 1fr));
+  }
 }
 
-th.mat-header-cell:not(:first-of-type),
-td.mat-cell:not(:first-of-type) {
-  border-left: 1px solid var(--border-color, rgb(0 0 0 / 12%));
+@media (width <= 768px) {
+  .details {
+    grid-template-columns: minmax(110px, max-content) minmax(0, 1fr);
+  }
 }
 
-.mat-elevation-z1 {
-  margin: 0.5rem 0;
-  box-shadow: 0 1px 3px var(--elevation-shadow, rgb(0 0 0 / 12%));
-  border-radius: 6px;
-}
+:host-context(.dark-theme) .details {
+  border-color: #444;
+  background: #2d2d2d;
 
-// Dark mode styles
-:host-context(.dark-theme) {
-  --border-color: #444;
-  --card-background: #2d2d2d;
-  --info-box-background: #383838;
-  --header-color: #e0e0e0;
-  --text-color: #d0d0d0;
-  --table-header-bg: #333;
-  --table-header-color: #e0e0e0;
-  --table-hover-bg: #3a3a3a;
-  --elevation-shadow: rgb(0 0 0 / 30%);
+  .label {
+    color: #c4c6d0;
+    background: #383838;
+  }
 
-  .container {
-    mat-card {
-      box-shadow: 0 2px 4px rgb(0 0 0 / 30%);
-    }
-
-    table {
-      box-shadow: 0 1px 3px rgb(0 0 0 / 30%);
-    }
+  .value {
+    color: #e0e0e0;
   }
 }

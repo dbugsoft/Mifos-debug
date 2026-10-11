@@ -23,7 +23,7 @@ mat-list-item {
 }
 
 .active {
-  background-color: #f2f2f2;
+  background-color: var(--dk-surface-2, #f2f2f2);
 }
 
 .grouping-name {

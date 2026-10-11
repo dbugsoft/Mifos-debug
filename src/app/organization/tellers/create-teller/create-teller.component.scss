@@ -7,5 +7,17 @@
  */
 
 .container {
-  max-width: 37rem;
+  max-width: 70rem;
+}
+
+.layout-column {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0 20px;
+}
+
+@media (width <=768px) {
+  .layout-column {
+    grid-template-columns: 1fr;
+  }
 }

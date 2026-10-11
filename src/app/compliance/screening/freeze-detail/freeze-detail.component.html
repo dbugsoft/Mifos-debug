@@ -1,0 +1,126 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="compliance-page">
+  @if (allowed() === false) {
+    <p class="empty">{{ 'compliance.You have no compliance access' | translate }}</p>
+  } @else if (freeze(); as f) {
+    @if (busy()) {
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }
+    <div class="title">
+      <h2 class="name">{{ f.name }}</h2>
+      <span class="chip" [class.red]="f.status === 'ACTIVE'" [class.grey]="f.status === 'RELEASED'">{{
+        'compliance.screening.freezeStatus.' + f.status | translate
+      }}</span>
+    </div>
+    @if (f.status === 'ACTIVE') {
+      <p class="notice bad">{{ 'compliance.screening.heldNotice' | translate }}</p>
+    }
+
+    <section class="frame">
+      <h3 class="legend">{{ 'compliance.screening.Why the funds are held' | translate }}</h3>
+      <dl class="facts">
+        <div class="fact">
+          <dt class="fact-label">{{ 'compliance.Member' | translate }}</dt>
+          <dd class="fact-value">
+            <a [routerLink]="['/compliance', 'members', f.clientId]">{{ f.name }}</a> · {{ f.accountNo }}
+          </dd>
+        </div>
+        <div class="fact">
+          <dt class="fact-label">{{ 'compliance.screening.Confirmed match' | translate }}</dt>
+          <dd class="fact-value">
+            <a [routerLink]="['/compliance', 'screening', 'matches', f.hitId]">{{ f.subjectName }}</a>
+            <span class="sub">{{ 'compliance.screening.source.' + f.source | translate }} · {{ f.reference }}</span>
+          </dd>
+        </div>
+        <div class="fact">
+          <dt class="fact-label">{{ 'compliance.screening.Held since' | translate }}</dt>
+          <dd class="fact-value">
+            {{ (f.frozenAt.slice(0, 10) | adToBs) || f.frozenAt.slice(0, 10) }} · {{ f.frozenBy }}
+            <span class="sub note">{{ f.reason }}</span>
+          </dd>
+        </div>
+        @if (f.caseId) {
+          <div class="fact">
+            <dt class="fact-label">{{ 'compliance.case.Case' | translate }}</dt>
+            <dd class="fact-value">
+              <a [routerLink]="['/compliance', 'cases', f.caseId]">{{ f.caseReference }}</a>
+            </dd>
+          </div>
+        }
+        @if (f.releasedAt) {
+          <div class="fact">
+            <dt class="fact-label">{{ 'compliance.screening.Released' | translate }}</dt>
+            <dd class="fact-value">
+              {{ (f.releasedAt.slice(0, 10) | adToBs) || f.releasedAt.slice(0, 10) }} · {{ f.releasedBy }}
+              <span class="sub note">{{ f.releaseReason }}</span>
+            </dd>
+          </div>
+        }
+      </dl>
+    </section>
+
+    <section class="frame">
+      <h3 class="legend">{{ 'compliance.screening.Savings accounts' | translate }}</h3>
+      <div class="table-scroll">
+        <table class="plain-rows">
+          <thead>
+            <tr>
+              <th>{{ 'compliance.screening.Account' | translate }}</th>
+              <th class="num">{{ 'compliance.screening.Balance' | translate }}</th>
+              <th>{{ 'compliance.screening.Now' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (a of f.accounts ?? []; track a.id) {
+              <tr>
+                <td>
+                  {{ a.accountNo }}
+                  <span class="sub">{{ a.product }}</span>
+                </td>
+                <td class="num">{{ a.balance | formatNumber }}</td>
+                <td>
+                  @if (a.blocked) {
+                    <span class="chip red">{{ 'compliance.screening.Blocked' | translate }}</span>
+                  } @else {
+                    <span class="chip grey">{{ 'compliance.screening.Open' | translate }}</span>
+                  }
+                  @if (heldByThis(a.id)) {
+                    <span class="sub">{{
+                      (f.status === 'ACTIVE'
+                        ? 'compliance.screening.blockedByThisFreeze'
+                        : 'compliance.screening.unblockedOnRelease'
+                      ) | translate
+                    }}</span>
+                  } @else if (f.status === 'ACTIVE' && !a.blocked) {
+                    <span class="sub">{{ 'compliance.screening.gateCovers' | translate }}</span>
+                  }
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="3">{{ 'compliance.screening.noAccounts' | translate }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      @if (f.status === 'ACTIVE' && canManage) {
+        <div class="actions">
+          <button mat-stroked-button color="warn" type="button" (click)="release()" [disabled]="busy()">
+            {{ 'compliance.screening.Release the funds' | translate }}
+          </button>
+          <span class="hint">{{ 'compliance.screening.releaseHint' | translate }}</span>
+        </div>
+      }
+    </section>
+  } @else {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
+</div>

@@ -7,7 +7,7 @@
  */
 
 /** Angular Imports */
-import { ChangeDetectionStrategy, Component, DestroyRef, inject } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { FormGroup } from '@angular/forms';
@@ -67,6 +67,7 @@ export class AddressTabComponent {
   private translateService = inject(TranslateService);
   private postalCodeLookup = inject(PostalCodeLookupService);
   private destroyRef = inject(DestroyRef);
+  private changeDetectorRef = inject(ChangeDetectorRef);
 
   /** Client Address Data */
   clientAddressData: any;
@@ -84,13 +85,15 @@ export class AddressTabComponent {
    * @param {TranslateService} translateService Translate Service.
    */
   constructor() {
+    this.route.parent.paramMap
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((params) => (this.clientId = params.get('clientId')));
     this.route.data
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((data: { clientAddressData: any; clientAddressFieldConfig: any; clientAddressTemplateData: any }) => {
         this.clientAddressData = data.clientAddressData;
         this.clientAddressFieldConfig = data.clientAddressFieldConfig;
         this.clientAddressTemplate = data.clientAddressTemplateData;
-        this.clientId = this.route.parent.snapshot.paramMap.get('clientId');
       });
   }
 
@@ -118,7 +121,11 @@ export class AddressTabComponent {
             addressData.addressId = res.resourceId;
             addressData.addressType = this.getSelectedValue('addressTypeIdOptions', addressData.addressType).name;
             addressData.isActive = false;
-            this.clientAddressData.push(addressData);
+            this.clientAddressData = [
+              ...this.clientAddressData,
+              addressData
+            ];
+            this.changeDetectorRef.markForCheck();
           });
       }
     });
@@ -152,7 +159,10 @@ export class AddressTabComponent {
           .subscribe((res: any) => {
             addressData.addressTypeId = address.addressTypeId;
             addressData.addressType = address.addressType;
-            this.clientAddressData[index] = addressData;
+            this.clientAddressData = this.clientAddressData.map((item: any, i: number) =>
+              i === index ? addressData : item
+            );
+            this.changeDetectorRef.markForCheck();
           });
       }
     });
@@ -302,6 +312,7 @@ export class AddressTabComponent {
     };
     this.clientService.editClientAddress(this.clientId, address.addressTypeId, addressData).subscribe(() => {
       address.isActive = address.isActive ? false : true;
+      this.changeDetectorRef.markForCheck();
     });
   }
 

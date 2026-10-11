@@ -369,21 +369,23 @@ export class AuditTrailsComponent implements OnInit, AfterViewInit {
     //this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
 
     if (this.sort && this.paginator) {
+      this.sort.sortChange.pipe(tap(() => (this.paginator.pageIndex = 0))).subscribe();
+
       merge(this.sort.sortChange, this.paginator.page)
-        .pipe(tap(() => this.loadAuditTrailsPage()))
+        .pipe(tap(() => this.loadAuditTrailsPage(this.paginator.pageIndex, this.paginator.pageSize)))
         .subscribe();
     }
   }
 
   /**
    * Initializes the data source for audit trails table and loads the first page.
+   * @param {number} pageIndex Page number to load.
+   * @param {number} pageSize Number of entries per page.
    */
-  getAuditTrails() {
+  getAuditTrails(pageIndex: number = 0, pageSize: number = 10) {
     this.isLoading = true;
     const isActive: string = this.sort ? this.sort.active : '';
     const direction: string = this.sort ? this.sort.direction : '';
-    const pageIndex: number = this.paginator ? this.paginator.pageIndex : 0;
-    const pageSize: any = this.paginator ? this.paginator.pageSize : 20;
 
     this.dataSource.getAuditTrails(this.filterAuditTrailsBy, isActive, direction, pageIndex, pageSize);
     this.isLoading = false;
@@ -391,12 +393,17 @@ export class AuditTrailsComponent implements OnInit, AfterViewInit {
 
   /**
    * Loads a page of audit trails.
+   * @param {number} pageIndex Page number to load.
+   * @param {number} pageSize Number of entries per page.
    */
-  loadAuditTrailsPage() {
+  loadAuditTrailsPage(pageIndex?: number, pageSize?: number) {
     if (this.sort && !this.sort.direction) {
       delete this.sort.active;
     }
-    this.getAuditTrails();
+    this.getAuditTrails(
+      pageIndex ?? (this.paginator ? this.paginator.pageIndex : 0),
+      pageSize ?? (this.paginator ? this.paginator.pageSize : 10)
+    );
   }
 
   /**

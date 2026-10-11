@@ -8,13 +8,7 @@
 
 <div class="container">
   @if (loanProductsBasicDetails.length > 0) {
-    <mat-stepper
-      orientation="vertical"
-      [linear]="false"
-      class="mat-elevation-z8"
-      labelPosition="bottom"
-      #loansAccountStepper
-    >
+    <mat-stepper orientation="vertical" [linear]="false" labelPosition="bottom" #loansAccountStepper>
       <ng-template matStepperIcon="number">
         <fa-icon icon="pencil-alt" size="sm"></fa-icon>
       </ng-template>
