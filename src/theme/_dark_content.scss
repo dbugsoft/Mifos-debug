@@ -219,7 +219,8 @@ body.dark-theme {
   }
 
   // Not the sidebar or menu items: they are white on the blue sidebar / plain menu text, not links in prose.
-  a:any-link:not(.sidebar a, .mat-mdc-menu-item) {
+  // Nor links drawn as filled buttons: they keep the button's own label colour on its light fill.
+  a:any-link:not(.sidebar a, .mat-mdc-menu-item, .mat-mdc-raised-button, .mat-mdc-unelevated-button) {
     color: #e0e0e0 !important;
   }
 

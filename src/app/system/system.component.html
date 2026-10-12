@@ -57,11 +57,7 @@
       <div class="icon-circle"><fa-icon icon="road" size="2x"></fa-icon></div>
       <span class="card-label">{{ 'labels.heading.Entity to Entity Mapping' | translate }}</span>
     </a>
-    <a
-      class="management-card management-card--disabled"
-      aria-disabled="true"
-      [title]="'labels.text.Manage Surveys' | translate"
-    >
+    <a class="management-card" [routerLink]="['surveys']" [title]="'labels.text.Manage Surveys' | translate">
       <div class="icon-circle"><fa-icon icon="file-alt" size="2x"></fa-icon></div>
       <span class="card-label">{{ 'labels.heading.Manage Surveys' | translate }}</span>
     </a>

@@ -29,7 +29,6 @@ import { ExternalNationalIdService } from 'app/clients/services/external-nationa
 
 /** Custom Services */
 import { SettingsService } from 'app/settings/settings.service';
-import { MatDivider } from '@angular/material/divider';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatStepperNext } from '@angular/material/stepper';
@@ -48,7 +47,6 @@ import { MembershipCitizenshipComponent } from '../../membership/membership-citi
   providers: [ExternalNationalIdService],
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
-    MatDivider,
     CdkTextareaAutosize,
     MatCheckbox,
     FaIconComponent,

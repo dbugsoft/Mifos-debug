@@ -6,25 +6,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  DestroyRef,
-  ElementRef,
-  OnDestroy,
-  ViewChild,
-  inject
-} from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { MatTableModule } from '@angular/material/table';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslateService } from '@ngx-translate/core';
-import { Chart, registerables } from 'chart.js';
-import { applyChartTheme } from 'app/shared/utils/chart-theme.util';
 import { debounceTime, distinctUntilChanged, filter, of, switchMap } from 'rxjs';
 import { ClientsService } from 'app/clients/clients.service';
 import { BsCalendarService } from 'app/core/bs-calendar/bs-calendar.service';
@@ -34,10 +22,9 @@ import { RepaymentSchedule, RepaymentSchedulePeriod } from 'app/loans/models/loa
 import { SettingsService } from 'app/settings/settings.service';
 import { FormatNumberPipe } from 'app/pipes/format-number.pipe';
 import { DualDateComponent } from 'app/shared/dual-date/dual-date.component';
+import { LoanScheduleComponent, ScheduleTotals } from 'app/loans/loan-schedule/loan-schedule.component';
 import { NepaliDateInputComponent } from 'app/shared/nepali-date-input/nepali-date-input.component';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
-
-Chart.register(...registerables);
 
 /** Fineract charge time type "Specified due date": needs a due date the calculator does not ask for. */
 const SPECIFIED_DUE_DATE = 2;
@@ -107,15 +94,15 @@ export function buildSchedulePayload(
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
     MatAutocompleteModule,
-    MatTableModule,
     FaIconComponent,
     FormatNumberPipe,
     DualDateComponent,
-    NepaliDateInputComponent
+    NepaliDateInputComponent,
+    LoanScheduleComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class LoanCalculatorComponent implements OnDestroy {
+export class LoanCalculatorComponent {
   private fb = inject(FormBuilder);
   private clientsService = inject(ClientsService);
   private loansService = inject(LoansService);
@@ -126,10 +113,6 @@ export class LoanCalculatorComponent implements OnDestroy {
   private snackBar = inject(MatSnackBar);
   private cdr = inject(ChangeDetectorRef);
   private destroyRef = inject(DestroyRef);
-
-  @ViewChild('balanceChart') set balanceChartCanvas(ref: ElementRef<HTMLCanvasElement> | undefined) {
-    if (ref) this.drawChart(ref.nativeElement);
-  }
 
   readonly form = this.fb.group({
     // Typed text is not a member: only a picked search result (an object with an id) is.
@@ -184,17 +167,7 @@ export class LoanCalculatorComponent implements OnDestroy {
   template: any = null;
   schedule: RepaymentSchedule | null = null;
   installments: RepaymentSchedulePeriod[] = [];
-  readonly columns = [
-    'period',
-    'dueDate',
-    'principal',
-    'interest',
-    'fees',
-    'due',
-    'balance'
-  ];
-
-  private chart: any = null;
+  totals: ScheduleTotals | null = null;
 
   constructor() {
     this.form.controls.member.valueChanges
@@ -288,6 +261,12 @@ export class LoanCalculatorComponent implements OnDestroy {
       this.schedule = schedule;
       // Period 0 (no number) is the disbursement row.
       this.installments = schedule.periods.filter((p) => p.period);
+      this.totals = {
+        principal: schedule.totalPrincipalExpected,
+        interest: schedule.totalInterestCharged,
+        fees: schedule.totalFeeChargesCharged,
+        repayment: schedule.totalRepaymentExpected
+      };
       this.cdr.markForCheck();
     });
   }
@@ -319,10 +298,6 @@ export class LoanCalculatorComponent implements OnDestroy {
     }
   }
 
-  ngOnDestroy(): void {
-    this.chart?.destroy();
-  }
-
   private summaryText(): string {
     const t = (key: string) => this.translate.instant(key);
     const money = (n: number) =>
@@ -345,64 +320,7 @@ export class LoanCalculatorComponent implements OnDestroy {
     if (!this.schedule) return;
     this.schedule = null;
     this.installments = [];
-    this.chart?.destroy();
-    this.chart = null;
+    this.totals = null;
     this.cdr.markForCheck();
-  }
-
-  /** Bars: principal and interest in each repayment. Line: the balance left after it. */
-  private drawChart(canvas: HTMLCanvasElement): void {
-    this.chart?.destroy();
-    const t = (key: string) => this.translate.instant(key);
-    const style = getComputedStyle(canvas);
-    const color = (token: string, fallback: string) => style.getPropertyValue(token).trim() || fallback;
-    applyChartTheme();
-    this.chart = new Chart(canvas, {
-      type: 'bar',
-      data: {
-        labels: this.installments.map((p) => this.bsCalendar.formatIso(this.bsCalendar.toBs(p.dueDate)) ?? ''),
-        datasets: [
-          {
-            type: 'line',
-            label: t('labels.inputs.Balance Of Loan'),
-            data: this.installments.map((p) => p.principalLoanBalanceOutstanding),
-            borderColor: color('--mat-sys-primary', '#2460b9'),
-            backgroundColor: color('--mat-sys-primary', '#2460b9'),
-            yAxisID: 'balance',
-            pointRadius: 2,
-            order: 0
-          },
-          {
-            type: 'bar',
-            label: t('labels.inputs.Principal'),
-            data: this.installments.map((p) => p.principalDue ?? 0),
-            backgroundColor: color('--mat-sys-tertiary', '#2e7d32'),
-            stack: 'due',
-            yAxisID: 'due',
-            order: 1
-          },
-          {
-            type: 'bar',
-            label: t('labels.inputs.Interest'),
-            data: this.installments.map((p: any) => p.interestDue ?? 0),
-            backgroundColor: color('--mat-sys-secondary', '#f9a825'),
-            stack: 'due',
-            yAxisID: 'due',
-            order: 1
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        animation: false,
-        interaction: { mode: 'index', intersect: false },
-        scales: {
-          due: { position: 'left', stacked: true, beginAtZero: true },
-          balance: { position: 'right', beginAtZero: true, grid: { drawOnChartArea: false } },
-          x: { stacked: true, ticks: { maxRotation: 0, autoSkip: true } }
-        }
-      }
-    });
   }
 }

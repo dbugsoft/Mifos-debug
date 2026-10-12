@@ -16,7 +16,17 @@ import { FormatNumberPipe } from 'app/pipes/format-number.pipe';
 import { NepaliDateInputComponent } from 'app/shared/nepali-date-input/nepali-date-input.component';
 import { SettingsService } from 'app/settings/settings.service';
 import { Dates } from 'app/core/utils/dates';
-import { MembershipApplyRequest, MembershipTemplate, Nominee, ShareProductOption } from '../membership.models';
+import { TranslateService } from '@ngx-translate/core';
+import {
+  MembershipApplyRequest,
+  MembershipTemplate,
+  Nominee,
+  RelationshipOption,
+  ShareProductOption,
+  nomineeRelationshipText,
+  relationshipLabel
+} from '../membership.models';
+import { MembershipService } from '../membership.service';
 
 /** What the applicant buys, as shown in the step, the preview and the request. */
 export interface SharesChoice {
@@ -61,6 +71,8 @@ export class MembershipSharesStepComponent implements OnInit {
   private destroyRef = inject(DestroyRef);
   private settingsService = inject(SettingsService);
   private dates = inject(Dates);
+  private membershipService = inject(MembershipService);
+  private translate = inject(TranslateService);
 
   @Input({ required: true }) template!: MembershipTemplate;
   @Input() mode: ApplicationMode = 'new';
@@ -77,6 +89,7 @@ export class MembershipSharesStepComponent implements OnInit {
     for (const control of [
       c.nomineeName,
       c.nomineeRelationship,
+      c.nomineeRelationshipDetail,
       c.nomineeMobileNo
     ]) {
       if (this.isOrganisation) {
@@ -92,6 +105,10 @@ export class MembershipSharesStepComponent implements OnInit {
   }
 
   readonly today = this.settingsService.businessDate ?? new Date();
+
+  /** The nominee relationships, in the order the server gives them */
+  readonly relationships = signal<RelationshipOption[]>([]);
+  readonly relationshipsState = signal<'loading' | 'failed' | 'loaded'>('loading');
 
   readonly form = this.formBuilder.group({
     shareProductId: [
@@ -113,9 +130,16 @@ export class MembershipSharesStepComponent implements OnInit {
       '',
       Validators.maxLength(200)
     ],
-    nomineeRelationship: [
+    /** The code of the relationship chosen from the list */
+    nomineeRelationship: [''],
+    /** What kind of relation, when the chosen entry needs detail (e.g. Guardian) */
+    nomineeRelationshipDetail: [
       '',
-      Validators.maxLength(100)
+      [
+        Validators.maxLength(100),
+        (c: AbstractControl) =>
+          this.relationship()?.needsDetail && !(c.value ?? '').trim() ? { required: true } : null
+      ]
     ],
     nomineeMobileNo: [
       '',
@@ -158,6 +182,11 @@ export class MembershipSharesStepComponent implements OnInit {
       paidNow: this.paidNow
     };
   });
+  /** The entry chosen; read by the detail validator, so it looks at the form rather than the value signal */
+  relationship(): RelationshipOption | null {
+    const code = this.form?.controls.nomineeRelationship.value;
+    return this.relationships().find((r) => r.code === code) ?? null;
+  }
   readonly valid = computed(() => this.status() === 'VALID' && this.choice() !== null);
 
   get paidNow(): boolean {
@@ -169,6 +198,7 @@ export class MembershipSharesStepComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.loadRelationships();
     const products = this.template.shareProducts;
     const preferred = products.find((p) => p.id === this.template.settings.shareProductId) ?? products[0];
     if (preferred) {
@@ -189,9 +219,51 @@ export class MembershipSharesStepComponent implements OnInit {
       this.form.controls.kitta.updateValueAndValidity({ emitEvent: false });
       this.form.controls.amountReceived.updateValueAndValidity({ emitEvent: false });
       this.form.controls.nomineeRelationship.updateValueAndValidity({ emitEvent: false });
+      const detail = this.form.controls.nomineeRelationshipDetail;
+      if (!this.relationship()?.needsDetail && detail.value) {
+        detail.setValue('', { emitEvent: false });
+        this.value.set(this.form.getRawValue());
+      }
+      detail.updateValueAndValidity({ emitEvent: false });
       this.status.set(this.form.status);
     });
     this.form.statusChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((s) => this.status.set(s));
+  }
+
+  loadRelationships(): void {
+    this.relationshipsState.set('loading');
+    this.membershipService
+      .nomineeRelationships()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (list) => {
+          this.relationships.set(list);
+          this.relationshipsState.set('loaded');
+        },
+        error: () => this.relationshipsState.set('failed')
+      });
+  }
+
+  relationshipLabel(option: RelationshipOption): string {
+    return relationshipLabel(this.translate, option.code, option.labelEn);
+  }
+
+  /** The relationship chosen with its detail, for the preview, e.g. "Guardian: uncle". */
+  relationshipText(): string | null {
+    this.value(); // follow the form
+    const option = this.relationship();
+    if (!option) {
+      return null;
+    }
+    return nomineeRelationshipText(
+      {
+        name: '',
+        relationshipCode: option.code,
+        relationshipLabelEn: option.labelEn,
+        relationshipDetail: (this.form.controls.nomineeRelationshipDetail.value ?? '').trim() || undefined
+      },
+      this.translate
+    );
   }
 
   /** The total, put in the amount received when staff have not typed one, so the usual case is one click. */
@@ -216,7 +288,12 @@ export class MembershipSharesStepComponent implements OnInit {
     const text = (s: string | null | undefined) => (s ?? '').trim() || undefined;
     const nominee: Nominee | undefined =
       !this.isOrganisation && text(v.nomineeName)
-        ? { name: text(v.nomineeName), relationship: text(v.nomineeRelationship), mobileNo: text(v.nomineeMobileNo) }
+        ? {
+            name: text(v.nomineeName),
+            relationshipCode: text(v.nomineeRelationship),
+            relationshipDetail: this.relationship()?.needsDetail ? text(v.nomineeRelationshipDetail) : undefined,
+            mobileNo: text(v.nomineeMobileNo)
+          }
         : undefined;
     return {
       kitta: choice.kitta,
@@ -239,9 +316,7 @@ export class MembershipSharesStepComponent implements OnInit {
     } else {
       // optional, but a nominee needs both a name and a relationship
       c.nomineeRelationship.addValidators((control) =>
-        (this.form?.controls.nomineeName.value ?? '').trim() && !(control.value ?? '').trim()
-          ? { required: true }
-          : null
+        (this.form?.controls.nomineeName.value ?? '').trim() && !control.value ? { required: true } : null
       );
     }
     if (this.paidNow) {

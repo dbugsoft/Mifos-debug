@@ -122,7 +122,7 @@
             "
             [district]="clientGeneralStep.citizenship?.districtLabel() ?? null"
             [nomineeName]="sharesStep?.form?.value?.nomineeName ?? null"
-            [nomineeRelationship]="sharesStep?.form?.value?.nomineeRelationship ?? null"
+            [nomineeRelationship]="sharesStep?.relationshipText() ?? null"
             [nomineeMobileNo]="sharesStep?.form?.value?.nomineeMobileNo ?? null"
             [receiptNumber]="sharesStep?.form?.value?.receiptNumber ?? null"
             [submittedOn]="sharesStep?.form?.value?.submittedOn ?? null"

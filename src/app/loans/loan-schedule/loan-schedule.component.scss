@@ -1,0 +1,75 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.chart-container {
+  position: relative;
+  height: 320px;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+.schedule-table {
+  width: 100%;
+
+  .num {
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .mat-mdc-footer-cell {
+    font-weight: 500;
+  }
+
+  // Blue header with white partitions, as on the member and loan product lists.
+  .mat-mdc-header-row {
+    background: var(--md-sys-color-primary, var(--dk-fill, #2460b9));
+  }
+
+  th.mat-mdc-header-cell {
+    color: #fff;
+    font-weight: 600;
+    border-bottom: none;
+  }
+
+  th.mat-mdc-header-cell + th.mat-mdc-header-cell {
+    border-left: 1px solid rgb(255 255 255 / 35%);
+  }
+}
+
+@media (width <= 600px) {
+  .chart-container {
+    height: 240px;
+  }
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  mat-card {
+    box-shadow: none !important;
+  }
+
+  .table-scroll {
+    overflow: visible;
+  }
+
+  .schedule-table tr {
+    break-inside: avoid;
+  }
+}

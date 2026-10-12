@@ -117,7 +117,7 @@
           <tr>
             <td>{{ 'membership.Nominee' | translate }}</td>
             <td>
-              {{ a.nominee.name }} ({{ a.nominee.relationship }})
+              {{ a.nominee.name }} ({{ nomineeRelationship(a.nominee) }})
               @if (a.nominee.mobileNo) {
                 · {{ a.nominee.mobileNo }}
               }

@@ -63,6 +63,15 @@
             }
           }
         </div>
+
+        <!-- Public loan calculator (fineract-dbug #242): no sign-in needed. -->
+        <div class="or-divider" aria-hidden="true">
+          <span>{{ 'publicCalculator.or' | translate }}</span>
+        </div>
+        <a class="calculator-link" routerLink="/calculator">
+          <mifosx-m3-icon name="calculate"></mifosx-m3-icon>
+          <span>{{ 'publicCalculator.Loan calculator' | translate }}</span>
+        </a>
       </main>
     </div>
   </div>
