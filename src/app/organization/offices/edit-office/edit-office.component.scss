@@ -6,61 +6,94 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-/* Edit Office page */
+/* Matches the breadcrumb bar's own width/max-width exactly, so the two share
+   the same centered left edge instead of drifting apart at wider viewports. */
 .container {
-  width: 100%;
-  max-width: 900px;
+  width: 90%;
+  max-width: 84rem;
   margin: 0 auto;
-  padding: 24px;
+  padding: 0 0 24px;
   box-sizing: border-box;
 }
 
-/* Main card */
-.container > mat-card {
-  padding: 20px;
-  border-radius: 16px;
-  background: var(--dk-surface, #fff);
-  box-shadow:
-    0 2px 8px rgb(0 0 0 / 5%),
-    0 8px 24px rgb(0 0 0 / 6%);
-}
-
-/* Form content */
 mat-card-content {
-  padding: 8px 4px 4px;
+  padding: 0;
 }
 
 /* Form fields */
 .layout-column {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 18px 20px;
+  margin-top: -8px;
 }
 
-/* Make fields full width when needed */
 mat-form-field {
   width: 100%;
 }
 
-/* Form field appearance */
 mat-form-field input,
 mat-form-field mat-select {
   font-size: 14px;
 }
 
-/* Labels */
 mat-label {
   font-size: 14px;
 }
 
-/* Error messages */
 mat-error {
   font-size: 12px;
   line-height: 1.4;
 }
 
+.section-heading {
+  margin: 28px 0 16px;
+  color: var(--dk-text, #1f2937);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.working-area {
+  grid-template-columns: 1fr;
+  margin-top: 20px;
+}
+
+.working-area input {
+  font-size: 14px;
+}
+
+/* Service Center Address fields - 3 per row (member-address-fields' own styles
+   default to 2; this is a cross-component override, safe since the address
+   fields component is only nested here, not projected from elsewhere). */
+// stylelint-disable-next-line selector-pseudo-element-no-unknown
+::ng-deep .address-fields {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+}
+
+@media (width <= 600px) {
+  // stylelint-disable-next-line selector-pseudo-element-no-unknown
+  ::ng-deep .address-fields {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+
+.server-error {
+  margin-bottom: 20px;
+  padding: 12px 14px;
+  border-left: 3px solid #c62828;
+  border-radius: 6px;
+  background: #ffebee;
+  color: #c62828;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
 /* Action buttons */
 mat-card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
   padding: 20px 4px 4px;
   margin: 0;
   border-top: 1px solid var(--dk-border, #e7eaf0);
@@ -93,14 +126,15 @@ mat-card-actions [color='primary'] {
 }
 
 /* Tablet */
+@media (width <= 900px) {
+  .layout-column {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (width <= 768px) {
   .container {
-    padding: 18px;
-  }
-
-  .container > mat-card {
-    padding: 16px;
-    border-radius: 14px;
+    padding: 0 18px 18px;
   }
 
   .layout-column {
@@ -116,13 +150,7 @@ mat-card-actions [color='primary'] {
 /* Mobile */
 @media (width <= 600px) {
   .container {
-    padding: 10px;
-  }
-
-  .container > mat-card {
-    padding: 12px;
-    border-radius: 12px;
-    box-shadow: 0 2px 6px rgb(0 0 0 / 5%);
+    padding: 0 10px 10px;
   }
 
   mat-card-content {
@@ -131,10 +159,6 @@ mat-card-actions [color='primary'] {
 
   .layout-column {
     gap: 10px;
-  }
-
-  mat-form-field {
-    width: 100%;
   }
 
   mat-card-actions {
@@ -153,11 +177,7 @@ mat-card-actions [color='primary'] {
 /* Small mobile */
 @media (width <= 400px) {
   .container {
-    padding: 6px;
-  }
-
-  .container > mat-card {
-    padding: 10px;
+    padding: 0 6px 6px;
   }
 
   mat-label,
