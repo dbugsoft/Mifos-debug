@@ -18,25 +18,90 @@
 // Same field sizing as Create Member and the loan product forms.
 @include compact-stepper('.edit-client-form');
 
+// A zero-height full-width item ends the line; the negative margin cancels the extra row gap.
+:host ::ng-deep .edit-client-form .layout-row-wrap > .row-break {
+  flex: 0 0 100%;
+  margin-top: -8px;
+}
+
+// On a phone an entity's details stack full width, like every other field.
+@media (width <= 768px) {
+  :host ::ng-deep .edit-client-form .non-person {
+    flex: 1 1 100%;
+
+    > mat-form-field,
+    > mifosx-nepali-date-input {
+      display: block;
+      width: 100%;
+    }
+  }
+}
+
 // Each field as wide as what it holds. Laptop and up only: on a phone every field is full width.
 @media (width > 768px) {
   :host ::ng-deep .edit-client-form .layout-row-wrap {
-    > mat-form-field:has([formcontrolname='legalFormId']),
-    > mat-form-field:has([formcontrolname='accountNo']),
-    > mat-form-field:has([formcontrolname='genderId']),
-    > mat-form-field:has([formcontrolname='mobileNo']),
-    > mat-checkbox {
-      flex-basis: 200px;
+    // Sized so a laptop line holds Office to Middle Name, then Last Name to Staff,
+    // then Is staff? to Member Classification.
+    > mat-form-field:has([formcontrolname='officeId']) {
+      flex-basis: 192px;
     }
 
-    > mat-form-field:has([formcontrolname='externalId']),
-    > mat-form-field:has([formcontrolname='firstname']),
-    > mat-form-field:has([formcontrolname='middlename']),
-    > mat-form-field:has([formcontrolname='lastname']),
-    > mat-form-field:has([formcontrolname='clientTypeId']),
+    > mat-form-field:has([formcontrolname='emailAddress']) {
+      flex-basis: 240px;
+    }
+
     > mat-form-field:has([formcontrolname='clientClassificationId']),
     > mat-form-field:has([formcontrolname='incorpNumber']) {
-      flex-basis: 240px;
+      flex-basis: 216px;
+    }
+
+    > mat-form-field:has([formcontrolname='staffId']),
+    > mat-form-field:has([formcontrolname='clientTypeId']) {
+      flex-basis: 176px;
+    }
+
+    > mat-form-field:has([formcontrolname='firstname']),
+    > mat-form-field:has([formcontrolname='middlename']),
+    > mat-form-field:has([formcontrolname='lastname']) {
+      flex-basis: 160px;
+    }
+
+    // A 10-digit number.
+    > mat-form-field:has([formcontrolname='mobileNo']) {
+      flex-basis: 144px;
+    }
+
+    > mat-form-field:has([formcontrolname='legalFormId']),
+    > mat-form-field:has([formcontrolname='genderId']) {
+      flex-basis: 136px;
+    }
+
+    // A 9-digit account number.
+    > mat-form-field:has([formcontrolname='accountNo']) {
+      flex-basis: 128px;
+    }
+
+    // Fixed width: the rest of its line takes the spare room.
+    > mat-form-field:has([formcontrolname='externalId']) {
+      flex: 0 1 160px;
+    }
+
+    // An entity's details join the same flowing row.
+    > .non-person {
+      display: contents;
+
+      > mat-form-field {
+        flex: 1 1 240px;
+      }
+
+      > mat-form-field:has(textarea) {
+        flex-basis: 100%;
+      }
+
+      > mifosx-nepali-date-input {
+        flex: 0 1 416px;
+        max-width: 100%;
+      }
     }
 
     > mat-form-field:has([formcontrolname='fullname']) {
@@ -49,10 +114,6 @@
       max-width: 100%;
     }
   }
-}
-
-.section-divider {
-  margin: 8px 0 16px;
 }
 
 .button-container {
