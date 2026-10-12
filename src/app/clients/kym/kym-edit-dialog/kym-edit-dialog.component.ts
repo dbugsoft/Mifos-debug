@@ -14,8 +14,17 @@ import { MatIcon } from '@angular/material/icon';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { NepaliDateInputComponent } from 'app/shared/nepali-date-input/nepali-date-input.component';
 import { CodeOption, KymService } from '../kym.service';
-import { FAMILY_TYPES, INCOME_BANDS, INCOME_HEADINGS, KymPerson, KymView, MARITAL_STATUSES } from '../kym.models';
+import {
+  FAMILY_TYPES,
+  INCOME_BANDS,
+  INCOME_HEADINGS,
+  KymOtherCoop,
+  KymPerson,
+  KymView,
+  MARITAL_STATUSES
+} from '../kym.models';
 import { KymMemberPickerComponent } from '../member-picker/member-picker.component';
+import { RelationshipSelectComponent } from 'app/shared/relationship-select/relationship-select.component';
 
 export interface KymEditDialogData {
   clientId: number;
@@ -70,7 +79,8 @@ const SECTION: Record<string, string> = {
     MatRadioButton,
     MatIcon,
     NepaliDateInputComponent,
-    KymMemberPickerComponent
+    KymMemberPickerComponent,
+    RelationshipSelectComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -88,7 +98,6 @@ export class KymEditDialogComponent implements AfterViewInit {
   readonly today = new Date();
   readonly busy = signal(false);
   readonly recommenders = signal<KymPerson[]>([]);
-  readonly familyHere = signal<KymPerson[]>([]);
 
   readonly form: FormGroup;
   private readonly initial: Record<string, unknown>;
@@ -109,10 +118,9 @@ export class KymEditDialogComponent implements AfterViewInit {
         v.pepName,
         Validators.maxLength(200)
       ],
-      pepRelationship: [
-        v.pepRelationship,
-        Validators.maxLength(100)
-      ],
+      pepSelf: [v.pepSelf ?? false],
+      pepRelationshipCode: [v.pepRelationshipCode ?? null],
+      pepRelationshipDetail: [v.pepRelationshipDetail ?? null],
       pepPost: [
         v.pepPost,
         Validators.maxLength(200)
@@ -168,9 +176,8 @@ export class KymEditDialogComponent implements AfterViewInit {
         v.remarks,
         Validators.maxLength(1000)
       ],
-      otherCoops: this.fb.array(
-        v.otherCoops.map((c) => this.coopRow(c.whose, c.personName, c.relationship, c.coopNameAddress, c.membershipNo))
-      ),
+      otherCoops: this.fb.array(v.otherCoops.map((c) => this.coopRow(c.whose, c))),
+      familyHere: this.fb.array(v.familyHere.map((p) => this.familyRow(p))),
       incomeSources: this.fb.array(v.incomeSources.map((s) => this.incomeRow(s.heading, s.detail, s.amount))),
       inPerson: [
         false,
@@ -182,7 +189,6 @@ export class KymEditDialogComponent implements AfterViewInit {
       ]
     });
     this.recommenders.set([...v.recommenders]);
-    this.familyHere.set([...v.familyHere]);
     this.initial = this.snapshot();
   }
 
@@ -201,35 +207,40 @@ export class KymEditDialogComponent implements AfterViewInit {
     return this.form.get('incomeSources') as FormArray;
   }
 
-  coopRow(
-    whose = 'OWN',
-    personName?: string,
-    relationship?: string,
-    coopNameAddress?: string,
-    membershipNo?: string
-  ): FormGroup {
+  get familyHere(): FormArray {
+    return this.form.get('familyHere') as FormArray;
+  }
+
+  /** The relationship controls of a row: the code and description, and the text typed before the list, kept as it is. */
+  private relationshipControls(r: Partial<KymPerson>): Record<string, unknown[]> {
+    return {
+      relationshipCode: [r.relationshipCode ?? null],
+      relationshipDetail: [r.relationshipDetail ?? null],
+      // with a code, the server sends the label here; it is not typed text
+      relationship: [r.relationshipCode ? null : (r.relationship ?? null)]
+    };
+  }
+
+  coopRow(whose = 'OWN', c: Partial<KymOtherCoop> = {}): FormGroup {
     return this.fb.group({
       whose: [
         whose,
         Validators.required
       ],
       personName: [
-        personName ?? null,
+        c.personName ?? null,
         Validators.maxLength(200)
       ],
-      relationship: [
-        relationship ?? null,
-        Validators.maxLength(100)
-      ],
+      ...this.relationshipControls(c),
       coopNameAddress: [
-        coopNameAddress ?? null,
+        c.coopNameAddress ?? null,
         [
           Validators.required,
           Validators.maxLength(300)
         ]
       ],
       membershipNo: [
-        membershipNo ?? null,
+        c.membershipNo ?? null,
         Validators.maxLength(50)
       ]
     });
@@ -264,30 +275,37 @@ export class KymEditDialogComponent implements AfterViewInit {
     }
   }
 
+  familyRow(p: KymPerson): FormGroup {
+    return this.fb.group({
+      clientId: [p.clientId],
+      name: [p.name],
+      accountNo: [p.accountNo],
+      ...this.relationshipControls(p)
+    });
+  }
+
   addFamilyHere(p: KymPerson): void {
-    if (!this.familyHere().some((r) => r.clientId === p.clientId)) {
-      this.familyHere.update((l) => [
-        ...l,
-        { ...p, relationship: '' }
-      ]);
+    if (!this.familyHere.value.some((r: KymPerson) => r.clientId === p.clientId)) {
+      this.familyHere.push(this.familyRow({ ...p, relationship: undefined }));
     }
   }
 
-  setRelationship(i: number, relationship: string): void {
-    this.familyHere.update((l) => l.map((p, j) => (j === i ? { ...p, relationship } : p)));
-  }
-
-  remove(list: 'recommenders' | 'familyHere', i: number): void {
+  remove(list: 'recommenders', i: number): void {
     this[list].update((l) => l.filter((_, j) => j !== i));
   }
 
   /** The values as the API takes them, for comparing and sending. */
   private snapshot(): Record<string, unknown> {
-    const { inPerson, changeHappenedOn, ...rest } = this.form.getRawValue();
+    const { inPerson, changeHappenedOn, familyHere, ...rest } = this.form.getRawValue();
     return {
       ...rest,
       recommenders: this.recommenders().map((r) => r.clientId),
-      familyHere: this.familyHere().map((p) => ({ clientId: p.clientId, relationship: p.relationship || null }))
+      familyHere: familyHere.map((p: KymPerson) => ({
+        clientId: p.clientId,
+        relationshipCode: p.relationshipCode || null,
+        relationshipDetail: p.relationshipDetail?.trim() || null,
+        relationship: p.relationship || null
+      }))
     };
   }
 

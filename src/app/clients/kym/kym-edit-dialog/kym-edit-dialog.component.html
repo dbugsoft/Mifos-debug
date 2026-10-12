@@ -63,15 +63,20 @@
       <mat-radio-button [value]="false">{{ 'kym.No' | translate }}</mat-radio-button>
     </mat-radio-group>
     @if (form.value.pepDeclared) {
+      <mat-checkbox formControlName="pepSelf">{{ 'kym.field.pepSelf' | translate }}</mat-checkbox>
       <div class="row three">
-        <mat-form-field>
-          <mat-label>{{ 'kym.field.pepName' | translate }}</mat-label>
-          <input matInput formControlName="pepName" />
-        </mat-form-field>
-        <mat-form-field>
-          <mat-label>{{ 'kym.field.pepRelationship' | translate }}</mat-label>
-          <input matInput formControlName="pepRelationship" />
-        </mat-form-field>
+        @if (!form.value.pepSelf) {
+          <mat-form-field>
+            <mat-label>{{ 'kym.field.pepName' | translate }}</mat-label>
+            <input matInput formControlName="pepName" />
+          </mat-form-field>
+          <mifosx-relationship-select
+            label="kym.field.pepRelationship"
+            [code]="$any(form.controls.pepRelationshipCode)"
+            [detail]="$any(form.controls.pepRelationshipDetail)"
+            [typed]="data.kym.values.pepRelationshipCode ? null : data.kym.values.pepRelationship"
+          ></mifosx-relationship-select>
+        }
         <mat-form-field>
           <mat-label>{{ 'kym.field.pepPost' | translate }}</mat-label>
           <input matInput formControlName="pepPost" />
@@ -139,10 +144,11 @@
                 <mat-label>{{ 'kym.Name' | translate }}</mat-label>
                 <input matInput formControlName="personName" />
               </mat-form-field>
-              <mat-form-field class="narrow">
-                <mat-label>{{ 'kym.Relationship' | translate }}</mat-label>
-                <input matInput formControlName="relationship" />
-              </mat-form-field>
+              <mifosx-relationship-select
+                [code]="$any(row.get('relationshipCode'))"
+                [detail]="$any(row.get('relationshipDetail'))"
+                [typed]="row.value.relationship"
+              ></mifosx-relationship-select>
             }
             <mat-form-field class="wide">
               <mat-label>{{ 'kym.Cooperative' | translate }}</mat-label>
@@ -178,17 +184,18 @@
       <mat-radio-button [value]="false">{{ 'kym.No' | translate }}</mat-radio-button>
     </mat-radio-group>
     @if (form.value.familyInThisCoop) {
-      @for (p of familyHere(); track p.clientId; let i = $index) {
+      @for (row of familyHere.controls; track row.value.clientId; let i = $index) {
         <div class="person">
-          <span>{{ p.name }} · {{ p.accountNo }}</span>
-          <mat-form-field class="narrow">
-            <mat-label>{{ 'kym.Relationship' | translate }}</mat-label>
-            <input matInput [value]="p.relationship ?? ''" (change)="setRelationship(i, $any($event.target).value)" />
-          </mat-form-field>
+          <span>{{ row.value.name }} · {{ row.value.accountNo }}</span>
+          <mifosx-relationship-select
+            [code]="$any(row.get('relationshipCode'))"
+            [detail]="$any(row.get('relationshipDetail'))"
+            [typed]="row.value.relationship"
+          ></mifosx-relationship-select>
           <button
             mat-icon-button
             type="button"
-            (click)="remove('familyHere', i)"
+            (click)="familyHere.removeAt(i)"
             [attr.aria-label]="'kym.Remove' | translate"
           >
             <mat-icon>delete</mat-icon>

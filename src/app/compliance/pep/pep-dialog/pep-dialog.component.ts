@@ -128,7 +128,12 @@ export class PepDialogComponent {
         }
         if (s.relationship !== 'SELF') {
           body['links'] = [
-            { clientId: s.memberId, relationship: s.relationship, relationshipDetail: s.relationshipDetail }
+            {
+              clientId: s.memberId,
+              relationship: s.relationship,
+              relationshipCode: s.relationshipCode ?? null,
+              relationshipDetail: s.relationshipDetail
+            }
           ];
         }
       }
