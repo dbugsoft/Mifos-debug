@@ -12,6 +12,14 @@
  */
 
 import { TranslateService } from '@ngx-translate/core';
+import {
+  RelationshipOption,
+  relationshipLabel,
+  relationshipText
+} from 'app/shared/relationship-select/relationship-select.component';
+
+export type { RelationshipOption };
+export { relationshipLabel };
 
 export type MembershipStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 
@@ -34,15 +42,6 @@ export interface Nominee {
   relationshipDetail?: string;
   relationshipLabelEn?: string;
   mobileNo?: string;
-}
-
-/** An entry of GET /nepal/relationships (fineract-dbug #193). */
-export interface RelationshipOption {
-  code: string;
-  /** The server's English label; the screens translate by code (relationship.<CODE>) and fall back to it */
-  labelEn: string;
-  /** The nominee's relationship needs a description, e.g. Guardian */
-  needsDetail: boolean;
 }
 
 export interface MembershipApplication {
@@ -180,25 +179,17 @@ export interface MembershipRejectRequest {
 }
 
 /**
- * A relationship in the user's language: the language files hold the words for each code (fineract-dbug ADR-0046);
- * a code they do not know yet shows the server's English label.
- */
-export function relationshipLabel(translate: TranslateService, code: string, labelEn?: string): string {
-  const key = `relationship.${code}`;
-  const label = translate.instant(key);
-  return label && label !== key ? label : labelEn || code;
-}
-
-/**
  * The nominee's relationship as shown: the label with any detail ("Guardian: uncle"), or, for a nominee typed before
  * the list, the text as it was typed.
  */
 export function nomineeRelationshipText(nominee: Nominee, translate: TranslateService): string {
-  if (!nominee.relationshipCode) {
-    return nominee.relationship ?? '';
-  }
-  const label = relationshipLabel(translate, nominee.relationshipCode, nominee.relationshipLabelEn);
-  return nominee.relationshipDetail ? `${label}: ${nominee.relationshipDetail}` : label;
+  return relationshipText(
+    translate,
+    nominee.relationshipCode,
+    nominee.relationshipDetail,
+    nominee.relationship,
+    nominee.relationshipLabelEn
+  );
 }
 
 /** The days-left chip: green with time to spare, amber in the last week, red once overdue. */

@@ -93,7 +93,7 @@
                 <a [routerLink]="['/compliance', 'members', l.clientId]">{{ l.name }}</a>
                 <span class="sub"
                   >{{ l.accountNo }} · {{ 'compliance.pepRelationship.' + l.relationship | translate
-                  }}{{ l.relationshipDetail ? ': ' + l.relationshipDetail : '' }}</span
+                  }}{{ relationText(l) ? ': ' + relationText(l) : '' }}</span
                 >
               </span>
               @if (canManage) {
@@ -121,10 +121,14 @@
                   }
                 </mat-select>
               </mat-form-field>
-              <mat-form-field>
-                <mat-label>{{ 'compliance.pep.Relationship in words' | translate }}</mat-label>
-                <input matInput maxlength="100" [value]="detail()" (input)="detail.set($any($event.target).value)" />
-              </mat-form-field>
+              @if (relationship() === 'FAMILY') {
+                <mifosx-relationship-select [code]="familyCode" [detail]="familyDetail"></mifosx-relationship-select>
+              } @else if (relationship() === 'ASSOCIATE') {
+                <mat-form-field>
+                  <mat-label>{{ 'compliance.pep.Relationship in words' | translate }}</mat-label>
+                  <input matInput maxlength="100" [value]="detail()" (input)="detail.set($any($event.target).value)" />
+                </mat-form-field>
+              }
             </div>
             <button mat-raised-button color="primary" type="button" (click)="link()" [disabled]="busy()">
               {{ 'compliance.pep.Link the member' | translate }}

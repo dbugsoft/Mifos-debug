@@ -52,7 +52,8 @@ const SWITCHES: (keyof AmlSettings)[] = [
   'kymGateEnabled',
   'remittanceService',
   'sharesCountAsCash',
-  'unknownPaymentCountsAsCash'
+  'unknownPaymentCountsAsCash',
+  'relationshipsFromList'
 ];
 const TEXTS: (keyof AmlSettings)[] = [
   'goamlEntityId',

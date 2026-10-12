@@ -115,7 +115,7 @@
                     >{{ 'compliance.pep.from.' + s.from | translate }} · {{ s.memberName }} ({{ s.accountNo }}){{
                       s.relationship === 'SELF'
                         ? ''
-                        : ', ' + (s.relationshipDetail ?? ('compliance.pepRelationship.' + s.relationship | translate))
+                        : ', ' + (relationText(s) || ('compliance.pepRelationship.' + s.relationship | translate))
                     }}</span
                   >
                 </div>

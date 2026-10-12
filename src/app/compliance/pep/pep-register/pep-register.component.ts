@@ -13,7 +13,9 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatButtonToggle, MatButtonToggleGroup } from '@angular/material/button-toggle';
 import { MatIcon } from '@angular/material/icon';
 import { MatProgressBar } from '@angular/material/progress-bar';
+import { TranslateService } from '@ngx-translate/core';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { relationshipText } from 'app/shared/relationship-select/relationship-select.component';
 import { AdToBsPipe } from 'app/pipes/ad-to-bs.pipe';
 import { ComplianceService } from '../../compliance.service';
 import { InputDialogComponent, InputDialogData } from '../../input-dialog/input-dialog.component';
@@ -47,6 +49,7 @@ export class PepRegisterComponent implements OnInit {
   private router = inject(Router);
   private dialog = inject(MatDialog);
   private destroyRef = inject(DestroyRef);
+  private translate = inject(TranslateService);
 
   readonly allowed = signal<boolean | null>(null);
   readonly view = signal<View>('REGISTER');
@@ -56,6 +59,17 @@ export class PepRegisterComponent implements OnInit {
   readonly register = signal<Pep[]>([]);
   readonly suggestions = signal<PepSuggestion[]>([]);
   canManage = false;
+
+  /** Which relationship a link is, in words: from the list ("Uncle", "Other: friend") or as written before the list. */
+  relationText(l: PepSuggestion): string {
+    return relationshipText(
+      this.translate,
+      l.relationshipCode,
+      l.relationshipDetail,
+      l.relationshipDetail,
+      l.relationshipLabelEn
+    );
+  }
 
   readonly statuses: (PepStatus | 'ALL')[] = [
     'ALL',
