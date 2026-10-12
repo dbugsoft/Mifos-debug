@@ -75,13 +75,6 @@ export class OrganizationService {
   }
 
   /**
-   * @returns {Observable<any>} Offices data
-   */
-  getOffices(): Observable<any> {
-    return this.http.get('/offices');
-  }
-
-  /**
    * Get Office Template.
    * @param {string} officeId Office Id of the office selected.
    * @returns {Observable<any>} Office Template.
@@ -113,9 +106,15 @@ export class OrganizationService {
   }
 
   /**
-   * @param {string} officeId Office ID of Office.
-   * @param {boolean} template
-   * @returns {Observable<any>} Office.
+   * @returns {Observable<any>} Offices data.
+   */
+  getOffices(): Observable<any> {
+    return this.http.get('/offices');
+  }
+
+  /**
+   * @param {string} officeId Office ID of office to be fetched.
+   * @returns {Observable<any>} Office data.
    */
   getOffice(officeId: string, template: boolean = false): Observable<any> {
     const httpParams = new HttpParams().set('template', template.toString());
@@ -131,12 +130,61 @@ export class OrganizationService {
   }
 
   /**
+   * @param {string} officeId Office ID of office to be updated.
    * @param {any} office Office to be updated.
-   * @param {string} officeId Office Id
    * @returns {Observable<any>}
    */
   updateOffice(officeId: string, office: any): Observable<any> {
     return this.http.put(`/offices/${officeId}`, office);
+  }
+
+  /*
+   * ===========================================================
+   * SERVICE CENTERS (GH-224)
+   * ===========================================================
+   * Frontend-facing rename/extension of offices with Nepal address,
+   * contact and working-area detail fields. Kept entirely separate
+   * from the plain office methods above, which many unrelated
+   * features (accounting, navigation, reports, client actions) still
+   * depend on against the stock Fineract `/offices` endpoints.
+   */
+
+  /**
+   * @param status Optional Service Center status filter.
+   * @returns {Observable<any>} Service Centers data, in tree order.
+   */
+  getServiceCenters(status?: 'ACTIVE' | 'INACTIVE'): Observable<any> {
+    let httpParams = new HttpParams();
+    if (status) {
+      httpParams = httpParams.set('status', status);
+    }
+    return this.http.get('/nepal/service-centers', { params: httpParams });
+  }
+
+  /**
+   * @param officeId Service Center (office) ID.
+   * @returns {Observable<any>} Service Center detail, including address/contact/status/workingArea.
+   */
+  getServiceCenter(officeId: string): Observable<any> {
+    return this.http.get(`/nepal/service-centers/${officeId}`);
+  }
+
+  /**
+   * @param serviceCenter Service Center data to create.
+   * @returns {Observable<any>} `{ officeId, resourceId }`.
+   */
+  createServiceCenter(serviceCenter: any): Observable<any> {
+    return this.http.post('/nepal/service-centers', serviceCenter);
+  }
+
+  /**
+   * @param officeId Service Center (office) ID to update.
+   * @param serviceCenter Service Center data to update - office fields are optional (only what is sent
+   * changes), detail fields are not (send all of them every time; an omitted optional one is cleared).
+   * @returns {Observable<any>} `{ officeId, resourceId, changes }`.
+   */
+  updateServiceCenter(officeId: string, serviceCenter: any): Observable<any> {
+    return this.http.put(`/nepal/service-centers/${officeId}`, serviceCenter);
   }
 
   /**

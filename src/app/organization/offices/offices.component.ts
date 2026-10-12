@@ -102,8 +102,7 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     MatTabGroup,
     MatTab,
     ExternalIdentifierComponent,
-    DatePipe,
-    DateFormatPipe
+    DatePipe
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -124,9 +123,9 @@ export class OfficesComponent implements OnInit, AfterViewInit {
   /** Columns to be displayed in offices table. */
   displayedColumns: string[] = [
     'name',
-    'externalId',
     'parentName',
-    'openingDate'
+    'status',
+    'contactPhone'
   ];
   /** Data source for offices table. */
   dataSource: MatTableDataSource<any>;

@@ -17,18 +17,18 @@ import { Observable } from 'rxjs';
 import { OrganizationService } from '../../organization.service';
 
 /**
- * Office data resolver.
+ * Service Center data resolver, for the View Service Center page.
  */
 @Injectable()
 export class OfficeResolver {
   private organizationService = inject(OrganizationService);
 
   /**
-   * Returns the office data.
+   * Returns the service center data.
    * @returns {Observable<any>}
    */
   resolve(route: ActivatedRouteSnapshot): Observable<any> {
     const officeId = route.parent.paramMap.get('officeId');
-    return this.organizationService.getOffice(officeId);
+    return this.organizationService.getServiceCenter(officeId);
   }
 }

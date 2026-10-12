@@ -11,78 +11,39 @@
   box-sizing: border-box;
 }
 
-/* =========================
-   Main Card
-========================= */
-
-.office-card-wrapper,
-.tab-container {
+.detail-table {
   width: 100%;
-  box-sizing: border-box;
-}
-
-.office-card-wrapper {
-  background: var(--dk-surface, #fff);
   border: 1px solid var(--dk-border, #e2e8f0);
-  border-radius: 9px;
+  border-radius: 10px;
+  border-collapse: separate;
+  border-spacing: 0;
   overflow: hidden;
 }
 
-/* =========================
-   Card Header
-========================= */
-
-.card-header {
-  display: flex;
-  align-items: center;
-  min-height: 52px;
-  padding: 0 22px;
-  background: var(--dk-surface-2, #f8fafc);
+.detail-table tr:not(:last-child) th,
+.detail-table tr:not(:last-child) td {
   border-bottom: 1px solid var(--dk-border, #e2e8f0);
 }
 
-.card-title {
-  color: var(--dk-text, #1e293b);
-  font-size: 16px;
-  font-weight: 600;
+.detail-table tr:nth-child(even) {
+  background: var(--dk-surface-2, #f8fafc);
 }
 
-/* =========================
-   Details
-========================= */
-
-.tab-container {
-  padding: 6px 22px 18px;
+.detail-table th,
+.detail-table td {
+  padding: 14px 18px;
+  text-align: left;
+  vertical-align: middle;
 }
 
-.compact-view {
+.detail-table th {
+  width: 35%;
   color: var(--dk-text-2, #334155);
-}
-
-.compact-details {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-}
-
-/* Labels */
-
-.flex-45.left {
-  width: 45%;
-  box-sizing: border-box;
-  padding: 15px 16px 15px 0;
-  color: var(--dk-text-muted, #64748b);
   font-size: 13px;
   font-weight: 600;
 }
 
-/* Values */
-
-.flex-50.right {
-  width: 50%;
-  min-width: 0;
-  box-sizing: border-box;
-  padding: 15px 0 15px 16px;
+.detail-table td {
   color: var(--dk-text, #1f2937);
   font-size: 14px;
   line-height: 1.5;
@@ -90,135 +51,35 @@
   word-break: break-word;
 }
 
-/* =========================
-   Dividers
-========================= */
-
-.section-divider {
-  flex-basis: 100%;
-  width: 100%;
-  height: 1px;
-  margin: 0;
-  border: 0;
-  background: var(--dk-surface-2, #edf0f2);
-}
-
-/* =========================
-   External Identifier
-========================= */
-
-.flex-50.right mifosx-external-identifier {
+.detail-table td mifosx-external-identifier {
   display: inline-flex;
   max-width: 100%;
   align-items: center;
 }
 
-/* =========================
-   Tablet
-========================= */
-
-@media (width <= 900px) {
-  .card-header {
-    padding: 0 18px;
-  }
-
-  .tab-container {
-    padding: 4px 18px 16px;
-  }
-
-  .flex-45.left {
-    width: 42%;
-    padding-right: 12px;
-  }
-
-  .flex-50.right {
-    width: 58%;
-    padding-left: 12px;
-  }
-}
-
-/* =========================
-   Mobile
-========================= */
-
+/* Mobile */
 @media (width <= 600px) {
-  .office-card-wrapper {
-    border-radius: 8px;
-  }
-
-  .card-header {
-    min-height: 48px;
-    padding: 0 16px;
-  }
-
-  .card-title {
-    font-size: 15px;
-  }
-
-  .tab-container {
-    padding: 4px 16px 14px;
-  }
-
-  /*
-   * Change from two columns
-   * to stacked fields.
-   */
-  .flex-45.left,
-  .flex-50.right {
+  .detail-table,
+  .detail-table tbody,
+  .detail-table tr,
+  .detail-table th,
+  .detail-table td {
+    display: block;
     width: 100%;
   }
 
-  .flex-45.left {
-    padding: 12px 0 3px;
-    color: var(--dk-text-muted, #64748b);
-    font-size: 12px;
+  .detail-table tr {
+    padding: 10px 14px;
   }
 
-  .flex-50.right {
-    padding: 3px 0 12px;
-    color: var(--dk-text, #1f2937);
-    font-size: 14px;
+  .detail-table tr:not(:last-child) {
+    border-bottom: 1px solid var(--dk-border, #e2e8f0);
   }
 
-  .section-divider {
-    margin: 0;
-  }
-}
-
-/* =========================
-   Small Mobile
-========================= */
-
-@media (width <= 400px) {
-  .card-header {
-    padding: 0 12px;
-  }
-
-  .tab-container {
-    padding: 2px 12px 12px;
-  }
-
-  .card-title {
-    font-size: 14px;
-  }
-
-  .flex-45.left {
-    padding-top: 10px;
-    font-size: 11px;
-  }
-
-  .flex-50.right {
+  .detail-table th,
+  .detail-table td {
+    padding: 2px 0;
+    border-bottom: 0 !important;
     font-size: 13px;
-    padding-bottom: 10px;
   }
-}
-
-/* =========================
-   Prevent Overflow
-========================= */
-
-.office-card-wrapper,
-.tab-container,
-.flex-50 {
-  box-sizing: border-box;
 }
