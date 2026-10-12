@@ -846,8 +846,12 @@ mat-card {
     margin-left: 0 !important;
   }
 
+  // html and body are one screen tall with overflow hidden (the app scrolls inside them), which would cut the
+  // printout to one page.
   body,
   html {
+    height: auto !important;
+    overflow: visible !important;
     background: #fff !important;
   }
 
