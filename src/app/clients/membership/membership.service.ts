@@ -19,7 +19,8 @@ import {
   MembershipSettings,
   MembershipSettingsView,
   MembershipStatus,
-  MembershipTemplate
+  MembershipTemplate,
+  RelationshipOption
 } from './membership.models';
 
 /**
@@ -54,6 +55,13 @@ export class MembershipService {
    */
   templateOrNull(): Observable<MembershipTemplate | null> {
     return this.canRead() ? this.template().pipe(catchError(() => of(null))) : of(null);
+  }
+
+  /** The relationships a nominee may have, in the order to show them. */
+  nomineeRelationships(): Observable<RelationshipOption[]> {
+    return this.http.get<RelationshipOption[]>('/nepal/relationships', {
+      params: new HttpParams().set('use', 'NOMINEE')
+    });
   }
 
   apply(request: MembershipApplyRequest): Observable<MembershipApplication> {

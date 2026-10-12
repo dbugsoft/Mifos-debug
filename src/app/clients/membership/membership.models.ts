@@ -11,6 +11,8 @@
  * Shapes of /nepal/memberships.
  */
 
+import { TranslateService } from '@ngx-translate/core';
+
 export type MembershipStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 
 /** When the money for the shares and charges is taken. */
@@ -24,8 +26,23 @@ export interface ChargeOption {
 
 export interface Nominee {
   name: string;
-  relationship: string;
+  /** The text typed before the list; on a saved nominee chosen from the list, e.g. "Guardian: uncle" */
+  relationship?: string;
+  /** The {@link RelationshipOption.code} chosen; absent on a nominee typed before the list */
+  relationshipCode?: string;
+  /** Only when the chosen entry needs detail, e.g. what kind of guardian */
+  relationshipDetail?: string;
+  relationshipLabelEn?: string;
   mobileNo?: string;
+}
+
+/** An entry of GET /nepal/relationships (fineract-dbug #193). */
+export interface RelationshipOption {
+  code: string;
+  /** The server's English label; the screens translate by code (relationship.<CODE>) and fall back to it */
+  labelEn: string;
+  /** The nominee's relationship needs a description, e.g. Guardian */
+  needsDetail: boolean;
 }
 
 export interface MembershipApplication {
@@ -94,6 +111,8 @@ export interface MembershipSettings {
   separateApprover: boolean;
   paymentTaken: PaymentTaken;
   nomineeRequired: boolean;
+  /** The nominee's relationship must be chosen from the list; typed text is refused */
+  nomineeRelationshipFromList?: boolean;
   /** Approval waits for a complete KYM (on by default, fineract-dbug ADR 0042) */
   kymRequiredForApproval?: boolean;
 }
@@ -158,6 +177,28 @@ export interface MembershipRejectRequest {
   date?: string;
   refundAmount?: number;
   refundReceiptNumber?: string;
+}
+
+/**
+ * A relationship in the user's language: the language files hold the words for each code (fineract-dbug ADR-0046);
+ * a code they do not know yet shows the server's English label.
+ */
+export function relationshipLabel(translate: TranslateService, code: string, labelEn?: string): string {
+  const key = `relationship.${code}`;
+  const label = translate.instant(key);
+  return label && label !== key ? label : labelEn || code;
+}
+
+/**
+ * The nominee's relationship as shown: the label with any detail ("Guardian: uncle"), or, for a nominee typed before
+ * the list, the text as it was typed.
+ */
+export function nomineeRelationshipText(nominee: Nominee, translate: TranslateService): string {
+  if (!nominee.relationshipCode) {
+    return nominee.relationship ?? '';
+  }
+  const label = relationshipLabel(translate, nominee.relationshipCode, nominee.relationshipLabelEn);
+  return nominee.relationshipDetail ? `${label}: ${nominee.relationshipDetail}` : label;
 }
 
 /** The days-left chip: green with time to spare, amber in the last week, red once overdue. */

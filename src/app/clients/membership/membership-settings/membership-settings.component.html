@@ -94,6 +94,15 @@
       </mat-form-field>
 
       <mat-form-field>
+        <mat-label>{{ 'membership.Relationship from the list' | translate }}</mat-label>
+        <mat-select formControlName="nomineeRelationshipFromList">
+          <mat-option [value]="false">{{ 'membership.Off' | translate }}</mat-option>
+          <mat-option [value]="true">{{ 'membership.On' | translate }}</mat-option>
+        </mat-select>
+        <mat-hint>{{ 'membership.relationshipFromListHint' | translate }}</mat-hint>
+      </mat-form-field>
+
+      <mat-form-field>
         <mat-label>{{ 'membership.KYM complete before approval' | translate }}</mat-label>
         <mat-select formControlName="kymRequiredForApproval">
           <mat-option [value]="true">{{ 'membership.On' | translate }}</mat-option>

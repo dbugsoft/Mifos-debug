@@ -14,7 +14,8 @@ import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { FormatNumberPipe } from 'app/pipes/format-number.pipe';
 import { ClientActionNotifierService } from '../../clients-view/client-actions/client-action-notifier.service';
-import { MembershipApplication, MembershipTemplate } from '../membership.models';
+import { TranslateService } from '@ngx-translate/core';
+import { MembershipApplication, MembershipTemplate, Nominee, nomineeRelationshipText } from '../membership.models';
 import { MembershipService } from '../membership.service';
 import { MembershipDeadlineComponent } from '../membership-deadline/membership-deadline.component';
 import {
@@ -52,6 +53,7 @@ export class MembershipTabComponent {
   private notifier = inject(ClientActionNotifierService);
   private membershipService = inject(MembershipService);
   private destroyRef = inject(DestroyRef);
+  private translate = inject(TranslateService);
 
   readonly application = signal<MembershipApplication | null>(null);
   /** Every application, newest first; the first is {@link application}. */
@@ -134,6 +136,10 @@ export class MembershipTabComponent {
 
   applyAgain(): void {
     this.openApply('again');
+  }
+
+  nomineeRelationship(nominee: Nominee): string {
+    return nomineeRelationshipText(nominee, this.translate);
   }
 
   private openApply(mode: 'again'): void {
