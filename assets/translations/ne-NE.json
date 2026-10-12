@@ -5826,6 +5826,7 @@
     "Transaction": "कारोबार",
     "Unusual yearly total": "असामान्य वार्षिक जम्मा",
     "We run a remittance service": "हामी रेमिट्यान्स सेवा चलाउँछौँ",
+    "relationshipsFromList": "नाता सूचीबाट मात्र छान्ने (लेखेको नाता नलिने)",
     "What FIU-Nepal said": "वित्तीय जानकारी इकाइले भनेको",
     "What": "के",
     "Who can see compliance data": "अनुपालन विवरण कसले हेर्न सक्छ",
@@ -6768,6 +6769,7 @@
       "pepShort": "उच्च पदस्थ व्यक्ति (सदस्य वा परिवार)",
       "pepName": "ती व्यक्तिको नाम",
       "pepRelationship": "नाता",
+      "pepSelf": "यो पद सदस्य आफैंको हो",
       "pepPost": "पद",
       "guardian": "अभिभावक",
       "guardianName": "अभिभावक (१६ वर्षमुनिका सदस्यका लागि)",
@@ -7098,6 +7100,11 @@
       "Description": "विवरण (ऐच्छिक)",
       "Upload": "अपलोड गर्नुहोस्"
     }
+  },
+  "relationshipList": {
+    "typedBefore": "सूचीअघि लेखिएको: {{text}}",
+    "required": "नाता छान्नुहोस्।",
+    "detailRequired": "नाता के हो लेख्नुहोस्।"
   },
   "relationship": {
     "FATHER": "बुबा",

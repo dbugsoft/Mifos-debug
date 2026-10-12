@@ -5944,6 +5944,7 @@
     "Transaction": "Transaction",
     "Unusual yearly total": "Unusual yearly total",
     "We run a remittance service": "We run a remittance service",
+    "relationshipsFromList": "Relationships only from the list (typed text is refused)",
     "What FIU-Nepal said": "What FIU-Nepal said",
     "What": "What",
     "Who can see compliance data": "Who can see compliance data",
@@ -6767,6 +6768,7 @@
       "pepShort": "High public position (member or family)",
       "pepName": "Name of that person",
       "pepRelationship": "Relationship",
+      "pepSelf": "The member themselves holds the post",
       "pepPost": "Post held",
       "guardian": "Parent or guardian",
       "guardianName": "Parent or guardian (for a member under 16)",
@@ -7097,6 +7099,11 @@
       "Description": "Description (optional)",
       "Upload": "Upload"
     }
+  },
+  "relationshipList": {
+    "typedBefore": "Typed before the list: {{text}}",
+    "required": "Choose the relationship.",
+    "detailRequired": "Say what the relationship is."
   },
   "relationship": {
     "FATHER": "Father",
