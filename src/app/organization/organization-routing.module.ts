@@ -71,6 +71,7 @@ import { CreateHolidayComponent } from './holidays/create-holiday/create-holiday
 /** Custom Resolvers */
 import { LoanProvisioningCriteriaResolver } from './loan-provisioning-criteria/common-resolvers/loan-provisioning-criteria.resolver';
 import { OfficesResolver } from './offices/common-resolvers/offices.resolver';
+import { ServiceCentersResolver } from './offices/common-resolvers/service-centers.resolver';
 import { EmployeesResolver } from './employees/employees.resolver';
 import { EmployeeResolver } from './employees/employee.resolver';
 import { EditEmployeeResolver } from './employees/edit-employee.resolver';
@@ -183,7 +184,7 @@ const routes: Routes = [
               path: '',
               component: OfficesComponent,
               resolve: {
-                offices: OfficesResolver
+                offices: ServiceCentersResolver
               }
             },
             {
@@ -235,7 +236,8 @@ const routes: Routes = [
               component: EditOfficeComponent,
               data: { title: 'Edit Office', breadcrumb: 'Edit', routeParamBreadcrumb: false },
               resolve: {
-                officeTemplate: EditOfficeResolver
+                officeTemplate: EditOfficeResolver,
+                offices: OfficesResolver
               }
             }
           ]
@@ -770,6 +772,7 @@ const routes: Routes = [
   providers: [
     LoanProvisioningCriteriaResolver,
     OfficesResolver,
+    ServiceCentersResolver,
     EmployeesResolver,
     EmployeeResolver,
     EditEmployeeResolver,

@@ -17,18 +17,18 @@ import { Observable } from 'rxjs';
 import { OrganizationService } from '../../organization.service';
 
 /**
- * Office and template data resolver.
+ * Service Center data resolver, for the Edit Service Center form.
  */
 @Injectable()
 export class EditOfficeResolver {
   private organizationService = inject(OrganizationService);
 
   /**
-   * Returns the office and template data.
+   * Returns the service center data.
    * @returns {Observable<any>}
    */
   resolve(route: ActivatedRouteSnapshot): Observable<any> {
     const officeId = route.paramMap.get('officeId');
-    return this.organizationService.getOffice(officeId, true);
+    return this.organizationService.getServiceCenter(officeId);
   }
 }
