@@ -773,6 +773,20 @@
                   }}
                 </span>
               </div>
+              @if (rs.ceiling; as ceiling) {
+                <div class="spread__foot spread__foot--ceiling">
+                  <span>
+                    {{ 'coopDashboard.highest loan rate' | translate: { rate: percent(ceiling.highestRate, 2) } }}
+                  </span>
+                  <span class="spread__status" [class.spread__status--bad]="!ceiling.within">
+                    <fa-icon [icon]="ceiling.within ? 'check-circle' : 'exclamation-circle'"></fa-icon>
+                    {{
+                      (ceiling.within ? 'coopDashboard.within ceiling' : 'coopDashboard.over ceiling')
+                        | translate: { limit: ceiling.limit, count: ceiling.loansAbove }
+                    }}
+                  </span>
+                </div>
+              }
             </div>
           </div>
           <div class="lines">

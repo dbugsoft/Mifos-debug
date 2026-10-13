@@ -689,6 +689,21 @@
   color: var(--coop-bad-ink);
 }
 
+// The highest loan rate against the ceiling, under the spread
+.spread__foot--ceiling {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--viz-grid);
+
+  .spread__status {
+    color: var(--coop-good-ink);
+  }
+
+  .spread__status--bad {
+    color: var(--coop-bad-ink);
+  }
+}
+
 .spread--over .spread__fill {
   background: var(--coop-bad-ink);
 }
