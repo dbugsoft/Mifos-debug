@@ -5209,7 +5209,7 @@
         "MEMBERS_AWAITING_ACTIVATION": "Membership applications waiting to be activated.",
         "CASH_WITH_CASHIERS": "Cash each cashier currently holds: allocated plus cash in, less settled and cash out."
       },
-      "rateSpread": "Average lending rate (weighted by loan balances) minus average deposit rate (weighted by savings and fixed deposit balances), on today’s balances. Nepal caps a cooperative’s spread at 6 percentage points; the green part of the bar is the allowed range and the line marks the cap.",
+      "rateSpread": "Average lending rate (weighted by loan balances) minus average deposit rate (weighted by savings and fixed deposit balances), on today’s balances. Nepal caps a cooperative’s spread at 6 percentage points; the green part of the bar is the allowed range and the line marks the cap. A loan may also carry at most the ceiling rate a year; the line below the bar shows the highest rate among running loans and how many are above the ceiling.",
       "pearlsAbout": "PEARLS is the World Council of Credit Unions’ monitoring system: Protection, Effective financial structure, Asset quality, Rates of return and costs, Liquidity and Signs of growth. Each indicator has a goal. Rates are for the fiscal year so far, worked out per year; growth is against a year earlier. Indicators that need balance-sheet categories use the tag on each ledger account (Accounting › Chart of accounts).",
       "pearls": {
         "P1": "Loan loss allowance ÷ provision required for loans more than 12 months overdue. Goal: 100%.",
@@ -5277,6 +5277,9 @@
     "lending minus deposits": "Lending {{lending}} − deposits {{deposit}}",
     "within cap": "Within the {{cap}}% cap",
     "over cap": "Above the {{cap}}% cap",
+    "highest loan rate": "Highest loan rate {{rate}}",
+    "within ceiling": "Within the {{limit}}% ceiling",
+    "over ceiling": "Loans above the {{limit}}% ceiling: {{count}}",
     "Financial health section": "Financial health",
     "PEARLS indicators": "PEARLS indicators",
     "pearls hint": "WOCCU’s 45 measures of a savings and credit cooperative’s health, against their goals",
