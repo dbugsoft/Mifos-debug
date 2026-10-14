@@ -7,7 +7,7 @@
 -->
 
 <form [formGroup]="createClientForm">
-  <div class="layout-row-wrap gap-2px responsive-column">
+  <div class="layout-row-wrap gap-2px responsive-column content-sized">
     <!-- Row 1: Office, Legal Form, External Id, First Name / Middle Name (or Full Name for Entity) -->
     <mat-form-field class="flex-18">
       <mat-label>{{ 'labels.inputs.Office' | translate }}</mat-label>
@@ -213,10 +213,8 @@
     <!-- Membership application: the citizenship, with the person's details (fineract-dbug ADR 0035); not for an
          organisation, whose people are linked on its KYM tab (ADR 0042) -->
     @if (membershipMode && !isOrganisation) {
-      <mifosx-membership-citizenship class="flex-98"></mifosx-membership-citizenship>
+      <mifosx-membership-citizenship></mifosx-membership-citizenship>
     }
-
-    <mat-divider class="flex-98"></mat-divider>
 
     <!-- Row 3: Mobile No, Email Address, Member Type, Member Classification -->
     <mat-form-field class="flex-11">

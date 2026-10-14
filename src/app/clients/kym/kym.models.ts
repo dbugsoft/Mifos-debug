@@ -21,7 +21,13 @@ export interface KymPerson {
   clientId: number;
   name: string;
   accountNo: string;
+  /** As typed before the list; for one chosen from the list, its label in one line ("Other: business partner") */
   relationship?: string;
+  /** From the relationship list (fineract-dbug ADR-0046); absent on one typed before the list */
+  relationshipCode?: string | null;
+  /** Only for a relationship that needs a description (Guardian, Other) */
+  relationshipDetail?: string | null;
+  relationshipLabelEn?: string | null;
 }
 
 export interface KymOtherCoop {
@@ -29,6 +35,11 @@ export interface KymOtherCoop {
   whose: 'OWN' | 'FAMILY';
   personName?: string;
   relationship?: string;
+  /** From the relationship list (fineract-dbug ADR-0046); absent on one typed before the list */
+  relationshipCode?: string | null;
+  /** Only for a relationship that needs a description (Guardian, Other) */
+  relationshipDetail?: string | null;
+  relationshipLabelEn?: string | null;
   coopNameAddress: string;
   membershipNo?: string;
 }
@@ -47,6 +58,11 @@ export interface BeneficialOwner {
   citizenshipNo: string | null;
   dateOfBirth: string | null;
   relationship: string | null;
+  /** From the relationship list (fineract-dbug ADR-0046); absent on one typed before the list */
+  relationshipCode?: string | null;
+  /** Only for a relationship that needs a description (Guardian, Other) */
+  relationshipDetail?: string | null;
+  relationshipLabelEn?: string | null;
   control: string;
   controlDetail: string | null;
   sharePercent: number | null;
@@ -74,7 +90,12 @@ export interface KymValues {
   otherEarnerFamilyMemberId: number | null;
   pepDeclared: boolean | null;
   pepName: string | null;
+  /** The member themselves holds the high public position; only the post is asked */
+  pepSelf?: boolean | null;
   pepRelationship: string | null;
+  pepRelationshipCode?: string | null;
+  pepRelationshipDetail?: string | null;
+  pepRelationshipLabelEn?: string | null;
   pepPost: string | null;
   workingAreaResidence: string | null;
   votingPollingPlace: string | null;

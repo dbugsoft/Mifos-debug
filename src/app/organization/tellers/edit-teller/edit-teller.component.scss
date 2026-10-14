@@ -6,6 +6,67 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+/* Matches the breadcrumb bar's own width/max-width exactly, so the two share
+   the same centered left edge instead of drifting apart at wider viewports. */
 .container {
-  max-width: 37rem;
+  width: 90%;
+  max-width: 84rem;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+mat-card-content {
+  padding: 0;
+}
+
+.layout-column {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0 20px;
+}
+
+mat-card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 20px 4px 4px;
+  margin: 0;
+  border-top: 1px solid var(--dk-border, #e7eaf0);
+}
+
+mat-card-actions button {
+  min-width: 100px;
+  min-height: 40px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: transform 0.15s ease;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+}
+
+mat-card-actions [type='button'] {
+  background: var(--dk-surface-2, #f1f1f1);
+  color: var(--dk-text, #000);
+}
+
+@media (width <=768px) {
+  .layout-column {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (width <= 600px) {
+  mat-card-actions {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+  }
+
+  mat-card-actions button {
+    width: 100%;
+  }
 }

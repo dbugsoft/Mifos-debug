@@ -29,20 +29,10 @@ button fa-icon {
   margin-right: 8px;
 }
 
-.container > mat-card {
-  padding: 20px;
-  border-radius: 16px;
-  box-shadow:
-    0 2px 8px rgb(0 0 0 / 5%),
-    0 8px 24px rgb(0 0 0 / 6%);
-}
-
-mat-card-content {
-  padding: 4px;
-}
-
 .detail-table {
   width: 100%;
+  max-width: 50rem;
+  margin: 0 auto;
   border: 1px solid var(--dk-border, #e2e8f0);
   border-radius: 10px;
   border-collapse: separate;
@@ -84,8 +74,9 @@ mat-card-actions {
   justify-content: flex-end;
   align-items: center;
   gap: 8px;
+  max-width: 50rem;
   padding: 20px 4px 4px;
-  margin: 0;
+  margin: 0 auto;
   border-top: 1px solid var(--dk-border, #e7eaf0);
 }
 
@@ -93,11 +84,6 @@ mat-card-actions {
 @media (width <= 768px) {
   .container {
     padding: 0 18px;
-  }
-
-  .container > mat-card {
-    padding: 16px;
-    border-radius: 14px;
   }
 
   .detail-table th,
@@ -119,15 +105,6 @@ mat-card-actions {
 
   .container.m-b-20 button {
     width: 100%;
-  }
-
-  .container > mat-card {
-    padding: 12px;
-    border-radius: 12px;
-  }
-
-  mat-card-content {
-    padding: 2px;
   }
 
   .detail-table,
@@ -171,10 +148,6 @@ mat-card-actions {
 @media (width <= 400px) {
   .container {
     padding: 0 6px;
-  }
-
-  .container > mat-card {
-    padding: 10px;
   }
 
   .detail-table th,

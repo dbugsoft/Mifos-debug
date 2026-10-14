@@ -57,6 +57,8 @@ export interface AmlSettings {
   screeningPossibleScore: number;
   screeningLikelyScore: number;
   unListUrl: string;
+  /** Relationships on the source-of-funds, KYM, beneficial owner and PEP screens only from the list (ADR-0046) */
+  relationshipsFromList?: boolean;
 }
 
 export type CashClass = 'CASH' | 'COOP_BANK_CASH' | 'NON_CASH';

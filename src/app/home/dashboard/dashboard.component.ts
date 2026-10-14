@@ -7,15 +7,9 @@
  */
 
 /** Angular Imports */
-import { ChangeDetectionStrategy, Component, OnInit, inject, DestroyRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormControl } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { activities } from '../activities';
-import { MatAutocompleteTrigger, MatAutocomplete } from '@angular/material/autocomplete';
-import { AsyncPipe } from '@angular/common';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { DashboardEngineComponent } from 'app/analytics/dashboard-engine/dashboard-engine.component';
 import { GLOBAL_ANALYTICS_DASHBOARD } from 'app/analytics/global-dashboard.config';
@@ -32,24 +26,15 @@ import { CoopDashboardComponent } from 'app/coop-dashboard/coop-dashboard.compon
   styleUrls: ['./dashboard.component.scss'],
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
-    MatAutocompleteTrigger,
-    MatAutocomplete,
     DashboardEngineComponent,
-    CoopDashboardComponent,
-    AsyncPipe
+    CoopDashboardComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent {
   private route = inject(ActivatedRoute);
   private destroyRef = inject(DestroyRef);
 
-  /** Search Text. */
-  searchText: FormControl = new FormControl();
-  /** Filtered Activities. */
-  filteredActivities!: Observable<any[]>;
-  /** All User Activities. */
-  allActivities: any[] = activities;
   /** Dashboard definition */
   dashboardDefinition = GLOBAL_ANALYTICS_DASHBOARD;
   /** Office options from resolver */
@@ -61,29 +46,5 @@ export class DashboardComponent implements OnInit {
     this.route.data.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((data: { offices: any[] }) => {
       this.offices = data.offices || [];
     });
-  }
-
-  ngOnInit() {
-    this.setFilteredActivities();
-  }
-
-  /**
-   * Sets filtered activities for autocomplete.
-   */
-  setFilteredActivities() {
-    this.filteredActivities = this.searchText.valueChanges.pipe(
-      map((activity: any) => (typeof activity === 'string' ? activity : activity.activity)),
-      map((activityName: string) => (activityName ? this.filterActivity(activityName) : this.allActivities))
-    );
-  }
-
-  /**
-   * Filters activities.
-   * @param activityName Activity name to filter activity by.
-   * @returns {any} Filtered activities.
-   */
-  private filterActivity(activityName: string): any {
-    const filterValue = activityName.toLowerCase();
-    return this.allActivities.filter((activity) => activity.activity.toLowerCase().indexOf(filterValue) === 0);
   }
 }

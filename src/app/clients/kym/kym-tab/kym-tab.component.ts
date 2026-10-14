@@ -13,10 +13,20 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { TranslateService } from '@ngx-translate/core';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { relationshipText } from 'app/shared/relationship-select/relationship-select.component';
 import { FormatNumberPipe } from 'app/pipes/format-number.pipe';
 import { InputDialogComponent, InputDialogData } from 'app/compliance/input-dialog/input-dialog.component';
 import { CodeOption, KymService } from '../kym.service';
-import { FIX_TAB, KYM_DOCUMENTS, KymHistoryRow, KymMissing, KymView, OrganisationPerson } from '../kym.models';
+import {
+  FIX_TAB,
+  KYM_DOCUMENTS,
+  KymHistoryRow,
+  KymMissing,
+  KymPerson,
+  KymValues,
+  KymView,
+  OrganisationPerson
+} from '../kym.models';
 import { KymEditDialogComponent, KymEditDialogData } from '../kym-edit-dialog/kym-edit-dialog.component';
 import { KymOwnerDialogComponent } from '../kym-owner-dialog/kym-owner-dialog.component';
 import { KymOrgDialogComponent, KymOrgDialogData } from '../kym-org-dialog/kym-org-dialog.component';
@@ -147,6 +157,31 @@ export class KymTabComponent {
 
   yesNo(v: boolean | null | undefined): string {
     return !this.has(v) ? 'kym.Not answered' : v ? 'kym.Yes' : 'kym.No';
+  }
+
+  /** How a person named on the KYM is related, in the user's language; text typed before the list as it was typed. */
+  relation(
+    r: Pick<KymPerson, 'relationshipCode' | 'relationshipDetail' | 'relationshipLabelEn'> & {
+      relationship?: string | null;
+    }
+  ): string {
+    return relationshipText(
+      this.translate,
+      r.relationshipCode,
+      r.relationshipDetail,
+      r.relationship,
+      r.relationshipLabelEn
+    );
+  }
+
+  pepRelation(v: KymValues): string {
+    return relationshipText(
+      this.translate,
+      v.pepRelationshipCode,
+      v.pepRelationshipDetail,
+      v.pepRelationship,
+      v.pepRelationshipLabelEn
+    );
   }
 
   /** A history row's field in words: the form's label when there is one, else the field's own name. */

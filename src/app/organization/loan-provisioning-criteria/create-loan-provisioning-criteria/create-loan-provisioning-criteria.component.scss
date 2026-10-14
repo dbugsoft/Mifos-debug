@@ -6,25 +6,20 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+/* Matches the breadcrumb bar's own width/max-width exactly, so the two share
+   the same centered left edge instead of drifting apart at wider viewports. */
 .container {
-  padding: 0.5rem;
-  max-width: 1200px;
+  width: 90%;
+  max-width: 84rem;
   margin: 0 auto;
+  padding: 0 0 24px;
+  box-sizing: border-box;
 }
 
 .layout-row {
   display: flex;
   flex-direction: row;
-}
-
-mat-card {
-  padding: 1rem;
-  box-shadow: 0 2px 8px rgb(0 0 0 / 10%) !important;
-  border-radius: 8px;
-
-  .layout-row {
-    margin-bottom: 0.5rem;
-  }
+  margin-bottom: 0.5rem;
 }
 
 .mat-elevation-z1 {
@@ -67,14 +62,6 @@ table {
 }
 
 @media (width <= 768px) {
-  .container {
-    padding: 0.5rem;
-  }
-
-  mat-card {
-    padding: 1rem;
-  }
-
   .layout-row {
     flex-direction: column;
   }

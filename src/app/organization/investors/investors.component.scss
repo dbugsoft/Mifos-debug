@@ -6,19 +6,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+/* Matches the breadcrumb bar's own width/max-width exactly, so the two share
+   the same centered left edge instead of drifting apart at wider viewports. */
 .container {
-  max-width: 75rem;
-  margin: 24px auto 0;
-  border-radius: 16px;
-  box-shadow:
-    0 2px 8px rgb(0 0 0 / 5%),
-    0 8px 24px rgb(0 0 0 / 6%);
-}
-
-@media (width <=768px) {
-  .container {
-    margin-top: 16px;
-  }
+  width: 90%;
+  max-width: 84rem;
+  margin: 0 auto;
+  padding: 0 0 24px;
+  box-sizing: border-box;
 }
 
 // Filter Section Styling

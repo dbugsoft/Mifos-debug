@@ -6,16 +6,52 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+/* Matches the breadcrumb bar's own width/max-width exactly, so the two share
+   the same centered left edge instead of drifting apart at wider viewports. */
 .container {
-  max-width: 50rem;
+  width: 90%;
+  max-width: 84rem;
   margin: 0 auto;
+  padding: 0 0 24px;
+  box-sizing: border-box;
 }
 
-.container > mat-card {
-  border-radius: 16px;
-  box-shadow:
-    0 2px 8px rgb(0 0 0 / 5%),
-    0 8px 24px rgb(0 0 0 / 6%);
+mat-card-content {
+  padding: 0;
+}
+
+/* Wide enough to fit all 7 day pills on a single row; the rest of the form
+   (select/checkbox) stays well within this width too. */
+form {
+  max-width: 70rem;
+}
+
+mat-card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  padding: 20px 4px 4px;
+  margin: 0;
+  border-top: 1px solid var(--dk-border, #e7eaf0);
+}
+
+mat-card-actions button {
+  min-width: 100px;
+  min-height: 40px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: transform 0.15s ease;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+}
+
+mat-card-actions [type='button'] {
+  background: var(--dk-surface-2, #f1f1f1);
+  color: var(--dk-text, #000);
 }
 
 .working-days-section {
@@ -59,11 +95,12 @@
 
 mat-form-field {
   width: 100%;
+  max-width: 24rem;
 }
 
 @media (width <=600px) {
-  .container > mat-card {
-    border-radius: 12px;
+  mat-form-field {
+    max-width: 100%;
   }
 
   .working-day-chip {
@@ -72,5 +109,15 @@ mat-form-field {
 
   .working-days-grid {
     flex-direction: column;
+  }
+
+  mat-card-actions {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+  }
+
+  mat-card-actions button {
+    width: 100%;
   }
 }

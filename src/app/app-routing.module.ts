@@ -109,6 +109,14 @@ const routes: Routes = [
     path: 'appusers',
     loadChildren: () => import('./users/users.module').then((m) => m.UsersModule)
   },
+  {
+    // Public loan calculator (fineract-dbug #242): no sign-in and no side menu, so it sits outside the shell.
+    path: 'calculator',
+    loadComponent: () =>
+      import('./loans/public-loan-calculator/public-loan-calculator.component').then(
+        (m) => m.PublicLoanCalculatorComponent
+      )
+  },
   Route.withShell([
     {
       path: 'loan-calculator',

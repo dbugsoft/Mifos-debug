@@ -269,8 +269,12 @@
               @if (!has(k.values.pepDeclared)) {
                 —
               } @else if (k.values.pepDeclared) {
-                {{ 'kym.Yes' | translate }}: {{ k.values.pepName }} ({{ k.values.pepRelationship }},
-                {{ k.values.pepPost }})
+                @if (k.values.pepSelf) {
+                  {{ 'kym.Yes' | translate }}: {{ 'kym.field.pepSelf' | translate }} ({{ k.values.pepPost }})
+                } @else {
+                  {{ 'kym.Yes' | translate }}: {{ k.values.pepName }} ({{ pepRelation(k.values) }},
+                  {{ k.values.pepPost }})
+                }
               } @else {
                 {{ 'kym.No' | translate }}
               }
@@ -320,7 +324,7 @@
               @if (k.values.familyHere.length) {
                 @for (p of k.values.familyHere; track p.clientId; let last = $last) {
                   <a [routerLink]="['/members', p.clientId]">{{ p.name }}</a
-                  >{{ p.relationship ? ' (' + p.relationship + ')' : '' }}{{ last ? '' : ', ' }}
+                  >{{ relation(p) ? ' (' + relation(p) + ')' : '' }}{{ last ? '' : ', ' }}
                 }
               } @else {
                 {{ yesNo(k.values.familyInThisCoop) | translate }}
@@ -358,7 +362,7 @@
                   <tr>
                     <td>
                       {{ 'kym.whose.' + c.whose | translate }}{{ c.personName ? ': ' + c.personName : ''
-                      }}{{ c.relationship ? ' (' + c.relationship + ')' : '' }}
+                      }}{{ relation(c) ? ' (' + relation(c) + ')' : '' }}
                     </td>
                     <td>{{ c.coopNameAddress }}</td>
                     <td>{{ c.membershipNo ?? '—' }}</td>
@@ -473,9 +477,7 @@
                     } @else {
                       {{ o.name }}
                     }
-                    <span class="sub"
-                      >{{ o.relationship ?? '' }}{{ o.citizenshipNo ? ' · ' + o.citizenshipNo : '' }}</span
-                    >
+                    <span class="sub">{{ relation(o) }}{{ o.citizenshipNo ? ' · ' + o.citizenshipNo : '' }}</span>
                   </td>
                   <td>
                     {{ 'kym.control.' + o.control | translate

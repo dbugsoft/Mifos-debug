@@ -26,34 +26,30 @@
 </div>
 
 <div class="container">
-  <mat-card>
-    <mat-card-content>
-      <div class="field-grid">
-        <div class="field-card">
-          <span class="field-label">{{ 'labels.inputs.Name' | translate }}</span>
-          <span class="field-value wrap-content">{{ holidayData.name }}</span>
-        </div>
-
-        <div class="field-card">
-          <span class="field-label">{{ 'labels.inputs.From Date' | translate }}</span>
-          <span class="field-value">{{ holidayData.fromDate | dateFormat }}</span>
-        </div>
-
-        <div class="field-card">
-          <span class="field-label">{{ 'labels.inputs.To Date' | translate }}</span>
-          <span class="field-value">{{ holidayData.toDate | dateFormat }}</span>
-        </div>
-
-        <div class="field-card">
-          <span class="field-label">{{ 'labels.inputs.Repayments Scheduled To' | translate }}</span>
+  <table class="detail-table">
+    <tbody>
+      <tr>
+        <th>{{ 'labels.inputs.Name' | translate }}</th>
+        <td class="wrap-content">{{ holidayData.name }}</td>
+      </tr>
+      <tr>
+        <th>{{ 'labels.inputs.From Date' | translate }}</th>
+        <td>{{ holidayData.fromDate | dateFormat }}</td>
+      </tr>
+      <tr>
+        <th>{{ 'labels.inputs.To Date' | translate }}</th>
+        <td>{{ holidayData.toDate | dateFormat }}</td>
+      </tr>
+      <tr>
+        <th>{{ 'labels.inputs.Repayments Scheduled To' | translate }}</th>
+        <td>
           @if (holidayData.repaymentsRescheduledTo !== undefined && holidayData.repaymentsRescheduledTo !== null) {
-            <span class="field-value">{{ holidayData.repaymentsRescheduledTo | dateFormat }}</span>
+            {{ holidayData.repaymentsRescheduledTo | dateFormat }}
+          } @else {
+            {{ 'labels.inputs.Next Repayment Date' | translate }}
           }
-          @if (holidayData.repaymentsRescheduledTo === undefined || holidayData.repaymentsRescheduledTo === null) {
-            <span class="field-value">{{ 'labels.inputs.Next Repayment Date' | translate }}</span>
-          }
-        </div>
-      </div>
-    </mat-card-content>
-  </mat-card>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </div>
