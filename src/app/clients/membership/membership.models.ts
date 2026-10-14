@@ -44,6 +44,19 @@ export interface Nominee {
   mobileNo?: string;
 }
 
+/** A person's nominee as it is now and the ones before (GET /nepal/memberships/nominees/{clientId}, fineract-dbug ADR-0047). */
+export interface MemberNominee {
+  clientId: number;
+  accountNo: string;
+  name: string;
+  /** null when the person has named nobody */
+  nominee: Nominee | null;
+  /** False for an organisation and for a client who is neither an applicant nor a member */
+  canChange: boolean;
+  /** Every change, newest first; a null nominee means there was none before that change */
+  previous: { nominee: Nominee | null; replacedOn: string; replacedBy: string; note?: string | null }[];
+}
+
 export interface MembershipApplication {
   id: number;
   clientId: number;

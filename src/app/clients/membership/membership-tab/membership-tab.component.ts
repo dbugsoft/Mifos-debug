@@ -15,7 +15,13 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { FormatNumberPipe } from 'app/pipes/format-number.pipe';
 import { ClientActionNotifierService } from '../../clients-view/client-actions/client-action-notifier.service';
 import { TranslateService } from '@ngx-translate/core';
-import { MembershipApplication, MembershipTemplate, Nominee, nomineeRelationshipText } from '../membership.models';
+import {
+  MemberNominee,
+  MembershipApplication,
+  MembershipTemplate,
+  Nominee,
+  nomineeRelationshipText
+} from '../membership.models';
 import { MembershipService } from '../membership.service';
 import { MembershipDeadlineComponent } from '../membership-deadline/membership-deadline.component';
 import {
@@ -26,12 +32,14 @@ import {
   MembershipApplyData,
   MembershipApplyDialogComponent
 } from '../membership-apply-dialog/membership-apply-dialog.component';
+import { MembershipNomineeDialogComponent } from '../membership-nominee-dialog/membership-nominee-dialog.component';
 
 /**
  * A member's membership (fineract-dbug ADR 0023 and 0035): where the latest application stands, what is being bought,
  * the money taken, the decision and its reason or note, and the accounts the approval opened; then every earlier
  * application with its decision. A refused person can apply again from here. For a member with no application on
- * record (joined before applications were kept), the shares they hold.
+ * record (joined before applications were kept), the shares they hold. For anyone but an organisation, the nominee as
+ * it is now and the ones before (ADR 0047), which staff with UPDATE_NOMINEE can give or change.
  */
 @Component({
   selector: 'mifosx-membership-tab',
@@ -73,6 +81,12 @@ export class MembershipTabComponent {
       .reduce((sum, s) => sum + Number(s.totalApprovedShares ?? 0), 0)
   );
 
+  /** The nominee and the ones before; null for an organisation, or until loaded */
+  readonly nominee = signal<MemberNominee | null>(null);
+  readonly canChangeNominee = computed(
+    () => !!this.nominee()?.canChange && this.membershipService.can('UPDATE_NOMINEE')
+  );
+
   /** "A different person must approve" is on, and this user entered the application. */
   readonly mustBeSomeoneElse = computed(() => {
     const app = this.application();
@@ -97,6 +111,13 @@ export class MembershipTabComponent {
         this.client.set(data.clientViewData ?? null);
         if (app) {
           this.membershipService.history(app.clientId).subscribe((all) => this.history.set(all));
+        }
+        const clientId = app?.clientId ?? data.clientViewData?.id;
+        // an organisation names no nominee (legal form 2, Entity)
+        const organisation = app?.organisation || data.clientViewData?.legalForm?.id === 2;
+        this.nominee.set(null);
+        if (clientId && !organisation && this.membershipService.canRead()) {
+          this.membershipService.nominee(clientId).subscribe((n) => this.nominee.set(n));
         }
       });
     this.membershipService.templateOrNull().subscribe((template) => this.template.set(template));
@@ -136,6 +157,26 @@ export class MembershipTabComponent {
 
   applyAgain(): void {
     this.openApply('again');
+  }
+
+  changeNominee(): void {
+    const current = this.nominee();
+    if (!current) {
+      return;
+    }
+    this.dialog
+      .open<MembershipNomineeDialogComponent, MemberNominee, MemberNominee>(MembershipNomineeDialogComponent, {
+        data: current,
+        width: '640px',
+        maxWidth: 'calc(100vw - 32px)'
+      })
+      .afterClosed()
+      .subscribe((saved) => {
+        if (saved) {
+          this.nominee.set(saved);
+          this.notifier.notify('membership.messages.nomineeSaved');
+        }
+      });
   }
 
   nomineeRelationship(nominee: Nominee): string {
