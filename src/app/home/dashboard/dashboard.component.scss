@@ -7,5 +7,7 @@
  */
 
 .container {
-  overflow-x: hidden;
+  // clip, not hidden: hidden turns overflow-y into auto and cuts off the
+  // floating labels of the filter fields sitting at the container's top edge.
+  overflow-x: clip;
 }

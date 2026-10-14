@@ -103,6 +103,8 @@ export class RelatedPersonRelationships {
       }
       @if (code.hasError('required')) {
         <mat-error>{{ 'relationshipList.required' | translate }}</mat-error>
+      } @else if (code.hasError('server')) {
+        <mat-error>{{ code.getError('server') }}</mat-error>
       }
     </mat-form-field>
     @if (chosen()?.needsDetail) {
@@ -112,6 +114,8 @@ export class RelatedPersonRelationships {
         <mat-hint>{{ 'membership.relationshipDetailHint' | translate }}</mat-hint>
         @if (detail.hasError('required')) {
           <mat-error>{{ 'relationshipList.detailRequired' | translate }}</mat-error>
+        } @else if (detail.hasError('server')) {
+          <mat-error>{{ detail.getError('server') }}</mat-error>
         }
       </mat-form-field>
     }
@@ -145,6 +149,8 @@ export class RelationshipSelectComponent implements OnInit {
   @Input() required = false;
   /** The relationship as typed before the list, shown until one is chosen so staff can pick the matching entry */
   @Input() typed: string | null | undefined;
+  /** Another list than the related-person one, e.g. the nominee relationships */
+  @Input() list$: Observable<RelationshipOption[]> | undefined;
 
   readonly options = signal<RelationshipOption[]>([]);
   readonly state = signal<'loading' | 'failed' | 'loaded'>('loading');
@@ -164,7 +170,7 @@ export class RelationshipSelectComponent implements OnInit {
 
   load(): void {
     this.state.set('loading');
-    this.relationships.list$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    (this.list$ ?? this.relationships.list$).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (list) => {
         this.options.set(list);
         this.state.set('loaded');
