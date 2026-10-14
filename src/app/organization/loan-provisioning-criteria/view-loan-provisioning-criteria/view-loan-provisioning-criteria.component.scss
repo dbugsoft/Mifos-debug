@@ -6,6 +6,15 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+/* Matches the breadcrumb bar's own width/max-width exactly, so the two share
+   the same centered left edge instead of drifting apart at wider viewports. */
+.container {
+  width: 90%;
+  max-width: 84rem;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
 .criteria-title {
   margin-bottom: 0;
   display: inline;

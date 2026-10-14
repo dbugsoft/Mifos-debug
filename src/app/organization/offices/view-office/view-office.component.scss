@@ -29,9 +29,12 @@
   font-weight: 500;
 }
 
-/* Tab nav, no surrounding card */
+/* Tab nav, no surrounding card - matches the detail table's own max-width/
+   centering below it so the underline/border lines up with the table edges
+   instead of stopping short or overshooting it. */
 .navigation-tabs {
-  max-width: 700px;
+  max-width: 50rem;
+  margin: 0 auto;
   overflow: auto;
   border-bottom: 1px solid var(--dk-border, #e2e8f0);
 
@@ -51,16 +54,9 @@
 }
 
 .tab-panel {
-  max-width: 700px;
+  max-width: 50rem;
+  margin: 0 auto;
   padding: 20px 0 0;
-}
-
-/* Tablet */
-@media (width <= 768px) {
-  .navigation-tabs,
-  .tab-panel {
-    max-width: 100%;
-  }
 }
 
 /* Mobile */

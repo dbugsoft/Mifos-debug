@@ -6,8 +6,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+/* Matches the breadcrumb bar's own width/max-width exactly, so the two share
+   the same centered left edge instead of drifting apart at wider viewports. */
 .container {
-  max-width: 73rem;
+  width: 90%;
+  max-width: 84rem;
+  margin: 0 auto;
+  padding: 0 0 24px;
+  box-sizing: border-box;
 
   .margin-v {
     margin: 1em 0;
@@ -22,11 +28,58 @@
   }
 }
 
-table {
+mat-card-content {
+  padding: 0;
+}
+
+mat-card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 20px 4px 4px;
+  margin: 0;
+  border-top: 1px solid var(--dk-border, #e7eaf0);
+}
+
+mat-card-actions button {
+  min-width: 100px;
+  min-height: 40px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: transform 0.15s ease;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+}
+
+mat-card-actions [type='button'] {
+  background: var(--dk-surface-2, #f1f1f1);
+  color: var(--dk-text, #000);
+}
+
+@media (width <= 600px) {
+  mat-card-actions {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+  }
+
+  mat-card-actions button {
+    width: 100%;
+  }
+}
+
+.mat-elevation-z8 {
   margin: 0 16px;
-  width: calc(100% - 32px);
   border-radius: 10px;
   overflow: hidden;
+}
+
+mat-paginator {
+  padding: 0 16px;
 }
 
 .mat-mdc-header-row {

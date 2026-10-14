@@ -6,30 +6,78 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+/* Matches the breadcrumb bar's own width/max-width exactly, so the two share
+   the same centered left edge instead of drifting apart at wider viewports. */
 .container {
-  display: flex;
-  justify-content: center;
-  padding: 16px 12px;
+  width: 90%;
+  max-width: 84rem;
+  margin: 0 auto;
+  padding: 0 0 24px;
+  box-sizing: border-box;
 }
 
-.container > mat-card {
-  width: 100%;
-  max-width: 560px;
-  margin: 0 auto;
-  border-radius: 4px;
-  padding: 16px 20px;
-  box-shadow:
-    0 1px 3px rgb(16 24 40 / 10%),
-    0 1px 2px rgb(16 24 40 / 6%);
+mat-card-content {
+  padding: 0;
+}
+
+mat-card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  padding: 20px 4px 4px;
+  margin: 0;
+  border-top: 1px solid var(--dk-border, #e7eaf0);
+}
+
+mat-card-actions button {
+  min-width: 100px;
+  min-height: 40px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: transform 0.15s ease;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+}
+
+mat-card-actions [type='button'] {
+  background: var(--dk-surface-2, #f1f1f1);
+  color: var(--dk-text, #000);
+}
+
+@media (width <= 600px) {
+  mat-card-actions {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+  }
+
+  mat-card-actions button {
+    width: 100%;
+  }
 }
 
 mat-form-field {
   width: 100%;
 }
 
-.flex-48 {
-  flex: 1 1 100%;
-  min-width: 100%;
+.layout-row-wrap {
+  gap: 18px 20px;
+}
+
+mat-form-field.flex-48 {
+  flex: 1 1 calc(25% - 15px);
+  min-width: 220px;
+}
+
+@media (width <= 900px) {
+  mat-form-field.flex-48 {
+    flex: 1 1 100%;
+    min-width: 100%;
+  }
 }
 
 table {

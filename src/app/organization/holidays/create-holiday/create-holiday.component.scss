@@ -10,22 +10,18 @@
    Create Holiday
    ========================================= */
 
+/* Matches the breadcrumb bar's own width/max-width exactly, so the two share
+   the same centered left edge instead of drifting apart at wider viewports. */
 .container {
-  width: 100%;
-  max-width: 1000px;
+  width: 90%;
+  max-width: 84rem;
   margin: 0 auto;
-  padding: 24px;
+  padding: 0 0 24px;
   box-sizing: border-box;
 }
 
-/* Main card */
-.container > mat-card {
-  padding: 20px;
-  border-radius: 16px;
-  background: var(--dk-surface, #fff);
-  box-shadow:
-    0 2px 8px rgb(0 0 0 / 5%),
-    0 8px 24px rgb(0 0 0 / 6%);
+mat-card-content {
+  padding: 0;
 }
 
 /* =========================================
@@ -175,15 +171,6 @@ mat-card-actions [type='button'] {
    ========================================= */
 
 @media (width <= 768px) {
-  .container {
-    padding: 18px;
-  }
-
-  .container > mat-card {
-    padding: 16px;
-    border-radius: 14px;
-  }
-
   .layout-column {
     grid-template-columns: 1fr;
     gap: 14px;
@@ -209,17 +196,7 @@ mat-card-actions [type='button'] {
 
 @media (width <= 600px) {
   .container {
-    padding: 10px;
-  }
-
-  .container > mat-card {
-    padding: 12px;
-    border-radius: 12px;
-    box-shadow: 0 2px 6px rgb(0 0 0 / 5%);
-  }
-
-  mat-card-content {
-    padding: 4px 0;
+    padding: 0 10px 10px;
   }
 
   .layout-column {
@@ -279,11 +256,7 @@ mat-card-actions [type='button'] {
 
 @media (width <= 400px) {
   .container {
-    padding: 6px;
-  }
-
-  .container > mat-card {
-    padding: 10px;
+    padding: 0 6px 6px;
   }
 
   .layout-column > mat-tree {

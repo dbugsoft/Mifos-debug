@@ -18,65 +18,63 @@
 </div>
 
 <div class="container">
-  <mat-card>
-    <mat-card-content>
-      <div class="layout-row-wrap">
-        <div class="flex-50 mat-body-strong">
-          {{ 'labels.inputs.Teller Name' | translate }}
-        </div>
-
-        <div class="flex-50">
-          {{ tellerData.name }}
-        </div>
-
-        <div class="flex-50 mat-body-strong">
-          {{ 'labels.inputs.Office' | translate }}
-        </div>
-
-        <div class="flex-50">
-          {{ tellerData.officeName }}
-        </div>
-
-        @if (tellerData.description) {
-          <div class="flex-50 mat-body-strong">
-            {{ 'labels.inputs.Description' | translate }}
-          </div>
-        }
-
-        @if (tellerData.description) {
-          <div class="flex-50">
-            {{ tellerData.description }}
-          </div>
-        }
-
-        <div class="flex-50 mat-body-strong">
-          {{ 'labels.inputs.Start Date' | translate }}
-        </div>
-
-        <div class="flex-50">
-          {{ tellerData.startDate | dateFormat }}
-        </div>
-
-        @if (tellerData.endDate) {
-          <div class="flex-50 mat-body-strong">
-            {{ 'labels.inputs.End Date' | translate }}
-          </div>
-        }
-
-        @if (tellerData.endDate) {
-          <div class="flex-50">
-            {{ tellerData.endDate | dateFormat }}
-          </div>
-        }
-
-        <div class="flex-50 mat-body-strong">
-          {{ 'labels.inputs.Status' | translate }}
-        </div>
-
-        <div class="flex-50">
-          {{ tellerData.status | titlecase }}
-        </div>
+  <mat-card-content>
+    <div class="layout-row-wrap">
+      <div class="flex-50 mat-body-strong">
+        {{ 'labels.inputs.Teller Name' | translate }}
       </div>
-    </mat-card-content>
-  </mat-card>
+
+      <div class="flex-50">
+        {{ tellerData.name }}
+      </div>
+
+      <div class="flex-50 mat-body-strong">
+        {{ 'labels.inputs.Office' | translate }}
+      </div>
+
+      <div class="flex-50">
+        {{ tellerData.officeName }}
+      </div>
+
+      @if (tellerData.description) {
+        <div class="flex-50 mat-body-strong">
+          {{ 'labels.inputs.Description' | translate }}
+        </div>
+      }
+
+      @if (tellerData.description) {
+        <div class="flex-50">
+          {{ tellerData.description }}
+        </div>
+      }
+
+      <div class="flex-50 mat-body-strong">
+        {{ 'labels.inputs.Start Date' | translate }}
+      </div>
+
+      <div class="flex-50">
+        {{ tellerData.startDate | dateFormat }}
+      </div>
+
+      @if (tellerData.endDate) {
+        <div class="flex-50 mat-body-strong">
+          {{ 'labels.inputs.End Date' | translate }}
+        </div>
+      }
+
+      @if (tellerData.endDate) {
+        <div class="flex-50">
+          {{ tellerData.endDate | dateFormat }}
+        </div>
+      }
+
+      <div class="flex-50 mat-body-strong">
+        {{ 'labels.inputs.Status' | translate }}
+      </div>
+
+      <div class="flex-50">
+        {{ tellerData.status | titlecase }}
+      </div>
+    </div>
+  </mat-card-content>
 </div>

@@ -10,16 +10,14 @@
   display: block;
 }
 
+/* Matches the breadcrumb bar's own width/max-width exactly, so the two share
+   the same centered left edge instead of drifting apart at wider viewports. */
 .container {
-  max-width: 1200px;
+  width: 90%;
+  max-width: 84rem;
   margin: 0 auto;
-  padding: 24px;
-}
-
-mat-card {
-  padding: 28px;
-  border-radius: 12px;
-  box-shadow: 0 2px 10px rgb(0 0 0 / 8%);
+  padding: 0 0 24px;
+  box-sizing: border-box;
 }
 
 form {
@@ -124,14 +122,6 @@ mat-hint {
 
 /* Tablet */
 @media (width <= 900px) {
-  .container {
-    padding: 16px;
-  }
-
-  mat-card {
-    padding: 20px;
-  }
-
   .layout-row {
     flex-direction: column;
   }
@@ -149,12 +139,7 @@ mat-hint {
 /* Mobile */
 @media (width <= 600px) {
   .container {
-    padding: 10px;
-  }
-
-  mat-card {
-    padding: 14px;
-    border-radius: 8px;
+    padding: 0 10px 10px;
   }
 
   .mat-mdc-cell,
