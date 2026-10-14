@@ -5,25 +5,19 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
+
+/* Matches the breadcrumb bar's own width/max-width exactly, so the two share
+   the same centered left edge instead of drifting apart at wider viewports. */
 .container {
-  width: 100%;
-  max-width: 900px;
+  width: 90%;
+  max-width: 84rem;
   margin: 0 auto;
-  padding: 24px;
+  padding: 0 0 24px;
   box-sizing: border-box;
 }
 
-.container > mat-card {
-  padding: 20px;
-  border-radius: 16px;
-  background: var(--dk-surface, #fff);
-  box-shadow:
-    0 2px 8px rgb(0 0 0 / 5%),
-    0 8px 24px rgb(0 0 0 / 6%);
-}
-
 mat-card-content {
-  padding: 4px;
+  padding: 0;
 }
 
 .layout-column {
@@ -92,15 +86,6 @@ mat-card-actions button:disabled {
 
 /* Tablet */
 @media (width <= 768px) {
-  .container {
-    padding: 18px;
-  }
-
-  .container > mat-card {
-    padding: 16px;
-    border-radius: 14px;
-  }
-
   .layout-column {
     grid-template-columns: 1fr;
     gap: 14px;
@@ -114,16 +99,7 @@ mat-card-actions button:disabled {
 /* Mobile */
 @media (width <= 600px) {
   .container {
-    padding: 10px;
-  }
-
-  .container > mat-card {
-    padding: 12px;
-    border-radius: 12px;
-  }
-
-  mat-card-content {
-    padding: 2px;
+    padding: 0 10px 10px;
   }
 
   .layout-column {
@@ -159,11 +135,7 @@ mat-card-actions button:disabled {
 /* Small mobile */
 @media (width <= 400px) {
   .container {
-    padding: 6px;
-  }
-
-  .container > mat-card {
-    padding: 10px;
+    padding: 0 6px 6px;
   }
 
   .layout-column {

@@ -14,54 +14,46 @@
 </div>
 
 <div class="container">
-  <mat-card>
-    <mat-card-content>
-      <div class="field-grid">
-        <div class="field-card">
-          <span class="field-label">{{ 'labels.inputs.First Name' | translate }}</span>
-          <span class="field-value">{{ employeeData.firstname }}</span>
-        </div>
-
-        <div class="field-card">
-          <span class="field-label">{{ 'labels.inputs.Last Name' | translate }}</span>
-          <span class="field-value">{{ employeeData.lastname }}</span>
-        </div>
-
-        <div class="field-card">
-          <span class="field-label">{{ 'labels.inputs.Office' | translate }}</span>
-          <span class="field-value">{{ employeeData.officeName }}</span>
-        </div>
-
-        <div class="field-card">
-          <span class="field-label">{{ 'labels.inputs.Is Loan Officer' | translate }}</span>
-          <span class="field-value">
-            <span class="badge" [class.badge-on]="employeeData.isLoanOfficer === true">
-              {{ employeeData.isLoanOfficer === true | yesNo }}
-            </span>
+  <table class="detail-table">
+    <tbody>
+      <tr>
+        <th>{{ 'labels.inputs.First Name' | translate }}</th>
+        <td>{{ employeeData.firstname }}</td>
+      </tr>
+      <tr>
+        <th>{{ 'labels.inputs.Last Name' | translate }}</th>
+        <td>{{ employeeData.lastname }}</td>
+      </tr>
+      <tr>
+        <th>{{ 'labels.inputs.Office' | translate }}</th>
+        <td>{{ employeeData.officeName }}</td>
+      </tr>
+      <tr>
+        <th>{{ 'labels.inputs.Is Loan Officer' | translate }}</th>
+        <td>
+          <span class="badge" [class.badge-on]="employeeData.isLoanOfficer === true">
+            {{ employeeData.isLoanOfficer === true | yesNo }}
           </span>
-        </div>
-
-        @if (employeeData.mobileNo) {
-          <div class="field-card">
-            <span class="field-label">{{ 'labels.inputs.Mobile Number for SMS' | translate }}</span>
-            <span class="field-value">{{ employeeData.mobileNo }}</span>
-          </div>
-        }
-
-        <div class="field-card">
-          <span class="field-label">{{ 'labels.inputs.Status' | translate }}</span>
-          <span class="field-value">
-            <span class="badge" [class.badge-on]="employeeData.isActive === true">
-              {{ employeeData.isActive === true ? 'Active' : 'Inactive' }}
-            </span>
+        </td>
+      </tr>
+      @if (employeeData.mobileNo) {
+        <tr>
+          <th>{{ 'labels.inputs.Mobile Number for SMS' | translate }}</th>
+          <td>{{ employeeData.mobileNo }}</td>
+        </tr>
+      }
+      <tr>
+        <th>{{ 'labels.inputs.Status' | translate }}</th>
+        <td>
+          <span class="badge" [class.badge-on]="employeeData.isActive === true">
+            {{ employeeData.isActive === true ? 'Active' : 'Inactive' }}
           </span>
-        </div>
-
-        <div class="field-card">
-          <span class="field-label">{{ 'labels.inputs.Joining Date' | translate }}</span>
-          <span class="field-value">{{ employeeData.joiningDate | dateFormat }}</span>
-        </div>
-      </div>
-    </mat-card-content>
-  </mat-card>
+        </td>
+      </tr>
+      <tr>
+        <th>{{ 'labels.inputs.Joining Date' | translate }}</th>
+        <td>{{ employeeData.joiningDate | dateFormat }}</td>
+      </tr>
+    </tbody>
+  </table>
 </div>

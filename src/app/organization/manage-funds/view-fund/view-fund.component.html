@@ -14,34 +14,21 @@
 </div>
 
 <div class="container">
-  <mat-card>
-    <mat-card-content>
-      <div class="layout-row-wrap">
-        <div class="flex-50 mat-body-strong">
-          {{ 'labels.inputs.name' | translate }}
-        </div>
-
-        <div class="flex-50">
-          {{ fundData.name }}
-        </div>
-
-        <div class="flex-50 mat-body-strong">
-          {{ 'labels.inputs.External Id' | translate }}
-        </div>
-
-        <div class="flex-50">
+  <table class="detail-table">
+    <tbody>
+      <tr>
+        <th>{{ 'labels.inputs.name' | translate }}</th>
+        <td class="wrap-content">{{ fundData.name }}</td>
+      </tr>
+      <tr>
+        <th>{{ 'labels.inputs.External Id' | translate }}</th>
+        <td>
           <mifosx-external-identifier
             externalId="{{ fundData.externalId }}"
             completed="true"
           ></mifosx-external-identifier>
-        </div>
-      </div>
-
-      <div class="layout-row layout-align-center gap-2percent column-on-mobile">
-        <button type="button" mat-raised-button color="primary" [routerLink]="['../']">
-          {{ 'labels.buttons.Back' | translate }}
-        </button>
-      </div>
-    </mat-card-content>
-  </mat-card>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </div>

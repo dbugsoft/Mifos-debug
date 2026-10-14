@@ -6,17 +6,17 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+/* Matches the breadcrumb bar's own width/max-width exactly, so the two share
+   the same centered left edge instead of drifting apart at wider viewports. */
 .container {
-  max-width: 70rem;
-  margin-top: 24px;
+  width: 90%;
+  max-width: 84rem;
+  margin: 0 auto;
+  box-sizing: border-box;
 }
 
-.container > mat-card {
-  padding: 20px;
-  border-radius: 16px;
-  box-shadow:
-    0 2px 8px rgb(0 0 0 / 5%),
-    0 8px 24px rgb(0 0 0 / 6%);
+mat-card-content {
+  padding: 0;
 }
 
 .layout-column {
@@ -35,25 +35,12 @@ mat-card-actions button {
 }
 
 @media (width <=768px) {
-  .container {
-    margin-top: 16px;
-  }
-
-  .container > mat-card {
-    padding: 16px;
-    border-radius: 14px;
-  }
-
   .layout-column {
     grid-template-columns: 1fr;
   }
 }
 
 @media (width <=600px) {
-  .container {
-    margin-top: 12px;
-  }
-
   mat-card-actions {
     flex-direction: column !important;
     align-items: stretch !important;
