@@ -5525,7 +5525,8 @@
       "phoneRequired": "The phone number is required.",
       "confirmMoney": "Confirm the money was received before approving.",
       "refundRequired": "Enter the amount refunded (0 if nothing is given back).",
-      "refundRange": "Between 0 and Rs {{amount}}."
+      "refundRange": "Between 0 and Rs {{amount}}.",
+      "nomineeName": "Give the nominee's name."
     },
     "daysLeft": "{{left}} of {{total}} days left",
     "daysOverdue": "{{days}} days overdue",
@@ -5603,7 +5604,8 @@
       "applicationTaken": "Application taken: the applicant is a pending client until the board decides.",
       "approved": "Approved: the applicant is now a member, with savings and shares.",
       "rejected": "Application refused; the reason is kept.",
-      "settingsSaved": "Membership settings saved."
+      "settingsSaved": "Membership settings saved.",
+      "nomineeSaved": "Nominee saved; the one before is kept under Earlier nominees."
     },
     "shareProductHint": "Its price, minimum kitta and charges apply to every application",
     "noAccountingWarning": "This share product has no accounting set up: share money and fees will not reach the books.",
@@ -5687,7 +5689,14 @@
     "Open the KYM": "Open the KYM",
     "Organisation": "Organisation",
     "kymComplete": "KYM complete",
-    "kymMissing": "KYM: {{count}} item(s) missing"
+    "kymMissing": "KYM: {{count}} item(s) missing",
+    "No nominee named": "No nominee named.",
+    "Add nominee": "Add nominee",
+    "Change nominee": "Change nominee",
+    "Earlier nominees": "Earlier nominees",
+    "No nominee before": "No nominee before",
+    "Replaced on": "Replaced on",
+    "nomineeNoteHint": "Optional, for example: member asked in person"
   },
   "error.msg.membership.share.first": "A person becomes a member by buying shares. Take a membership application; approving it activates the member and buys the shares together.",
   "error.msg.membership.application.pending": "This person has a membership application waiting for the board. Approve or refuse the application instead, so the decision and its reason are kept.",
