@@ -7064,6 +7064,7 @@
     "answerSmallerMonth": "You pay from Rs {{first}} down to Rs {{last}} every month",
     "answerSmallerQuarter": "You pay from Rs {{first}} down to Rs {{last}} every 3 months",
     "estimateNote": "This is an estimate. Your cooperative will give you the exact figures, including any fees.",
+    "Rs": "Rs",
     "Total interest": "Total interest",
     "Total you pay back": "Total you pay back",
     "Last payment": "Last payment",
