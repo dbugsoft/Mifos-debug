@@ -1,0 +1,50 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<h2 mat-dialog-title>
+  <mat-icon>{{ data.action === 'approve' ? 'check_circle' : 'undo' }}</mat-icon>
+  {{ (data.action === 'approve' ? 'managementReports.ApproveTitle' : 'managementReports.ReturnTitle') | translate }}
+</h2>
+<form [formGroup]="form" (ngSubmit)="save()">
+  <mat-dialog-content>
+    @if (serverError()) {
+      <div class="server-error">
+        <mat-icon>error_outline</mat-icon>
+        <span>{{ serverError() }}</span>
+      </div>
+    }
+
+    <div class="notice">
+      <mat-icon>info</mat-icon>
+      <span>{{ 'managementReports.DecisionIdHint' | translate }}</span>
+    </div>
+
+    <mat-form-field class="field">
+      <mat-icon matPrefix>tag</mat-icon>
+      <mat-label>{{ 'managementReports.DecisionId' | translate }}</mat-label>
+      <input matInput type="number" min="1" formControlName="decisionId" />
+      @if (form.controls.decisionId.hasError('server')) {
+        <mat-error>{{ form.controls.decisionId.getError('server') }}</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field class="field">
+      <mat-label>{{ 'labels.inputs.Note' | translate }}</mat-label>
+      <textarea matInput formControlName="note" rows="3" maxlength="1000"></textarea>
+    </mat-form-field>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-stroked-button type="button" mat-dialog-close>{{ 'labels.buttons.Cancel' | translate }}</button>
+    <button mat-raised-button color="primary" type="submit" [disabled]="busy()">
+      @if (busy()) {
+        <mat-icon class="spin">autorenew</mat-icon>
+      }
+      {{ (data.action === 'approve' ? 'managementReports.ApproveTitle' : 'managementReports.ReturnTitle') | translate }}
+    </button>
+  </mat-dialog-actions>
+</form>

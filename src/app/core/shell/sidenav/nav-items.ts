@@ -199,7 +199,19 @@ export const navSections: NavSection[] = [
     items: [
       { label: 'labels.menus.Accounting', icon: 'account_balance', children: accountingPages },
       { label: 'labels.menus.Reports', icon: 'bar_chart', children: reportsCards },
-      { label: 'compliance.Compliance', icon: 'shield_person', path: ['/compliance'], compliance: true }
+      { label: 'compliance.Compliance', icon: 'shield_person', path: ['/compliance'], compliance: true },
+      {
+        label: 'governanceRegister.GovernanceRegister',
+        icon: 'gavel',
+        path: ['/governance-register'],
+        permission: 'READ_GOVERNANCE'
+      },
+      {
+        label: 'managementReports.ManagementReports',
+        icon: 'summarize',
+        path: ['/management-reports'],
+        permission: 'READ_MANAGEMENTREPORT'
+      }
     ]
   },
   {

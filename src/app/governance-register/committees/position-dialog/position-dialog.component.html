@@ -1,0 +1,53 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<h2 mat-dialog-title>
+  {{ (editing ? 'governanceRegister.positions.EditPosition' : 'governanceRegister.positions.AddPosition') | translate }}
+</h2>
+<form [formGroup]="form" (ngSubmit)="save()">
+  <mat-dialog-content>
+    @if (serverError()) {
+      <p class="server-error">{{ serverError() }}</p>
+    }
+
+    @if (!editing || isOwn) {
+      <mat-form-field class="field">
+        <mat-label>{{ 'labels.inputs.name' | translate }}</mat-label>
+        <input matInput formControlName="name" maxlength="150" />
+        @if (form.controls.name.hasError('server')) {
+          <mat-error>{{ form.controls.name.getError('server') }}</mat-error>
+        }
+      </mat-form-field>
+    } @else {
+      <p class="hint">{{ data.position?.name }}</p>
+    }
+
+    @if (!editing) {
+      <mat-checkbox formControlName="singleHolder">
+        {{ 'governanceRegister.positions.SingleHolder' | translate }}
+      </mat-checkbox>
+      <mat-checkbox formControlName="memberRequired">
+        {{ 'governanceRegister.committees.MemberRequired' | translate }}
+      </mat-checkbox>
+    }
+    @if (editing) {
+      <mat-checkbox formControlName="active">
+        {{ 'governanceRegister.committees.Active' | translate }}
+      </mat-checkbox>
+      @if (form.controls.active.hasError('server')) {
+        <p class="field-error">{{ form.controls.active.getError('server') }}</p>
+      }
+    }
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-stroked-button type="button" mat-dialog-close>{{ 'labels.buttons.Cancel' | translate }}</button>
+    <button mat-raised-button color="primary" type="submit" [disabled]="busy()">
+      {{ 'labels.buttons.Submit' | translate }}
+    </button>
+  </mat-dialog-actions>
+</form>

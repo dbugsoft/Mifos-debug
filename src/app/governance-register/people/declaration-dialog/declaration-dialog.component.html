@@ -1,0 +1,70 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<h2 mat-dialog-title>{{ 'governanceRegister.declarations.AddDeclaration' | translate }}</h2>
+<form [formGroup]="form" (ngSubmit)="save()">
+  <mat-dialog-content>
+    @if (serverError()) {
+      <p class="server-error">{{ serverError() }}</p>
+    }
+
+    <mat-form-field class="field">
+      <mat-label>{{ 'governanceRegister.declarations.Kind' | translate }}</mat-label>
+      <mat-select formControlName="kind">
+        @for (k of kinds; track k) {
+          <mat-option [value]="k">{{ 'governanceRegister.declarationKind.' + k | translate }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mifosx-nepali-date-input
+      [inline]="true"
+      formControlName="declaredOn"
+      [label]="'governanceRegister.declarations.DeclaredOn' | translate"
+      [maxDate]="today"
+    ></mifosx-nepali-date-input>
+
+    @if (isProperty) {
+      <mat-form-field class="field">
+        <mat-label>{{ 'governanceRegister.declarations.FiscalYear' | translate }}</mat-label>
+        <input matInput type="number" formControlName="fiscalYear" />
+        @if (form.controls.fiscalYear.hasError('server')) {
+          <mat-error>{{ form.controls.fiscalYear.getError('server') }}</mat-error>
+        }
+      </mat-form-field>
+    } @else {
+      <mat-form-field class="field">
+        <mat-label>{{ 'governanceRegister.declarations.Subject' | translate }}</mat-label>
+        <input matInput formControlName="subject" maxlength="200" />
+        @if (form.controls.subject.hasError('server')) {
+          <mat-error>{{ form.controls.subject.getError('server') }}</mat-error>
+        }
+      </mat-form-field>
+      <mat-form-field class="field">
+        <mat-label>{{ 'governanceRegister.DecisionReference' | translate }}</mat-label>
+        <input matInput formControlName="decisionReference" maxlength="200" />
+      </mat-form-field>
+    }
+
+    <mat-form-field class="field">
+      <mat-label>{{ 'governanceRegister.declarations.Detail' | translate }}</mat-label>
+      <textarea matInput formControlName="detail" rows="2" maxlength="1000"></textarea>
+    </mat-form-field>
+
+    <button mat-stroked-button type="button" (click)="filePicker.click()">
+      {{ file()?.name ?? ('governanceRegister.declarations.ChooseTheSignedPaper' | translate) }}
+    </button>
+    <input #filePicker type="file" hidden accept="application/pdf,image/*" (change)="onFileSelect($event)" />
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-stroked-button type="button" mat-dialog-close>{{ 'labels.buttons.Cancel' | translate }}</button>
+    <button mat-raised-button color="primary" type="submit" [disabled]="busy() || !file()">
+      {{ 'labels.buttons.Submit' | translate }}
+    </button>
+  </mat-dialog-actions>
+</form>

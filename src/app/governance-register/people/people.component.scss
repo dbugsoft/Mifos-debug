@@ -1,0 +1,103 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+@use 'app/compliance/compliance' as compliance;
+
+@include compliance.page;
+
+// Nested inside the governance-register shell, which already matches the breadcrumb's own width - the page
+// itself must not repeat that constraint, or the two 90%/84rem caps would compound.
+.compliance-page {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+
+  .grow {
+    flex: 1;
+  }
+
+  .search {
+    width: 320px;
+    max-width: 100%;
+  }
+}
+
+.row {
+  cursor: pointer;
+
+  &:hover {
+    background: rgb(127 127 127 / 6%);
+  }
+}
+
+.sub {
+  display: block;
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+td .chip {
+  margin: 2px 4px 2px 0;
+}
+
+// table.blue's own header styling (in the shared compliance mixin) targets Angular Material's mat-table markup
+// (.mat-mdc-header-row/th.mat-mdc-header-cell); this is a plain <table><thead>, so it never matched. Same blue
+// header, aimed at the real markup instead.
+// A plain <table>'s default border-spacing (2px, not 0) left thin page-background seams between the header
+// cells and around the row - collapsing the borders removes those gaps so the blue reads as one solid bar.
+table.blue {
+  border-collapse: collapse;
+}
+
+table.blue thead th {
+  padding: 16px 20px;
+  background: var(--md-sys-color-primary, var(--dk-fill, #2460b9));
+  color: #fff;
+  font-weight: 600;
+  border-bottom: none;
+  white-space: nowrap;
+}
+
+table.blue thead th:not(:last-child) {
+  border-right: 1px solid rgb(255 255 255 / 25%);
+}
+
+// Matched to the header's own padding: unstated, a plain <table>'s td padding falls back to the shared mixin's
+// much smaller 8px, which looks squeezed and small next to a 16px/20px header.
+table.blue tbody td {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--dk-border, #e2e8f0);
+}
+
+table.blue tbody tr:last-child td {
+  border-bottom: none;
+}
+
+// A <table>'s own border-radius/overflow:hidden don't reliably clip its header's background in browsers
+// (border-collapse breaks it); the rounded corners have to come from a plain wrapping box instead - the same
+// mat-elevation-z8 box the Service Centers list (and the rest of the app's list pages) already uses.
+.table-card {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.table-card .table-scroll {
+  overflow-x: auto;
+}
+
+.table-card table.blue {
+  border: 0;
+  border-radius: 0;
+}
