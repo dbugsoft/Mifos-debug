@@ -1,0 +1,88 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+
+  .grow {
+    flex: 1;
+  }
+}
+
+.empty {
+  padding: 12px 0;
+  color: var(--dk-text-muted, rgb(127 127 127));
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 8px;
+  border-radius: 10px;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background: var(--dk-surface-2, #f1f5f9);
+  }
+
+  &.inactive {
+    opacity: 0.55;
+  }
+}
+
+.row-icon {
+  flex: none;
+  color: var(--dk-text-muted, rgb(127 127 127));
+}
+
+.info {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.name {
+  font-weight: 600;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag {
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--dk-surface-2, #f1f5f9);
+  color: var(--dk-text-muted, rgb(127 127 127));
+  font-size: 0.7rem;
+  font-weight: 600;
+
+  &.blue {
+    background: var(--dk-primary-soft, #e0edf8);
+    color: var(--dk-primary, #0b5488);
+  }
+
+  &.green {
+    background: var(--dk-success-soft, #e3f3e6);
+    color: var(--dk-success, #1b6b2a);
+  }
+
+  &.off {
+    background: var(--dk-danger-soft, #ffebee);
+    color: var(--dk-danger, #c62828);
+  }
+}

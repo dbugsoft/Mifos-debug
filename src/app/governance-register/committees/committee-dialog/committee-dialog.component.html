@@ -1,0 +1,73 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<h2 mat-dialog-title>
+  {{
+    (editing ? 'governanceRegister.committees.EditCommittee' : 'governanceRegister.committees.AddCommittee') | translate
+  }}
+</h2>
+<form [formGroup]="form" (ngSubmit)="save()">
+  <mat-dialog-content>
+    @if (serverError()) {
+      <p class="server-error">{{ serverError() }}</p>
+    }
+
+    @if (!editing || isOwn) {
+      <mat-form-field class="field">
+        <mat-label>{{ 'labels.inputs.name' | translate }}</mat-label>
+        <input matInput formControlName="name" maxlength="200" />
+        @if (form.controls.name.hasError('server')) {
+          <mat-error>{{ form.controls.name.getError('server') }}</mat-error>
+        }
+      </mat-form-field>
+    }
+
+    @if (!editing) {
+      <mat-form-field class="field">
+        <mat-label>{{ 'governanceRegister.committees.Kind' | translate }}</mat-label>
+        <mat-select formControlName="kind">
+          <mat-option value="SUB_COMMITTEE">{{
+            'governanceRegister.committees.kind.SUB_COMMITTEE' | translate
+          }}</mat-option>
+          <mat-option value="OTHER">{{ 'governanceRegister.committees.kind.OTHER' | translate }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    }
+
+    <mat-form-field class="field">
+      <mat-label>{{ 'governanceRegister.committees.TermYears' | translate }}</mat-label>
+      <input matInput type="number" formControlName="termYears" min="1" max="20" />
+      @if (editing && !form.controls.termYears.value) {
+        <mat-hint>{{ 'governanceRegister.committees.termYearsNotSet' | translate }}</mat-hint>
+      }
+      @if (form.controls.termYears.hasError('server')) {
+        <mat-error>{{ form.controls.termYears.getError('server') }}</mat-error>
+      }
+    </mat-form-field>
+
+    @if (!editing || isOwn) {
+      <mat-checkbox formControlName="memberRequired">
+        {{ 'governanceRegister.committees.MemberRequired' | translate }}
+      </mat-checkbox>
+    }
+    <mat-checkbox formControlName="declaresProperty">
+      {{ 'governanceRegister.committees.DeclaresProperty' | translate }}
+    </mat-checkbox>
+    @if (editing && canSwitchOff) {
+      <mat-checkbox formControlName="active">
+        {{ 'governanceRegister.committees.Active' | translate }}
+      </mat-checkbox>
+    }
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-stroked-button type="button" mat-dialog-close>{{ 'labels.buttons.Cancel' | translate }}</button>
+    <button mat-raised-button color="primary" type="submit" [disabled]="busy()">
+      {{ 'labels.buttons.Submit' | translate }}
+    </button>
+  </mat-dialog-actions>
+</form>

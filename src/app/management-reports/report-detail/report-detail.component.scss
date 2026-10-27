@@ -1,0 +1,349 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+@use 'app/compliance/compliance' as compliance;
+
+@include compliance.page;
+
+// mifosx-coop-pearls-card (reused from the dashboard, ADR-0022) reads its colours entirely from these --viz-*/
+// --coop-* custom properties - normally supplied by CoopDashboardComponent's own :host. Embedded here, outside
+// that page, the properties are undefined: every pill/status/goal-bar background falls back to transparent and
+// every muted label falls back to plain inherited text, which is why the PEARLS section read as unstyled. Copied
+// verbatim from coop-dashboard.component.scss so the widget renders exactly as it already does on the dashboard.
+:host {
+  --viz-1: var(--dk-primary, #2460b9);
+  --viz-2: var(--dk-warning, #eb6834);
+  --viz-3: var(--dk-success, #1baf7a);
+  --viz-ink: var(--dk-text, #1f2124);
+  --viz-ink-2: var(--dk-text-2, #52545a);
+  --viz-muted: var(--dk-text-muted, #7b7e86);
+  --viz-grid: var(--dk-border, #e6e7eb);
+  --viz-surface: var(--dk-surface, #fff);
+  --viz-tooltip: var(--dk-text, #303135);
+  --coop-card: var(--dk-surface, #fff);
+  --coop-shadow: 0 1px 2px rgb(16 24 40 / 6%), 0 1px 3px rgb(16 24 40 / 10%);
+  --coop-accent: var(--dk-primary, #2460b9);
+  --coop-accent-soft: rgb(var(--dk-tint-rgb, 36 96 185) / 10%);
+  --coop-hover: rgb(var(--dk-tint-rgb, 36 96 185) / 6%);
+  --coop-good-ink: var(--dk-success, #1b7a1b);
+  --coop-good-soft: rgb(12 163 12 / 12%);
+  --coop-warn-ink: var(--dk-warning, #9a6400);
+  --coop-warn-soft: rgb(250 178 25 / 18%);
+  --coop-bad-ink: var(--dk-danger, #c62828);
+  --coop-bad-soft: rgb(208 59 59 / 11%);
+  --coop-shimmer-a: rgb(var(--dk-ink-rgb, 0 0 0) / 4%);
+  --coop-shimmer-b: rgb(var(--dk-ink-rgb, 0 0 0) / 9%);
+  --cls-pass: var(--dk-success, #0ca30c);
+  --cls-watch: var(--dk-warning, #fab219);
+  --cls-substandard: var(--dk-warning, #ec835a);
+  --cls-doubtful: var(--dk-danger, #d03b3b);
+  --cls-loss: var(--dk-danger, #8e1d1d);
+}
+
+:host-context(.dark-theme) {
+  --viz-1: #3987e5;
+  --viz-2: #d95926;
+  --viz-3: #199e70;
+  --viz-ink: #f1f1f3;
+  --viz-ink-2: #c4c6d0;
+  --viz-muted: #9a9ca4;
+  --viz-grid: #55575d;
+  --viz-surface: #424242;
+  --viz-tooltip: #1a1a19;
+  --coop-card: #424242;
+  --coop-shadow: 0 1px 3px rgb(0 0 0 / 40%);
+  --coop-accent: #e0e0e0;
+  --coop-accent-soft: rgb(158 158 158 / 16%);
+  --coop-hover: rgb(255 255 255 / 6%);
+  --coop-good-ink: #5fd35f;
+  --coop-good-soft: rgb(12 163 12 / 20%);
+  --coop-warn-ink: #fcc75a;
+  --coop-warn-soft: rgb(250 178 25 / 18%);
+  --coop-bad-ink: #ff8a80;
+  --coop-bad-soft: rgb(208 59 59 / 22%);
+  --coop-shimmer-a: rgb(255 255 255 / 5%);
+  --coop-shimmer-b: rgb(255 255 255 / 11%);
+  --cls-loss: #b23a3a;
+}
+
+// Replaces the shared "framed section with a legend floating on the border" look with a plain elevated card, one
+// per section - the same change made to the governance register's committee cards, for the same reason: many of
+// these stacked one after another read as cluttered. Angular's view encapsulation keeps this scoped to this
+// component, so Compliance's own pages are unaffected.
+.report-card {
+  margin: 16px 0 0;
+  padding: 20px 22px;
+  border-radius: 14px;
+  background: var(--mat-sys-surface, var(--dk-surface, #fff));
+
+  &:first-child {
+    margin-top: 0;
+  }
+}
+
+.report-card--header {
+  border-left: 4px solid var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+}
+
+.card-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.period-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+
+  mat-icon {
+    color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+  }
+}
+
+.status-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 16px;
+  font-size: 1rem;
+  font-weight: 700;
+
+  mat-icon {
+    color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+  }
+}
+
+// Stat tiles instead of inline "label: value" pairs - the shared compliance.page mixin's own .facts/.fact/
+// .fact-label/.fact-value classes are reused for structure (grid, responsive columns) but restyled from a text
+// row into a small card per figure, which reads far more clearly in a page that is mostly numbers.
+.facts {
+  gap: 12px;
+}
+
+.fact {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--dk-surface-2, #f1f5f9);
+}
+
+.fact-label {
+  color: var(--dk-text-muted, rgb(127 127 127));
+  font-size: 0.75rem;
+
+  &::after {
+    content: '';
+  }
+}
+
+.fact-value {
+  color: var(--dk-text, inherit);
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-top: 12px;
+
+  &.top {
+    margin: 12px 0;
+  }
+}
+
+.notes-block {
+  margin-top: 12px;
+}
+
+.section-label {
+  margin: 20px 0 10px;
+  color: var(--dk-text-2, #334155);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.field {
+  display: block;
+  width: 100%;
+  max-width: 480px;
+}
+
+.notes-text {
+  margin: 0;
+  color: var(--dk-text, inherit);
+}
+
+.sub {
+  display: block;
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+// table.blue's own header styling (in the shared compliance mixin) targets Angular Material's mat-table markup; this
+// is a plain <table><thead>, so the same fix used across the app's other plain tables (governance-register, loan
+// aging) is needed here too.
+table.blue {
+  border-collapse: collapse;
+}
+
+table.blue thead th {
+  padding: 14px 18px;
+  background: var(--md-sys-color-primary, var(--dk-fill, #2460b9));
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-bottom: none;
+  white-space: nowrap;
+}
+
+table.blue thead th:not(:last-child) {
+  border-right: 1px solid rgb(255 255 255 / 25%);
+}
+
+// Matched to the header's own padding (14px/18px): the shared mixin's 8px td padding, and the browser's default
+// font-size, looked squeezed and small next to it.
+table.blue td {
+  padding: 14px 18px;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--dk-border, #e2e8f0);
+}
+
+table.blue tbody tr:last-child td {
+  border-bottom: none;
+}
+
+// Figures read right-aligned and bold, same weight as the stat tiles above each table, instead of plain text at
+// the same size as the row's label columns.
+table.blue .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+table.blue td.num {
+  font-weight: 700;
+}
+
+.table-card {
+  margin-top: 12px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.table-card .table-scroll {
+  overflow-x: auto;
+}
+
+.table-card table.blue {
+  border: 0;
+  border-radius: 0;
+}
+
+.sealed-content {
+  margin: 12px 0 0;
+  padding: 12px;
+  overflow-x: auto;
+  border-radius: 8px;
+  background: var(--dk-surface-2, #f1f5f9);
+  font-family: monospace;
+  font-size: 0.75rem;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.sha {
+  margin: 8px 0 0;
+  font-family: monospace;
+  font-size: 0.75rem;
+  word-break: break-all;
+}
+
+.pdf-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 4px 0;
+  color: var(--dk-text-muted, rgb(127 127 127));
+  font-size: 0.8rem;
+
+  mat-icon {
+    flex: none;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+@media (width <= 600px) {
+  .report-card {
+    padding: 16px;
+    border-radius: 10px;
+  }
+
+  .period-title {
+    font-size: 1.1rem;
+  }
+
+  .card-title-row {
+    align-items: flex-start;
+  }
+}
+
+// A touch more room between an indicator's name and its note/tag line (mifosx-coop-pearls-card's own styling,
+// reached with ::ng-deep since it's a child component's template - scoped to :host so it only applies on this
+// page, not the dashboard's own copy of the same widget.
+:host ::ng-deep mifosx-coop-pearls-card {
+  .ind__name span {
+    font-weight: 600;
+  }
+
+  .ind__note,
+  .ind__tags {
+    margin-top: 4px;
+    font-style: italic;
+  }
+
+  // The indicator table's own header (coop-dashboard's .ind) is plain muted text on white, unlike every other
+  // table on this page - matched to the same blue header the rest of the report's tables use. Rounded on
+  // .table-wrap (the widget's own scroll wrapper), not the table itself: a border-collapse table's own
+  // border-radius doesn't reliably clip its header background.
+  // .table-wrap already sets overflow-x: auto (its own scroll behaviour, kept as-is for narrow screens); that
+  // alone is enough for the border-radius below to clip the header's corners.
+  .table-wrap {
+    border-radius: 10px;
+  }
+
+  .ind thead th {
+    padding: 10px 8px;
+    background: var(--md-sys-color-primary, var(--dk-fill, #2460b9)) !important;
+    color: #fff !important;
+    font-size: 0.8rem;
+    border-bottom: none;
+  }
+}

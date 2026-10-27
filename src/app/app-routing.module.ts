@@ -248,6 +248,80 @@ const routes: Routes = [
       ]
     },
     {
+      // The governance register (fineract-dbug #138): kept apart from the AML-focused Compliance > Governance
+      // screen above. A person's own page (people/:id) is a sibling, not nested under the tab shell, same as
+      // Compliance's peps/:id.
+      path: 'governance-register',
+      data: { title: 'Governance register', breadcrumb: 'Governance register' },
+      children: [
+        {
+          path: '',
+          loadComponent: () =>
+            import('./governance-register/governance-register-shell.component').then(
+              (m) => m.GovernanceRegisterShellComponent
+            ),
+          children: [
+            { path: '', redirectTo: 'committees', pathMatch: 'full' },
+            {
+              path: 'committees',
+              loadComponent: () =>
+                import('./governance-register/committees/committees.component').then((m) => m.CommitteesComponent),
+              data: { title: 'Committees', breadcrumb: 'Committees' }
+            },
+            {
+              path: 'people',
+              loadComponent: () =>
+                import('./governance-register/people/people.component').then((m) => m.PeopleComponent),
+              data: { title: 'People', breadcrumb: 'People' }
+            },
+            {
+              path: 'directors',
+              loadComponent: () =>
+                import('./governance-register/directors-table/directors-table.component').then(
+                  (m) => m.DirectorsTableComponent
+                ),
+              data: { title: "Directors' table", breadcrumb: "Directors' table" }
+            },
+            {
+              path: 'property-declarations',
+              loadComponent: () =>
+                import('./governance-register/property-declarations/property-declarations.component').then(
+                  (m) => m.PropertyDeclarationsComponent
+                ),
+              data: { title: 'Who has declared', breadcrumb: 'Who has declared' }
+            }
+          ]
+        },
+        {
+          path: 'people/:id',
+          loadComponent: () =>
+            import('./governance-register/people/person-detail/person-detail.component').then(
+              (m) => m.PersonDetailComponent
+            ),
+          data: { title: 'Person', breadcrumb: 'Person', routeParamBreadcrumb: false }
+        }
+      ]
+    },
+    {
+      // The management report (fineract-dbug #142): a separate issue/permission set from the governance register
+      // above, so its own top-level route rather than a tab inside governance-register-shell.
+      path: 'management-reports',
+      data: { title: 'Management reports', breadcrumb: 'Management reports' },
+      children: [
+        {
+          path: '',
+          loadComponent: () =>
+            import('./management-reports/reports-list/reports-list.component').then((m) => m.ReportsListComponent)
+        },
+        {
+          path: ':id',
+          loadComponent: () =>
+            import('./management-reports/report-detail/report-detail.component').then((m) => m.ReportDetailComponent),
+          data: { title: 'Report', breadcrumb: 'Report', routeParamBreadcrumb: false }
+        }
+      ]
+    },
+    {
       path: 'loan-aging',
       loadComponent: () => import('./reports/loan-aging/loan-aging.component').then((m) => m.LoanAgingComponent),
       data: {

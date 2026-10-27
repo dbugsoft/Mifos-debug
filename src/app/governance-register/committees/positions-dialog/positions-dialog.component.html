@@ -1,0 +1,63 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<h2 mat-dialog-title>
+  <mat-icon>badge</mat-icon>
+  {{ 'governanceRegister.positions.Positions' | translate }}
+</h2>
+<mat-dialog-content>
+  <div class="toolbar">
+    <mat-checkbox color="primary" [checked]="includeInactive()" (change)="toggleInactive($event)">
+      {{ 'governanceRegister.committees.IncludeInactive' | translate }}
+    </mat-checkbox>
+    <span class="grow"></span>
+    <button mat-flat-button color="primary" type="button" (click)="add()" *mifosxHasPermission="'UPDATE_GOVERNANCE'">
+      <mat-icon>add</mat-icon>{{ 'governanceRegister.positions.AddPosition' | translate }}
+    </button>
+  </div>
+
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
+
+  @if (!loading() && !positions().length) {
+    <p class="empty">{{ 'governanceRegister.positions.Empty' | translate }}</p>
+  }
+
+  @for (p of positions(); track p.id) {
+    <div class="row" [class.inactive]="!p.active">
+      <mat-icon class="row-icon">badge</mat-icon>
+      <div class="info">
+        <span class="name">{{ positionLabel(p) | translate }}</span>
+        <span class="meta">
+          @if (p.singleHolder) {
+            <span class="tag blue">{{ 'governanceRegister.positions.SingleHolder' | translate }}</span>
+          }
+          @if (p.memberRequired) {
+            <span class="tag green">{{ 'governanceRegister.committees.MemberRequired' | translate }}</span>
+          }
+          @if (!p.active) {
+            <span class="tag off">{{ 'governanceRegister.committees.Inactive' | translate }}</span>
+          }
+        </span>
+      </div>
+      <button
+        mat-icon-button
+        type="button"
+        [matTooltip]="'labels.buttons.Edit' | translate"
+        (click)="edit(p)"
+        *mifosxHasPermission="'UPDATE_GOVERNANCE'"
+      >
+        <mat-icon>edit</mat-icon>
+      </button>
+    </div>
+  }
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-stroked-button type="button" mat-dialog-close>{{ 'labels.buttons.Close' | translate }}</button>
+</mat-dialog-actions>
