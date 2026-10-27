@@ -189,6 +189,16 @@ export interface RateSpread {
   spread: number | null;
   cap: number;
   withinCap: boolean;
+  /** Missing when the lending limits are switched off. */
+  ceiling?: RateCeiling | null;
+}
+
+/** The highest rate a loan may carry, against the running loans. */
+export interface RateCeiling {
+  limit: number;
+  highestRate: number | null;
+  loansAbove: number;
+  within: boolean;
 }
 
 export type ActionCode =

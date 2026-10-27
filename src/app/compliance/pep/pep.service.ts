@@ -45,6 +45,9 @@ export interface PepLink {
   accountNo: string;
   relationship: 'SELF' | 'FAMILY' | 'ASSOCIATE';
   relationshipDetail: string | null;
+  /** For FAMILY, from the relationship list (fineract-dbug ADR-0046); absent on one described in words before the list */
+  relationshipCode?: string | null;
+  relationshipLabelEn?: string | null;
   since: string;
   endedAt: string | null;
   endReason: string | null;
@@ -62,6 +65,9 @@ export interface PepSuggestion {
   accountNo: string;
   relationship: 'SELF' | 'FAMILY' | 'ASSOCIATE';
   relationshipDetail: string | null;
+  /** For FAMILY, from the relationship list (fineract-dbug ADR-0046); absent on one described in words before the list */
+  relationshipCode?: string | null;
+  relationshipLabelEn?: string | null;
 }
 
 export interface PepTemplate {
@@ -128,10 +134,17 @@ export class PepService {
     return this.http.put<Pep>(`/nepal/aml/peps/${id}`, changes);
   }
 
-  link(id: number, clientId: number, relationship: string, relationshipDetail?: string): Observable<Pep> {
+  link(
+    id: number,
+    clientId: number,
+    relationship: string,
+    relationshipDetail?: string | null,
+    relationshipCode?: string | null
+  ): Observable<Pep> {
     return this.http.post<Pep>(`/nepal/aml/peps/${id}/links`, {
       clientId,
       relationship,
+      relationshipCode: relationshipCode || null,
       relationshipDetail: relationshipDetail || null
     });
   }

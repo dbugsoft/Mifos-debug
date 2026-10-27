@@ -8,6 +8,7 @@
 
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormControl } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
@@ -17,6 +18,10 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { AdToBsPipe } from 'app/pipes/ad-to-bs.pipe';
 import { KymMemberPickerComponent } from 'app/clients/kym/member-picker/member-picker.component';
 import { KymPerson } from 'app/clients/kym/kym.models';
+import {
+  RelationshipSelectComponent,
+  relationshipText
+} from 'app/shared/relationship-select/relationship-select.component';
 import { ComplianceService } from '../../compliance.service';
 import { InputDialogComponent, InputDialogData } from '../../input-dialog/input-dialog.component';
 import { Pep, PepLink, PepService } from '../pep.service';
@@ -33,7 +38,8 @@ import { PepDialogComponent, PepDialogData } from '../pep-dialog/pep-dialog.comp
     MatIcon,
     MatProgressBar,
     AdToBsPipe,
-    KymMemberPickerComponent
+    KymMemberPickerComponent,
+    RelationshipSelectComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -51,10 +57,25 @@ export class PepDetailComponent implements OnInit {
   /** The member being linked, before the relationship is chosen */
   readonly picked = signal<KymPerson | null>(null);
   readonly relationship = signal('FAMILY');
+  /** For a close associate: how they are close, in words */
   readonly detail = signal('');
+  /** For family: which relationship, from the list */
+  readonly familyCode = new FormControl<string | null>(null);
+  readonly familyDetail = new FormControl<string | null>(null);
   readonly current = computed(() => (this.pep()?.links ?? []).filter((l) => !l.endedAt));
   readonly ended = computed(() => (this.pep()?.links ?? []).filter((l) => !!l.endedAt));
   canManage = false;
+
+  /** Which relationship a link is, in words: from the list ("Uncle", "Other: friend") or as written before the list. */
+  relationText(l: PepLink): string {
+    return relationshipText(
+      this.translate,
+      l.relationshipCode,
+      l.relationshipDetail,
+      l.relationshipDetail,
+      l.relationshipLabelEn
+    );
+  }
 
   ngOnInit(): void {
     this.compliance
@@ -93,12 +114,24 @@ export class PepDetailComponent implements OnInit {
     if (!p || !m) {
       return;
     }
+    const family = this.relationship() === 'FAMILY';
+    if (family && this.familyDetail.invalid) {
+      this.familyDetail.markAsTouched();
+      return;
+    }
     this.busy.set(true);
-    this.peps.link(p.id, m.clientId, this.relationship(), this.detail().trim()).subscribe({
+    const detail = family
+      ? this.familyDetail.value?.trim()
+      : this.relationship() === 'ASSOCIATE'
+        ? this.detail().trim()
+        : null;
+    this.peps.link(p.id, m.clientId, this.relationship(), detail, family ? this.familyCode.value : null).subscribe({
       next: (x) => {
         this.pep.set(x);
         this.picked.set(null);
         this.detail.set('');
+        this.familyCode.reset();
+        this.familyDetail.reset();
         this.busy.set(false);
       },
       error: () => this.busy.set(false)

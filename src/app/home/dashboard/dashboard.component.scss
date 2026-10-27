@@ -7,23 +7,7 @@
  */
 
 .container {
-  overflow-x: hidden;
-}
-
-.dashboard-layout {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-.search-card {
-  padding: 16px;
-}
-
-.search-card mat-card-content {
-  width: 100%;
-}
-
-.search-card mat-form-field {
-  width: 100%;
+  // clip, not hidden: hidden turns overflow-y into auto and cuts off the
+  // floating labels of the filter fields sitting at the container's top edge.
+  overflow-x: clip;
 }

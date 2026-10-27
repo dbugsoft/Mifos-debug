@@ -113,17 +113,6 @@
             <td>{{ a.citizenshipNumber }} · {{ a.citizenshipDistrictName ?? a.citizenshipDistrictCode }}</td>
           </tr>
         }
-        @if (a.nominee) {
-          <tr>
-            <td>{{ 'membership.Nominee' | translate }}</td>
-            <td>
-              {{ a.nominee.name }} ({{ a.nominee.relationship }})
-              @if (a.nominee.mobileNo) {
-                · {{ a.nominee.mobileNo }}
-              }
-            </td>
-          </tr>
-        }
         <tr>
           <td>{{ 'membership.Status' | translate }}</td>
           <td>
@@ -181,6 +170,8 @@
         </button>
       </div>
     }
+
+    <ng-container *ngTemplateOutlet="nomineeBlock"></ng-container>
 
     @if (a.status === 'APPROVED') {
       <h3>{{ 'membership.Accounts opened by the approval' | translate }}</h3>
@@ -303,6 +294,8 @@
       </div>
     }
 
+    <ng-container *ngTemplateOutlet="nomineeBlock"></ng-container>
+
     @if (shareAccounts().length) {
       <h3>{{ 'membership.Shares' | translate }}</h3>
       <div class="table-wrap">
@@ -332,3 +325,74 @@
     }
   </div>
 }
+
+<!-- The nominee as it is now and the ones before (fineract-dbug ADR 0047); none for an organisation -->
+<ng-template #nomineeBlock>
+  @if (nominee(); as mn) {
+    <h3>{{ 'membership.Nominee' | translate }}</h3>
+    @if (mn.nominee; as n) {
+      <table class="details">
+        <tbody>
+          <tr>
+            <td>{{ 'membership.Nominee name' | translate }}</td>
+            <td>{{ n.name }}</td>
+          </tr>
+          <tr>
+            <td>{{ 'membership.Relationship' | translate }}</td>
+            <td>{{ nomineeRelationship(n) }}</td>
+          </tr>
+          @if (n.mobileNo) {
+            <tr>
+              <td>{{ 'membership.Nominee phone' | translate }}</td>
+              <td>{{ n.mobileNo }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    } @else {
+      <p class="muted">{{ 'membership.No nominee named' | translate }}</p>
+    }
+    @if (canChangeNominee()) {
+      <div class="actions">
+        <button mat-raised-button color="primary" (click)="changeNominee()">
+          {{ (mn.nominee ? 'membership.Change nominee' : 'membership.Add nominee') | translate }}
+        </button>
+      </div>
+    }
+    @if (mn.previous.length) {
+      <h3>{{ 'membership.Earlier nominees' | translate }}</h3>
+      <div class="table-wrap">
+        <table class="accounts">
+          <thead>
+            <tr>
+              <th>{{ 'membership.Nominee' | translate }}</th>
+              <th>{{ 'membership.Replaced on' | translate }}</th>
+              <th>{{ 'membership.Note' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (p of mn.previous; track $index) {
+              <tr>
+                <td>
+                  @if (p.nominee; as n) {
+                    {{ n.name }} ({{ nomineeRelationship(n) }})
+                    @if (n.mobileNo) {
+                      · {{ n.mobileNo }}
+                    }
+                  } @else {
+                    <span class="muted">{{ 'membership.No nominee before' | translate }}</span>
+                  }
+                </td>
+                <td>
+                  {{ p.replacedOn | dateFormat }}
+                  <span class="muted">&nbsp;· {{ 'membership.byUser' | translate: { user: p.replacedBy } }}</span>
+                </td>
+                <td>{{ p.note }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  }
+</ng-template>

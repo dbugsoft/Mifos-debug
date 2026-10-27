@@ -11,6 +11,16 @@
  * Shapes of /nepal/memberships.
  */
 
+import { TranslateService } from '@ngx-translate/core';
+import {
+  RelationshipOption,
+  relationshipLabel,
+  relationshipText
+} from 'app/shared/relationship-select/relationship-select.component';
+
+export type { RelationshipOption };
+export { relationshipLabel };
+
 export type MembershipStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 
 /** When the money for the shares and charges is taken. */
@@ -24,8 +34,27 @@ export interface ChargeOption {
 
 export interface Nominee {
   name: string;
-  relationship: string;
+  /** The text typed before the list; on a saved nominee chosen from the list, e.g. "Guardian: uncle" */
+  relationship?: string;
+  /** The {@link RelationshipOption.code} chosen; absent on a nominee typed before the list */
+  relationshipCode?: string;
+  /** Only when the chosen entry needs detail, e.g. what kind of guardian */
+  relationshipDetail?: string;
+  relationshipLabelEn?: string;
   mobileNo?: string;
+}
+
+/** A person's nominee as it is now and the ones before (GET /nepal/memberships/nominees/{clientId}, fineract-dbug ADR-0047). */
+export interface MemberNominee {
+  clientId: number;
+  accountNo: string;
+  name: string;
+  /** null when the person has named nobody */
+  nominee: Nominee | null;
+  /** False for an organisation and for a client who is neither an applicant nor a member */
+  canChange: boolean;
+  /** Every change, newest first; a null nominee means there was none before that change */
+  previous: { nominee: Nominee | null; replacedOn: string; replacedBy: string; note?: string | null }[];
 }
 
 export interface MembershipApplication {
@@ -94,6 +123,8 @@ export interface MembershipSettings {
   separateApprover: boolean;
   paymentTaken: PaymentTaken;
   nomineeRequired: boolean;
+  /** The nominee's relationship must be chosen from the list; typed text is refused */
+  nomineeRelationshipFromList?: boolean;
   /** Approval waits for a complete KYM (on by default, fineract-dbug ADR 0042) */
   kymRequiredForApproval?: boolean;
 }
@@ -158,6 +189,20 @@ export interface MembershipRejectRequest {
   date?: string;
   refundAmount?: number;
   refundReceiptNumber?: string;
+}
+
+/**
+ * The nominee's relationship as shown: the label with any detail ("Guardian: uncle"), or, for a nominee typed before
+ * the list, the text as it was typed.
+ */
+export function nomineeRelationshipText(nominee: Nominee, translate: TranslateService): string {
+  return relationshipText(
+    translate,
+    nominee.relationshipCode,
+    nominee.relationshipDetail,
+    nominee.relationship,
+    nominee.relationshipLabelEn
+  );
 }
 
 /** The days-left chip: green with time to spare, amber in the last week, red once overdue. */

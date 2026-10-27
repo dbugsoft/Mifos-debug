@@ -18,7 +18,6 @@ import { ClientsService } from '../clients.service';
 import { SettingsService } from 'app/settings/settings.service';
 import { Dates } from 'app/core/utils/dates';
 import { ExternalNationalIdService } from 'app/clients/services/external-national-id.service';
-import { MatDivider } from '@angular/material/divider';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
@@ -37,7 +36,6 @@ import { catchError, switchMap } from 'rxjs/operators';
   providers: [ExternalNationalIdService],
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
-    MatDivider,
     CdkTextareaAutosize,
     MatCheckbox,
     NepaliDateInputComponent

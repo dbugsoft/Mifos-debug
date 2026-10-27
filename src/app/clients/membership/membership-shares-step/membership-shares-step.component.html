@@ -139,7 +139,17 @@
         </mat-form-field>
         <mat-form-field class="third">
           <mat-label>{{ 'membership.Relationship' | translate }}</mat-label>
-          <input matInput formControlName="nomineeRelationship" maxlength="100" [required]="nomineeRequired" />
+          <mat-select formControlName="nomineeRelationship" [required]="nomineeRequired">
+            @if (!nomineeRequired) {
+              <mat-option value="">—</mat-option>
+            }
+            @for (option of relationships(); track option.code) {
+              <mat-option [value]="option.code">{{ relationshipLabel(option) }}</mat-option>
+            }
+          </mat-select>
+          @if (relationshipsState() === 'loading') {
+            <mat-hint>{{ 'membership.relationshipsLoading' | translate }}</mat-hint>
+          }
           @if (form.controls.nomineeRelationship.hasError('required')) {
             <mat-error>{{ 'membership.errors.relationshipRequired' | translate }}</mat-error>
           }
@@ -148,7 +158,26 @@
           <mat-label>{{ 'membership.Nominee phone' | translate }}</mat-label>
           <input matInput formControlName="nomineeMobileNo" maxlength="50" />
         </mat-form-field>
+        @if (relationship()?.needsDetail) {
+          <mat-form-field class="half">
+            <mat-label>{{ 'membership.Nature of the relation' | translate }}</mat-label>
+            <input matInput formControlName="nomineeRelationshipDetail" maxlength="100" required />
+            <mat-hint>{{ 'membership.relationshipDetailHint' | translate }}</mat-hint>
+            @if (form.controls.nomineeRelationshipDetail.hasError('required')) {
+              <mat-error>{{ 'membership.errors.relationshipDetailRequired' | translate }}</mat-error>
+            }
+          </mat-form-field>
+        }
       </div>
+      @if (relationshipsState() === 'failed') {
+        <p class="load-failed" role="alert">
+          <fa-icon icon="exclamation-triangle" class="m-r-10"></fa-icon
+          >{{ 'membership.relationshipsFailed' | translate }}
+          <button mat-button color="primary" type="button" (click)="loadRelationships()">
+            {{ 'labels.buttons.Retry' | translate }}
+          </button>
+        </p>
+      }
     </section>
   } @else {
     <p class="muted">{{ 'membership.organisationNote' | translate }}</p>

@@ -16,3 +16,125 @@
   width: 90%;
   padding-bottom: 32px;
 }
+
+// Each field as wide as what it holds (a 10-digit phone, a 2-digit ward), not one width for all.
+// Wide screens only: below 768px the stepper puts every field on its own line.
+@media (width > 768px) {
+  :host ::ng-deep .mat-stepper-vertical {
+    // General
+    .layout-row-wrap {
+      > mat-form-field {
+        &:has([formcontrolname='fullname']) {
+          flex-basis: 400px;
+        }
+
+        &:has(
+          [formcontrolname='officeId'],
+          [formcontrolname='staffId'],
+          [formcontrolname='mainBusinessLineId'],
+          [formcontrolname='clientClassificationId']
+        ) {
+          flex-basis: 240px;
+        }
+
+        &:has([formcontrolname='emailAddress'], [formcontrolname='savingsProductId']) {
+          flex-basis: 280px;
+        }
+
+        &:has(
+          [formcontrolname='firstname'],
+          [formcontrolname='middlename'],
+          [formcontrolname='lastname'],
+          [formcontrolname='clientTypeId'],
+          [formcontrolname='constitutionId'],
+          [formcontrolname='incorpNumber']
+        ) {
+          flex-basis: 200px;
+        }
+
+        &:has([formcontrolname='mobileNo']) {
+          flex-basis: 168px;
+        }
+
+        &:has([formcontrolname='legalFormId']) {
+          flex-basis: 160px;
+        }
+
+        &:has([formcontrolname='genderId']) {
+          flex-basis: 136px;
+        }
+
+        // Fixed width: the rest of its line takes the spare room.
+        &:has([formcontrolname='externalId']) {
+          flex: 0 1 160px;
+        }
+      }
+
+      // Checkbox tiles hug their label.
+      > mat-checkbox {
+        flex: 0 0 auto;
+      }
+    }
+
+    // Citizenship: its fields join the general row, right after the person's details.
+    mifosx-membership-citizenship,
+    .citizenship {
+      display: contents;
+
+      > .number {
+        flex: 0 1 200px;
+      }
+
+      > .district {
+        flex: 0 1 224px;
+      }
+    }
+
+    // Address
+    .address-fields {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+
+      > mat-form-field {
+        flex: 0 1 200px;
+        width: auto;
+
+        &:has([formcontrolname='localLevelCode'], [formcontrolname='tole']) {
+          flex-basis: 280px;
+        }
+
+        &:has([formcontrolname='houseNumber']) {
+          flex-basis: 160px;
+        }
+
+        &:has([formcontrolname='wardNo']) {
+          flex-basis: 112px;
+        }
+      }
+    }
+
+    // Membership: receipt and nominee
+    .shares-step .row {
+      gap: 0 16px;
+
+      > mat-form-field {
+        &:has([formcontrolname='amountReceived'], [formcontrolname='receiptNumber']) {
+          flex: 0 1 200px;
+        }
+
+        &:has([formcontrolname='nomineeRelationship'], [formcontrolname='nomineeRelationshipDetail']) {
+          flex: 0 1 280px;
+        }
+
+        &:has([formcontrolname='nomineeName']) {
+          flex: 0 1 280px;
+        }
+
+        &:has([formcontrolname='nomineeMobileNo']) {
+          flex: 0 1 168px;
+        }
+      }
+    }
+  }
+}

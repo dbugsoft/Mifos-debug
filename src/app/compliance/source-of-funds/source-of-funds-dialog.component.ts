@@ -13,6 +13,7 @@ import { MatRadioModule } from '@angular/material/radio';
 import { HttpClient } from '@angular/common/http';
 import { FormatNumberPipe } from 'app/pipes/format-number.pipe';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { RelationshipSelectComponent } from 'app/shared/relationship-select/relationship-select.component';
 
 export interface SourceOfFundsDialogData {
   product: 'SAVINGS' | 'LOAN' | 'SHARE';
@@ -66,10 +67,12 @@ export interface SourceOfFundsDialogData {
               <mat-label>{{ 'compliance.sof.Their name' | translate }}</mat-label>
               <input matInput formControlName="otherName" maxlength="200" required />
             </mat-form-field>
-            <mat-form-field>
-              <mat-label>{{ 'compliance.sof.Relationship to the member' | translate }}</mat-label>
-              <input matInput formControlName="otherRelationship" maxlength="100" required />
-            </mat-form-field>
+            <mifosx-relationship-select
+              label="compliance.sof.Relationship to the member"
+              [code]="form.controls.otherRelationshipCode"
+              [detail]="form.controls.otherRelationshipDetail"
+              [required]="true"
+            ></mifosx-relationship-select>
           </div>
         }
         @if (failed()) {
@@ -126,7 +129,8 @@ export interface SourceOfFundsDialogData {
     ...STANDALONE_SHARED_IMPORTS,
     MatDialogModule,
     MatRadioModule,
-    FormatNumberPipe
+    FormatNumberPipe,
+    RelationshipSelectComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -148,12 +152,13 @@ export class SourceOfFundsDialogComponent {
       Validators.required
     ],
     otherName: [''],
-    otherRelationship: ['']
+    otherRelationshipCode: [null as string | null],
+    otherRelationshipDetail: [null as string | null]
   });
 
   save(): void {
     const v = this.form.getRawValue();
-    if (this.form.invalid || (v.broughtBy === 'OTHER' && (!v.otherName?.trim() || !v.otherRelationship?.trim()))) {
+    if (this.form.invalid || (v.broughtBy === 'OTHER' && (!v.otherName?.trim() || !v.otherRelationshipCode))) {
       this.form.markAllAsTouched();
       return;
     }
@@ -169,7 +174,8 @@ export class SourceOfFundsDialogComponent {
         details: v.details?.trim() || null,
         broughtBy: v.broughtBy,
         otherName: v.broughtBy === 'OTHER' ? v.otherName.trim() : null,
-        otherRelationship: v.broughtBy === 'OTHER' ? v.otherRelationship.trim() : null
+        otherRelationshipCode: v.broughtBy === 'OTHER' ? v.otherRelationshipCode : null,
+        otherRelationshipDetail: v.broughtBy === 'OTHER' ? v.otherRelationshipDetail?.trim() || null : null
       })
       .subscribe({
         next: () => this.ref.close(true),

@@ -16,6 +16,7 @@ import { NepaliDateInputComponent } from 'app/shared/nepali-date-input/nepali-da
 import { KymService } from '../kym.service';
 import { KymPerson, KymView, OWNER_CONTROLS, OWNER_IDENTIFIED_BY } from '../kym.models';
 import { KymMemberPickerComponent } from '../member-picker/member-picker.component';
+import { RelationshipSelectComponent } from 'app/shared/relationship-select/relationship-select.component';
 
 /**
  * Names a beneficial owner (fineract-dbug #199): a member here, or anyone else by name, citizenship number and date of
@@ -69,10 +70,10 @@ import { KymMemberPickerComponent } from '../member-picker/member-picker.compone
           ></mifosx-nepali-date-input>
         }
         <div class="row">
-          <mat-form-field>
-            <mat-label>{{ 'kym.Relationship' | translate }}</mat-label>
-            <input matInput formControlName="relationship" />
-          </mat-form-field>
+          <mifosx-relationship-select
+            [code]="form.controls.relationshipCode"
+            [detail]="form.controls.relationshipDetail"
+          ></mifosx-relationship-select>
           <mat-form-field>
             <mat-label>{{ 'kym.How' | translate }}</mat-label>
             <mat-select formControlName="control" required>
@@ -180,7 +181,8 @@ import { KymMemberPickerComponent } from '../member-picker/member-picker.compone
     MatRadioButton,
     MatIcon,
     NepaliDateInputComponent,
-    KymMemberPickerComponent
+    KymMemberPickerComponent,
+    RelationshipSelectComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -212,10 +214,8 @@ export class KymOwnerDialogComponent {
       Validators.maxLength(50)
     ],
     dateOfBirth: [null as Date | null],
-    relationship: [
-      '',
-      Validators.maxLength(100)
-    ],
+    relationshipCode: [null as string | null],
+    relationshipDetail: [null as string | null],
     control: [
       '',
       Validators.required

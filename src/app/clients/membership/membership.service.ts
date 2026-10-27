@@ -11,6 +11,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, map, of } from 'rxjs';
 import { AuthenticationService } from 'app/core/authentication/authentication.service';
 import {
+  MemberNominee,
   MembersWithoutShares,
   MembershipApplication,
   MembershipApplyRequest,
@@ -19,7 +20,9 @@ import {
   MembershipSettings,
   MembershipSettingsView,
   MembershipStatus,
-  MembershipTemplate
+  MembershipTemplate,
+  Nominee,
+  RelationshipOption
 } from './membership.models';
 
 /**
@@ -54,6 +57,13 @@ export class MembershipService {
    */
   templateOrNull(): Observable<MembershipTemplate | null> {
     return this.canRead() ? this.template().pipe(catchError(() => of(null))) : of(null);
+  }
+
+  /** The relationships a nominee may have, in the order to show them. */
+  nomineeRelationships(): Observable<RelationshipOption[]> {
+    return this.http.get<RelationshipOption[]>('/nepal/relationships', {
+      params: new HttpParams().set('use', 'NOMINEE')
+    });
   }
 
   apply(request: MembershipApplyRequest): Observable<MembershipApplication> {
@@ -115,6 +125,15 @@ export class MembershipService {
   mayDecide(application: MembershipApplication, settings: MembershipSettings | null | undefined): boolean {
     const me = this.authenticationService.getCredentials()?.userId;
     return !settings?.separateApprover || application.submittedById == null || application.submittedById !== me;
+  }
+
+  nominee(clientId: number): Observable<MemberNominee> {
+    return this.http.get<MemberNominee>(`/nepal/memberships/nominees/${clientId}`);
+  }
+
+  /** Gives or changes the nominee (UPDATE_NOMINEE); the one before goes into the history. */
+  changeNominee(clientId: number, nominee: Nominee, note?: string): Observable<MemberNominee> {
+    return this.http.put<MemberNominee>(`/nepal/memberships/nominees/${clientId}`, { nominee, note });
   }
 
   membersWithoutShares(): Observable<MembersWithoutShares> {

@@ -1,0 +1,199 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<!-- The app's top bar, without the menu and the signed-in actions. -->
+<header class="toolbar no-print">
+  <span></span>
+  <span class="app-title">
+    <span class="hide-on-phone">{{ coopName ?? ('APP_FULL_NAME' | translate) }}</span>
+    <span class="show-on-phone">{{ coopName ?? ('APP_NAME' | translate) }}</span>
+  </span>
+  <div class="toolbar-end">
+    <mifosx-language-selector [compact]="true"></mifosx-language-selector>
+    <mifosx-theme-toggle></mifosx-theme-toggle>
+    <a mat-raised-button color="primary" routerLink="/login">{{ 'publicCalculator.Sign in' | translate }}</a>
+  </div>
+</header>
+
+<!-- The page title, as the breadcrumb shows it. -->
+<div class="page-title">
+  <h1>{{ 'publicCalculator.Loan calculator' | translate }}</h1>
+  <p class="print-only">{{ coopName ?? ('APP_NAME' | translate) }} · {{ inputsSummary() }}</p>
+</div>
+
+<div class="calculator">
+  <form [formGroup]="form" class="calculator-form no-print">
+    <div class="layout-row-wrap">
+      <mat-form-field>
+        <mat-label>{{ 'publicCalculator.How much do you want to borrow?' | translate }}</mat-label>
+        <span matTextPrefix>Rs&nbsp;</span>
+        <input
+          matInput
+          formControlName="amount"
+          inputmode="decimal"
+          (input)="groupAmount($any($event.target))"
+          required
+        />
+        @if (form.controls.amount.invalid) {
+          <mat-error>{{
+            'publicCalculator.errors.amountRange'
+              | translate: { min: money(limits.amount.min), max: money(limits.amount.max) }
+          }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>{{ 'publicCalculator.Interest rate (% a year)' | translate }}</mat-label>
+        <input matInput formControlName="rate" inputmode="decimal" required />
+        <span matTextSuffix>%</span>
+        <mat-hint>{{ 'publicCalculator.rateHint' | translate }}</mat-hint>
+        @if (form.controls.rate.invalid) {
+          <mat-error>{{
+            'publicCalculator.errors.rateRange'
+              | translate: { min: limits.ratePercent.min, max: limits.ratePercent.max }
+          }}</mat-error>
+        }
+      </mat-form-field>
+
+      <div class="period" role="group" [attr.aria-label]="'publicCalculator.For how long?' | translate">
+        <span class="period-label">{{ 'publicCalculator.For how long?' | translate }}</span>
+        <mat-form-field>
+          <mat-label>{{ 'publicCalculator.Years' | translate }}</mat-label>
+          <input matInput type="number" min="0" max="20" step="1" formControlName="years" />
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>{{ 'publicCalculator.Months' | translate }}</mat-label>
+          <input matInput type="number" min="0" max="11" step="1" formControlName="months" />
+        </mat-form-field>
+        @if (form.hasError('periodRange')) {
+          <p class="period-error" role="alert">{{ 'publicCalculator.errors.periodRange' | translate }}</p>
+        }
+        @if (form.hasError('periodNotDivisible')) {
+          <p class="period-error" role="alert">
+            {{
+              'publicCalculator.errors.periodNotDivisible'
+                | translate: { months: totalMonths(), suggestions: periodSuggestions() }
+            }}
+          </p>
+        }
+      </div>
+    </div>
+
+    <button mat-button type="button" class="more-toggle" (click)="moreOptions.set(!moreOptions())">
+      <fa-icon icon="chevron-down" class="m-r-10 chevron" [class.open]="moreOptions()"></fa-icon>
+      {{ (moreOptions() ? 'publicCalculator.Fewer options' : 'publicCalculator.More options') | translate }}
+    </button>
+
+    @if (moreOptions()) {
+      <div class="layout-row-wrap more">
+        <mat-form-field>
+          <mat-label>{{ 'publicCalculator.How often you pay' | translate }}</mat-label>
+          <mat-select formControlName="monthsPerPayment">
+            <mat-option [value]="1">{{ 'publicCalculator.Every month' | translate }}</mat-option>
+            <mat-option [value]="3">{{ 'publicCalculator.Every 3 months' | translate }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mifosx-nepali-date-input
+          [inline]="true"
+          [label]="'publicCalculator.When you take the loan' | translate"
+          formControlName="startDate"
+        />
+
+        <div class="method">
+          <span class="method-label">{{ 'publicCalculator.How you pay it back' | translate }}</span>
+          <mat-radio-group formControlName="method">
+            <mat-radio-button value="same">
+              {{ 'publicCalculator.Same amount every time' | translate }}
+              <span class="hint">{{ 'publicCalculator.sameHint' | translate }}</span>
+            </mat-radio-button>
+            <mat-radio-button value="smaller">
+              {{ 'publicCalculator.Smaller amount each time' | translate }}
+              <span class="hint">{{ 'publicCalculator.smallerHint' | translate }}</span>
+            </mat-radio-button>
+          </mat-radio-group>
+        </div>
+      </div>
+    }
+  </form>
+
+  @if (estimate(); as e) {
+    <div class="totals" aria-live="polite">
+      <mat-card class="answer">
+        <mat-card-content>
+          <span class="answer-text">{{ answer()!.key | translate: answer()!.params }}</span>
+          <span class="hint">{{ 'publicCalculator.estimateNote' | translate }}</span>
+        </mat-card-content>
+      </mat-card>
+      <mat-card>
+        <mat-card-content>
+          <span class="label">{{ 'publicCalculator.Total interest' | translate }}</span>
+          <span class="value">Rs {{ money(e.totalInterest) }}</span>
+        </mat-card-content>
+      </mat-card>
+      <mat-card>
+        <mat-card-content>
+          <span class="label">{{ 'publicCalculator.Total you pay back' | translate }}</span>
+          <span class="value">Rs {{ money(e.totalRepayment) }}</span>
+        </mat-card-content>
+      </mat-card>
+      <mat-card>
+        <mat-card-content>
+          <span class="label">{{ 'publicCalculator.Last payment' | translate }}</span>
+          <span class="value"><mifosx-dual-date [date]="e.rows.at(-1)!.dueDate" [stacked]="true" /></span>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <mat-card class="split no-print">
+      <mat-card-content>
+        <div
+          class="split-bar"
+          role="img"
+          [attr.aria-label]="'publicCalculator.interestShare' | translate: { percent: interestPercent() }"
+        >
+          <span class="loan-part" [style.flex-grow]="e.totalPrincipal"></span>
+          <span class="interest-part" [style.flex-grow]="e.totalInterest"></span>
+        </div>
+        <div class="split-legend">
+          <span
+            ><i class="swatch loan-part"></i>{{ 'publicCalculator.Loan amount' | translate }} Rs
+            {{ money(e.totalPrincipal) }}</span
+          >
+          <span
+            ><i class="swatch interest-part"></i>{{ 'publicCalculator.Interest' | translate }} Rs
+            {{ money(e.totalInterest) }}</span
+          >
+          <span class="hint">{{ 'publicCalculator.interestShare' | translate: { percent: interestPercent() } }}</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <div class="actions no-print">
+      <button mat-button type="button" (click)="scheduleOpen.set(!scheduleOpen())">
+        <fa-icon icon="chevron-down" class="m-r-10 chevron" [class.open]="scheduleOpen()"></fa-icon>
+        {{ (scheduleOpen() ? 'publicCalculator.Hide the payments' : 'publicCalculator.See every payment') | translate }}
+      </button>
+      <span class="spacer"></span>
+      <button mat-button type="button" (click)="share()">
+        <fa-icon icon="share-alt" class="m-r-10"></fa-icon>{{ 'labels.buttons.Share' | translate }}
+      </button>
+      <button mat-raised-button color="primary" type="button" (click)="print()">
+        <fa-icon icon="print" class="m-r-10"></fa-icon>{{ 'labels.buttons.Print' | translate }}
+      </button>
+    </div>
+
+    <mifosx-loan-schedule
+      [class.closed]="!scheduleOpen()"
+      [rows]="e.rows"
+      [totals]="totals()!"
+      [headings]="headings"
+      [printChart]="false"
+    />
+  }
+</div>

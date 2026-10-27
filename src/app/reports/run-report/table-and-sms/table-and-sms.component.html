@@ -6,14 +6,15 @@
   file, You can obtain one at http://mozilla.org/MPL/2.0/.
 -->
 
-<div class="container">
-  @if (!hideOutput && !toBeExportedToRepo) {
+<div class="container output-area" [attr.aria-busy]="loading">
+  @if (loaded && !toBeExportedToRepo) {
     <div>
       @if (!notExistsReportData && !hasError && dataObject.report.type === 'Table') {
-        <div class="m-b-10 gap-45px" align="end">
+        <div class="export-actions">
           <button
             mat-raised-button
             color="primary"
+            [disabled]="loading"
             (click)="exportFile()"
             matToolTip="{{ 'labels.text.Export the data to CSV file' | translate }}"
           >
@@ -22,6 +23,7 @@
           <button
             mat-raised-button
             color="primary"
+            [disabled]="loading"
             (click)="exportToXLS()"
             matToolTip="{{ 'labels.text.Export the data to XLS file' | translate }}"
           >
@@ -66,24 +68,16 @@
     </div>
   }
 
-  @if (!hideOutput && toBeExportedToRepo) {
+  @if (loaded && toBeExportedToRepo) {
     <div class="empty-state">
       <mat-icon class="empty-state__icon">cloud_upload</mat-icon>
       <p class="empty-state__message">{{ 'labels.text.The report request' | translate }}</p>
     </div>
   }
 
-  @if (hideOutput) {
-    <div class="loader">
-      <div class="loading"></div>
-    </div>
-  }
-
-  @if (!hideOutput) {
-    <div class="back-button">
-      <button type="button" color="primary" mat-raised-button [routerLink]="['../..']">
-        <fa-icon icon="arrow-left" class="m-r-10"></fa-icon>{{ 'labels.buttons.Back' | translate }}
-      </button>
+  @if (loading) {
+    <div class="loading-overlay" [class.initial]="!loaded">
+      <mat-progress-spinner mode="indeterminate" diameter="40"></mat-progress-spinner>
     </div>
   }
 </div>

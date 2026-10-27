@@ -68,6 +68,7 @@ export class MembershipSettingsComponent implements OnInit {
     separateApprover: [false],
     paymentTaken: ['AT_APPROVAL' as PaymentTaken],
     nomineeRequired: [false],
+    nomineeRelationshipFromList: [false],
     kymRequiredForApproval: [true],
     savingsProductId: [null as number | null],
     shareProductId: [null as number | null]
@@ -135,6 +136,7 @@ export class MembershipSettingsComponent implements OnInit {
         separateApprover: !!v.separateApprover,
         paymentTaken: v.paymentTaken ?? 'AT_APPROVAL',
         nomineeRequired: !!v.nomineeRequired,
+        nomineeRelationshipFromList: !!v.nomineeRelationshipFromList,
         kymRequiredForApproval: v.kymRequiredForApproval !== false,
         savingsProductId: v.savingsProductId ?? undefined,
         shareProductId: v.shareProductId ?? undefined
@@ -172,6 +174,7 @@ export class MembershipSettingsComponent implements OnInit {
           separateApprover: !!s.separateApprover,
           paymentTaken: s.paymentTaken ?? 'AT_APPROVAL',
           nomineeRequired: !!s.nomineeRequired,
+          nomineeRelationshipFromList: !!s.nomineeRelationshipFromList,
           kymRequiredForApproval: s.kymRequiredForApproval !== false,
           savingsProductId: s.savingsProductId ?? null,
           shareProductId: s.shareProductId ?? null
