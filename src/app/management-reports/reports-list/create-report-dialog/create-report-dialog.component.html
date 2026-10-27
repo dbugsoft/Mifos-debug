@@ -1,0 +1,70 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<h2 mat-dialog-title>
+  <mat-icon>{{ data.replaces ? 'edit_note' : 'add_chart' }}</mat-icon>
+  {{ (data.replaces ? 'managementReports.MakeACorrectedReport' : 'managementReports.NewReport') | translate }}
+</h2>
+<form [formGroup]="form" (ngSubmit)="save()">
+  <mat-dialog-content>
+    @if (serverError()) {
+      <div class="server-error">
+        <mat-icon>error_outline</mat-icon>
+        <span>{{ serverError() }}</span>
+      </div>
+    }
+
+    @if (data.replaces) {
+      <div class="notice">
+        <mat-icon>info</mat-icon>
+        <span>{{
+          'managementReports.ReplacesHint' | translate: { from: data.replaces.fromBs, to: data.replaces.toBs }
+        }}</span>
+      </div>
+    }
+
+    <h3 class="section">{{ 'managementReports.Period' | translate }}</h3>
+    <mifosx-nepali-date-input
+      [inline]="true"
+      formControlName="from"
+      [label]="'managementReports.From' | translate"
+      [maxDate]="today"
+    ></mifosx-nepali-date-input>
+    <mifosx-nepali-date-input
+      [inline]="true"
+      formControlName="to"
+      [label]="'managementReports.To' | translate"
+      [maxDate]="today"
+    ></mifosx-nepali-date-input>
+
+    <mat-form-field class="field">
+      <mat-icon matPrefix>business</mat-icon>
+      <mat-label>{{ 'labels.inputs.Office' | translate }}</mat-label>
+      <mat-select formControlName="officeId">
+        <mat-option [value]="null">{{ 'managementReports.MyOffice' | translate }}</mat-option>
+        @for (o of offices; track o.id) {
+          <mat-option [value]="o.id">{{ o.nameDecorated || o.name }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field class="field">
+      <mat-label>{{ 'labels.inputs.Note' | translate }}</mat-label>
+      <textarea matInput formControlName="notes" rows="3" maxlength="4000"></textarea>
+    </mat-form-field>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-stroked-button type="button" mat-dialog-close>{{ 'labels.buttons.Cancel' | translate }}</button>
+    <button mat-raised-button color="primary" type="submit" [disabled]="busy()">
+      @if (busy()) {
+        <mat-icon class="spin">autorenew</mat-icon>
+      }
+      {{ 'labels.buttons.Submit' | translate }}
+    </button>
+  </mat-dialog-actions>
+</form>

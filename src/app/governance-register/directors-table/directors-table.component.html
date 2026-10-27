@@ -1,0 +1,100 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="compliance-page">
+  <div class="filters">
+    <mifosx-nepali-date-input
+      [inline]="true"
+      [formControl]="asOf"
+      [label]="'governanceRegister.committees.AsOf' | translate"
+      [maxDate]="today"
+    ></mifosx-nepali-date-input>
+    <button mat-raised-button color="primary" type="button" (click)="load()">
+      <mat-icon>search</mat-icon>{{ 'governanceRegister.committees.Find' | translate }}
+    </button>
+  </div>
+
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
+
+  @if (table(); as t) {
+    <div class="tiles">
+      <div class="tile">
+        <span class="label">{{ 'governanceRegister.committees.AsOf' | translate }}</span>
+        <span class="value">{{ (t.asOf | adToBs) || t.asOf }}</span>
+        @if (t.termYears) {
+          <span class="sub">{{ 'governanceRegister.committees.yearTerm' | translate: { years: t.termYears } }}</span>
+        }
+      </div>
+      <div class="tile">
+        <span class="label">{{ 'governanceRegister.directors.DirectorsTable' | translate }}</span>
+        <span class="value">{{ t.directors.length }}</span>
+      </div>
+      <div class="tile" [class.bad]="ranOutCount() > 0">
+        <span class="label">{{ 'governanceRegister.RanOut' | translate }}</span>
+        <span class="value">{{ ranOutCount() }}</span>
+      </div>
+    </div>
+
+    <section class="frame">
+      <h2 class="legend">{{ 'governanceRegister.directors.DirectorsTable' | translate }}</h2>
+      @if (t.directors.length) {
+        <div class="table-card mat-elevation-z8">
+          <div class="table-scroll">
+            <table class="blue">
+              <thead>
+                <tr>
+                  <th>{{ 'labels.inputs.name' | translate }}</th>
+                  <th>{{ 'governanceRegister.Position' | translate }}</th>
+                  <th>{{ 'governanceRegister.ServingSince' | translate }}</th>
+                  <th>{{ 'governanceRegister.TermEndsOn' | translate }}</th>
+                  <th>{{ 'governanceRegister.directors.WhatIsLeft' | translate }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (d of t.directors; track d.personId) {
+                  <tr>
+                    <td>
+                      @if (d.clientId) {
+                        <a [routerLink]="['/members', d.clientId]">{{ d.name }}</a>
+                      } @else {
+                        {{ d.name }}
+                      }
+                    </td>
+                    <td>{{ positionLabel(d.positionCode, d.positionName) | translate }}</td>
+                    <td>{{ (d.servingSince | adToBs) || d.servingSince }}</td>
+                    <td>{{ (d.termEndsOn | adToBs) || d.termEndsOn || '-' }}</td>
+                    <td>
+                      @if (d.remaining; as r) {
+                        @if (r.ranOut) {
+                          <span class="chip amber">{{ 'governanceRegister.RanOut' | translate }}</span>
+                        } @else {
+                          <span class="chip green">
+                            {{
+                              'governanceRegister.directors.remaining'
+                                | translate: { years: r.years, months: r.months, days: r.days }
+                            }}
+                          </span>
+                        }
+                      } @else {
+                        -
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      } @else {
+        <p class="empty">{{ 'governanceRegister.directors.Empty' | translate }}</p>
+      }
+    </section>
+  }
+</div>

@@ -1,0 +1,96 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="compliance-page">
+  <div class="filters">
+    <mat-form-field class="year" subscriptSizing="dynamic">
+      <mat-label>{{ 'governanceRegister.declarations.FiscalYear' | translate }}</mat-label>
+      <input matInput type="number" [formControl]="fiscalYear" (keydown.enter)="load()" />
+    </mat-form-field>
+    <button mat-raised-button color="primary" type="button" (click)="load()">
+      <mat-icon>search</mat-icon>{{ 'governanceRegister.committees.Find' | translate }}
+    </button>
+  </div>
+
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
+
+  @if (table(); as t) {
+    <div class="tiles">
+      <div class="tile">
+        <span class="label">{{ 'governanceRegister.declarations.FiscalYear' | translate }}</span>
+        <span class="value">{{ t.fiscalYearLabel }}</span>
+        <span class="sub"
+          >{{ 'governanceRegister.declarations.DueOn' | translate }} {{ (t.dueOn | adToBs) || t.dueOn }}</span
+        >
+      </div>
+      <div class="tile">
+        <span class="label">{{ 'governanceRegister.declarations.Declared' | translate }}</span>
+        <span class="value">{{ t.declared }}</span>
+      </div>
+      <div class="tile" [class.bad]="t.missing > 0">
+        <span class="label">{{ 'governanceRegister.declarations.Missing' | translate }}</span>
+        <span class="value">{{ t.missing }}</span>
+      </div>
+    </div>
+
+    <section class="frame">
+      <h2 class="legend">{{ 'governanceRegister.declarations.WhoHasDeclared' | translate }}</h2>
+      @if (t.people.length) {
+        <div class="table-card mat-elevation-z8">
+          <div class="table-scroll">
+            <table class="blue">
+              <thead>
+                <tr>
+                  <th>{{ 'labels.inputs.name' | translate }}</th>
+                  <th>{{ 'governanceRegister.Committee' | translate }}</th>
+                  <th>{{ 'governanceRegister.declarations.DeclaredOn' | translate }}</th>
+                  <th>{{ 'labels.inputs.Status' | translate }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (p of t.people; track p.personId) {
+                  <tr>
+                    <td>
+                      @if (p.clientId) {
+                        <a [routerLink]="['/members', p.clientId]">{{ p.name }}</a>
+                        <span class="sub">{{ p.accountNo }}</span>
+                      } @else {
+                        {{ p.name }}
+                      }
+                    </td>
+                    <td>
+                      @for (code of p.committees; track code) {
+                        <span class="chip blue">{{ 'governanceRegister.committee.' + code | translate }}</span>
+                      }
+                    </td>
+                    <td>{{ (p.declaredOn | adToBs) || p.declaredOn || '-' }}</td>
+                    <td>
+                      <span
+                        class="chip"
+                        [class.green]="p.status === 'DECLARED'"
+                        [class.amber]="p.status === 'LATE' || p.status === 'DUE'"
+                        [class.red]="p.status === 'OVERDUE'"
+                        [class.grey]="p.status === 'NOT_YET'"
+                      >
+                        {{ 'governanceRegister.declarationStatus.' + p.status | translate }}
+                      </span>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      } @else {
+        <p class="empty">{{ 'governanceRegister.declarations.Empty' | translate }}</p>
+      }
+    </section>
+  }
+</div>

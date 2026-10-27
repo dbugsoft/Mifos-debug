@@ -1,0 +1,117 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+@use 'app/compliance/compliance' as compliance;
+
+@include compliance.page;
+
+// Same elevated-card look as the report detail page and the governance register's committee cards, instead of the
+// shared "framed section with a legend floating on the border" style - kept consistent across the whole module.
+.report-card {
+  margin: 0 0 16px;
+  padding: 18px 20px;
+  border-radius: 14px;
+  background: var(--mat-sys-surface, var(--dk-surface, #fff));
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 14px;
+  font-size: 1rem;
+  font-weight: 700;
+
+  mat-icon {
+    color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+  }
+}
+
+.shortcuts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 16px;
+
+  .field {
+    width: 220px;
+    max-width: 100%;
+  }
+
+  .field--year {
+    width: 140px;
+  }
+
+  .grow {
+    flex: 1;
+  }
+}
+
+.row {
+  cursor: pointer;
+
+  &:hover {
+    background: rgb(127 127 127 / 6%);
+  }
+}
+
+// table.blue's own header styling (in the shared compliance mixin) targets Angular Material's mat-table markup
+// (.mat-mdc-header-row/th.mat-mdc-header-cell); this is a plain <table><thead>, so it never matches. Same blue
+// header, aimed at the real markup instead - and border-collapse removes the default 2px border-spacing gap
+// a plain <table> otherwise leaves between the header cells (see governance-register's people page, same fix).
+table.blue {
+  border-collapse: collapse;
+}
+
+table.blue thead th {
+  padding: 16px 20px;
+  background: var(--md-sys-color-primary, var(--dk-fill, #2460b9));
+  color: #fff;
+  font-weight: 600;
+  border-bottom: none;
+  white-space: nowrap;
+}
+
+table.blue thead th:not(:last-child) {
+  border-right: 1px solid rgb(255 255 255 / 25%);
+}
+
+// The shared compliance mixin's own table.blue td padding (8px) was sized for a denser Material table, not this
+// plain one - against the header's own 16px/20px padding it made every data row look squeezed and small by
+// comparison. Matched to the header so the table reads as one consistent size, not a big header over tiny rows.
+table.blue tbody td {
+  padding: 16px 20px;
+  font-size: 0.95rem;
+  border-bottom: 1px solid var(--dk-border, #e2e8f0);
+}
+
+table.blue tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.table-card {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.table-card .table-scroll {
+  overflow-x: auto;
+}
+
+.table-card table.blue {
+  border: 0;
+  border-radius: 0;
+}

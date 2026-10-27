@@ -1,0 +1,49 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+/* Matches the breadcrumb bar's own width/max-width exactly, so the two share
+   the same centered left edge instead of drifting apart at wider viewports. */
+.shell {
+  width: 90%;
+  max-width: 84rem;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.navigation-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  overflow: auto;
+  border-bottom: 1px solid var(--dk-border, #e2e8f0);
+
+  // A filled blue pill on the current tab instead of the underline indicator (the tab-link's own template
+  // classes, not this component's markup, so reaching them needs ::ng-deep).
+  // stylelint-disable-next-line selector-pseudo-element-no-unknown
+  ::ng-deep .mat-mdc-tab-link {
+    height: 40px;
+    border-radius: 8px;
+    color: var(--dk-text, #334155);
+
+    .mdc-tab-indicator {
+      display: none;
+    }
+
+    &.mdc-tab--active {
+      background: var(--md-sys-color-primary, var(--dk-fill, #2460b9));
+
+      .mdc-tab__text-label {
+        color: #fff;
+      }
+    }
+  }
+}
+
+.tab-panel {
+  padding: 20px 0 0;
+}

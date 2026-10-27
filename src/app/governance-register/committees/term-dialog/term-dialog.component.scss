@@ -1,0 +1,131 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+[mat-dialog-title] {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.committee-name {
+  color: var(--dk-text-muted, rgb(127 127 127));
+  font-size: 0.9rem;
+  font-weight: 400;
+}
+
+.field {
+  display: block;
+  width: 100%;
+}
+
+.section {
+  margin: 20px 0 10px;
+  color: var(--dk-text-2, #334155);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+// Full width, stacked, one per row: the inline BS/AD picker (date text + calendar icon + the BS|AD toggle + the
+// converted date) needs more room than half a dialog gives it - a side-by-side grid made the two fields overlap.
+mifosx-nepali-date-input {
+  margin-bottom: 16px;
+}
+
+.toggle {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+
+  button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+}
+
+.who {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: var(--dk-surface-2, #f1f5f9);
+  font-weight: 600;
+
+  mat-icon {
+    color: var(--dk-text-muted, rgb(127 127 127));
+  }
+
+  &.picked {
+    border: 1px solid var(--dk-success-border, #bbf7d0);
+    background: var(--dk-success-soft, #f0fdf4);
+
+    mat-icon {
+      color: var(--dk-success, #16a34a);
+    }
+  }
+
+  button {
+    margin-left: auto;
+  }
+}
+
+.no-match {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: -8px 0 16px;
+  color: var(--dk-text-muted, rgb(127 127 127));
+  font-size: 13px;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.add-new-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: -8px 0 16px;
+}
+
+.server-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  border-left: 3px solid var(--dk-danger, #c62828);
+  border-radius: 6px;
+  background: var(--dk-danger-soft, #ffebee);
+  color: var(--dk-danger, #c62828);
+  font-size: 14px;
+}
+
+.spin {
+  margin-right: 6px;
+  animation: mfx-spin 1s linear infinite;
+}
+
+@keyframes mfx-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}

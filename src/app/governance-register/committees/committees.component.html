@@ -1,0 +1,150 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="compliance-page">
+  <div class="filters">
+    <mifosx-nepali-date-input
+      [inline]="true"
+      [formControl]="asOf"
+      [label]="'governanceRegister.committees.AsOf' | translate"
+      [maxDate]="today"
+    ></mifosx-nepali-date-input>
+    <mat-checkbox [checked]="includeInactive()" (change)="toggleInactive($event)">
+      {{ 'governanceRegister.committees.IncludeInactive' | translate }}
+    </mat-checkbox>
+    <span class="grow"></span>
+    <button mat-stroked-button type="button" (click)="managePositions()" *mifosxHasPermission="'UPDATE_GOVERNANCE'">
+      <mat-icon>badge</mat-icon>{{ 'governanceRegister.positions.Positions' | translate }}
+    </button>
+    <button
+      mat-raised-button
+      color="primary"
+      type="button"
+      (click)="addCommittee()"
+      *mifosxHasPermission="'UPDATE_GOVERNANCE'"
+    >
+      <mat-icon>add</mat-icon>{{ 'governanceRegister.committees.AddCommittee' | translate }}
+    </button>
+  </div>
+
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
+
+  @if (!loading() && !committees().length) {
+    <p class="empty">{{ 'governanceRegister.committees.Empty' | translate }}</p>
+  }
+
+  @for (c of committees(); track c.id) {
+    <section class="committee-card mat-elevation-z2" [class.inactive]="!c.active">
+      <div class="card-header">
+        <div class="title-group">
+          <h2 class="title">{{ committeeLabel(c) | translate }}</h2>
+          @if (c.termYears) {
+            <span class="term-length">{{
+              'governanceRegister.committees.yearTerm' | translate: { years: c.termYears }
+            }}</span>
+          }
+          @if (!c.active) {
+            <span class="chip grey">{{ 'governanceRegister.committees.Inactive' | translate }}</span>
+          }
+        </div>
+        <div class="actions" *mifosxHasPermission="'UPDATE_GOVERNANCE'">
+          <button mat-stroked-button type="button" (click)="editCommittee(c)">
+            <mat-icon>edit</mat-icon>{{ 'labels.buttons.Edit' | translate }}
+          </button>
+          <button mat-flat-button color="primary" type="button" (click)="addPerson(c)">
+            <mat-icon>person_add</mat-icon>{{ 'governanceRegister.committees.AddPerson' | translate }}
+          </button>
+        </div>
+      </div>
+
+      @for (w of c.warnings; track w.code + (w.personId ?? '')) {
+        <div class="notice">
+          <mat-icon>warning_amber</mat-icon>
+          <span>{{
+            'governanceRegister.warning.' + w.code | translate: { personName: w.personName, detail: w.detail }
+          }}</span>
+        </div>
+      }
+
+      @if (c.members.length) {
+        <div class="table-card mat-elevation-z8">
+          <div class="table-scroll">
+            <table class="blue">
+              <thead>
+                <tr>
+                  <th>{{ 'governanceRegister.Person' | translate }}</th>
+                  <th>{{ 'governanceRegister.Position' | translate }}</th>
+                  <th>{{ 'governanceRegister.ServingSince' | translate }}</th>
+                  <th>{{ 'governanceRegister.TermEndsOn' | translate }}</th>
+                  <th *mifosxHasPermission="'UPDATE_GOVERNANCE'">{{ 'labels.inputs.Actions' | translate }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (t of c.members; track t.id) {
+                  <tr>
+                    <td>
+                      @if (t.clientId) {
+                        <a [routerLink]="['/members', t.clientId]">{{ t.personName }}</a>
+                      } @else {
+                        {{ t.personName }}
+                      }
+                      <span class="sub">
+                        <a [routerLink]="['/governance-register/people', t.personId]">{{
+                          'governanceRegister.ViewTheFile' | translate
+                        }}</a>
+                      </span>
+                    </td>
+                    <td>{{ positionLabel(t) | translate }}</td>
+                    <td>{{ (t.servingSince | adToBs) || t.servingSince }}</td>
+                    <td>
+                      {{ (t.expectedEndOn | adToBs) || t.expectedEndOn || '-' }}
+                      @if (t.remaining?.ranOut) {
+                        <span class="chip amber">{{ 'governanceRegister.RanOut' | translate }}</span>
+                      }
+                    </td>
+                    <td *mifosxHasPermission="'UPDATE_GOVERNANCE'">
+                      <button
+                        mat-icon-button
+                        type="button"
+                        [matTooltip]="'governanceRegister.committees.ChangePosition' | translate"
+                        (click)="changePosition(c, t)"
+                      >
+                        <mat-icon>swap_horiz</mat-icon>
+                      </button>
+                      <button
+                        mat-icon-button
+                        type="button"
+                        [matTooltip]="'governanceRegister.committees.EndTerm' | translate"
+                        (click)="endTerm(t)"
+                      >
+                        <mat-icon>event_busy</mat-icon>
+                      </button>
+                      <button
+                        mat-icon-button
+                        color="warn"
+                        type="button"
+                        [matTooltip]="'governanceRegister.committees.Void' | translate"
+                        (click)="voidTerm(t)"
+                      >
+                        <mat-icon>block</mat-icon>
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      } @else if (!c.warnings.length) {
+        <p class="empty">{{ 'governanceRegister.committees.NobodyServing' | translate }}</p>
+      }
+    </section>
+  }
+</div>

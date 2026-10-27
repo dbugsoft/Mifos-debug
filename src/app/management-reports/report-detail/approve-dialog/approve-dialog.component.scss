@@ -1,0 +1,64 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+[mat-dialog-title] {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.field {
+  display: block;
+  width: 100%;
+}
+
+.notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  border: 1px solid var(--dk-warning, #f0d08a);
+  border-radius: 8px;
+  background: var(--dk-warning-soft, #fff4dc);
+  color: var(--dk-text, #5c3d00);
+  font-size: 0.875rem;
+
+  mat-icon {
+    flex: none;
+    color: var(--dk-warning, #c77700);
+  }
+}
+
+.server-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  border-left: 3px solid var(--dk-danger, #c62828);
+  border-radius: 6px;
+  background: var(--dk-danger-soft, #ffebee);
+  color: var(--dk-danger, #c62828);
+  font-size: 14px;
+}
+
+.spin {
+  margin-right: 6px;
+  animation: mfx-spin 1s linear infinite;
+}
+
+@keyframes mfx-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}

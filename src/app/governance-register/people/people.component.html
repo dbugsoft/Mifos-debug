@@ -1,0 +1,101 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="compliance-page">
+  <div class="filters">
+    <mat-form-field class="search" subscriptSizing="dynamic">
+      <mat-label>{{ 'governanceRegister.people.Search' | translate }}</mat-label>
+      <input
+        matInput
+        [formControl]="search"
+        (keydown.enter)="load()"
+        placeholder="{{ 'governanceRegister.people.searchHint' | translate }}"
+      />
+    </mat-form-field>
+    <mat-checkbox [checked]="currentOnly()" (change)="toggleCurrent($event)">
+      {{ 'governanceRegister.people.CurrentlyServing' | translate }}
+    </mat-checkbox>
+    <button mat-raised-button color="primary" type="button" (click)="load()">
+      <mat-icon>search</mat-icon>{{ 'governanceRegister.committees.Find' | translate }}
+    </button>
+    <span class="grow"></span>
+    <button mat-raised-button color="primary" type="button" (click)="add()" *mifosxHasPermission="'UPDATE_GOVERNANCE'">
+      <mat-icon>person_add</mat-icon>{{ 'governanceRegister.people.AddPerson' | translate }}
+    </button>
+  </div>
+
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
+
+  @if (!loading()) {
+    <div class="tiles">
+      <div class="tile">
+        <span class="label">{{ 'governanceRegister.people.ThePeople' | translate }}</span>
+        <span class="value">{{ people().length }}</span>
+      </div>
+      <div class="tile">
+        <span class="label">{{ 'governanceRegister.people.CurrentlyServing' | translate }}</span>
+        <span class="value">{{ servingCount() }}</span>
+      </div>
+    </div>
+  }
+
+  @if (people().length) {
+    <div class="table-card mat-elevation-z8">
+      <div class="table-scroll">
+        <table class="blue">
+          <thead>
+            <tr>
+              <th>{{ 'labels.inputs.name' | translate }}</th>
+              <th>{{ 'governanceRegister.people.Member' | translate }}</th>
+              <th>{{ 'governanceRegister.people.CurrentPositions' | translate }}</th>
+              <th>{{ 'labels.inputs.Office' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (p of people(); track p.id) {
+              <tr class="row" tabindex="0" (click)="open(p)" (keydown.enter)="open(p)">
+                <td>
+                  {{ p.name }}
+                  @if (p.phone) {
+                    <span class="sub">{{ p.phone }}</span>
+                  }
+                </td>
+                <td>
+                  @if (p.clientId) {
+                    {{ p.accountNo }}
+                    <span
+                      class="chip"
+                      [class.green]="p.memberStatus === 'ACTIVE'"
+                      [class.grey]="p.memberStatus !== 'ACTIVE'"
+                    >
+                      {{ 'governanceRegister.people.status.' + (p.memberStatus ?? 'NOT_ACTIVE') | translate }}
+                    </span>
+                  } @else {
+                    {{ 'governanceRegister.people.NotAMember' | translate }}
+                  }
+                </td>
+                <td>
+                  @for (t of p.current; track t.id) {
+                    <span class="chip blue">{{ positionLabel(t) | translate }} · {{ t.committeeName }}</span>
+                  } @empty {
+                    <span class="sub">{{ 'governanceRegister.people.NothingServing' | translate }}</span>
+                  }
+                </td>
+                <td>{{ p.officeName }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  } @else if (!loading()) {
+    <p class="empty">{{ 'governanceRegister.people.Empty' | translate }}</p>
+  }
+</div>

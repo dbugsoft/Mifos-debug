@@ -1,0 +1,119 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<h2 mat-dialog-title>
+  <mat-icon>{{ editing ? 'edit' : 'person_add' }}</mat-icon>
+  {{ (editing ? 'governanceRegister.people.EditPerson' : 'governanceRegister.people.AddPerson') | translate }}
+</h2>
+<form [formGroup]="form" (ngSubmit)="save()">
+  <mat-dialog-content>
+    @if (serverError()) {
+      <div class="server-error">
+        <mat-icon>error_outline</mat-icon>
+        <span>{{ serverError() }}</span>
+      </div>
+    }
+
+    @if (editing) {
+      <div class="who">
+        <mat-icon>person</mat-icon>
+        <span>{{ data.person?.name }}</span>
+      </div>
+    } @else {
+      <h3 class="section">{{ 'governanceRegister.people.WhoAreYouAdding' | translate }}</h3>
+      <div class="toggle">
+        <button mat-stroked-button type="button" [color]="isMember() ? 'primary' : undefined" (click)="setMember(true)">
+          <mat-icon>badge</mat-icon>{{ 'governanceRegister.people.AnExistingMember' | translate }}
+        </button>
+        <button
+          mat-stroked-button
+          type="button"
+          [color]="!isMember() ? 'primary' : undefined"
+          (click)="setMember(false)"
+        >
+          <mat-icon>person_outline</mat-icon>{{ 'governanceRegister.people.NotAMember' | translate }}
+        </button>
+      </div>
+
+      @if (isMember()) {
+        @if (picked()) {
+          <div class="who picked">
+            <mat-icon>check_circle</mat-icon>
+            <span>{{ picked()?.name }} · {{ picked()?.accountNo }}</span>
+            <button mat-button type="button" (click)="picked.set(null)">
+              {{ 'governanceRegister.committees.ChoseAnother' | translate }}
+            </button>
+          </div>
+        } @else {
+          <mifosx-kym-member-picker
+            [label]="'governanceRegister.people.FindTheMember'"
+            (picked)="pickMember($event)"
+          ></mifosx-kym-member-picker>
+          @if (missingMember) {
+            <p class="field-error">
+              <mat-icon>warning_amber</mat-icon>{{ 'governanceRegister.people.PleaseChooseAMember' | translate }}
+            </p>
+          }
+        }
+      } @else {
+        <mat-form-field class="field">
+          <mat-label>{{ 'labels.inputs.name' | translate }}</mat-label>
+          <input matInput formControlName="name" maxlength="200" />
+          @if (form.controls.name.hasError('required')) {
+            <mat-error>{{ 'governanceRegister.people.NameIsRequired' | translate }}</mat-error>
+          }
+          @if (form.controls.name.hasError('server')) {
+            <mat-error>{{ form.controls.name.getError('server') }}</mat-error>
+          }
+        </mat-form-field>
+      }
+
+      <h3 class="section">{{ 'governanceRegister.people.ContactDetails' | translate }}</h3>
+    }
+
+    <div class="contact-grid">
+      <mat-form-field class="field">
+        <mat-label>{{ 'labels.inputs.Mobile Number' | translate }}</mat-label>
+        <input matInput formControlName="phone" maxlength="30" />
+        @if (form.controls.phone.hasError('server')) {
+          <mat-error>{{ form.controls.phone.getError('server') }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field class="field">
+        <mat-label>{{ 'labels.inputs.Email' | translate }}</mat-label>
+        <input matInput formControlName="email" maxlength="200" />
+        @if (form.controls.email.hasError('email')) {
+          <mat-error>{{ 'labels.inputs.Email is invalid' | translate }}</mat-error>
+        }
+        @if (form.controls.email.hasError('server')) {
+          <mat-error>{{ form.controls.email.getError('server') }}</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <mat-form-field class="field">
+      <mat-label>{{ 'labels.inputs.Address' | translate }}</mat-label>
+      <input matInput formControlName="address" maxlength="500" />
+    </mat-form-field>
+
+    <mat-form-field class="field">
+      <mat-label>{{ 'labels.inputs.Note' | translate }}</mat-label>
+      <textarea matInput formControlName="note" rows="2" maxlength="1000"></textarea>
+    </mat-form-field>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-stroked-button type="button" mat-dialog-close>{{ 'labels.buttons.Cancel' | translate }}</button>
+    <button mat-raised-button color="primary" type="submit" [disabled]="busy()">
+      @if (busy()) {
+        <mat-icon class="spin">autorenew</mat-icon>
+      }
+      {{ 'labels.buttons.Submit' | translate }}
+    </button>
+  </mat-dialog-actions>
+</form>
