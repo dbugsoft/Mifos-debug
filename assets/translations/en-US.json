@@ -7396,6 +7396,8 @@
     "periods": {
       "Shortcuts": "Make a report for",
       "None": "No period is available yet."
+    }
+  },
   "relationshipList": {
     "typedBefore": "Typed before the list: {{text}}",
     "required": "Choose the relationship.",
