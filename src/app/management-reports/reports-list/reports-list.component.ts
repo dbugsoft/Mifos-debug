@@ -12,7 +12,9 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatProgressBar } from '@angular/material/progress-bar';
 import { Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { AdToBsPipe } from 'app/pipes/ad-to-bs.pipe';
 import { BS_MONTHS } from 'app/core/bs-calendar/bs-calendar.service';
 import { ManagementReportsService } from '../management-reports.service';
 import { Office, Period, REPORT_STATUSES, Report, ReportSummary } from '../management-reports.models';
@@ -30,7 +32,8 @@ import {
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
     MatIcon,
-    MatProgressBar
+    MatProgressBar,
+    AdToBsPipe
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -38,6 +41,7 @@ export class ReportsListComponent implements OnInit {
   private reportsService = inject(ManagementReportsService);
   private dialog = inject(MatDialog);
   private router = inject(Router);
+  private translate = inject(TranslateService);
 
   readonly reports = signal<ReportSummary[]>([]);
   readonly periods = signal<Period[]>([]);
@@ -74,6 +78,11 @@ export class ReportsListComponent implements OnInit {
       });
   }
 
+  showApproved(): void {
+    this.status.setValue('APPROVED');
+    this.load();
+  }
+
   open(r: ReportSummary): void {
     this.router.navigate([
       '/management-reports',
@@ -105,7 +114,7 @@ export class ReportsListComponent implements OnInit {
       return `${p.bsYear}/${(p.bsYear + 1).toString().slice(-2)}`;
     }
     if (p.kind === 'QUARTER') {
-      return `Q${p.number} ${p.bsYear}`;
+      return this.translate.instant('managementReports.periods.Quarter', { number: p.number, year: p.bsYear });
     }
     return `${BS_MONTHS[p.number - 1]} ${p.bsYear}`;
   }

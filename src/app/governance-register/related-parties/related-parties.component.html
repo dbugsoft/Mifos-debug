@@ -1,0 +1,330 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="compliance-page">
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
+
+  @if (loadFailed() && !loading()) {
+    <p class="empty">{{ 'relatedParties.LoadFailed' | translate }}</p>
+  }
+
+  @if (register(); as reg) {
+    <div class="tiles">
+      <div class="tile">
+        <span class="label">{{ 'relatedParties.Officers' | translate }}</span>
+        <span class="value">{{ reg.officers.length }}</span>
+      </div>
+      <div class="tile">
+        <span class="label">{{ 'relatedParties.RelatedMembers' | translate }}</span>
+        <span class="value">{{ reg.members.length }}</span>
+      </div>
+      <div class="tile" [class.bad]="reg.notLinked.length > 0">
+        <span class="label">{{ 'relatedParties.NotLinked' | translate }}</span>
+        <span class="value">{{ reg.notLinked.length }}</span>
+      </div>
+    </div>
+
+    <mat-tab-group class="related-parties-tabs" animationDuration="150ms">
+      <mat-tab>
+        <ng-template mat-tab-label><mat-icon>badge</mat-icon>{{ 'relatedParties.Officers' | translate }}</ng-template>
+        <div class="tab-panel">
+          @if (reg.officers.length) {
+            <div class="table-card mat-elevation-z8">
+              <div class="table-scroll">
+                <table class="blue">
+                  <thead>
+                    <tr>
+                      <th>{{ 'labels.inputs.name' | translate }}</th>
+                      <th>{{ 'relatedParties.Seats' | translate }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (o of reg.officers; track o.personId) {
+                      <tr>
+                        <td>
+                          @if (o.clientId) {
+                            <a [routerLink]="['/members', o.clientId]">{{ o.name }}</a>
+                          } @else {
+                            {{ o.name }}
+                          }
+                          @if (o.director) {
+                            <span class="chip blue">{{ 'relatedParties.Director' | translate }}</span>
+                          }
+                          <span class="sub">
+                            <a [routerLink]="['/governance-register/people', o.personId]">{{
+                              'governanceRegister.ViewTheFile' | translate
+                            }}</a>
+                          </span>
+                        </td>
+                        <td>
+                          @for (s of o.seats; track s.committeeCode + s.positionCode) {
+                            <span class="chip grey">{{ s.positionName }} · {{ s.committeeName }}</span>
+                          }
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          } @else {
+            <p class="empty">{{ 'relatedParties.NoOfficers' | translate }}</p>
+          }
+        </div>
+      </mat-tab>
+
+      <mat-tab>
+        <ng-template mat-tab-label
+          ><mat-icon>diversity_3</mat-icon>{{ 'relatedParties.RelatedMembers' | translate }}</ng-template
+        >
+        <div class="tab-panel">
+          @if (reg.members.length) {
+            <div class="table-card mat-elevation-z8">
+              <div class="table-scroll">
+                <table class="blue">
+                  <thead>
+                    <tr>
+                      <th>{{ 'labels.inputs.name' | translate }}</th>
+                      <th>{{ 'labels.inputs.Office' | translate }}</th>
+                      <th>{{ 'relatedParties.RelatedAs' | translate }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (m of reg.members; track m.clientId) {
+                      <tr>
+                        <td>
+                          <a [routerLink]="['/members', m.clientId]">{{ m.name }}</a>
+                          @if (m.organisation) {
+                            <span class="chip grey">{{ 'relatedParties.Organisation' | translate }}</span>
+                          }
+                          @if (m.officer) {
+                            <span class="chip blue">{{ 'relatedParties.Officer' | translate }}</span>
+                          }
+                        </td>
+                        <td>{{ m.officeName }}</td>
+                        <td>
+                          @for (w of m.ways; track w.personId + w.kin) {
+                            <div class="way">
+                              <span
+                                class="chip"
+                                [class.blue]="w.closeness === 'SELF'"
+                                [class.amber]="w.closeness === 'FAMILY'"
+                                [class.grey]="w.closeness === 'RELATIVE' || w.closeness === 'BUSINESS'"
+                              >
+                                {{ 'relatedParties.kin.' + w.kin | translate }}
+                              </span>
+                              <span class="sub">{{ w.how }}</span>
+                              @if (w.steps.length) {
+                                <button
+                                  type="button"
+                                  class="steps-toggle"
+                                  (click)="toggleWay(wayKey(m.clientId, w.personId, w.kin))"
+                                >
+                                  <mat-icon>{{
+                                    expandedWays().has(wayKey(m.clientId, w.personId, w.kin))
+                                      ? 'expand_less'
+                                      : 'expand_more'
+                                  }}</mat-icon>
+                                  {{ 'relatedParties.ShowTheChain' | translate }}
+                                </button>
+                              }
+                              @if (expandedWays().has(wayKey(m.clientId, w.personId, w.kin))) {
+                                <ul class="steps">
+                                  @for (s of w.steps; track $index) {
+                                    <li>
+                                      @if (s.source === 'ORGANISATION') {
+                                        <span class="step-text">{{
+                                          'relatedParties.steps.Controls'
+                                            | translate: { from: s.fromName, to: s.toName }
+                                        }}</span>
+                                      } @else {
+                                        <span class="step-text">{{
+                                          'relatedParties.steps.IsRelation'
+                                            | translate
+                                              : { to: s.toName, from: s.fromName, relationship: s.relationship }
+                                        }}</span>
+                                      }
+                                      @if (s.source === 'KYM') {
+                                        <span class="step-hint">{{
+                                          'relatedParties.steps.ChangeOnKym' | translate
+                                        }}</span>
+                                      } @else if (s.source === 'REGISTER' && s.linkId) {
+                                        <button
+                                          mat-button
+                                          color="warn"
+                                          type="button"
+                                          (click)="removeStep(s)"
+                                          *mifosxHasPermission="'UPDATE_GOVERNANCE'"
+                                        >
+                                          {{ 'relatedParties.RemoveLink' | translate }}
+                                        </button>
+                                      }
+                                    </li>
+                                  }
+                                </ul>
+                              }
+                            </div>
+                          }
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          } @else {
+            <p class="empty">{{ 'relatedParties.NoRelatedMembers' | translate }}</p>
+          }
+        </div>
+      </mat-tab>
+
+      @if (reg.notLinked.length) {
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <mat-icon>warning_amber</mat-icon>{{ 'relatedParties.NotLinked' | translate }}
+            <span class="tab-count">{{ reg.notLinked.length }}</span>
+          </ng-template>
+          <div class="tab-panel">
+            <p class="hint">{{ 'relatedParties.NotLinkedHint' | translate }}</p>
+            <div class="not-linked-list">
+              @for (n of reg.notLinked; track n.familyMemberId) {
+                <div class="not-linked-row">
+                  <span class="row-icon"><mat-icon>person_off</mat-icon></span>
+                  <div class="info">
+                    <span class="name">{{ n.name }}</span>
+                    <span class="sub"
+                      >{{ n.relationship }} {{ 'relatedParties.of' | translate }} {{ n.officerName }}</span
+                    >
+                    @if (n.possibleName) {
+                      <span class="suggestion">
+                        <mat-icon>lightbulb</mat-icon>
+                        {{
+                          'relatedParties.PossibleMatch'
+                            | translate: { name: n.possibleName, account: n.possibleAccountNo }
+                        }}
+                      </span>
+                    }
+                  </div>
+                  <button
+                    mat-flat-button
+                    color="primary"
+                    type="button"
+                    (click)="link(n)"
+                    *mifosxHasPermission="'UPDATE_GOVERNANCE'"
+                  >
+                    <mat-icon>link</mat-icon>{{ 'relatedParties.Link' | translate }}
+                  </button>
+                </div>
+              }
+            </div>
+          </div>
+        </mat-tab>
+      }
+
+      <mat-tab>
+        <ng-template mat-tab-label
+          ><mat-icon>account_balance_wallet</mat-icon>{{ 'relatedParties.CreditExposure' | translate }}</ng-template
+        >
+        <div class="tab-panel">
+          <div class="tab-panel-header">
+            <span class="grow"></span>
+            <button mat-stroked-button color="primary" type="button" (click)="toggleReport()">
+              <mat-icon>{{ showReport() ? 'expand_less' : 'expand_more' }}</mat-icon>
+              {{ (showReport() ? 'relatedParties.HideReport' : 'relatedParties.ShowReport') | translate }}
+            </button>
+          </div>
+
+          @if (showReport()) {
+            @if (report(); as rep) {
+              <div class="facts">
+                <div class="fact">
+                  <span class="fact-label">{{ 'managementReports.DirectorsOutstanding' | translate }}</span>
+                  <span class="fact-value">{{ rep.directorsOutstanding | number: '1.0-0' }}</span>
+                </div>
+                <div class="fact">
+                  <span class="fact-label">{{ 'managementReports.RelatedOutstanding' | translate }}</span>
+                  <span class="fact-value">{{ rep.relatedOutstanding | number: '1.0-0' }}</span>
+                </div>
+                <div class="fact">
+                  <span class="fact-label">{{ 'relatedParties.AsOf' | translate }}</span>
+                  <span class="fact-value">{{ rep.asOf }}</span>
+                </div>
+              </div>
+
+              @if (rep.directors.length) {
+                <h3 class="section-label">
+                  <mat-icon>badge</mat-icon>{{ 'relatedParties.DirectorsCredit' | translate }}
+                </h3>
+                <div class="table-card mat-elevation-z8">
+                  <div class="table-scroll">
+                    <table class="blue">
+                      <thead>
+                        <tr>
+                          <th>{{ 'labels.inputs.name' | translate }}</th>
+                          <th class="num">{{ 'managementReports.Loans' | translate }}</th>
+                          <th class="num">{{ 'governanceRegister.declarations.FiscalYear' | translate }}</th>
+                          <th class="num">{{ 'managementReports.Outstanding' | translate }}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (d of rep.directors; track d.personId) {
+                          <tr>
+                            <td>{{ d.name }}</td>
+                            <td class="num">{{ d.loans }}</td>
+                            <td class="num">{{ d.principal | number: '1.0-0' }}</td>
+                            <td class="num">{{ d.outstanding | number: '1.0-0' }}</td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              }
+
+              @if (rep.parties.length) {
+                <h3 class="section-label">
+                  <mat-icon>diversity_3</mat-icon>{{ 'relatedParties.PartiesWithCredit' | translate }}
+                </h3>
+                <div class="table-card mat-elevation-z8">
+                  <div class="table-scroll">
+                    <table class="blue">
+                      <thead>
+                        <tr>
+                          <th>{{ 'labels.inputs.name' | translate }}</th>
+                          <th class="num">{{ 'managementReports.Loans' | translate }}</th>
+                          <th>{{ 'relatedParties.Guarantees' | translate }}</th>
+                          <th class="num">{{ 'managementReports.Outstanding' | translate }}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (b of rep.parties; track b.member.clientId) {
+                          <tr>
+                            <td>{{ b.member.name }}</td>
+                            <td class="num">{{ b.loans.length }}</td>
+                            <td>{{ b.guarantees.length || '-' }}</td>
+                            <td class="num">{{ b.outstanding | number: '1.0-0' }}</td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              } @else {
+                <p class="empty">{{ 'relatedParties.NoCredit' | translate }}</p>
+              }
+            } @else {
+              <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+            }
+          }
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  }
+</div>

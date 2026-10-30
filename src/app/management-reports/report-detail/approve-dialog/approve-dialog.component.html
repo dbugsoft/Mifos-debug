@@ -19,19 +19,55 @@
       </div>
     }
 
-    <div class="notice">
-      <mat-icon>info</mat-icon>
-      <span>{{ 'managementReports.DecisionIdHint' | translate }}</span>
-    </div>
+    @if (decisionsForbidden()) {
+      <div class="notice">
+        <mat-icon>lock</mat-icon>
+        <span>{{ 'managementReports.DecisionsForbidden' | translate }}</span>
+      </div>
+    }
 
-    <mat-form-field class="field">
-      <mat-icon matPrefix>tag</mat-icon>
-      <mat-label>{{ 'managementReports.DecisionId' | translate }}</mat-label>
-      <input matInput type="number" min="1" formControlName="decisionId" />
-      @if (form.controls.decisionId.hasError('server')) {
-        <mat-error>{{ form.controls.decisionId.getError('server') }}</mat-error>
+    @if (pickedDecision(); as d) {
+      <div class="who picked">
+        <mat-icon>gavel</mat-icon>
+        <span
+          >{{ 'meetings.DecisionNumber' | translate: { number: d.number } }} · {{ d.subject }}
+          <span class="sub">{{ (d.heldOn | adToBs) || d.heldOn }}</span>
+        </span>
+        <button mat-button color="primary" type="button" (click)="clearDecision()">
+          {{ 'governanceRegister.committees.ChoseAnother' | translate }}
+        </button>
+      </div>
+    } @else {
+      <mat-form-field class="field" subscriptSizing="dynamic">
+        <mat-icon matPrefix>gavel</mat-icon>
+        <mat-label>{{ 'managementReports.FindTheDecision' | translate }}</mat-label>
+        <input matInput [formControl]="decisionSearch" [matAutocomplete]="decisionAuto" autocomplete="off" />
+        <mat-autocomplete #decisionAuto="matAutocomplete" (optionSelected)="pickDecision($event.option.value)">
+          @for (d of foundDecisions(); track d.id) {
+            <mat-option [value]="d"
+              >{{ 'meetings.DecisionNumber' | translate: { number: d.number } }} · {{ d.subject }} ·
+              {{ (d.heldOn | adToBs) || d.heldOn }}
+            </mat-option>
+          }
+        </mat-autocomplete>
+        <mat-hint>{{ 'managementReports.DecisionHint' | translate }}</mat-hint>
+        @if (form.controls.decisionId.hasError('server')) {
+          <mat-error>{{ form.controls.decisionId.getError('server') }}</mat-error>
+        }
+      </mat-form-field>
+      @if (decisionSearched() && !foundDecisions().length && (decisionSearch.value?.length ?? 0) >= 2) {
+        <p class="no-match">
+          <mat-icon>search_off</mat-icon>
+          <span>{{ 'governanceRegister.committees.NoDecisionMatch' | translate }}</span>
+        </p>
       }
-    </mat-form-field>
+      @if (form.controls.decisionId.invalid && form.controls.decisionId.touched) {
+        <p class="no-match">
+          <mat-icon>error_outline</mat-icon>
+          <span>{{ 'managementReports.DecisionRequired' | translate }}</span>
+        </p>
+      }
+    }
 
     <mat-form-field class="field">
       <mat-label>{{ 'labels.inputs.Note' | translate }}</mat-label>

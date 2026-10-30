@@ -1,0 +1,93 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+[mat-dialog-title] {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.field {
+  display: block;
+  width: 100%;
+}
+
+.file-label {
+  display: block;
+  margin: 0 0 4px;
+  color: var(--dk-text-muted, rgb(0 0 0 / 60%));
+  font-size: 0.75rem;
+}
+
+.file-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 56px;
+  padding: 0 16px;
+  border: 1px solid var(--dk-border-strong, rgb(0 0 0 / 38%));
+  border-radius: 4px;
+  margin-bottom: 16px;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    border-color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+    outline: none;
+  }
+
+  mat-icon {
+    flex: none;
+    color: var(--dk-text-muted, rgb(0 0 0 / 54%));
+  }
+
+  &.has-file mat-icon {
+    color: var(--dk-success, #16a34a);
+  }
+}
+
+.file-field-text {
+  flex: 1;
+  overflow: hidden;
+  color: var(--dk-text-muted, rgb(0 0 0 / 60%));
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.has-file .file-field-text {
+  color: var(--dk-text, inherit);
+  font-weight: 600;
+}
+
+.server-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  border-left: 3px solid var(--dk-danger, #c62828);
+  border-radius: 6px;
+  background: var(--dk-danger-soft, #ffebee);
+  color: var(--dk-danger, #c62828);
+  font-size: 14px;
+}
+
+.spin {
+  margin-right: 6px;
+  animation: mfx-spin 1s linear infinite;
+}
+
+@keyframes mfx-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}

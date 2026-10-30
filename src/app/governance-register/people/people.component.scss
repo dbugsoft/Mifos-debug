@@ -22,15 +22,35 @@
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  align-items: center;
+  // Top-aligned instead of centered, so the checkbox and buttons sit level with the search field's own top edge
+  // rather than centered against its taller margin box (which reads as sitting too low next to the field).
+  align-items: flex-start;
+  // The shared shell gives every page under these tabs a 24px gap from the tab bar's own bottom border, but the
+  // search field here is tall enough to flush its own top edge against that gap, reading as touching the line -
+  // this adds the little extra room it needs on its own.
+  margin-top: 12px;
 
   .grow {
     flex: 1;
   }
 
+  // Lines up with the 56px-high outlined field beside it, rather than being centred against the field's own
+  // margin box (which reads taller than its visible border, leaving the checkbox looking too low).
+  mat-checkbox {
+    display: flex;
+    align-items: center;
+    height: 56px;
+  }
+
   .search {
     width: 320px;
     max-width: 100%;
+  }
+
+  // A touch lower than the top-aligned row, so it reads as sitting next to the checkbox's own label text rather
+  // than flush with the search field's top edge.
+  .find-btn {
+    margin-top: 6px;
   }
 }
 

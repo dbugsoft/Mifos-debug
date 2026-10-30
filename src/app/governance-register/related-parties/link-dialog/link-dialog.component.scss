@@ -1,0 +1,136 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+[mat-dialog-title] {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--dk-border, #e2e8f0);
+}
+
+.officer-name {
+  color: var(--dk-text-muted, rgb(127 127 127));
+  font-size: 0.9rem;
+  font-weight: 400;
+}
+
+.field {
+  display: block;
+  width: 100%;
+}
+
+.section {
+  margin: 20px 0 10px;
+  color: var(--dk-text-2, #334155);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+
+  &:first-child {
+    margin-top: 0;
+  }
+
+  &.divider-top {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--dk-border, #e2e8f0);
+  }
+}
+
+// mifosx-relationship-select lays its own mat-form-field out to share a parent flex/grid row with siblings
+// (its default width there), but here it is the only field on its row, so it should fill it like the others.
+::ng-deep mifosx-relationship-select mat-form-field {
+  width: 100%;
+}
+
+mat-checkbox {
+  display: block;
+  margin: 12px 0;
+}
+
+.who {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: var(--dk-surface-2, #f1f5f9);
+  font-weight: 600;
+
+  mat-icon {
+    color: var(--dk-text-muted, rgb(127 127 127));
+  }
+
+  &.picked {
+    border: 1px solid var(--dk-success-border, #bbf7d0);
+    background: var(--dk-success-soft, #f0fdf4);
+
+    mat-icon {
+      color: var(--dk-success, #16a34a);
+    }
+  }
+
+  button {
+    margin-left: auto;
+  }
+}
+
+.notice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  border: 1px solid var(--dk-primary-border, #bcd6f2);
+  border-radius: 8px;
+  background: var(--dk-primary-soft, #e0edf8);
+  color: var(--dk-text, #334155);
+  font-size: 0.875rem;
+
+  mat-icon {
+    flex: none;
+    color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+  }
+
+  button {
+    margin-left: auto;
+  }
+}
+
+.server-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  border-left: 3px solid var(--dk-danger, #c62828);
+  border-radius: 6px;
+  background: var(--dk-danger-soft, #ffebee);
+  color: var(--dk-danger, #c62828);
+  font-size: 14px;
+}
+
+.spin {
+  margin-right: 6px;
+  animation: mfx-spin 1s linear infinite;
+}
+
+@keyframes mfx-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}

@@ -7,10 +7,12 @@
  */
 
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import { MatStepperModule } from '@angular/material/stepper';
 import { MatIcon } from '@angular/material/icon';
 import { debounceTime, distinctUntilChanged, filter, switchMap, tap } from 'rxjs';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
@@ -20,6 +22,8 @@ import { KymPerson } from 'app/clients/kym/kym.models';
 import { GovernanceRegisterService } from '../../governance-register.service';
 import { applyServerErrors, isoDate } from '../../governance-register.utils';
 import { Committee, Person, PersonListItem, Position, Term } from '../../governance-register.models';
+import { MeetingsService } from '../../meetings/meetings.service';
+import { Decision } from '../../meetings/meetings.models';
 
 export interface TermDialogData {
   /** Only the committee's id and name are read; the person page passes these straight off a Term. */
@@ -42,9 +46,11 @@ export interface TermDialogData {
   styleUrls: ['./term-dialog.component.scss'],
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
+    NgTemplateOutlet,
     MatDialogModule,
     MatAutocomplete,
     MatAutocompleteTrigger,
+    MatStepperModule,
     MatIcon,
     NepaliDateInputComponent,
     KymMemberPickerComponent
@@ -55,6 +61,7 @@ export class TermDialogComponent {
   readonly data = inject<TermDialogData>(MAT_DIALOG_DATA);
   private ref = inject(MatDialogRef<TermDialogComponent, Term>);
   private governance = inject(GovernanceRegisterService);
+  private meetingsService = inject(MeetingsService);
 
   readonly busy = signal(false);
   readonly serverError = signal<string | null>(null);
@@ -79,6 +86,13 @@ export class TermDialogComponent {
   readonly newPersonIsMember = signal(true);
   readonly newMember = signal<KymPerson | null>(null);
   readonly newPersonName = new FormControl('', Validators.maxLength(200));
+
+  // ---- linking the term to a decision recorded in a meeting (fineract-dbug #141)
+
+  readonly decisionSearch = new FormControl('');
+  readonly foundDecisions = signal<Decision[]>([]);
+  readonly decisionSearched = signal(false);
+  readonly pickedDecision = signal<Decision | null>(null);
 
   get personReady(): boolean {
     if (this.changingPosition || this.pickedPerson()) {
@@ -119,12 +133,35 @@ export class TermDialogComponent {
         takeUntilDestroyed(inject(DestroyRef))
       )
       .subscribe((r) => this.foundPeople.set(r));
+
+    this.decisionSearch.valueChanges
+      .pipe(
+        filter((v): v is string => typeof v === 'string' && v.trim().length >= 2),
+        debounceTime(300),
+        distinctUntilChanged(),
+        tap(() => this.decisionSearched.set(true)),
+        switchMap((v) => this.meetingsService.decisions(undefined, this.data.committee.id, undefined, v)),
+        takeUntilDestroyed(inject(DestroyRef))
+      )
+      .subscribe((r) => this.foundDecisions.set(r));
   }
 
   pickPerson(p: PersonListItem): void {
     this.pickedPerson.set(p);
     this.personSearch.setValue('');
     this.foundPeople.set([]);
+  }
+
+  pickDecision(d: Decision): void {
+    this.pickedDecision.set(d);
+    this.form.controls.decisionReference.setValue(d.reference);
+    this.decisionSearch.setValue('');
+    this.foundDecisions.set([]);
+  }
+
+  clearDecision(): void {
+    this.pickedDecision.set(null);
+    this.form.controls.decisionReference.setValue('');
   }
 
   startAddingNewPerson(): void {
@@ -152,6 +189,7 @@ export class TermDialogComponent {
           positionId: v.positionId,
           on: isoDate(v.on),
           decisionReference: v.decisionReference?.trim() || null,
+          decisionId: this.pickedDecision()?.id ?? null,
           note: v.note?.trim() || null
         })
         .subscribe({
@@ -193,6 +231,7 @@ export class TermDialogComponent {
         startOn: isoDate(v.on),
         expectedEndOn: isoDate(v.expectedEndOn),
         decisionReference: v.decisionReference?.trim() || null,
+        decisionId: this.pickedDecision()?.id ?? null,
         note: v.note?.trim() || null
       })
       .subscribe({

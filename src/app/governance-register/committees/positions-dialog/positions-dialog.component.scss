@@ -6,6 +6,19 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+[mat-dialog-title] {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 16px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--dk-border, #e2e8f0);
+
+  mat-icon {
+    color: var(--dk-text, #1a1a1a);
+  }
+}
+
 .toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -40,9 +53,16 @@
   }
 }
 
-.row-icon {
+.row-number {
   flex: none;
+  width: 22px;
   color: var(--dk-text-muted, rgb(127 127 127));
+  font-weight: 700;
+  text-align: right;
+}
+
+.edit-btn {
+  color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
 }
 
 .info {

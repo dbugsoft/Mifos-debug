@@ -1,0 +1,446 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+@use 'app/compliance/compliance' as compliance;
+
+@include compliance.page;
+
+.report-card {
+  margin: 16px 0 0;
+  padding: 20px 22px;
+  border-radius: 14px;
+  background: var(--mat-sys-surface, var(--dk-surface, #fff));
+
+  &:first-child {
+    margin-top: 0;
+  }
+}
+
+.report-card--header {
+  border-left: 4px solid var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+}
+
+// Replaces the long stack of separate cards (Details, Attendance, Decisions, Minutes, Corrections) with one
+// elevated card holding a tab per area - the same change made to the person page, for the same reason: several
+// of those sections one after another, each with its own header, read as cluttered beneath the meeting's own
+// status card.
+.meeting-tabs {
+  display: block;
+  margin: 16px 0 0;
+  padding: 6px 0 18px;
+  border-radius: 14px;
+  background: var(--mat-sys-surface, var(--dk-surface, #fff));
+
+  ::ng-deep .mat-mdc-tab-label-container {
+    padding: 0 10px;
+  }
+
+  ::ng-deep .mdc-tab {
+    gap: 8px;
+
+    mat-icon {
+      color: inherit;
+    }
+  }
+}
+
+.tab-panel {
+  padding: 18px 22px 0;
+}
+
+.tab-panel-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 16px;
+
+  .grow {
+    flex: 1;
+  }
+}
+
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 20px 0 10px;
+  color: var(--dk-text-2, #334155);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+
+  &.divider-top {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--dk-border, #e2e8f0);
+  }
+}
+
+.card-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+
+  .chip {
+    padding: 4px 14px;
+    font-size: 0.8rem;
+    line-height: 1.4;
+  }
+}
+
+.period-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+
+  mat-icon {
+    color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+  }
+}
+
+.facts {
+  gap: 12px;
+}
+
+// The header card's own facts: Approved on / Mistake only show once a meeting reaches that state, so a fixed
+// 3-column grid left them stranded alone on their own row - flows them into whatever room is left instead.
+.report-card--header .facts {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.fact {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--dk-surface-2, #f1f5f9);
+}
+
+.fact-label {
+  color: var(--dk-text-muted, rgb(127 127 127));
+  font-size: 0.75rem;
+
+  &::after {
+    content: '';
+  }
+}
+
+.fact-value {
+  color: var(--dk-text, #0f172a);
+  font-size: 1.05rem;
+  font-weight: 400;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.divider {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--dk-border, #e2e8f0);
+}
+
+.field {
+  display: block;
+  width: 100%;
+}
+
+.server-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  border-left: 3px solid var(--dk-danger, #c62828);
+  border-radius: 6px;
+  background: var(--dk-danger-soft, #ffebee);
+  color: var(--dk-danger, #c62828);
+  font-size: 14px;
+}
+
+mifosx-nepali-date-input {
+  margin-bottom: 16px;
+}
+
+.agenda-text {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.labeled-text {
+  margin-top: 16px;
+
+  .fact-label {
+    display: block;
+    margin-bottom: 4px;
+  }
+}
+
+.sub {
+  display: block;
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+// ── Attendance ──
+
+.attendance {
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid rgb(127 127 127 / 15%);
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  .name {
+    flex: 1;
+    min-width: 160px;
+    font-weight: 600;
+  }
+}
+
+.marks {
+  display: flex;
+  gap: 4px;
+}
+
+.mark {
+  padding: 4px 12px;
+  border: 1px solid var(--dk-border, #e2e8f0);
+  border-radius: 999px;
+  background: none;
+  color: var(--dk-text-muted, rgb(127 127 127));
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease,
+    color 0.15s ease;
+
+  &:hover {
+    border-color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+  }
+
+  &.active {
+    border-color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+    background: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+    color: #fff;
+  }
+}
+
+// ── Decisions ──
+
+.decisions {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    padding: 14px 16px;
+    margin-bottom: 8px;
+    border: 1px solid var(--dk-border, #e2e8f0);
+    border-radius: 10px;
+    background: var(--dk-surface-2, #f8fafc);
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
+
+    &:hover {
+      border-color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+      box-shadow: 0 1px 6px rgb(0 0 0 / 6%);
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    &.voided {
+      opacity: 0.6;
+    }
+  }
+}
+
+.decision-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.number {
+  flex: none;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--dk-primary-soft, #e0edf8);
+  color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.subject {
+  flex: 1;
+  font-weight: 600;
+}
+
+.struck {
+  text-decoration: line-through;
+}
+
+.decision-actions {
+  display: flex;
+  flex: none;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.action-btn {
+  border-radius: 10px;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    transform 0.15s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+
+  &--edit {
+    background: var(--dk-primary-soft, #e0edf8);
+    color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+
+    &:hover {
+      background: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+      color: #fff;
+    }
+  }
+
+  &--void {
+    background: var(--dk-danger-soft, #fdeceb);
+    color: var(--dk-danger, #9f1f17);
+
+    &:hover {
+      background: var(--dk-danger, #9f1f17);
+      color: #fff;
+    }
+  }
+}
+
+.wording {
+  margin: 6px 0 0;
+  color: var(--dk-text, inherit);
+  white-space: pre-wrap;
+}
+
+.correction {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 8px 0 0;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--dk-warning-soft, #fff4dc);
+  font-size: 0.8rem;
+
+  mat-icon {
+    flex: none;
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+// ── Files (minutes, corrections) ──
+
+.files {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 16px;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid rgb(127 127 127 / 15%);
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  .name {
+    font-weight: 600;
+  }
+
+  button {
+    margin-left: auto;
+  }
+
+  .file-thumb {
+    flex: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    border: 1px solid var(--dk-border, #e2e8f0);
+    object-fit: cover;
+  }
+
+  .file-icon {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--dk-border, #e2e8f0);
+    border-radius: 8px;
+    background: var(--dk-surface, #fff);
+    color: var(--dk-text-muted, rgb(127 127 127));
+  }
+
+  .file-info {
+    display: flex;
+    flex: 1 1 200px;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .row-actions {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 4px;
+    margin-left: auto;
+  }
+}

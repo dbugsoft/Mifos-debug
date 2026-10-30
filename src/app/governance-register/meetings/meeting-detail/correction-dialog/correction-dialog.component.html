@@ -1,0 +1,52 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<h2 mat-dialog-title><mat-icon>edit_note</mat-icon>{{ 'meetings.AddCorrection' | translate }}</h2>
+<form [formGroup]="form" (ngSubmit)="save()">
+  <mat-dialog-content>
+    @if (serverError()) {
+      <div class="server-error">
+        <mat-icon>error_outline</mat-icon>
+        <span>{{ serverError() }}</span>
+      </div>
+    }
+
+    @if (data.decisions.length) {
+      <mat-form-field class="field">
+        <mat-label>{{ 'meetings.AboutDecision' | translate }}</mat-label>
+        <mat-select formControlName="decisionId">
+          <mat-option [value]="null">{{ 'meetings.AboutMeeting' | translate }}</mat-option>
+          @for (d of data.decisions; track d.id) {
+            <mat-option [value]="d.id">{{ d.number }} · {{ d.subject }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    }
+
+    <mat-form-field class="field">
+      <mat-label>{{ 'meetings.Correction' | translate }}</mat-label>
+      <textarea matInput formControlName="correction" rows="3" maxlength="2000"></textarea>
+    </mat-form-field>
+
+    <span class="file-label">{{ 'meetings.CorrectedCopy' | translate }}</span>
+    <div class="file-field" [class.has-file]="file()" tabindex="0" role="button" (click)="filePicker.click()">
+      <mat-icon>{{ file() ? 'check_circle' : 'upload_file' }}</mat-icon>
+      <span class="file-field-text">{{ file()?.name ?? ('meetings.NoFile' | translate) }}</span>
+    </div>
+    <input #filePicker type="file" hidden accept="application/pdf,image/*" (change)="onFileSelect($event)" />
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-stroked-button type="button" mat-dialog-close>{{ 'labels.buttons.Cancel' | translate }}</button>
+    <button mat-raised-button color="primary" type="submit" [disabled]="busy()">
+      @if (busy()) {
+        <mat-icon class="spin">autorenew</mat-icon>
+      }
+      {{ 'labels.buttons.Submit' | translate }}
+    </button>
+  </mat-dialog-actions>
+</form>

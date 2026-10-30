@@ -20,7 +20,7 @@
     <mat-checkbox [checked]="currentOnly()" (change)="toggleCurrent($event)">
       {{ 'governanceRegister.people.CurrentlyServing' | translate }}
     </mat-checkbox>
-    <button mat-raised-button color="primary" type="button" (click)="load()">
+    <button class="find-btn" mat-raised-button color="primary" type="button" (click)="load()">
       <mat-icon>search</mat-icon>{{ 'governanceRegister.committees.Find' | translate }}
     </button>
     <span class="grow"></span>

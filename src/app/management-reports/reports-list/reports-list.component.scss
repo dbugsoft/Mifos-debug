@@ -35,15 +35,28 @@
 .shortcuts {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
   align-items: center;
+}
+
+// Rounded pill chips instead of plain rectangular buttons, so the period shortcuts read as quick-pick tags
+// rather than a row of form buttons.
+.shortcut-btn {
+  border-radius: 999px;
+  transition: transform 0.15s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+  }
 }
 
 .filters {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  align-items: center;
+  // Top-aligned instead of centered, so the buttons sit level with the fields' own top edge rather than centered
+  // against their taller margin box (which reads as sitting too low next to the fields).
+  align-items: flex-start;
   margin-bottom: 16px;
 
   .field {
@@ -60,11 +73,31 @@
   }
 }
 
-.row {
-  cursor: pointer;
+// A green accent instead of the default (black) icon colour, so "Approved reports" reads as a status filter
+// rather than a plain action button.
+.approved-btn {
+  border-color: var(--dk-success-border, #bbf7d0);
+  color: var(--dk-success, #16a34a);
+
+  mat-icon {
+    color: var(--dk-success, #16a34a);
+  }
 
   &:hover {
-    background: rgb(127 127 127 / 6%);
+    background: var(--dk-success-soft, #f0fdf4);
+  }
+}
+
+.row {
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+
+  &:nth-child(even) {
+    background: var(--dk-surface-2, #f8fafc);
+  }
+
+  &:hover {
+    background: rgb(127 127 127 / 10%);
   }
 }
 

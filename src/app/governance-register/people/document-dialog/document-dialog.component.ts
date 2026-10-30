@@ -9,6 +9,7 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatIcon } from '@angular/material/icon';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { GovernanceRegisterService } from '../../governance-register.service';
 import { applyServerErrors } from '../../governance-register.utils';
@@ -25,7 +26,8 @@ export interface DocumentDialogData {
   styleUrls: ['./document-dialog.component.scss'],
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
-    MatDialogModule
+    MatDialogModule,
+    MatIcon
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })

@@ -8,18 +8,23 @@
 
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormControl } from '@angular/forms';
+import { FormControl, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatProgressBar } from '@angular/material/progress-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { TranslateService } from '@ngx-translate/core';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { AdToBsPipe } from 'app/pipes/ad-to-bs.pipe';
 import { InputDialogComponent, InputDialogData } from 'app/compliance/input-dialog/input-dialog.component';
 import { PearlsCardComponent } from 'app/coop-dashboard/widgets/pearls-card.component';
 import { Pearls as DashboardPearls } from 'app/coop-dashboard/coop-dashboard.models';
+import { grouped, percent } from 'app/coop-dashboard/coop-format';
+import { getCoopConfig } from 'environments/coop-config';
 import { ManagementReportsService } from '../management-reports.service';
 import { statusChipClass } from '../management-reports.status';
-import { DISCARDABLE_STATUSES, Office, Report } from '../management-reports.models';
+import { DISCARDABLE_STATUSES, Office, Report, ReportContent } from '../management-reports.models';
 import {
   CreateReportDialogComponent,
   CreateReportDialogData
@@ -35,7 +40,8 @@ import { ApproveDialogComponent, ApproveDialogData } from './approve-dialog/appr
     ...STANDALONE_SHARED_IMPORTS,
     MatIcon,
     MatProgressBar,
-    PearlsCardComponent
+    PearlsCardComponent,
+    AdToBsPipe
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -45,26 +51,39 @@ export class ReportDetailComponent implements OnInit {
   private reportsService = inject(ManagementReportsService);
   private dialog = inject(MatDialog);
   private destroyRef = inject(DestroyRef);
+  private snackBar = inject(MatSnackBar);
+  private translate = inject(TranslateService);
 
   readonly report = signal<Report | null>(null);
   readonly loading = signal(false);
   readonly loadFailed = signal(false);
   readonly offices = signal<Office[]>([]);
   readonly statusChipClass = statusChipClass;
+  readonly grouped = grouped;
+  readonly percent = percent;
 
-  readonly notes = new FormControl('');
+  readonly notes = new FormControl('', Validators.maxLength(8000));
   readonly savingNotes = signal(false);
 
   readonly sealedContent = signal<string | null>(null);
   readonly loadingSealedContent = signal(false);
   readonly showSealedContent = signal(false);
 
+  readonly printContent = signal<ReportContent | null>(null);
+  readonly loadingPrint = signal(false);
+  readonly coopName = getCoopConfig().coopName;
+
   readonly canEditNotes = computed(() => {
     const r = this.report();
     return !!r && DISCARDABLE_STATUSES.includes(r.status);
   });
 
-  readonly notesDirty = computed(() => this.notes.value !== (this.report()?.notes ?? ''));
+  // Not a computed(): it reads notes.value, a plain FormControl property rather than a signal, so a computed()
+  // here would cache its first result and never notice further typing. A plain method re-evaluates on every
+  // change-detection pass instead - which typing already triggers, since it's a native event in this template.
+  notesDirty(): boolean {
+    return this.notes.value !== (this.report()?.notes ?? '');
+  }
 
   /** PearlsCardComponent is the dashboard's own widget, reused as-is (fineract-dbug ADR 0022); it never reads
    * `period`'s own sub-fields in its template, so a minimal stand-in satisfies the type without fabricating data. */
@@ -133,6 +152,30 @@ export class ReportDetailComponent implements OnInit {
     }
   }
 
+  /**
+   * Prints from the sealed content only (GET {id}/content), never from the editable `report().content` - so the
+   * printout always matches the figures `contentSha256` was taken over, even if the page happens to be open on a
+   * report that was since regenerated in another tab.
+   */
+  openPrint(): void {
+    const r = this.report();
+    if (!r) {
+      return;
+    }
+    this.loadingPrint.set(true);
+    this.reportsService.content(r.id).subscribe({
+      next: (text) => {
+        this.printContent.set(JSON.parse(text) as ReportContent);
+        this.loadingPrint.set(false);
+        setTimeout(() => window.print(), 50);
+      },
+      error: (e) => {
+        this.loadingPrint.set(false);
+        this.showError(e);
+      }
+    });
+  }
+
   saveNotes(): void {
     const r = this.report();
     if (!r) {
@@ -144,7 +187,18 @@ export class ReportDetailComponent implements OnInit {
         this.report.set(updated);
         this.savingNotes.set(false);
       },
-      error: () => this.savingNotes.set(false)
+      error: (e) => {
+        this.savingNotes.set(false);
+        this.showError(e);
+      }
+    });
+  }
+
+  private showError(e: unknown): void {
+    const err = e as { error?: { defaultUserMessage?: string; errors?: { defaultUserMessage?: string }[] } };
+    const message = err?.error?.defaultUserMessage || err?.error?.errors?.[0]?.defaultUserMessage;
+    this.snackBar.open(message || this.translate.instant('managementReports.ActionFailed'), undefined, {
+      duration: 5000
     });
   }
 
@@ -167,7 +221,10 @@ export class ReportDetailComponent implements OnInit {
       .afterClosed()
       .subscribe((confirmed) => {
         if (confirmed) {
-          this.reportsService.regenerate(r.id).subscribe((updated) => this.report.set(updated));
+          this.reportsService.regenerate(r.id).subscribe({
+            next: (updated) => this.report.set(updated),
+            error: (e) => this.showError(e)
+          });
         }
       });
   }
@@ -191,7 +248,10 @@ export class ReportDetailComponent implements OnInit {
       .afterClosed()
       .subscribe((confirmed) => {
         if (confirmed) {
-          this.reportsService.submit(r.id).subscribe((updated) => this.report.set(updated));
+          this.reportsService.submit(r.id).subscribe({
+            next: (updated) => this.report.set(updated),
+            error: (e) => this.showError(e)
+          });
         }
       });
   }
@@ -217,7 +277,10 @@ export class ReportDetailComponent implements OnInit {
       .afterClosed()
       .subscribe((result) => {
         if (result?.reason) {
-          this.reportsService.discard(r.id, result.reason).subscribe((updated) => this.report.set(updated));
+          this.reportsService.discard(r.id, result.reason).subscribe({
+            next: (updated) => this.report.set(updated),
+            error: (e) => this.showError(e)
+          });
         }
       });
   }
