@@ -39,6 +39,7 @@ export const TERM_END_REASONS = [
   'DIED',
   'LEFT_COOPERATIVE',
   'COMMITTEE_DISSOLVED',
+  'POSITION_CHANGED',
   'OTHER'
 ];
 
@@ -90,6 +91,7 @@ export interface Term {
   endReason: string | null;
   endNote: string | null;
   decisionReference: string | null;
+  decisionId: number | null;
   note: string | null;
   continuesTermId: number | null;
   termNumber: number;

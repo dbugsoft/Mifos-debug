@@ -1,0 +1,312 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+@use 'app/compliance/compliance' as compliance;
+
+@include compliance.page;
+
+// Nested inside the governance-register shell, which already matches the breadcrumb's own width - the page
+// itself must not repeat that constraint, or the two 90%/84rem caps would compound.
+.compliance-page {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+// The shared shell gives every page under these tabs a 24px gap from the tab bar's own bottom border, but the
+// tiles are tall enough to flush their own top edge against that gap, reading as touching the line - this adds
+// the little extra room they need on their own.
+.tiles {
+  margin-top: 12px;
+}
+
+// Replaces the stack of separate cards (Officers, Related members, Not linked, Credit exposure) with one
+// elevated card holding a tab per area - the same change made to the meeting and person pages, for the same
+// reason: several sections one after another, each with its own header, read as cluttered beneath the summary
+// tiles above.
+.related-parties-tabs {
+  display: block;
+  margin: 16px 0 0;
+  padding: 6px 0 18px;
+  border-radius: 14px;
+  background: var(--mat-sys-surface, var(--dk-surface, #fff));
+
+  ::ng-deep .mat-mdc-tab-label-container {
+    padding: 0 10px;
+  }
+
+  ::ng-deep .mdc-tab {
+    gap: 8px;
+
+    mat-icon {
+      color: inherit;
+    }
+  }
+}
+
+.tab-panel {
+  padding: 18px 22px 0;
+}
+
+.tab-panel-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 16px;
+
+  .grow {
+    flex: 1;
+  }
+}
+
+// The small count on the "Not linked" tab label, echoing the "bad" tile above it.
+.tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  margin-left: 2px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--dk-danger, #b3261e);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 20px 0 10px;
+  color: var(--dk-text-2, #334155);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+
+  mat-icon {
+    color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.sub {
+  display: block;
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+td .chip {
+  margin: 2px 4px 2px 0;
+}
+
+.way {
+  margin-bottom: 8px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  .sub {
+    margin-top: 2px;
+  }
+}
+
+.steps-toggle {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-top: 2px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+  font-size: 0.75rem;
+  cursor: pointer;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.steps {
+  margin: 6px 0 0;
+  padding: 0 0 0 12px;
+  border-left: 2px solid var(--dk-border, #e2e8f0);
+  list-style: none;
+
+  li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+  }
+}
+
+.step-text {
+  font-size: 0.8rem;
+}
+
+.step-hint {
+  color: var(--dk-text-muted, rgb(127 127 127));
+  font-size: 0.75rem;
+  font-style: italic;
+}
+
+.not-linked-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.not-linked-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border: 1px solid var(--dk-border, #e2e8f0);
+  border-left: 3px solid var(--dk-warning, #c87f0a);
+  border-radius: 10px;
+  background: var(--mat-sys-surface, var(--dk-surface, #fff));
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+
+  &:hover {
+    box-shadow: 0 1px 6px rgb(0 0 0 / 6%);
+  }
+
+  .row-icon {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--dk-warning-soft, #fff4dc);
+    color: var(--dk-warning, #c87f0a);
+  }
+
+  .info {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 200px;
+  }
+
+  .name {
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+
+  .suggestion {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    width: fit-content;
+    margin-top: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: var(--dk-primary-soft, #e0edf8);
+    color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+    font-size: 0.75rem;
+    font-weight: 600;
+
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+  }
+}
+
+.facts {
+  margin-bottom: 8px;
+}
+
+// The shared label-value-grid mixin only sets plain label:value text pairs; boxed like the meeting and person
+// pages' own fact tiles instead, so the report's headline numbers read as a summary rather than running text.
+.fact {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--dk-surface-2, #f1f5f9);
+}
+
+.fact-label {
+  color: var(--dk-text-muted, rgb(127 127 127));
+  font-size: 0.75rem;
+}
+
+.fact-value {
+  color: var(--dk-text, #0f172a);
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+// table.blue's own header styling (in the shared compliance mixin) targets Angular Material's mat-table markup;
+// this is a plain <table><thead>, so the same fix used across the app's other plain tables is needed here too.
+table.blue {
+  border-collapse: collapse;
+}
+
+table.blue thead th {
+  padding: 16px 20px;
+  background: var(--md-sys-color-primary, var(--dk-fill, #2460b9));
+  color: #fff;
+  font-weight: 600;
+  border-bottom: none;
+  white-space: nowrap;
+}
+
+table.blue thead th:not(:last-child) {
+  border-right: 1px solid rgb(255 255 255 / 25%);
+}
+
+table.blue tbody td {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--dk-border, #e2e8f0);
+}
+
+table.blue tbody tr:last-child td {
+  border-bottom: none;
+}
+
+table.blue .num {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.table-card {
+  margin-top: 4px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.table-card .table-scroll {
+  overflow-x: auto;
+}
+
+.table-card table.blue {
+  border: 0;
+  border-radius: 0;
+}

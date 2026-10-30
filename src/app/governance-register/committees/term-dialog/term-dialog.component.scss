@@ -6,10 +6,23 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+:host {
+  display: block;
+}
+
+// Dialog heading
 [mat-dialog-title] {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 10px;
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--dk-border, #e2e8f0);
+
+  mat-icon {
+    color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+  }
 }
 
 .committee-name {
@@ -18,39 +31,63 @@
   font-weight: 400;
 }
 
-.field {
+// Dialog content: Material's own 65vh cap is kept (the dialog's own maxHeight: 90vh, set where it's opened, keeps
+// the surface itself from ever needing a second, outer scrollbar on top of this one).
+mat-dialog-content {
   display: block;
-  width: 100%;
+  padding-top: 0;
 }
 
-.section {
-  margin: 20px 0 10px;
+// The "Change position" form (a plain scrolling dialog, not the stepper below): spacing here comes entirely from
+// this flex gap rather than each field's own margin, which is zeroed out below - the fields' margins are sized
+// for the stepper's plain block flow, where this wrapper doesn't apply, and stacking both on top of each other is
+// what used to read as an oversized gap between fields.
+.change-position-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  .field,
+  mifosx-nepali-date-input,
+  .who,
+  .no-match {
+    margin: 0;
+  }
+}
+
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
   color: var(--dk-text-2, #334155);
   font-size: 0.8rem;
   font-weight: 700;
   letter-spacing: 0.03em;
   text-transform: uppercase;
+
+  mat-icon {
+    color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
 }
 
-// Full width, stacked, one per row: the inline BS/AD picker (date text + calendar icon + the BS|AD toggle + the
-// converted date) needs more room than half a dialog gives it - a side-by-side grid made the two fields overlap.
+// Form fields: full width, stacked, one per row - the inline BS/AD picker (date text + calendar icon + the BS|AD
+// toggle + the converted date) needs more room than half a dialog gives it, so fields never sit side by side here.
+.field {
+  display: block;
+  width: 100%;
+  margin-bottom: 4px;
+}
+
+// Full width, one per row, same reason as .field above.
 mifosx-nepali-date-input {
   margin-bottom: 16px;
 }
 
-.toggle {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 16px;
-
-  button {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-}
-
+// Person / picked-decision summary
 .who {
   display: flex;
   align-items: center;
@@ -79,6 +116,7 @@ mifosx-nepali-date-input {
   }
 }
 
+// Search result messages
 .no-match {
   display: flex;
   flex-wrap: wrap;
@@ -102,17 +140,89 @@ mifosx-nepali-date-input {
   margin: -8px 0 16px;
 }
 
-.server-error {
+// Informational notice
+.notice {
   display: flex;
   align-items: flex-start;
   gap: 8px;
   margin: 0 0 16px;
+  padding: 10px 14px;
+  border-left: 4px solid var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+  border-radius: 0 8px 8px 0;
+  background: var(--dk-primary-soft, #e0edf8);
+  color: var(--dk-text, #334155);
+  font-size: 0.875rem;
+
+  mat-icon {
+    flex: none;
+    color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+  }
+}
+
+// Member / non-member toggle
+.toggle {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+
+  button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .selected {
+    border-color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+    background: var(--dk-primary-soft, #e0edf8);
+    color: var(--dk-text, inherit);
+    font-weight: 700;
+
+    mat-icon {
+      color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+    }
+  }
+}
+
+// The stepper replaces mat-dialog-content as the dialog's main scroll/layout area (fineract-dbug #138 redesign):
+// it isn't a dialog-aware component, so the 24px side inset mat-dialog-content gives for free has to be set here
+// instead, to keep fields lined up with the title and footer above and below it.
+.term-stepper {
+  padding: 0 24px 4px;
+}
+
+.step-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.grow {
+  flex: 1;
+}
+
+// Sits directly in the form, above the stepper/content (not inside mat-dialog-content), so it needs its own match
+// of the dialog's 24px side inset instead of inheriting one.
+.server-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0 24px 16px;
   padding: 10px 14px;
   border-left: 3px solid var(--dk-danger, #c62828);
   border-radius: 6px;
   background: var(--dk-danger-soft, #ffebee);
   color: var(--dk-danger, #c62828);
   font-size: 14px;
+}
+
+mat-dialog-actions {
+  margin: 20px -24px -24px;
+  padding: 16px 24px;
+  background: var(--dk-surface-2, #f8fafc);
+  border-top: 1px solid var(--dk-border, #e2e8f0);
 }
 
 .spin {
@@ -127,5 +237,31 @@ mifosx-nepali-date-input {
 
   to {
     transform: rotate(360deg);
+  }
+}
+
+@media (width <= 600px) {
+  [mat-dialog-title] {
+    padding-bottom: 12px;
+  }
+
+  .term-stepper {
+    padding: 0 16px 4px;
+  }
+
+  .server-error {
+    margin: 0 16px 16px;
+  }
+
+  .toggle {
+    flex-direction: column;
+
+    button {
+      width: 100%;
+    }
+  }
+
+  mat-dialog-actions {
+    padding: 14px 16px;
   }
 }

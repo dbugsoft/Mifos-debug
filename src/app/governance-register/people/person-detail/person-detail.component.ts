@@ -12,6 +12,8 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatProgressBar } from '@angular/material/progress-bar';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatTooltip } from '@angular/material/tooltip';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { AdToBsPipe } from 'app/pipes/ad-to-bs.pipe';
 import { InputDialogComponent, InputDialogData } from 'app/compliance/input-dialog/input-dialog.component';
@@ -23,6 +25,10 @@ import { EndTermDialogComponent, EndTermDialogData } from '../../committees/end-
 import { DocumentDialogComponent } from '../document-dialog/document-dialog.component';
 import { DeclarationDialogComponent } from '../declaration-dialog/declaration-dialog.component';
 import { PersonDialogComponent, PersonDialogData } from '../person-dialog/person-dialog.component';
+import { RelatedPartiesService } from '../../related-parties/related-parties.service';
+import { Link, PersonParties } from '../../related-parties/related-parties.models';
+import { LinkDialogComponent, LinkDialogData } from '../../related-parties/link-dialog/link-dialog.component';
+import { LoginDialogComponent, LoginDialogData } from '../../related-parties/login-dialog/login-dialog.component';
 
 /** One person's dossier: the positions they hold or have held, their documents and declarations (fineract-dbug #138). */
 @Component({
@@ -34,6 +40,8 @@ import { PersonDialogComponent, PersonDialogData } from '../person-dialog/person
     RouterLink,
     MatIcon,
     MatProgressBar,
+    MatTabsModule,
+    MatTooltip,
     AdToBsPipe
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -41,15 +49,42 @@ import { PersonDialogComponent, PersonDialogData } from '../person-dialog/person
 export class PersonDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private governance = inject(GovernanceRegisterService);
+  private relatedParties = inject(RelatedPartiesService);
   private dialog = inject(MatDialog);
   private destroyRef = inject(DestroyRef);
 
   readonly person = signal<Person | null>(null);
   readonly declarations = signal<Declaration[]>([]);
+  readonly parties = signal<PersonParties | null>(null);
   readonly loading = signal(false);
+
+  // Object URLs for the documents that are images, keyed by document id, so a thumbnail can be shown alongside
+  // the name instead of everything (PDFs, photos, scans alike) reading as the same plain text row.
+  private readonly thumbUrls = new Map<number, string>();
+  readonly documentThumbs = signal<Record<number, string>>({});
 
   ngOnInit(): void {
     this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((p) => this.load(Number(p.get('id'))));
+    this.destroyRef.onDestroy(() => this.clearThumbs());
+  }
+
+  private clearThumbs(): void {
+    this.thumbUrls.forEach((url) => URL.revokeObjectURL(url));
+    this.thumbUrls.clear();
+    this.documentThumbs.set({});
+  }
+
+  private loadThumbs(documents: PersonDocument[]): void {
+    this.clearThumbs();
+    for (const d of documents) {
+      if (!d.removed && d.contentType.startsWith('image/')) {
+        this.governance.downloadDocument(d.id).subscribe((blob) => {
+          const url = URL.createObjectURL(blob);
+          this.thumbUrls.set(d.id, url);
+          this.documentThumbs.update((t) => ({ ...t, [d.id]: url }));
+        });
+      }
+    }
   }
 
   private load(id: number): void {
@@ -58,6 +93,7 @@ export class PersonDetailComponent implements OnInit {
       next: (p) => {
         this.person.set(p);
         this.loading.set(false);
+        this.loadThumbs(p.documents);
         if (p.canSeeDeclarations) {
           this.governance.declarations(id).subscribe((d) => this.declarations.set(d));
         } else {
@@ -66,6 +102,7 @@ export class PersonDetailComponent implements OnInit {
       },
       error: () => this.loading.set(false)
     });
+    this.relatedParties.person(id).subscribe({ next: (p) => this.parties.set(p), error: () => this.parties.set(null) });
   }
 
   edit(): void {
@@ -96,6 +133,7 @@ export class PersonDetailComponent implements OnInit {
         data: { committee: { id: t.committeeId, name: t.committeeName }, changePositionOf: t },
         width: '640px',
         maxWidth: '96vw',
+        maxHeight: '90vh',
         autoFocus: false
       })
       .afterClosed()
@@ -217,5 +255,60 @@ export class PersonDetailComponent implements OnInit {
           this.governance.voidDeclaration(d.id, r.reason).subscribe(() => this.load(p.id));
         }
       });
+  }
+
+  addLink(): void {
+    const p = this.person();
+    if (!p) {
+      return;
+    }
+    this.dialog
+      .open<LinkDialogComponent, LinkDialogData, PersonParties>(LinkDialogComponent, {
+        data: { personId: p.id, officerName: p.name },
+        width: '520px',
+        maxWidth: '96vw',
+        autoFocus: false
+      })
+      .afterClosed()
+      .subscribe((linked) => linked && this.parties.set(linked));
+  }
+
+  removeLink(l: Link): void {
+    this.dialog
+      .open<InputDialogComponent, InputDialogData, { reason: string }>(InputDialogComponent, {
+        data: {
+          title: 'relatedParties.RemoveLinkTitle',
+          message: l.name,
+          fields: [
+            { name: 'reason', label: 'governanceRegister.Reason', type: 'textarea', required: true, maxLength: 500 }
+          ],
+          confirm: 'relatedParties.RemoveLink',
+          danger: true
+        },
+        width: '520px',
+        maxWidth: '96vw'
+      })
+      .afterClosed()
+      .subscribe((r) => {
+        if (r?.reason) {
+          this.relatedParties.removeLink(l.id, r.reason).subscribe((p) => this.parties.set(p));
+        }
+      });
+  }
+
+  setLogin(): void {
+    const parties = this.parties();
+    if (!parties) {
+      return;
+    }
+    this.dialog
+      .open<LoginDialogComponent, LoginDialogData, PersonParties>(LoginDialogComponent, {
+        data: { person: parties },
+        width: '480px',
+        maxWidth: '96vw',
+        autoFocus: false
+      })
+      .afterClosed()
+      .subscribe((updated) => updated && this.parties.set(updated));
   }
 }

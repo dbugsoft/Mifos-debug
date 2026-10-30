@@ -56,6 +56,10 @@ export class CommitteesComponent implements OnInit {
   readonly today = new Date();
   readonly builtInCodes = BUILT_IN_COMMITTEE_CODES;
 
+  readonly pastMembersOpen = signal<Set<number>>(new Set());
+  readonly pastMembersLoading = signal<Set<number>>(new Set());
+  readonly pastMembers = signal<Record<number, Term[]>>({});
+
   ngOnInit(): void {
     this.load();
     this.asOf.valueChanges.subscribe(() => this.load());
@@ -111,6 +115,7 @@ export class CommitteesComponent implements OnInit {
         data: { committee: c },
         width: '640px',
         maxWidth: '96vw',
+        maxHeight: '90vh',
         autoFocus: false
       })
       .afterClosed()
@@ -123,6 +128,7 @@ export class CommitteesComponent implements OnInit {
         data: { committee: c, changePositionOf: t },
         width: '640px',
         maxWidth: '96vw',
+        maxHeight: '90vh',
         autoFocus: false
       })
       .afterClosed()
@@ -162,6 +168,36 @@ export class CommitteesComponent implements OnInit {
           this.governance.voidTerm(t.id, r.reason).subscribe(() => this.load());
         }
       });
+  }
+
+  togglePastMembers(c: Committee): void {
+    const open = new Set(this.pastMembersOpen());
+    if (open.has(c.id)) {
+      open.delete(c.id);
+      this.pastMembersOpen.set(open);
+      return;
+    }
+    open.add(c.id);
+    this.pastMembersOpen.set(open);
+    if (this.pastMembers()[c.id]) {
+      return;
+    }
+    const loading = new Set(this.pastMembersLoading());
+    loading.add(c.id);
+    this.pastMembersLoading.set(loading);
+    this.governance.terms(c.id).subscribe({
+      next: (terms) => {
+        this.pastMembers.update((m) => ({ ...m, [c.id]: terms.filter((t) => !t.current) }));
+        const l = new Set(this.pastMembersLoading());
+        l.delete(c.id);
+        this.pastMembersLoading.set(l);
+      },
+      error: () => {
+        const l = new Set(this.pastMembersLoading());
+        l.delete(c.id);
+        this.pastMembersLoading.set(l);
+      }
+    });
   }
 
   committeeLabel(c: Committee): string {

@@ -29,9 +29,9 @@
     <p class="empty">{{ 'governanceRegister.positions.Empty' | translate }}</p>
   }
 
-  @for (p of positions(); track p.id) {
+  @for (p of positions(); track p.id; let i = $index) {
     <div class="row" [class.inactive]="!p.active">
-      <mat-icon class="row-icon">badge</mat-icon>
+      <span class="row-number">{{ i + 1 }}.</span>
       <div class="info">
         <span class="name">{{ positionLabel(p) | translate }}</span>
         <span class="meta">
@@ -48,6 +48,7 @@
       </div>
       <button
         mat-icon-button
+        class="edit-btn"
         type="button"
         [matTooltip]="'labels.buttons.Edit' | translate"
         (click)="edit(p)"
@@ -59,5 +60,7 @@
   }
 </mat-dialog-content>
 <mat-dialog-actions align="end">
-  <button mat-stroked-button type="button" mat-dialog-close>{{ 'labels.buttons.Close' | translate }}</button>
+  <button mat-flat-button color="primary" type="button" mat-dialog-close>
+    {{ 'labels.buttons.Close' | translate }}
+  </button>
 </mat-dialog-actions>

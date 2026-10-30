@@ -1,0 +1,102 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="compliance-page">
+  <div class="filters">
+    <mat-form-field class="field" subscriptSizing="dynamic">
+      <mat-label>{{ 'meetings.Kind' | translate }}</mat-label>
+      <mat-select [formControl]="kind">
+        <mat-option [value]="null">{{ 'relatedParties.All' | translate }}</mat-option>
+        @for (k of kinds; track k) {
+          <mat-option [value]="k">{{ 'meetings.kind.' + k | translate }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field class="field" subscriptSizing="dynamic">
+      <mat-label>{{ 'governanceRegister.Committee' | translate }}</mat-label>
+      <mat-select [formControl]="committeeId">
+        <mat-option [value]="null">{{ 'relatedParties.All' | translate }}</mat-option>
+        @for (c of committees(); track c.id) {
+          <mat-option [value]="c.id">{{ c.name }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field class="field field--year" subscriptSizing="dynamic">
+      <mat-label>{{ 'managementReports.FiscalYear' | translate }}</mat-label>
+      <input matInput type="number" [formControl]="fiscalYear" placeholder="2083" />
+    </mat-form-field>
+    <button mat-raised-button color="primary" type="button" (click)="load()">
+      <mat-icon>search</mat-icon>{{ 'managementReports.Find' | translate }}
+    </button>
+    <span class="grow"></span>
+    <button
+      mat-raised-button
+      color="primary"
+      type="button"
+      (click)="newMeeting()"
+      *mifosxHasPermission="'UPDATE_GOVERNANCE'"
+    >
+      <mat-icon>add</mat-icon>{{ 'meetings.RecordAMeeting' | translate }}
+    </button>
+  </div>
+
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
+
+  @if (loadFailed() && !loading()) {
+    <p class="empty">{{ 'meetings.LoadFailed' | translate }}</p>
+  }
+
+  @if (!loading() && !loadFailed() && !meetings().length) {
+    <p class="empty">{{ 'meetings.Empty' | translate }}</p>
+  }
+
+  @if (meetings().length) {
+    <div class="table-card mat-elevation-z8">
+      <div class="table-scroll">
+        <table class="blue">
+          <thead>
+            <tr>
+              <th>{{ 'meetings.HeldOn' | translate }}</th>
+              <th>{{ 'meetings.Body' | translate }}</th>
+              <th>{{ 'managementReports.FiscalYear' | translate }}</th>
+              <th>{{ 'labels.inputs.Status' | translate }}</th>
+              <th class="num">{{ 'meetings.Decisions' | translate }}</th>
+              <th>{{ 'meetings.Minutes' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (m of meetings(); track m.id) {
+              <tr class="row" tabindex="0" (click)="open(m)" (keydown.enter)="open(m)">
+                <td>
+                  {{ (m.heldOn | adToBs) || m.heldOn }} <span class="sub">({{ m.heldOn }} AD)</span>
+                </td>
+                <td>{{ bodyName(m) | translate }}</td>
+                <td>{{ m.fiscalYearLabel }}</td>
+                <td>
+                  <span class="chip" [class]="statusChipClass(m.status)">{{
+                    'meetings.status.' + m.status | translate
+                  }}</span>
+                </td>
+                <td class="num">{{ m.decisionCount }}</td>
+                <td>
+                  @if (m.hasMinutes) {
+                    <mat-icon class="minutes-icon">check_circle</mat-icon>
+                  } @else {
+                    -
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+</div>

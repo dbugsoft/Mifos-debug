@@ -24,10 +24,24 @@
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  align-items: center;
+  // Top-aligned instead of centered, so the checkbox and buttons sit level with the date field's own top edge
+  // rather than centered against its taller margin box (which reads as sitting too low next to the field).
+  align-items: flex-start;
+  // The shared shell gives every page under these tabs a 24px gap from the tab bar's own bottom border, but the
+  // date field here is tall enough to flush its own top edge against that gap, reading as touching the line -
+  // this adds the little extra room it needs on its own.
+  margin-top: 12px;
 
   .grow {
     flex: 1;
+  }
+
+  // Lines up with the 56px-high outlined date field beside it, rather than being centred against the field's
+  // own margin box (which reads taller than its visible border, leaving the checkbox looking too low).
+  mat-checkbox {
+    display: flex;
+    align-items: center;
+    height: 56px;
   }
 }
 
@@ -66,9 +80,35 @@
 }
 
 .title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   margin: 0;
   font-size: 1.05rem;
   font-weight: 700;
+
+  mat-icon {
+    color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+  }
+}
+
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 14px 0 8px;
+  color: var(--dk-text-2, #334155);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+
+  mat-icon {
+    color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
 }
 
 .actions {
@@ -78,15 +118,27 @@
   align-items: center;
 }
 
+// A tinted banner instead of plain inline text, so a warning (an officer holding two seats, say) reads as
+// something that needs attention rather than another line of body copy.
 .notice {
   display: flex;
   align-items: flex-start;
   gap: 8px;
   margin-top: 14px;
+  padding: 10px 14px;
+  border: 1px solid var(--dk-warning-border, #f0d08a);
+  border-radius: 8px;
+  background: var(--dk-warning-soft, #fff4dc);
+  color: var(--dk-text, #5c3d00);
+  font-size: 0.875rem;
+
+  &:not(:first-of-type) {
+    margin-top: 8px;
+  }
 
   mat-icon {
     flex: none;
-    color: var(--dk-text-muted, rgb(127 127 127));
+    color: var(--dk-warning, #c87f0a);
   }
 }
 
@@ -94,6 +146,67 @@
   display: block;
   font-size: 0.75rem;
   opacity: 0.8;
+}
+
+.row-actions {
+  display: inline-flex;
+  gap: 6px;
+}
+
+// Soft tinted circles instead of plain bordered squares - same recipe as the meeting page's decision edit/void
+// buttons, with a third (amber) variant for the "end term" action here.
+.icon-btn {
+  border-radius: 10px;
+  background: var(--dk-primary-soft, #e0edf8);
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    transform 0.15s ease;
+
+  mat-icon {
+    color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+  }
+
+  &:hover {
+    background: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+    transform: translateY(-1px);
+
+    mat-icon {
+      color: #fff;
+    }
+  }
+
+  &--amber {
+    background: var(--dk-warning-soft, #fff4dc);
+
+    mat-icon {
+      color: var(--dk-warning, #c87f0a);
+    }
+
+    &:hover {
+      background: var(--dk-warning, #c87f0a);
+
+      mat-icon {
+        color: #fff;
+      }
+    }
+  }
+
+  &--red {
+    background: var(--dk-danger-soft, #fdeceb);
+
+    mat-icon {
+      color: var(--dk-danger, #c62828);
+    }
+
+    &:hover {
+      background: var(--dk-danger, #c62828);
+
+      mat-icon {
+        color: #fff;
+      }
+    }
+  }
 }
 
 .term-length {
@@ -108,6 +221,32 @@
 
 .committee-card .table-card {
   margin-top: 14px;
+}
+
+// The section label right above it already carries its own bottom margin, so the table doesn't need the
+// card-level spacing on top of that too.
+.section-label + .table-card {
+  margin-top: 0;
+}
+
+.past-members {
+  margin-top: 14px;
+  border-top: 1px solid var(--dk-border, #e2e8f0);
+  padding-top: 14px;
+
+  .table-card {
+    margin-top: 10px;
+  }
+
+  .empty {
+    margin: 10px 0 0;
+  }
+}
+
+// A mistake, crossed out but kept in the history (fineract-dbug #138: nothing is deleted).
+tr.voided {
+  color: var(--dk-text-muted, rgb(127 127 127));
+  text-decoration: line-through;
 }
 
 // table.blue's own header styling (in the shared compliance mixin) targets Angular Material's mat-table markup

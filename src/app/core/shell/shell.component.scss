@@ -25,9 +25,16 @@
 }
 
 // Printing: only the page, at full length.
+// !important throughout: Angular Material's own styles for this same element (.mat-drawer-container's
+// `overflow: hidden`, .mat-drawer-content's `height: 100%; overflow: auto`) are same-specificity single-class
+// rules (see governance-register-shell's own ".tab-panel" fix for the identical problem), so a plain override
+// here was an even match it could lose on load order. Left standing, that `overflow: hidden` on the container
+// clips a report's printed content to a single screen's height - it never flows onto further pages, so the
+// saved PDF has only that first page and reads as "not scrollable" once opened.
 @media print {
   #mifosx-shell-container {
-    height: auto;
+    height: auto !important;
+    overflow: visible !important;
 
     .sidebar-panel,
     mifosx-toolbar {
@@ -36,8 +43,9 @@
 
     // Material sets the sidenav's width as an inline margin.
     .sidenav {
+      height: auto !important;
       margin-left: 0 !important;
-      overflow: visible;
+      overflow: visible !important;
     }
   }
 }

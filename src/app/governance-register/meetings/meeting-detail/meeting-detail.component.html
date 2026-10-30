@@ -1,0 +1,409 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="compliance-page">
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
+
+  @if (loadFailed() && !loading()) {
+    <p class="empty">{{ 'meetings.LoadOneFailed' | translate }}</p>
+  }
+
+  @if (meeting(); as m) {
+    <section class="report-card report-card--header mat-elevation-z2">
+      <div class="card-title-row">
+        <h1 class="period-title">
+          <mat-icon>event_note</mat-icon>
+          {{ bodyName(m) | translate }} · {{ (m.heldOn | adToBs) || m.heldOn }} ({{ m.heldOn }} AD)
+        </h1>
+        <span class="chip" [class]="statusChipClass(m.status)">{{ 'meetings.status.' + m.status | translate }}</span>
+      </div>
+
+      <div class="facts">
+        <div class="fact">
+          <span class="fact-label">{{ 'meetings.Kind' | translate }}</span>
+          <span class="fact-value">{{ 'meetings.kind.' + m.kind | translate }}</span>
+        </div>
+        <div class="fact">
+          <span class="fact-label">{{ 'governanceRegister.declarations.FiscalYear' | translate }}</span>
+          <span class="fact-value">{{ m.fiscalYearLabel }}</span>
+        </div>
+        <div class="fact">
+          <span class="fact-label">{{ 'meetings.Decisions' | translate }}</span>
+          <span class="fact-value">{{ m.decisionCount }}</span>
+        </div>
+        @if (m.approvedOn) {
+          <div class="fact">
+            <span class="fact-label">{{ 'meetings.ApprovedOn' | translate }}</span>
+            <span class="fact-value">{{ m.approvedOn }} · {{ m.approvedBy }}</span>
+          </div>
+        }
+        @if (m.voidReason) {
+          <div class="fact">
+            <span class="fact-label">{{ 'governanceRegister.committees.Mistake' | translate }}</span>
+            <span class="fact-value">{{ m.voidReason }}</span>
+          </div>
+        }
+      </div>
+
+      @if (m.status === 'DRAFT') {
+        <div class="actions top divider">
+          <button
+            mat-raised-button
+            color="primary"
+            type="button"
+            (click)="approve()"
+            [disabled]="!m.hasMinutes"
+            [matTooltip]="!m.hasMinutes ? ('meetings.NeedsMinutesToApprove' | translate) : ''"
+            *mifosxHasPermission="'UPDATE_GOVERNANCE'"
+          >
+            <mat-icon>check_circle</mat-icon>{{ 'meetings.ApproveTitle' | translate }}
+          </button>
+          <button
+            mat-stroked-button
+            color="warn"
+            type="button"
+            (click)="voidMeeting()"
+            *mifosxHasPermission="'UPDATE_GOVERNANCE'"
+          >
+            <mat-icon>delete_outline</mat-icon>{{ 'governanceRegister.committees.MarkAsAMistake' | translate }}
+          </button>
+        </div>
+      }
+      @if (m.status === 'APPROVED') {
+        <div class="actions top divider">
+          <button
+            mat-stroked-button
+            color="primary"
+            type="button"
+            (click)="addCorrection()"
+            *mifosxHasPermission="'UPDATE_GOVERNANCE'"
+          >
+            <mat-icon>edit_note</mat-icon>{{ 'meetings.AddCorrection' | translate }}
+          </button>
+        </div>
+      }
+    </section>
+
+    <mat-tab-group class="meeting-tabs" animationDuration="150ms">
+      <mat-tab>
+        <ng-template mat-tab-label><mat-icon>description</mat-icon>{{ 'meetings.Details' | translate }}</ng-template>
+        <div class="tab-panel">
+          @if (m.status === 'DRAFT') {
+            @if (detailsError()) {
+              <div class="server-error">
+                <mat-icon>error_outline</mat-icon>
+                <span>{{ detailsError() }}</span>
+              </div>
+            }
+            <mifosx-nepali-date-input
+              [inline]="true"
+              [formControl]="heldOn"
+              [label]="'meetings.HeldOn' | translate"
+              [maxDate]="today"
+            ></mifosx-nepali-date-input>
+            <mat-form-field class="field">
+              <mat-icon matPrefix>place</mat-icon>
+              <mat-label>{{ 'meetings.Place' | translate }}</mat-label>
+              <input matInput [formControl]="place" maxlength="300" />
+            </mat-form-field>
+            <mat-form-field class="field">
+              <mat-icon matPrefix>event_note</mat-icon>
+              <mat-label>{{ 'meetings.Agenda' | translate }}</mat-label>
+              <textarea matInput [formControl]="agenda" rows="3" maxlength="4000"></textarea>
+            </mat-form-field>
+            @if (!m.committeeId) {
+              <mat-form-field class="field">
+                <mat-icon matPrefix>groups</mat-icon>
+                <mat-label>{{ 'meetings.MembersPresent' | translate }}</mat-label>
+                <input matInput type="number" min="0" [formControl]="membersPresent" />
+              </mat-form-field>
+            }
+            <mat-form-field class="field">
+              <mat-icon matPrefix>note_alt</mat-icon>
+              <mat-label>{{ 'meetings.AttendanceNote' | translate }}</mat-label>
+              <textarea matInput [formControl]="attendanceNote" rows="2" maxlength="1000"></textarea>
+            </mat-form-field>
+            <button
+              mat-flat-button
+              color="primary"
+              type="button"
+              [disabled]="savingDetails()"
+              (click)="saveDetails()"
+              *mifosxHasPermission="'UPDATE_GOVERNANCE'"
+            >
+              @if (savingDetails()) {
+                <mat-icon class="spin">autorenew</mat-icon>
+              } @else {
+                <mat-icon>save</mat-icon>
+              }
+              {{ 'labels.buttons.Save Changes' | translate }}
+            </button>
+          } @else {
+            @if (m.place || m.agenda || (!m.committeeId && m.membersPresent !== null)) {
+              <div class="facts">
+                @if (m.place) {
+                  <div class="fact">
+                    <span class="fact-label">{{ 'meetings.Place' | translate }}</span>
+                    <span class="fact-value">{{ m.place }}</span>
+                  </div>
+                }
+                @if (!m.committeeId && m.membersPresent !== null) {
+                  <div class="fact">
+                    <span class="fact-label">{{ 'meetings.MembersPresent' | translate }}</span>
+                    <span class="fact-value">{{ m.membersPresent }}</span>
+                  </div>
+                }
+                @if (m.agenda) {
+                  <div class="fact">
+                    <span class="fact-label">{{ 'meetings.Agenda' | translate }}</span>
+                    <span class="fact-value agenda-text">{{ m.agenda }}</span>
+                  </div>
+                }
+              </div>
+            } @else {
+              <p class="empty">{{ 'meetings.Details' | translate }}</p>
+            }
+          }
+        </div>
+      </mat-tab>
+
+      @if (m.committeeId) {
+        <mat-tab>
+          <ng-template mat-tab-label><mat-icon>groups</mat-icon>{{ 'meetings.Attendance' | translate }}</ng-template>
+          <div class="tab-panel">
+            @if (m.attendance.length) {
+              <ul class="attendance">
+                @for (a of m.attendance; track a.personId) {
+                  <li>
+                    <span class="name"
+                      >{{ a.name }} <span class="sub">{{ a.positionName }}</span></span
+                    >
+                    @if (m.status === 'DRAFT') {
+                      <div class="marks">
+                        @for (s of attendanceStatuses; track s) {
+                          <button
+                            type="button"
+                            class="mark"
+                            [class.active]="marks()[a.personId] === s"
+                            (click)="mark(a.personId, marks()[a.personId] === s ? null : s)"
+                            *mifosxHasPermission="'UPDATE_GOVERNANCE'"
+                          >
+                            {{ 'meetings.attendanceStatus.' + s | translate }}
+                          </button>
+                        }
+                      </div>
+                    } @else if (a.status) {
+                      <span class="chip" [class.green]="a.status === 'PRESENT'" [class.grey]="a.status !== 'PRESENT'">
+                        {{ 'meetings.attendanceStatus.' + a.status | translate }}
+                      </span>
+                    } @else {
+                      <span class="sub">{{ 'meetings.NotMarked' | translate }}</span>
+                    }
+                  </li>
+                }
+              </ul>
+              @if (m.status === 'DRAFT') {
+                <button
+                  mat-flat-button
+                  color="primary"
+                  type="button"
+                  [disabled]="savingAttendance()"
+                  (click)="saveAttendance()"
+                  *mifosxHasPermission="'UPDATE_GOVERNANCE'"
+                >
+                  @if (savingAttendance()) {
+                    <mat-icon class="spin">autorenew</mat-icon>
+                  } @else {
+                    <mat-icon>save</mat-icon>
+                  }
+                  {{ 'labels.buttons.Save Changes' | translate }}
+                </button>
+              }
+            } @else {
+              <p class="empty">{{ 'meetings.NoAttendance' | translate }}</p>
+            }
+            @if (m.attendanceNote) {
+              <div class="labeled-text">
+                <span class="fact-label">{{ 'meetings.AttendanceNote' | translate }}</span>
+                <p class="hint">{{ m.attendanceNote }}</p>
+              </div>
+            }
+          </div>
+        </mat-tab>
+      }
+
+      <mat-tab>
+        <ng-template mat-tab-label><mat-icon>gavel</mat-icon>{{ 'meetings.Decisions' | translate }}</ng-template>
+        <div class="tab-panel">
+          <div class="tab-panel-header">
+            <span class="grow"></span>
+            @if (m.status === 'DRAFT') {
+              <button
+                mat-flat-button
+                color="primary"
+                type="button"
+                (click)="addDecision()"
+                *mifosxHasPermission="'UPDATE_GOVERNANCE'"
+              >
+                <mat-icon>add</mat-icon>{{ 'meetings.AddDecision' | translate }}
+              </button>
+            }
+          </div>
+          @if (m.decisions.length) {
+            <ul class="decisions">
+              @for (d of m.decisions; track d.id) {
+                <li [class.voided]="d.voided">
+                  <div class="decision-header">
+                    <span class="number">{{ 'meetings.DecisionNumber' | translate: { number: d.number } }}</span>
+                    <span class="subject" [class.struck]="d.voided">{{ d.subject }}</span>
+                    @if (m.status === 'DRAFT' && !d.voided) {
+                      <span class="decision-actions">
+                        <button
+                          mat-icon-button
+                          class="action-btn action-btn--edit"
+                          type="button"
+                          [matTooltip]="'labels.buttons.Edit' | translate"
+                          (click)="editDecision(d)"
+                        >
+                          <mat-icon>edit</mat-icon>
+                        </button>
+                        <button
+                          mat-icon-button
+                          class="action-btn action-btn--void"
+                          type="button"
+                          [matTooltip]="'governanceRegister.committees.Void' | translate"
+                          (click)="voidDecision(d)"
+                        >
+                          <mat-icon>block</mat-icon>
+                        </button>
+                      </span>
+                    }
+                  </div>
+                  <p class="wording" [class.struck]="d.voided">{{ d.wording }}</p>
+                  @if (d.voided) {
+                    <p class="sub">{{ 'governanceRegister.committees.Mistake' | translate }}: {{ d.voidReason }}</p>
+                  }
+                  @if (d.corrections.length) {
+                    @for (c of d.corrections; track c.id) {
+                      <p class="correction">
+                        <mat-icon>edit_note</mat-icon>
+                        {{ c.correction }}
+                        @if (c.fileId) {
+                          <button mat-button type="button" (click)="downloadFile(c.fileId, c.fileName!)">
+                            {{ 'labels.buttons.Download' | translate }}
+                          </button>
+                        }
+                      </p>
+                    }
+                  }
+                </li>
+              }
+            </ul>
+          } @else {
+            <p class="empty">{{ 'meetings.NoDecisions' | translate }}</p>
+          }
+        </div>
+      </mat-tab>
+
+      <mat-tab>
+        <ng-template mat-tab-label><mat-icon>upload_file</mat-icon>{{ 'meetings.Minutes' | translate }}</ng-template>
+        <div class="tab-panel">
+          <div class="tab-panel-header">
+            <span class="grow"></span>
+            @if (m.status === 'DRAFT') {
+              <button
+                mat-flat-button
+                color="primary"
+                type="button"
+                [disabled]="minutesUploading()"
+                (click)="minutesPicker.click()"
+                *mifosxHasPermission="'UPDATE_GOVERNANCE'"
+              >
+                @if (minutesUploading()) {
+                  <mat-icon class="spin">autorenew</mat-icon>
+                } @else {
+                  <mat-icon>upload_file</mat-icon>
+                }
+                {{ 'meetings.AttachMinutes' | translate }}
+              </button>
+              <input
+                #minutesPicker
+                type="file"
+                hidden
+                accept="application/pdf,image/*"
+                (change)="uploadMinutes($event)"
+              />
+            }
+          </div>
+          @if (m.minutes.length) {
+            <ul class="files">
+              @for (f of m.minutes; track f.id) {
+                <li>
+                  @if (minutesThumbs()[f.id]; as thumb) {
+                    <img class="file-thumb" [src]="thumb" alt="" />
+                  } @else {
+                    <span class="file-icon">
+                      <mat-icon>{{
+                        f.contentType === 'application/pdf' ? 'picture_as_pdf' : 'insert_drive_file'
+                      }}</mat-icon>
+                    </span>
+                  }
+                  <div class="file-info">
+                    <span class="name">{{ f.fileName }}</span>
+                    <span class="sub">{{ f.addedOn }} · {{ f.addedBy }}</span>
+                  </div>
+                  <span class="row-actions">
+                    @if (minutesThumbs()[f.id]; as thumb) {
+                      <button
+                        mat-icon-button
+                        type="button"
+                        [matTooltip]="'labels.buttons.View' | translate"
+                        (click)="viewFile(thumb)"
+                      >
+                        <mat-icon>visibility</mat-icon>
+                      </button>
+                    }
+                    <button mat-button type="button" (click)="downloadFile(f.id, f.fileName)">
+                      {{ 'labels.buttons.Download' | translate }}
+                    </button>
+                  </span>
+                </li>
+              }
+            </ul>
+          } @else {
+            <p class="empty">{{ 'meetings.NoMinutes' | translate }}</p>
+          }
+
+          @if (m.corrections.length) {
+            <h3 class="section-label divider-top">{{ 'meetings.Corrections' | translate }}</h3>
+            <ul class="files">
+              @for (c of m.corrections; track c.id) {
+                <li>
+                  <span class="name">
+                    @if (c.decisionNumber) {
+                      {{ 'meetings.DecisionNumber' | translate: { number: c.decisionNumber } }} ·
+                    }
+                    {{ c.correction }}
+                  </span>
+                  <span class="sub">{{ c.addedOn }} · {{ c.addedBy }}</span>
+                  @if (c.fileId) {
+                    <button mat-button type="button" (click)="downloadFile(c.fileId, c.fileName!)">
+                      {{ 'labels.buttons.Download' | translate }}
+                    </button>
+                  }
+                </li>
+              }
+            </ul>
+          }
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  }
+</div>

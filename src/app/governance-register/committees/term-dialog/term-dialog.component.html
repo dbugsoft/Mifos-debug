@@ -15,137 +15,219 @@
   <span class="committee-name">· {{ data.committee.name }}</span>
 </h2>
 <form [formGroup]="form" (ngSubmit)="save()">
-  <mat-dialog-content>
-    @if (serverError()) {
-      <div class="server-error">
-        <mat-icon>error_outline</mat-icon>
-        <span>{{ serverError() }}</span>
-      </div>
-    }
+  @if (serverError()) {
+    <div class="server-error">
+      <mat-icon>error_outline</mat-icon>
+      <span>{{ serverError() }}</span>
+    </div>
+  }
 
-    @if (changingPosition) {
-      <div class="who">
-        <mat-icon>person</mat-icon>
-        <span>{{ pickedPerson()?.name }}</span>
-      </div>
-    } @else if (pickedPerson()) {
-      <div class="who picked">
-        <mat-icon>check_circle</mat-icon>
-        <span>{{ pickedPerson()?.name }}</span>
-        <button mat-button color="primary" type="button" (click)="pickedPerson.set(null)">
-          {{ 'governanceRegister.committees.ChoseAnother' | translate }}
-        </button>
-      </div>
-    } @else if (!addingNewPerson()) {
-      <h3 class="section">{{ 'governanceRegister.committees.FindAPerson' | translate }}</h3>
-      <mat-form-field class="field">
-        <mat-icon matPrefix>search</mat-icon>
-        <mat-label>{{ 'governanceRegister.committees.FindAPerson' | translate }}</mat-label>
-        <input matInput [formControl]="personSearch" [matAutocomplete]="auto" autocomplete="off" />
-        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="pickPerson($event.option.value)">
-          @for (p of foundPeople(); track p.id) {
-            <mat-option [value]="p"
-              >{{ p.name }}
-              @if (p.accountNo) {
-                · {{ p.accountNo }}
-              }
-            </mat-option>
-          }
-        </mat-autocomplete>
-        <mat-hint>{{ 'governanceRegister.committees.typeToSearch' | translate }}</mat-hint>
-      </mat-form-field>
-      @if (searched() && !foundPeople().length && (personSearch.value?.length ?? 0) >= 2) {
-        <p class="no-match">
-          <mat-icon>search_off</mat-icon>
-          <span>{{ 'governanceRegister.committees.NoMatch' | translate }}</span>
-          <button mat-button color="primary" type="button" (click)="startAddingNewPerson()">
-            {{ 'governanceRegister.committees.AddAsNewPerson' | translate }}
-          </button>
-        </p>
-      } @else {
-        <button mat-button color="primary" type="button" class="add-new-link" (click)="startAddingNewPerson()">
-          <mat-icon>person_add_alt</mat-icon>{{ 'governanceRegister.committees.CantFindThem' | translate }}
-        </button>
-      }
-    } @else {
-      <h3 class="section">{{ 'governanceRegister.committees.RegisteringSomebodyNew' | translate }}</h3>
-      <div class="toggle">
-        <button
-          mat-stroked-button
-          type="button"
-          [color]="newPersonIsMember() ? 'primary' : undefined"
-          (click)="newPersonIsMember.set(true)"
-        >
-          <mat-icon>badge</mat-icon>{{ 'governanceRegister.people.AnExistingMember' | translate }}
-        </button>
-        <button
-          mat-stroked-button
-          type="button"
-          [color]="!newPersonIsMember() ? 'primary' : undefined"
-          (click)="newPersonIsMember.set(false)"
-        >
-          <mat-icon>person_outline</mat-icon>{{ 'governanceRegister.people.NotAMember' | translate }}
-        </button>
-      </div>
+  @if (changingPosition) {
+    <mat-dialog-content>
+      <div class="change-position-body">
+        <div class="who">
+          <mat-icon>person</mat-icon>
+          <span>{{ pickedPerson()?.name }}</span>
+        </div>
 
-      @if (newPersonIsMember()) {
-        @if (newMember()) {
+        <h3 class="section-label">
+          <mat-icon>work_outline</mat-icon>{{ 'governanceRegister.committees.TermDetails' | translate }}
+        </h3>
+        <ng-container [ngTemplateOutlet]="termFields"></ng-container>
+      </div>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+      <button mat-stroked-button type="button" mat-dialog-close>{{ 'labels.buttons.Cancel' | translate }}</button>
+      <button mat-raised-button color="primary" type="submit" [disabled]="busy()">
+        @if (busy()) {
+          <mat-icon class="spin">autorenew</mat-icon>
+        }
+        {{ 'labels.buttons.Submit' | translate }}
+      </button>
+    </mat-dialog-actions>
+  } @else {
+    <mat-stepper #stepper orientation="vertical" [linear]="true" class="term-stepper">
+      <mat-step [completed]="personReady">
+        <ng-template matStepLabel>{{ 'governanceRegister.committees.FindAPerson' | translate }}</ng-template>
+
+        @if (pickedPerson()) {
           <div class="who picked">
             <mat-icon>check_circle</mat-icon>
-            <span>{{ newMember()?.name }} · {{ newMember()?.accountNo }}</span>
-            <button mat-button color="primary" type="button" (click)="newMember.set(null)">
+            <span>{{ pickedPerson()?.name }}</span>
+            <button mat-button color="primary" type="button" (click)="pickedPerson.set(null)">
               {{ 'governanceRegister.committees.ChoseAnother' | translate }}
             </button>
           </div>
+        } @else if (!addingNewPerson()) {
+          <mat-form-field class="field">
+            <mat-icon matPrefix>search</mat-icon>
+            <mat-label>{{ 'governanceRegister.committees.FindAPerson' | translate }}</mat-label>
+            <input matInput [formControl]="personSearch" [matAutocomplete]="auto" autocomplete="off" />
+            <mat-autocomplete #auto="matAutocomplete" (optionSelected)="pickPerson($event.option.value)">
+              @for (p of foundPeople(); track p.id) {
+                <mat-option [value]="p"
+                  >{{ p.name }}
+                  @if (p.accountNo) {
+                    · {{ p.accountNo }}
+                  }
+                </mat-option>
+              }
+            </mat-autocomplete>
+            <mat-hint>{{ 'governanceRegister.committees.typeToSearch' | translate }}</mat-hint>
+          </mat-form-field>
+          @if (searched() && !foundPeople().length && (personSearch.value?.length ?? 0) >= 2) {
+            <p class="no-match">
+              <mat-icon>search_off</mat-icon>
+              <span>{{ 'governanceRegister.committees.NoMatch' | translate }}</span>
+              <button mat-button color="primary" type="button" (click)="startAddingNewPerson()">
+                {{ 'governanceRegister.committees.AddAsNewPerson' | translate }}
+              </button>
+            </p>
+          } @else {
+            <button mat-button color="primary" type="button" class="add-new-link" (click)="startAddingNewPerson()">
+              <mat-icon>person_add_alt</mat-icon>{{ 'governanceRegister.committees.CantFindThem' | translate }}
+            </button>
+          }
         } @else {
-          <mifosx-kym-member-picker
-            [label]="'governanceRegister.people.FindTheMember'"
-            (picked)="newMember.set($event)"
-          ></mifosx-kym-member-picker>
-        }
-      } @else {
-        <mat-form-field class="field">
-          <mat-label>{{ 'labels.inputs.name' | translate }}</mat-label>
-          <input matInput [formControl]="newPersonName" maxlength="200" />
-        </mat-form-field>
-      }
+          <div class="notice">
+            <mat-icon>info</mat-icon>
+            <span>{{ 'governanceRegister.committees.RegisteringSomebodyNew' | translate }}</span>
+          </div>
+          <div class="toggle">
+            <button
+              mat-stroked-button
+              type="button"
+              [class.selected]="newPersonIsMember()"
+              (click)="newPersonIsMember.set(true)"
+            >
+              <mat-icon>badge</mat-icon>{{ 'governanceRegister.people.AnExistingMember' | translate }}
+            </button>
+            <button
+              mat-stroked-button
+              type="button"
+              [class.selected]="!newPersonIsMember()"
+              (click)="newPersonIsMember.set(false)"
+            >
+              <mat-icon>person_outline</mat-icon>{{ 'governanceRegister.people.NotAMember' | translate }}
+            </button>
+          </div>
 
-      <button mat-button color="primary" type="button" class="add-new-link" (click)="addingNewPerson.set(false)">
-        <mat-icon>arrow_back</mat-icon>{{ 'governanceRegister.committees.FindAPersonInstead' | translate }}
-      </button>
+          @if (newPersonIsMember()) {
+            @if (newMember()) {
+              <div class="who picked">
+                <mat-icon>check_circle</mat-icon>
+                <span>{{ newMember()?.name }} · {{ newMember()?.accountNo }}</span>
+                <button mat-button color="primary" type="button" (click)="newMember.set(null)">
+                  {{ 'governanceRegister.committees.ChoseAnother' | translate }}
+                </button>
+              </div>
+            } @else {
+              <mifosx-kym-member-picker
+                [label]="'governanceRegister.people.FindTheMember'"
+                (picked)="newMember.set($event)"
+              ></mifosx-kym-member-picker>
+            }
+          } @else {
+            <mat-form-field class="field">
+              <mat-label>{{ 'labels.inputs.name' | translate }}</mat-label>
+              <input matInput [formControl]="newPersonName" maxlength="200" />
+            </mat-form-field>
+          }
+
+          <button mat-button color="primary" type="button" class="add-new-link" (click)="addingNewPerson.set(false)">
+            <mat-icon>arrow_back</mat-icon>{{ 'governanceRegister.committees.FindAPersonInstead' | translate }}
+          </button>
+        }
+
+        <div class="step-actions">
+          <button mat-stroked-button type="button" mat-dialog-close>{{ 'labels.buttons.Cancel' | translate }}</button>
+          <button mat-flat-button color="primary" type="button" matStepperNext [disabled]="!personReady">
+            {{ 'labels.buttons.Next' | translate }}
+            <mat-icon>arrow_forward</mat-icon>
+          </button>
+        </div>
+      </mat-step>
+
+      <mat-step>
+        <ng-template matStepLabel>{{ 'governanceRegister.committees.TermDetails' | translate }}</ng-template>
+
+        <ng-container [ngTemplateOutlet]="termFields"></ng-container>
+
+        <div class="step-actions">
+          <button mat-stroked-button type="button" matStepperPrevious>
+            <mat-icon>arrow_back</mat-icon>{{ 'labels.buttons.Back' | translate }}
+          </button>
+          <span class="grow"></span>
+          <button mat-stroked-button type="button" mat-dialog-close>{{ 'labels.buttons.Cancel' | translate }}</button>
+          <button mat-raised-button color="primary" type="submit" [disabled]="busy()">
+            @if (busy()) {
+              <mat-icon class="spin">autorenew</mat-icon>
+            }
+            {{ 'labels.buttons.Submit' | translate }}
+          </button>
+        </div>
+      </mat-step>
+    </mat-stepper>
+  }
+</form>
+
+<ng-template #termFields>
+  <mat-form-field class="field">
+    <mat-icon matPrefix>work_outline</mat-icon>
+    <mat-label>{{ 'governanceRegister.Position' | translate }}</mat-label>
+    <mat-select formControlName="positionId">
+      @for (p of positions(); track p.id) {
+        <mat-option [value]="p.id">{{ positionLabel(p) | translate }}</mat-option>
+      }
+    </mat-select>
+    @if (form.controls.positionId.hasError('server')) {
+      <mat-error>{{ form.controls.positionId.getError('server') }}</mat-error>
     }
+  </mat-form-field>
 
-    <h3 class="section">{{ 'governanceRegister.committees.TermDetails' | translate }}</h3>
+  <mifosx-nepali-date-input
+    [inline]="true"
+    formControlName="on"
+    [label]="
+      (changingPosition ? 'governanceRegister.committees.ChangedOn' : 'governanceRegister.committees.StartedOn')
+        | translate
+    "
+    [maxDate]="today"
+  ></mifosx-nepali-date-input>
 
-    <mat-form-field class="field">
-      <mat-icon matPrefix>work_outline</mat-icon>
-      <mat-label>{{ 'governanceRegister.Position' | translate }}</mat-label>
-      <mat-select formControlName="positionId">
-        @for (p of positions(); track p.id) {
-          <mat-option [value]="p.id">{{ positionLabel(p) | translate }}</mat-option>
-        }
-      </mat-select>
-      @if (form.controls.positionId.hasError('server')) {
-        <mat-error>{{ form.controls.positionId.getError('server') }}</mat-error>
-      }
-    </mat-form-field>
-
+  @if (!changingPosition) {
     <mifosx-nepali-date-input
       [inline]="true"
-      formControlName="on"
-      [label]="
-        (changingPosition ? 'governanceRegister.committees.ChangedOn' : 'governanceRegister.committees.StartedOn')
-          | translate
-      "
-      [maxDate]="today"
+      formControlName="expectedEndOn"
+      [label]="'governanceRegister.committees.ExpectedEndOn' | translate"
     ></mifosx-nepali-date-input>
+  }
 
-    @if (!changingPosition) {
-      <mifosx-nepali-date-input
-        [inline]="true"
-        formControlName="expectedEndOn"
-        [label]="'governanceRegister.committees.ExpectedEndOn' | translate"
-      ></mifosx-nepali-date-input>
+  @if (pickedDecision()) {
+    <div class="who picked">
+      <mat-icon>gavel</mat-icon>
+      <span>{{ pickedDecision()?.reference }}</span>
+      <button mat-button color="primary" type="button" (click)="clearDecision()">
+        {{ 'governanceRegister.committees.ChoseAnother' | translate }}
+      </button>
+    </div>
+  } @else {
+    <mat-form-field class="field" subscriptSizing="dynamic">
+      <mat-icon matPrefix>gavel</mat-icon>
+      <mat-label>{{ 'governanceRegister.committees.FindADecision' | translate }}</mat-label>
+      <input matInput [formControl]="decisionSearch" [matAutocomplete]="decisionAuto" autocomplete="off" />
+      <mat-autocomplete #decisionAuto="matAutocomplete" (optionSelected)="pickDecision($event.option.value)">
+        @for (d of foundDecisions(); track d.id) {
+          <mat-option [value]="d">{{ d.reference }}</mat-option>
+        }
+      </mat-autocomplete>
+      <mat-hint>{{ 'governanceRegister.committees.DecisionHint' | translate }}</mat-hint>
+    </mat-form-field>
+    @if (decisionSearched() && !foundDecisions().length && (decisionSearch.value?.length ?? 0) >= 2) {
+      <p class="no-match">
+        <mat-icon>search_off</mat-icon>
+        <span>{{ 'governanceRegister.committees.NoDecisionMatch' | translate }}</span>
+      </p>
     }
 
     <mat-form-field class="field">
@@ -153,19 +235,10 @@
       <mat-label>{{ 'governanceRegister.DecisionReference' | translate }}</mat-label>
       <input matInput formControlName="decisionReference" maxlength="200" />
     </mat-form-field>
+  }
 
-    <mat-form-field class="field">
-      <mat-label>{{ 'labels.inputs.Note' | translate }}</mat-label>
-      <textarea matInput formControlName="note" rows="3" maxlength="1000"></textarea>
-    </mat-form-field>
-  </mat-dialog-content>
-  <mat-dialog-actions align="end">
-    <button mat-stroked-button type="button" mat-dialog-close>{{ 'labels.buttons.Cancel' | translate }}</button>
-    <button mat-raised-button color="primary" type="submit" [disabled]="busy() || !personReady">
-      @if (busy()) {
-        <mat-icon class="spin">autorenew</mat-icon>
-      }
-      {{ 'labels.buttons.Submit' | translate }}
-    </button>
-  </mat-dialog-actions>
-</form>
+  <mat-form-field class="field">
+    <mat-label>{{ 'labels.inputs.Note' | translate }}</mat-label>
+    <textarea matInput formControlName="note" rows="3" maxlength="1000"></textarea>
+  </mat-form-field>
+</ng-template>

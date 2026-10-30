@@ -6,21 +6,105 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+[mat-dialog-title] {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .field {
   display: block;
   width: 100%;
 }
 
-[mat-stroked-button] {
+.file-label {
+  display: block;
+  margin: 0 0 4px;
+  color: var(--dk-text-muted, rgb(0 0 0 / 60%));
+  font-size: 0.75rem;
+}
+
+// Styled to match the surrounding mat-form-field outline boxes (same border, radius and height), so the file
+// picker reads as a field alongside Title/Note instead of a stray button sitting below them. The filename takes
+// the place of the "Choose a file" placeholder once one is picked, exactly like a filled text field.
+.file-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 56px;
+  padding: 0 16px;
+  border: 1px solid var(--dk-border-strong, rgb(0 0 0 / 38%));
+  border-radius: 4px;
   margin-bottom: 16px;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    border-color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+    outline: none;
+  }
+
+  mat-icon {
+    flex: none;
+    color: var(--dk-text-muted, rgb(0 0 0 / 54%));
+  }
+
+  &.has-file mat-icon {
+    color: var(--dk-success, #16a34a);
+  }
+}
+
+.file-field-text {
+  flex: 1;
+  overflow: hidden;
+  color: var(--dk-text-muted, rgb(0 0 0 / 60%));
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.has-file .file-field-text {
+  color: var(--dk-text, inherit);
+  font-weight: 600;
+}
+
+.file-field-change {
+  flex: none;
+  color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+  font-size: 0.8rem;
+  font-weight: 600;
 }
 
 .server-error {
-  margin: 0 0 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0 0 16px;
   padding: 10px 14px;
   border-left: 3px solid var(--dk-danger, #c62828);
   border-radius: 6px;
   background: var(--dk-danger-soft, #ffebee);
   color: var(--dk-danger, #c62828);
   font-size: 14px;
+}
+
+// mat-dialog-actions doesn't centre its buttons' baselines by default, which left Submit (raised, with its own
+// elevation shadow) looking a touch lower than Cancel (stroked, flat). Aligning both on the same cross-axis
+// centre fixes it without changing either button's own style.
+mat-dialog-actions {
+  align-items: center;
+}
+
+.spin {
+  margin-right: 6px;
+  animation: mfx-spin 1s linear infinite;
+}
+
+@keyframes mfx-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }

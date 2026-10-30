@@ -1,0 +1,76 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<h2 mat-dialog-title>
+  <mat-icon>link</mat-icon>
+  {{ 'relatedParties.LinkDialogTitle' | translate }}
+  <span class="officer-name">· {{ data.officerName }}</span>
+</h2>
+<form [formGroup]="form" (ngSubmit)="save()">
+  <mat-dialog-content>
+    @if (serverError()) {
+      <div class="server-error">
+        <mat-icon>error_outline</mat-icon>
+        <span>{{ serverError() }}</span>
+      </div>
+    }
+
+    @if (!picked() && data.suggested?.possibleName) {
+      <div class="notice">
+        <mat-icon>lightbulb</mat-icon>
+        <span>{{
+          'relatedParties.PossibleMatch'
+            | translate: { name: data.suggested?.possibleName, account: data.suggested?.possibleAccountNo }
+        }}</span>
+        <button mat-button color="primary" type="button" (click)="useSuggested()">
+          {{ 'relatedParties.UseThis' | translate }}
+        </button>
+      </div>
+    }
+
+    <h3 class="section">{{ 'relatedParties.FindTheMember' | translate }}</h3>
+    @if (picked(); as m) {
+      <div class="who picked">
+        <mat-icon>check_circle</mat-icon>
+        <span>{{ m.name }} · {{ m.accountNo }}</span>
+        <button mat-button color="primary" type="button" (click)="picked.set(null)">
+          {{ 'governanceRegister.committees.ChoseAnother' | translate }}
+        </button>
+      </div>
+    } @else {
+      <mifosx-kym-member-picker
+        [label]="'relatedParties.FindTheMember'"
+        (picked)="pickMember($event)"
+      ></mifosx-kym-member-picker>
+    }
+
+    <h3 class="section divider-top">{{ 'relatedParties.Relationship' | translate }}</h3>
+    <mifosx-relationship-select
+      [code]="form.controls.relationshipCode"
+      [detail]="form.controls.relationshipDetail"
+      [required]="true"
+      label="relatedParties.Relationship"
+    ></mifosx-relationship-select>
+
+    <mat-checkbox formControlName="marriageEnded">{{ 'relatedParties.MarriageEnded' | translate }}</mat-checkbox>
+
+    <mat-form-field class="field">
+      <mat-label>{{ 'labels.inputs.Note' | translate }}</mat-label>
+      <textarea matInput formControlName="note" rows="2" maxlength="500"></textarea>
+    </mat-form-field>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-stroked-button type="button" mat-dialog-close>{{ 'labels.buttons.Cancel' | translate }}</button>
+    <button mat-raised-button color="primary" type="submit" [disabled]="busy() || !picked()">
+      @if (busy()) {
+        <mat-icon class="spin">autorenew</mat-icon>
+      }
+      {{ 'labels.buttons.Submit' | translate }}
+    </button>
+  </mat-dialog-actions>
+</form>

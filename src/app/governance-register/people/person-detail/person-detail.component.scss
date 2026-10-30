@@ -10,22 +10,318 @@
 
 @include compliance.page;
 
-.actions {
+// Replaces the shared "framed section with a legend floating on the border" look with a plain elevated card -
+// same change made to the governance register's committee cards and the management report's pages, for the same
+// reason: several of these stacked one after another read as cluttered. Angular's view encapsulation keeps this
+// scoped to this component, so Compliance's own pages are unaffected.
+.person-card {
+  margin: 16px 0 0;
+  padding: 20px 22px;
+  border-radius: 14px;
+  background: var(--mat-sys-surface, var(--dk-surface, #fff));
+
+  &:first-child {
+    margin-top: 0;
+  }
+}
+
+.card-header {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 12px;
+  justify-content: space-between;
   align-items: center;
-  margin-top: 12px;
+  margin-bottom: 16px;
+}
 
-  &.top {
-    margin: 0 0 12px;
+.person-title,
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-weight: 700;
+
+  mat-icon {
+    color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
   }
+}
+
+.person-title {
+  font-size: 1.3rem;
+}
+
+.card-title {
+  margin-bottom: 16px;
+  font-size: 1rem;
+}
+
+.card-header .card-title {
+  margin-bottom: 0;
+}
+
+// Stat tiles instead of inline "label: value" pairs, matching the management report's own cards: label small and
+// muted on top, the value in bold underneath, each on its own light tile instead of plain text in a row.
+// As many tiles per row as fit, rather than the shared mixin's fixed 3 columns: with Member, Office, Mobile,
+// Email, Address and Note all possibly present, a fixed 3-column grid wraps address/note to a row of their own.
+.facts {
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px;
+}
+
+.fact-value--plain {
+  font-weight: 400;
+}
+
+.fact {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--dk-surface-2, #f1f5f9);
+}
+
+.fact-label {
+  color: var(--dk-text-muted, rgb(127 127 127));
+  font-size: 0.75rem;
+
+  &::after {
+    content: '';
+  }
+}
+
+.fact-value {
+  color: var(--dk-text, inherit);
+  font-size: 1.05rem;
+  font-weight: 700;
 }
 
 // A mistake, crossed out but kept in the history (fineract-dbug #138: nothing is deleted).
 tr.voided {
   color: var(--dk-text-muted, rgb(127 127 127));
   text-decoration: line-through;
+}
+
+// Change position / end term / clear, on the Current positions table - same treatment as the committees page's
+// own copy of these three actions.
+.row-actions {
+  display: inline-flex;
+  gap: 6px;
+}
+
+// Soft tinted circles instead of plain bordered squares - same recipe as the meeting page's decision edit/void
+// buttons, with a third (amber) variant for the "end term" action here.
+.icon-btn {
+  border-radius: 10px;
+  background: var(--dk-primary-soft, #e0edf8);
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    transform 0.15s ease;
+
+  mat-icon {
+    color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+  }
+
+  &:hover {
+    background: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+    transform: translateY(-1px);
+
+    mat-icon {
+      color: #fff;
+    }
+  }
+
+  &--amber {
+    background: var(--dk-warning-soft, #fff4dc);
+
+    mat-icon {
+      color: var(--dk-warning, #c87f0a);
+    }
+
+    &:hover {
+      background: var(--dk-warning, #c87f0a);
+
+      mat-icon {
+        color: #fff;
+      }
+    }
+  }
+
+  &--red {
+    background: var(--dk-danger-soft, #fdeceb);
+
+    mat-icon {
+      color: var(--dk-danger, #c62828);
+    }
+
+    &:hover {
+      background: var(--dk-danger, #c62828);
+
+      mat-icon {
+        color: #fff;
+      }
+    }
+  }
+}
+
+// Replaces the long stack of separate cards (related parties, positions, history, documents, declarations) with
+// one elevated card holding a tab per area - the same reason the committee cards became plain cards above: several
+// of those sections one after another, each with its own header and table, read as cluttered and hid the person's
+// own summary further and further down the page.
+.person-tabs {
+  display: block;
+  margin: 16px 0 0;
+  padding: 6px 0 18px;
+  border-radius: 14px;
+  background: var(--mat-sys-surface, var(--dk-surface, #fff));
+
+  ::ng-deep .mat-mdc-tab-label-container {
+    padding: 0 10px;
+  }
+
+  ::ng-deep .mdc-tab {
+    gap: 8px;
+
+    mat-icon {
+      color: inherit;
+    }
+  }
+}
+
+.tab-panel {
+  padding: 18px 22px 0;
+}
+
+.tab-panel-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 16px;
+
+  .grow {
+    flex: 1;
+  }
+}
+
+.header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+// The login fact plus its two action buttons, read as one identity strip at the top of the Related parties tab
+// instead of the fact tile and the buttons sitting in separate rows above one another.
+.login-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--dk-surface-2, #f1f5f9);
+}
+
+.login-identity {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  mat-icon {
+    color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+  }
+
+  > div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+}
+
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 20px 0 10px;
+  color: var(--dk-text-2, #334155);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+
+  mat-icon {
+    color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+
+  &.divider-top {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--dk-border, #e2e8f0);
+  }
+}
+
+.links,
+.related-members {
+  margin: 0 0 8px;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    align-items: center;
+    padding: 10px 14px;
+    margin-bottom: 8px;
+    border: 1px solid var(--dk-border, #e2e8f0);
+    border-radius: 10px;
+    background: var(--dk-surface-2, #f8fafc);
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
+
+    &:hover {
+      border-color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+      box-shadow: 0 1px 6px rgb(0 0 0 / 6%);
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    &.removed {
+      opacity: 0.6;
+    }
+  }
+
+  .name {
+    font-weight: 600;
+  }
+
+  button {
+    margin-left: auto;
+  }
+}
+
+.related-members li {
+  gap: 8px;
+}
+
+.row-icon {
+  flex: none;
+  color: var(--dk-text-muted, rgb(127 127 127));
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
 }
 
 .documents {
@@ -36,14 +332,59 @@ tr.voided {
   li {
     display: flex;
     flex-wrap: wrap;
-    gap: 4px 16px;
     align-items: center;
-    padding: 10px 0;
-    border-bottom: 1px solid rgb(127 127 127 / 15%);
+    gap: 14px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    border: 1px solid var(--dk-border, #e2e8f0);
+    border-radius: 10px;
+    background: var(--dk-surface-2, #f8fafc);
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
+
+    &:hover {
+      border-color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+      box-shadow: 0 1px 6px rgb(0 0 0 / 6%);
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
 
     &.removed {
       opacity: 0.6;
     }
+  }
+
+  .doc-thumb {
+    flex: none;
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    border: 1px solid var(--dk-border, #e2e8f0);
+    object-fit: cover;
+  }
+
+  .doc-icon {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border: 1px solid var(--dk-border, #e2e8f0);
+    border-radius: 8px;
+    background: var(--dk-surface, #fff);
+    color: var(--dk-text-muted, rgb(127 127 127));
+  }
+
+  .doc-info {
+    display: flex;
+    flex: 1 1 200px;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
   }
 
   .name {
@@ -57,7 +398,16 @@ tr.voided {
   }
 
   .row-actions {
+    display: flex;
+    flex: none;
+    gap: 4px;
     margin-left: auto;
+
+    button {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
   }
 }
 

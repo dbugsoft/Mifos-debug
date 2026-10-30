@@ -22,7 +22,13 @@
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  align-items: center;
+  // Top-aligned instead of centered, so the shorter button sits level with the date field's own top edge rather
+  // than centered against its taller margin box (which reads as sitting too low next to the field).
+  align-items: flex-start;
+  // The shared shell gives every page under these tabs a 24px gap from the tab bar's own bottom border, but the
+  // field here is tall enough (centered against the shorter button beside it) to flush its own top edge against
+  // that gap, reading as touching the line - this adds the little extra room it needs on its own.
+  margin-top: 12px;
 }
 
 // table.blue's own header styling (in the shared compliance mixin) targets Angular Material's mat-table markup

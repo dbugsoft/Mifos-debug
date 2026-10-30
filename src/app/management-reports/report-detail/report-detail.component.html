@@ -16,500 +16,892 @@
   }
 
   @if (report(); as r) {
-    <section class="report-card report-card--header mat-elevation-z2">
-      <div class="card-title-row">
-        <h1 class="period-title">
-          <mat-icon>summarize</mat-icon>
-          {{ r.fromBs }} – {{ r.toBs }}
-        </h1>
-        <div class="status-chips">
-          <span class="chip" [class]="statusChipClass(r.status)">{{
-            'managementReports.status.' + r.status | translate
-          }}</span>
-          @if (r.replacesId) {
-            <span class="chip amber">{{ 'managementReports.Correction' | translate }}</span>
-          }
-        </div>
-      </div>
-
-      <div class="facts">
-        <div class="fact">
-          <span class="fact-label">{{ 'labels.inputs.Office' | translate }}</span>
-          <span class="fact-value">{{ r.officeName }}</span>
-        </div>
-        <div class="fact">
-          <span class="fact-label">{{ 'managementReports.FiscalYear' | translate }}</span>
-          <span class="fact-value">{{ r.fiscalYear }}</span>
-        </div>
-        @if (r.generatedAt) {
-          <div class="fact">
-            <span class="fact-label">{{ 'managementReports.Generated' | translate }}</span>
-            <span class="fact-value">{{ r.generatedAt | date: 'medium' }} · {{ r.generatedBy }}</span>
-          </div>
-        }
-        @if (r.submittedAt) {
-          <div class="fact">
-            <span class="fact-label">{{ 'managementReports.Submitted' | translate }}</span>
-            <span class="fact-value">{{ r.submittedAt | date: 'medium' }} · {{ r.submittedBy }}</span>
-          </div>
-        }
-        @if (r.decidedAt) {
-          <div class="fact">
-            <span class="fact-label">{{ 'managementReports.Decided' | translate }}</span>
-            <span class="fact-value"
-              >{{ r.decidedAt | date: 'medium' }} · {{ r.decidedBy }}
-              @if (r.decisionReference) {
-                <span class="sub">{{ r.decisionReference }}</span>
-              }
-              @if (r.decisionNote) {
-                <span class="sub">{{ r.decisionNote }}</span>
-              }
-            </span>
-          </div>
-        }
-        @if (r.discardedAt) {
-          <div class="fact">
-            <span class="fact-label">{{ 'managementReports.Discarded' | translate }}</span>
-            <span class="fact-value"
-              >{{ r.discardedAt | date: 'medium' }} · {{ r.discardedBy }}
-              <span class="sub">{{ r.discardReason }}</span>
-            </span>
-          </div>
-        }
-      </div>
-
-      <div class="actions top">
-        @if (canEditNotes()) {
-          <button
-            mat-stroked-button
-            type="button"
-            (click)="regenerate()"
-            *mifosxHasPermission="'CREATE_MANAGEMENTREPORT'"
-          >
-            <mat-icon>refresh</mat-icon>{{ 'managementReports.Regenerate' | translate }}
-          </button>
-          <button
-            mat-raised-button
-            color="primary"
-            type="button"
-            (click)="submit()"
-            *mifosxHasPermission="'CREATE_MANAGEMENTREPORT'"
-          >
-            <mat-icon>send</mat-icon>{{ 'managementReports.SubmitToTheBoard' | translate }}
-          </button>
-          <button
-            mat-button
-            color="warn"
-            type="button"
-            (click)="discard()"
-            *mifosxHasPermission="'CREATE_MANAGEMENTREPORT'"
-          >
-            <mat-icon>delete_outline</mat-icon>{{ 'managementReports.Discard' | translate }}
-          </button>
-        }
-        @if (r.status === 'SUBMITTED') {
-          <button
-            mat-raised-button
-            color="primary"
-            type="button"
-            (click)="approve()"
-            *mifosxHasPermission="'APPROVE_MANAGEMENTREPORT'"
-          >
-            <mat-icon>check_circle</mat-icon>{{ 'managementReports.ApproveTitle' | translate }}
-          </button>
-          <button
-            mat-stroked-button
-            type="button"
-            (click)="returnReport()"
-            *mifosxHasPermission="'APPROVE_MANAGEMENTREPORT'"
-          >
-            <mat-icon>undo</mat-icon>{{ 'managementReports.ReturnTitle' | translate }}
-          </button>
-        }
-        @if (r.status === 'APPROVED') {
-          <button
-            mat-stroked-button
-            color="primary"
-            type="button"
-            (click)="makeCorrectedReport()"
-            *mifosxHasPermission="'CREATE_MANAGEMENTREPORT'"
-          >
-            <mat-icon>edit_note</mat-icon>{{ 'managementReports.MakeACorrectedReport' | translate }}
-          </button>
-        }
-        @if (r.replacedById) {
-          <span class="hint">{{ 'managementReports.ReplacedHint' | translate: { id: r.replacedById } }}</span>
-        }
-      </div>
-
-      <div class="notes-block">
-        <h3 class="section-label">{{ 'labels.inputs.Note' | translate }}</h3>
-        @if (canEditNotes()) {
-          <mat-form-field class="field" subscriptSizing="dynamic">
-            <textarea matInput [formControl]="notes" rows="3" maxlength="4000"></textarea>
-          </mat-form-field>
-          <button
-            mat-button
-            type="button"
-            [disabled]="!notesDirty() || savingNotes()"
-            (click)="saveNotes()"
-            *mifosxHasPermission="'CREATE_MANAGEMENTREPORT'"
-          >
-            {{ 'labels.buttons.Save Changes' | translate }}
-          </button>
-        } @else {
-          <p class="notes-text">{{ r.notes || ('managementReports.NoNotes' | translate) }}</p>
-        }
-      </div>
-    </section>
-
-    @if (r.content; as c) {
-      <section class="report-card mat-elevation-z2">
-        <h2 class="card-title"><mat-icon>group</mat-icon>{{ 'managementReports.sections.Members' | translate }}</h2>
-        <div class="facts">
-          <div class="fact">
-            <span class="fact-label">{{ 'managementReports.AtStart' | translate }}</span>
-            <span class="fact-value">{{ c.members.atStart }}</span>
-          </div>
-          <div class="fact">
-            <span class="fact-label">{{ 'managementReports.Joined' | translate }}</span>
-            <span class="fact-value">{{ c.members.joined }}</span>
-          </div>
-          <div class="fact">
-            <span class="fact-label">{{ 'managementReports.Left' | translate }}</span>
-            <span class="fact-value">{{ c.members.left }}</span>
-          </div>
-          <div class="fact">
-            <span class="fact-label">{{ 'managementReports.AtEnd' | translate }}</span>
-            <span class="fact-value">{{ c.members.atEnd }}</span>
-          </div>
-          <div class="fact">
-            <span class="fact-label">{{ 'managementReports.ShareCapitalAtStart' | translate }}</span>
-            <span class="fact-value">{{ c.members.shareCapitalAtStart | number: '1.0-0' }}</span>
-          </div>
-          <div class="fact">
-            <span class="fact-label">{{ 'managementReports.SharesBought' | translate }}</span>
-            <span class="fact-value">{{ c.members.sharesBought | number: '1.0-0' }}</span>
-          </div>
-          <div class="fact">
-            <span class="fact-label">{{ 'managementReports.SharesRefunded' | translate }}</span>
-            <span class="fact-value">{{ c.members.sharesRefunded | number: '1.0-0' }}</span>
-          </div>
-          <div class="fact">
-            <span class="fact-label">{{ 'managementReports.ShareCapitalAtEnd' | translate }}</span>
-            <span class="fact-value">{{ c.members.shareCapitalAtEnd | number: '1.0-0' }}</span>
-          </div>
-        </div>
-      </section>
-
-      <section class="report-card mat-elevation-z2">
-        <h2 class="card-title"><mat-icon>savings</mat-icon>{{ 'managementReports.sections.Deposits' | translate }}</h2>
-        <div class="facts">
-          <div class="fact">
-            <span class="fact-label">{{ 'managementReports.AtStart' | translate }}</span>
-            <span class="fact-value">{{ c.deposits.atStart | number: '1.0-0' }}</span>
-          </div>
-          <div class="fact">
-            <span class="fact-label">{{ 'managementReports.Deposited' | translate }}</span>
-            <span class="fact-value">{{ c.deposits.deposited | number: '1.0-0' }}</span>
-          </div>
-          <div class="fact">
-            <span class="fact-label">{{ 'managementReports.Withdrawn' | translate }}</span>
-            <span class="fact-value">{{ c.deposits.withdrawn | number: '1.0-0' }}</span>
-          </div>
-          <div class="fact">
-            <span class="fact-label">{{ 'managementReports.InterestPosted' | translate }}</span>
-            <span class="fact-value">{{ c.deposits.interestPosted | number: '1.0-0' }}</span>
-          </div>
-          <div class="fact">
-            <span class="fact-label">{{ 'managementReports.AtEnd' | translate }}</span>
-            <span class="fact-value">{{ c.deposits.atEnd | number: '1.0-0' }}</span>
-          </div>
-        </div>
-        @if (c.deposits.byProduct.length) {
-          <div class="table-card mat-elevation-z8">
-            <div class="table-scroll">
-              <table class="blue">
-                <thead>
-                  <tr>
-                    <th>{{ 'managementReports.Product' | translate }}</th>
-                    <th class="num">{{ 'managementReports.Accounts' | translate }}</th>
-                    <th class="num">{{ 'managementReports.Balance' | translate }}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @for (d of c.deposits.byProduct; track d.product) {
-                    <tr>
-                      <td>{{ d.product }}</td>
-                      <td class="num">{{ d.accounts }}</td>
-                      <td class="num">{{ d.balance | number: '1.0-0' }}</td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
-            </div>
-          </div>
-        }
-      </section>
-
-      <section class="report-card mat-elevation-z2">
-        <h2 class="card-title">
-          <mat-icon>account_balance</mat-icon>{{ 'managementReports.sections.Loans' | translate }}
-        </h2>
-        <div class="facts">
-          <div class="fact">
-            <span class="fact-label">{{ 'managementReports.OutstandingAtStart' | translate }}</span>
-            <span class="fact-value">{{ c.loans.outstandingAtStart | number: '1.0-0' }}</span>
-          </div>
-          <div class="fact">
-            <span class="fact-label">{{ 'managementReports.LoansDisbursed' | translate }}</span>
-            <span class="fact-value">{{ c.loans.loansDisbursed }}</span>
-          </div>
-          <div class="fact">
-            <span class="fact-label">{{ 'managementReports.Disbursed' | translate }}</span>
-            <span class="fact-value">{{ c.loans.disbursed | number: '1.0-0' }}</span>
-          </div>
-          <div class="fact">
-            <span class="fact-label">{{ 'managementReports.PrincipalCollected' | translate }}</span>
-            <span class="fact-value">{{ c.loans.principalCollected | number: '1.0-0' }}</span>
-          </div>
-          <div class="fact">
-            <span class="fact-label">{{ 'managementReports.InterestCollected' | translate }}</span>
-            <span class="fact-value">{{ c.loans.interestCollected | number: '1.0-0' }}</span>
-          </div>
-          <div class="fact">
-            <span class="fact-label">{{ 'managementReports.OutstandingAtEnd' | translate }}</span>
-            <span class="fact-value">{{ c.loans.outstandingAtEnd | number: '1.0-0' }}</span>
-          </div>
-          <div class="fact">
-            <span class="fact-label">{{ 'managementReports.LoansAtEnd' | translate }}</span>
-            <span class="fact-value">{{ c.loans.loansAtEnd }}</span>
-          </div>
-          <div class="fact">
-            <span class="fact-label">{{ 'managementReports.ProvisionRequired' | translate }}</span>
-            <span class="fact-value">{{ c.loans.provisionRequired | number: '1.0-0' }}</span>
-          </div>
-          <div class="fact">
-            <span class="fact-label">{{ 'managementReports.Overdue30Percent' | translate }}</span>
-            <span class="fact-value">{{ c.loans.overdue30Percent | number: '1.1-1' }}%</span>
-          </div>
-          <div class="fact">
-            <span class="fact-label">{{ 'managementReports.NonPerformingPercent' | translate }}</span>
-            <span class="fact-value">{{ c.loans.nonPerformingPercent | number: '1.1-1' }}%</span>
-          </div>
-        </div>
-
-        @if (c.loans.classes.length) {
-          <div class="table-card mat-elevation-z8">
-            <div class="table-scroll">
-              <table class="blue">
-                <thead>
-                  <tr>
-                    <th>{{ 'managementReports.LoanClass' | translate }}</th>
-                    <th class="num">{{ 'managementReports.Loans' | translate }}</th>
-                    <th class="num">{{ 'managementReports.Outstanding' | translate }}</th>
-                    <th class="num">{{ 'managementReports.ProvisionRate' | translate }}</th>
-                    <th class="num">{{ 'managementReports.Provision' | translate }}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @for (cl of c.loans.classes; track cl.code) {
-                    <tr>
-                      <td>{{ cl.label }}</td>
-                      <td class="num">{{ cl.loans }}</td>
-                      <td class="num">{{ cl.outstanding | number: '1.0-0' }}</td>
-                      <td class="num">{{ cl.provisionRate | number: '1.0-0' }}%</td>
-                      <td class="num">{{ cl.provision | number: '1.0-0' }}</td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
-            </div>
-          </div>
-        }
-
-        @if (c.loans.largest.length) {
-          <h3 class="section-label">{{ 'managementReports.LargestLoans' | translate }}</h3>
-          <div class="table-card mat-elevation-z8">
-            <div class="table-scroll">
-              <table class="blue">
-                <thead>
-                  <tr>
-                    <th>{{ 'labels.inputs.name' | translate }}</th>
-                    <th>{{ 'managementReports.AccountNo' | translate }}</th>
-                    <th class="num">{{ 'managementReports.Outstanding' | translate }}</th>
-                    <th class="num">{{ 'managementReports.DaysOverdue' | translate }}</th>
-                    <th>{{ 'managementReports.LoanClass' | translate }}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @for (l of c.loans.largest; track l.accountNo) {
-                    <tr>
-                      <td>{{ l.borrower }}</td>
-                      <td>{{ l.accountNo }}</td>
-                      <td class="num">{{ l.outstanding | number: '1.0-0' }}</td>
-                      <td class="num">{{ l.daysOverdue }}</td>
-                      <td>{{ l.loanClass }}</td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
-            </div>
-          </div>
-        }
-      </section>
-
-      <section class="report-card mat-elevation-z2">
-        <h2 class="card-title"><mat-icon>payments</mat-icon>{{ 'managementReports.sections.Income' | translate }}</h2>
-        <div class="facts">
-          <div class="fact">
-            <span class="fact-label">{{ 'managementReports.Income' | translate }}</span>
-            <span class="fact-value">{{ c.income.income | number: '1.0-0' }}</span>
-          </div>
-          <div class="fact">
-            <span class="fact-label">{{ 'managementReports.Expense' | translate }}</span>
-            <span class="fact-value">{{ c.income.expense | number: '1.0-0' }}</span>
-          </div>
-          <div class="fact">
-            <span class="fact-label">{{ 'managementReports.Surplus' | translate }}</span>
-            <span class="fact-value">{{ c.income.surplus | number: '1.0-0' }}</span>
-          </div>
-        </div>
-        @if (c.income.accounts.length) {
-          <div class="table-card mat-elevation-z8">
-            <div class="table-scroll">
-              <table class="blue">
-                <thead>
-                  <tr>
-                    <th>{{ 'managementReports.GlCode' | translate }}</th>
-                    <th>{{ 'labels.inputs.name' | translate }}</th>
-                    <th>{{ 'labels.inputs.Type' | translate }}</th>
-                    <th class="num">{{ 'managementReports.Amount' | translate }}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @for (a of c.income.accounts; track a.glCode) {
-                    <tr>
-                      <td>{{ a.glCode }}</td>
-                      <td>{{ a.name }}</td>
-                      <td>{{ 'managementReports.accountType.' + a.type | translate }}</td>
-                      <td class="num">{{ a.amount | number: '1.0-0' }}</td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
-            </div>
-          </div>
-        }
-      </section>
-
-      <section class="report-card mat-elevation-z2">
-        <h2 class="card-title"><mat-icon>show_chart</mat-icon>{{ 'managementReports.sections.Spread' | translate }}</h2>
-        <div class="facts">
-          <div class="fact">
-            <span class="fact-label">{{ 'managementReports.LoanYield' | translate }}</span>
-            <span class="fact-value">{{
-              c.spread.loanYield !== null ? (c.spread.loanYield | number: '1.1-1') + '%' : '-'
+    <div class="screen-only">
+      <section class="report-card report-card--header mat-elevation-z2">
+        <div class="card-title-row">
+          <h1 class="period-title">
+            <mat-icon>summarize</mat-icon>
+            {{ r.fromBs }} – {{ r.toBs }}
+          </h1>
+          <div class="status-chips">
+            <span class="chip" [class]="statusChipClass(r.status)">{{
+              'managementReports.status.' + r.status | translate
             }}</span>
+            @if (r.replacesId) {
+              <span class="chip amber">{{ 'managementReports.Correction' | translate }}</span>
+            }
+          </div>
+        </div>
+
+        <div class="facts">
+          <div class="fact">
+            <span class="fact-label">{{ 'labels.inputs.Office' | translate }}</span>
+            <span class="fact-value">{{ r.officeName }}</span>
           </div>
           <div class="fact">
-            <span class="fact-label">{{ 'managementReports.DepositCost' | translate }}</span>
-            <span class="fact-value">{{
-              c.spread.depositCost !== null ? (c.spread.depositCost | number: '1.1-1') + '%' : '-'
-            }}</span>
+            <span class="fact-label">{{ 'managementReports.FiscalYear' | translate }}</span>
+            <span class="fact-value">{{ r.fiscalYear }}</span>
           </div>
-          <div class="fact">
-            <span class="fact-label">{{ 'managementReports.Spread' | translate }}</span>
-            <span class="fact-value">
-              {{ c.spread.spread !== null ? (c.spread.spread | number: '1.1-1') + '%' : '-' }}
-              @if (c.spread.withinCap !== null) {
-                <span class="chip" [class]="c.spread.withinCap ? 'green' : 'red'">
-                  {{ (c.spread.withinCap ? 'managementReports.WithinCap' : 'managementReports.OverCap') | translate }}
-                </span>
-              }
-            </span>
-          </div>
-          @if (c.spread.cap !== null) {
+          @if (r.generatedAt) {
             <div class="fact">
-              <span class="fact-label">{{ 'managementReports.Cap' | translate }}</span>
-              <span class="fact-value">{{ c.spread.cap | number: '1.1-1' }}%</span>
+              <span class="fact-label">{{ 'managementReports.Generated' | translate }}</span>
+              <span class="fact-value">{{ (r.generatedAt | adToBs) || r.generatedAt }} · {{ r.generatedBy }}</span>
             </div>
+          }
+          @if (r.submittedAt) {
+            <div class="fact">
+              <span class="fact-label">{{ 'managementReports.Submitted' | translate }}</span>
+              <span class="fact-value">{{ (r.submittedAt | adToBs) || r.submittedAt }} · {{ r.submittedBy }}</span>
+            </div>
+          }
+          @if (r.decidedAt) {
+            <div class="fact">
+              <span class="fact-label">{{ 'managementReports.Decided' | translate }}</span>
+              <span class="fact-value"
+                >{{ (r.decidedAt | adToBs) || r.decidedAt }} · {{ r.decidedBy }}
+                @if (r.decisionReference) {
+                  <span class="sub">{{ r.decisionReference }}</span>
+                }
+                @if (r.decisionNote) {
+                  <span class="sub">{{ r.decisionNote }}</span>
+                }
+              </span>
+            </div>
+          }
+          @if (r.status === 'SUBMITTED' && !r.decidedAt) {
+            <div class="fact">
+              <span class="fact-label">{{ 'managementReports.Decided' | translate }}</span>
+              <span class="fact-value">{{ 'managementReports.WaitingForTheBoard' | translate }}</span>
+            </div>
+          }
+          @if (r.discardedAt) {
+            <div class="fact">
+              <span class="fact-label">{{ 'managementReports.Discarded' | translate }}</span>
+              <span class="fact-value"
+                >{{ (r.discardedAt | adToBs) || r.discardedAt }} · {{ r.discardedBy }}
+                <span class="sub">{{ r.discardReason }}</span>
+              </span>
+            </div>
+          }
+        </div>
+
+        <div class="actions top divider">
+          @if (canEditNotes()) {
+            <button
+              mat-stroked-button
+              type="button"
+              (click)="regenerate()"
+              *mifosxHasPermission="'CREATE_MANAGEMENTREPORT'"
+            >
+              <mat-icon>refresh</mat-icon>{{ 'managementReports.Regenerate' | translate }}
+            </button>
+            <button
+              mat-raised-button
+              color="primary"
+              type="button"
+              (click)="submit()"
+              *mifosxHasPermission="'CREATE_MANAGEMENTREPORT'"
+            >
+              <mat-icon>send</mat-icon>{{ 'managementReports.SubmitToTheBoard' | translate }}
+            </button>
+            <button
+              mat-button
+              color="warn"
+              type="button"
+              (click)="discard()"
+              *mifosxHasPermission="'CREATE_MANAGEMENTREPORT'"
+            >
+              <mat-icon>delete_outline</mat-icon>{{ 'managementReports.Discard' | translate }}
+            </button>
+          }
+          @if (r.status === 'SUBMITTED') {
+            <button
+              mat-raised-button
+              color="primary"
+              type="button"
+              (click)="approve()"
+              *mifosxHasPermission="'APPROVE_MANAGEMENTREPORT'"
+            >
+              <mat-icon>check_circle</mat-icon>{{ 'managementReports.ApproveTitle' | translate }}
+            </button>
+            <button
+              mat-stroked-button
+              type="button"
+              (click)="returnReport()"
+              *mifosxHasPermission="'APPROVE_MANAGEMENTREPORT'"
+            >
+              <mat-icon>undo</mat-icon>{{ 'managementReports.ReturnTitle' | translate }}
+            </button>
+          }
+          @if (r.status === 'APPROVED') {
+            <button
+              mat-stroked-button
+              color="primary"
+              type="button"
+              (click)="makeCorrectedReport()"
+              *mifosxHasPermission="'CREATE_MANAGEMENTREPORT'"
+            >
+              <mat-icon>edit_note</mat-icon>{{ 'managementReports.MakeACorrectedReport' | translate }}
+            </button>
+          }
+          @if (r.status === 'SUBMITTED' || r.status === 'APPROVED') {
+            <button mat-stroked-button type="button" [disabled]="loadingPrint()" (click)="openPrint()">
+              @if (loadingPrint()) {
+                <mat-icon class="spin">autorenew</mat-icon>
+              } @else {
+                <mat-icon>print</mat-icon>
+              }
+              {{ 'managementReports.Print' | translate }}
+            </button>
+          }
+          @if (r.replacedById) {
+            <span class="hint">{{ 'managementReports.ReplacedHint' | translate: { id: r.replacedById } }}</span>
+          }
+        </div>
+
+        <div class="notes-block divider">
+          <h3 class="section-label">{{ 'labels.inputs.Note' | translate }}</h3>
+          @if (canEditNotes()) {
+            <mat-form-field class="field" subscriptSizing="dynamic">
+              <textarea matInput [formControl]="notes" rows="3" maxlength="8000"></textarea>
+            </mat-form-field>
+            <button
+              mat-flat-button
+              color="primary"
+              type="button"
+              [disabled]="!notesDirty() || savingNotes()"
+              (click)="saveNotes()"
+              *mifosxHasPermission="'CREATE_MANAGEMENTREPORT'"
+            >
+              @if (savingNotes()) {
+                <mat-icon class="spin">autorenew</mat-icon>
+              } @else {
+                <mat-icon>save</mat-icon>
+              }
+              {{ 'labels.buttons.Save Changes' | translate }}
+            </button>
+          } @else {
+            <p class="notes-text">{{ r.notes || ('managementReports.NoNotes' | translate) }}</p>
           }
         </div>
       </section>
 
-      <section class="report-card mat-elevation-z2">
-        <h2 class="card-title"><mat-icon>insights</mat-icon>{{ 'managementReports.sections.Pearls' | translate }}</h2>
-        @if (dashboardPearls(); as pearls) {
-          <mifosx-coop-pearls-card [pearls]="pearls"></mifosx-coop-pearls-card>
-        }
-      </section>
+      @if (r.content; as c) {
+        <section class="report-card mat-elevation-z2">
+          <h2 class="card-title"><mat-icon>group</mat-icon>{{ 'managementReports.sections.Members' | translate }}</h2>
+          <div class="facts">
+            <div class="fact">
+              <span class="fact-label">{{ 'managementReports.AtStart' | translate }}</span>
+              <span class="fact-value">{{ c.members.atStart }}</span>
+            </div>
+            <div class="fact">
+              <span class="fact-label">{{ 'managementReports.Joined' | translate }}</span>
+              <span class="fact-value">{{ c.members.joined }}</span>
+            </div>
+            <div class="fact">
+              <span class="fact-label">{{ 'managementReports.Left' | translate }}</span>
+              <span class="fact-value">{{ c.members.left }}</span>
+            </div>
+            <div class="fact">
+              <span class="fact-label">{{ 'managementReports.AtEnd' | translate }}</span>
+              <span class="fact-value">{{ c.members.atEnd }}</span>
+            </div>
+            <div class="fact">
+              <span class="fact-label">{{ 'managementReports.ShareCapitalAtStart' | translate }}</span>
+              <span class="fact-value">{{ grouped(c.members.shareCapitalAtStart) }}</span>
+            </div>
+            <div class="fact">
+              <span class="fact-label">{{ 'managementReports.SharesBought' | translate }}</span>
+              <span class="fact-value">{{ grouped(c.members.sharesBought) }}</span>
+            </div>
+            <div class="fact">
+              <span class="fact-label">{{ 'managementReports.SharesRefunded' | translate }}</span>
+              <span class="fact-value">{{ grouped(c.members.sharesRefunded) }}</span>
+            </div>
+            <div class="fact">
+              <span class="fact-label">{{ 'managementReports.ShareCapitalAtEnd' | translate }}</span>
+              <span class="fact-value">{{ grouped(c.members.shareCapitalAtEnd) }}</span>
+            </div>
+          </div>
+        </section>
 
-      @if (c.relatedParties; as rp) {
         <section class="report-card mat-elevation-z2">
           <h2 class="card-title">
-            <mat-icon>link</mat-icon>{{ 'managementReports.sections.RelatedParties' | translate }}
+            <mat-icon>savings</mat-icon>{{ 'managementReports.sections.Deposits' | translate }}
           </h2>
           <div class="facts">
             <div class="fact">
-              <span class="fact-label">{{ 'managementReports.Borrowers' | translate }}</span>
-              <span class="fact-value">{{ rp.borrowers }}</span>
+              <span class="fact-label">{{ 'managementReports.AtStart' | translate }}</span>
+              <span class="fact-value">{{ grouped(c.deposits.atStart) }}</span>
             </div>
             <div class="fact">
-              <span class="fact-label">{{ 'managementReports.RelatedOutstanding' | translate }}</span>
-              <span class="fact-value">{{ rp.relatedOutstanding | number: '1.0-0' }}</span>
+              <span class="fact-label">{{ 'managementReports.Deposited' | translate }}</span>
+              <span class="fact-value">{{ grouped(c.deposits.deposited) }}</span>
             </div>
             <div class="fact">
-              <span class="fact-label">{{ 'managementReports.DirectorsOutstanding' | translate }}</span>
-              <span class="fact-value">{{ rp.directorsOutstanding | number: '1.0-0' }}</span>
+              <span class="fact-label">{{ 'managementReports.Withdrawn' | translate }}</span>
+              <span class="fact-value">{{ grouped(c.deposits.withdrawn) }}</span>
+            </div>
+            <div class="fact">
+              <span class="fact-label">{{ 'managementReports.InterestPosted' | translate }}</span>
+              <span class="fact-value">{{ grouped(c.deposits.interestPosted) }}</span>
+            </div>
+            <div class="fact">
+              <span class="fact-label">{{ 'managementReports.AtEnd' | translate }}</span>
+              <span class="fact-value">{{ grouped(c.deposits.atEnd) }}</span>
             </div>
           </div>
-          <p class="hint">{{ 'managementReports.RelatedPartiesAsOf' | translate: { asOf: rp.asOf } }}</p>
+          @if (c.deposits.byProduct.length) {
+            <div class="table-card mat-elevation-z8">
+              <div class="table-scroll">
+                <table class="blue">
+                  <thead>
+                    <tr>
+                      <th>{{ 'managementReports.Product' | translate }}</th>
+                      <th class="num">{{ 'managementReports.Accounts' | translate }}</th>
+                      <th class="num">{{ 'managementReports.Balance' | translate }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (d of c.deposits.byProduct; track d.product) {
+                      <tr>
+                        <td>{{ d.product }}</td>
+                        <td class="num">{{ d.accounts }}</td>
+                        <td class="num">{{ grouped(d.balance) }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          }
+        </section>
+
+        <section class="report-card mat-elevation-z2">
+          <h2 class="card-title">
+            <mat-icon>account_balance</mat-icon>{{ 'managementReports.sections.Loans' | translate }}
+          </h2>
+          <div class="facts">
+            <div class="fact">
+              <span class="fact-label">{{ 'managementReports.OutstandingAtStart' | translate }}</span>
+              <span class="fact-value">{{ grouped(c.loans.outstandingAtStart) }}</span>
+            </div>
+            <div class="fact">
+              <span class="fact-label">{{ 'managementReports.LoansDisbursed' | translate }}</span>
+              <span class="fact-value">{{ c.loans.loansDisbursed }}</span>
+            </div>
+            <div class="fact">
+              <span class="fact-label">{{ 'managementReports.Disbursed' | translate }}</span>
+              <span class="fact-value">{{ grouped(c.loans.disbursed) }}</span>
+            </div>
+            <div class="fact">
+              <span class="fact-label">{{ 'managementReports.PrincipalCollected' | translate }}</span>
+              <span class="fact-value">{{ grouped(c.loans.principalCollected) }}</span>
+            </div>
+            <div class="fact">
+              <span class="fact-label">{{ 'managementReports.InterestCollected' | translate }}</span>
+              <span class="fact-value">{{ grouped(c.loans.interestCollected) }}</span>
+            </div>
+            <div class="fact">
+              <span class="fact-label">{{ 'managementReports.OutstandingAtEnd' | translate }}</span>
+              <span class="fact-value">{{ grouped(c.loans.outstandingAtEnd) }}</span>
+            </div>
+            <div class="fact">
+              <span class="fact-label">{{ 'managementReports.LoansAtEnd' | translate }}</span>
+              <span class="fact-value">{{ c.loans.loansAtEnd }}</span>
+            </div>
+            <div class="fact">
+              <span class="fact-label">{{ 'managementReports.ProvisionRequired' | translate }}</span>
+              <span class="fact-value">{{ grouped(c.loans.provisionRequired) }}</span>
+            </div>
+            <div class="fact">
+              <span class="fact-label">{{ 'managementReports.Overdue30Percent' | translate }}</span>
+              <span class="fact-value">{{ percent(c.loans.overdue30Percent) }}</span>
+            </div>
+            <div class="fact">
+              <span class="fact-label">{{ 'managementReports.NonPerformingPercent' | translate }}</span>
+              <span class="fact-value">{{ percent(c.loans.nonPerformingPercent) }}</span>
+            </div>
+          </div>
+
+          @if (c.loans.classes.length) {
+            <div class="table-card mat-elevation-z8">
+              <div class="table-scroll">
+                <table class="blue">
+                  <thead>
+                    <tr>
+                      <th>{{ 'managementReports.LoanClass' | translate }}</th>
+                      <th class="num">{{ 'managementReports.Loans' | translate }}</th>
+                      <th class="num">{{ 'managementReports.Outstanding' | translate }}</th>
+                      <th class="num">{{ 'managementReports.ProvisionRate' | translate }}</th>
+                      <th class="num">{{ 'managementReports.Provision' | translate }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (cl of c.loans.classes; track cl.code) {
+                      <tr>
+                        <td>{{ 'managementReports.loanClass.' + cl.code | translate }}</td>
+                        <td class="num">{{ cl.loans }}</td>
+                        <td class="num">{{ grouped(cl.outstanding) }}</td>
+                        <td class="num">{{ percent(cl.provisionRate, 0) }}</td>
+                        <td class="num">{{ grouped(cl.provision) }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          }
+
+          @if (c.loans.largest.length) {
+            <h3 class="section-label">{{ 'managementReports.LargestLoans' | translate }}</h3>
+            <div class="table-card mat-elevation-z8">
+              <div class="table-scroll">
+                <table class="blue">
+                  <thead>
+                    <tr>
+                      <th>{{ 'labels.inputs.name' | translate }}</th>
+                      <th>{{ 'managementReports.AccountNo' | translate }}</th>
+                      <th class="num">{{ 'managementReports.Outstanding' | translate }}</th>
+                      <th class="num">{{ 'managementReports.DaysOverdue' | translate }}</th>
+                      <th>{{ 'managementReports.LoanClass' | translate }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (l of c.loans.largest; track l.accountNo) {
+                      <tr>
+                        <td>{{ l.borrower }}</td>
+                        <td>{{ l.accountNo }}</td>
+                        <td class="num">{{ grouped(l.outstanding) }}</td>
+                        <td class="num">{{ l.daysOverdue }}</td>
+                        <td>{{ l.loanClass }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          }
+        </section>
+
+        <section class="report-card mat-elevation-z2">
+          <h2 class="card-title"><mat-icon>payments</mat-icon>{{ 'managementReports.sections.Income' | translate }}</h2>
+          <div class="facts">
+            <div class="fact">
+              <span class="fact-label">{{ 'managementReports.Income' | translate }}</span>
+              <span class="fact-value">{{ grouped(c.income.income) }}</span>
+            </div>
+            <div class="fact">
+              <span class="fact-label">{{ 'managementReports.Expense' | translate }}</span>
+              <span class="fact-value">{{ grouped(c.income.expense) }}</span>
+            </div>
+            <div class="fact">
+              <span class="fact-label">{{ 'managementReports.Surplus' | translate }}</span>
+              <span class="fact-value">{{ grouped(c.income.surplus) }}</span>
+            </div>
+          </div>
+          @if (c.income.accounts.length) {
+            <div class="table-card mat-elevation-z8">
+              <div class="table-scroll">
+                <table class="blue">
+                  <thead>
+                    <tr>
+                      <th>{{ 'managementReports.GlCode' | translate }}</th>
+                      <th>{{ 'labels.inputs.name' | translate }}</th>
+                      <th>{{ 'labels.inputs.Type' | translate }}</th>
+                      <th class="num">{{ 'managementReports.Amount' | translate }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (a of c.income.accounts; track a.glCode) {
+                      <tr>
+                        <td>{{ a.glCode }}</td>
+                        <td>{{ a.name }}</td>
+                        <td>{{ 'managementReports.accountType.' + a.type | translate }}</td>
+                        <td class="num">{{ grouped(a.amount) }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          }
+        </section>
+
+        <section class="report-card mat-elevation-z2">
+          <h2 class="card-title">
+            <mat-icon>show_chart</mat-icon>{{ 'managementReports.sections.Spread' | translate }}
+          </h2>
+          <div class="facts">
+            <div class="fact">
+              <span class="fact-label">{{ 'managementReports.LoanYield' | translate }}</span>
+              <span class="fact-value">{{ percent(c.spread.loanYield) }}</span>
+            </div>
+            <div class="fact">
+              <span class="fact-label">{{ 'managementReports.DepositCost' | translate }}</span>
+              <span class="fact-value">{{ percent(c.spread.depositCost) }}</span>
+            </div>
+            <div class="fact">
+              <span class="fact-label">{{ 'managementReports.Spread' | translate }}</span>
+              <span class="fact-value">
+                {{ percent(c.spread.spread) }}
+                @if (c.spread.withinCap !== null) {
+                  <span class="chip" [class]="c.spread.withinCap ? 'green' : 'red'">
+                    {{ (c.spread.withinCap ? 'managementReports.WithinCap' : 'managementReports.OverCap') | translate }}
+                  </span>
+                }
+              </span>
+            </div>
+            @if (c.spread.cap !== null) {
+              <div class="fact">
+                <span class="fact-label">{{ 'managementReports.Cap' | translate }}</span>
+                <span class="fact-value">{{ percent(c.spread.cap) }}</span>
+              </div>
+            }
+          </div>
+        </section>
+
+        <section class="report-card mat-elevation-z2">
+          <h2 class="card-title"><mat-icon>insights</mat-icon>{{ 'managementReports.sections.Pearls' | translate }}</h2>
+          @if (dashboardPearls(); as pearls) {
+            <mifosx-coop-pearls-card [pearls]="pearls"></mifosx-coop-pearls-card>
+          }
+        </section>
+
+        @if (c.relatedParties; as rp) {
+          <section class="report-card mat-elevation-z2">
+            <h2 class="card-title">
+              <mat-icon>link</mat-icon>{{ 'managementReports.sections.RelatedParties' | translate }}
+            </h2>
+            <div class="facts">
+              <div class="fact">
+                <span class="fact-label">{{ 'managementReports.Borrowers' | translate }}</span>
+                <span class="fact-value">{{ rp.borrowers }}</span>
+              </div>
+              <div class="fact">
+                <span class="fact-label">{{ 'managementReports.RelatedOutstanding' | translate }}</span>
+                <span class="fact-value">{{ grouped(rp.relatedOutstanding) }}</span>
+              </div>
+              <div class="fact">
+                <span class="fact-label">{{ 'managementReports.DirectorsOutstanding' | translate }}</span>
+                <span class="fact-value">{{ grouped(rp.directorsOutstanding) }}</span>
+              </div>
+            </div>
+            <p class="hint">{{ 'managementReports.RelatedPartiesAsOf' | translate: { asOf: rp.asOf } }}</p>
+          </section>
+        }
+
+        <section class="report-card mat-elevation-z2">
+          <h2 class="card-title">
+            <mat-icon>verified_user</mat-icon>{{ 'managementReports.sections.Compliance' | translate }}
+          </h2>
+          <div class="facts">
+            <div class="fact">
+              <span class="fact-label">{{ 'managementReports.ThresholdReportsFiled' | translate }}</span>
+              <span class="fact-value">{{ c.compliance.thresholdReportsFiled }}</span>
+            </div>
+            <div class="fact">
+              <span class="fact-label">{{ 'managementReports.SuspiciousReportsFiled' | translate }}</span>
+              <span class="fact-value">{{ c.compliance.suspiciousReportsFiled }}</span>
+            </div>
+          </div>
         </section>
       }
 
       <section class="report-card mat-elevation-z2">
-        <h2 class="card-title">
-          <mat-icon>verified_user</mat-icon>{{ 'managementReports.sections.Compliance' | translate }}
-        </h2>
-        <div class="facts">
-          <div class="fact">
-            <span class="fact-label">{{ 'managementReports.ThresholdReportsFiled' | translate }}</span>
-            <span class="fact-value">{{ c.compliance.thresholdReportsFiled }}</span>
-          </div>
-          <div class="fact">
-            <span class="fact-label">{{ 'managementReports.SuspiciousReportsFiled' | translate }}</span>
-            <span class="fact-value">{{ c.compliance.suspiciousReportsFiled }}</span>
-          </div>
-        </div>
+        <h2 class="card-title"><mat-icon>lock</mat-icon>{{ 'managementReports.SealedContent' | translate }}</h2>
+        <button mat-stroked-button type="button" (click)="toggleSealedContent()">
+          <mat-icon>{{ showSealedContent() ? 'expand_less' : 'expand_more' }}</mat-icon>
+          {{
+            (showSealedContent() ? 'managementReports.HideSealedContent' : 'managementReports.ShowSealedContent')
+              | translate
+          }}
+        </button>
+        @if (r.contentSha256) {
+          <p class="hint sha">{{ 'managementReports.Sha256' | translate }}: {{ r.contentSha256 }}</p>
+        }
+        @if (showSealedContent()) {
+          @if (loadingSealedContent()) {
+            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+          }
+          @if (sealedContent()) {
+            <pre class="sealed-content">{{ sealedContent() }}</pre>
+          }
+        }
       </section>
-    }
-
-    <section class="report-card mat-elevation-z2">
-      <h2 class="card-title"><mat-icon>lock</mat-icon>{{ 'managementReports.SealedContent' | translate }}</h2>
-      <button mat-stroked-button type="button" (click)="toggleSealedContent()">
-        <mat-icon>{{ showSealedContent() ? 'expand_less' : 'expand_more' }}</mat-icon>
-        {{
-          (showSealedContent() ? 'managementReports.HideSealedContent' : 'managementReports.ShowSealedContent')
-            | translate
-        }}
-      </button>
-      @if (r.contentSha256) {
-        <p class="hint sha">{{ 'managementReports.Sha256' | translate }}: {{ r.contentSha256 }}</p>
-      }
-      @if (showSealedContent()) {
-        @if (loadingSealedContent()) {
-          <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-        }
-        @if (sealedContent()) {
-          <pre class="sealed-content">{{ sealedContent() }}</pre>
-        }
-      }
-    </section>
-
-    <div class="pdf-note">
-      <mat-icon>picture_as_pdf</mat-icon>
-      <span>{{ 'managementReports.PdfNotYetAvailable' | translate }}</span>
     </div>
+
+    @if (printContent(); as pc) {
+      <div class="print-only">
+        @if (r.status === 'DRAFT' || r.status === 'RETURNED') {
+          <div class="print-watermark">{{ 'managementReports.DraftWatermark' | translate }}</div>
+        }
+
+        <header class="print-header">
+          <h1>{{ coopName }}</h1>
+          <h2>{{ 'managementReports.Title' | translate }} #{{ r.id }}</h2>
+          <table class="print-table">
+            <tbody>
+              <tr>
+                <th>{{ 'managementReports.Period' | translate }}</th>
+                <td>{{ r.fromBs }} – {{ r.toBs }}</td>
+              </tr>
+              <tr>
+                <th>{{ 'labels.inputs.Status' | translate }}</th>
+                <td>{{ 'managementReports.status.' + r.status | translate }}</td>
+              </tr>
+              <tr>
+                <th>{{ 'labels.inputs.Office' | translate }}</th>
+                <td>{{ r.officeName }}</td>
+              </tr>
+              @if (r.submittedAt) {
+                <tr>
+                  <th>{{ 'managementReports.Submitted' | translate }}</th>
+                  <td>{{ (r.submittedAt | adToBs) || r.submittedAt }} · {{ r.submittedBy }}</td>
+                </tr>
+              }
+              @if (r.decidedAt) {
+                <tr>
+                  <th>{{ 'managementReports.Decided' | translate }}</th>
+                  <td>
+                    {{ (r.decidedAt | adToBs) || r.decidedAt }} · {{ r.decidedBy }}
+                    @if (r.decisionReference) {
+                      · {{ r.decisionReference }}
+                    }
+                    @if (r.decisionNote) {
+                      — {{ r.decisionNote }}
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </header>
+
+        <section class="print-section">
+          <h3>{{ 'managementReports.sections.Members' | translate }}</h3>
+          <table class="print-table">
+            <tbody>
+              <tr>
+                <th>{{ 'managementReports.AtStart' | translate }}</th>
+                <td>{{ pc.members.atStart }}</td>
+              </tr>
+              <tr>
+                <th>{{ 'managementReports.Joined' | translate }}</th>
+                <td>{{ pc.members.joined }}</td>
+              </tr>
+              <tr>
+                <th>{{ 'managementReports.Left' | translate }}</th>
+                <td>{{ pc.members.left }}</td>
+              </tr>
+              <tr>
+                <th>{{ 'managementReports.AtEnd' | translate }}</th>
+                <td>{{ pc.members.atEnd }}</td>
+              </tr>
+              <tr>
+                <th>{{ 'managementReports.ShareCapitalAtStart' | translate }}</th>
+                <td>{{ grouped(pc.members.shareCapitalAtStart) }}</td>
+              </tr>
+              <tr>
+                <th>{{ 'managementReports.SharesBought' | translate }}</th>
+                <td>{{ grouped(pc.members.sharesBought) }}</td>
+              </tr>
+              <tr>
+                <th>{{ 'managementReports.SharesRefunded' | translate }}</th>
+                <td>{{ grouped(pc.members.sharesRefunded) }}</td>
+              </tr>
+              <tr>
+                <th>{{ 'managementReports.ShareCapitalAtEnd' | translate }}</th>
+                <td>{{ grouped(pc.members.shareCapitalAtEnd) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section class="print-section">
+          <h3>{{ 'managementReports.sections.Deposits' | translate }}</h3>
+          <table class="print-table">
+            <tbody>
+              <tr>
+                <th>{{ 'managementReports.AtStart' | translate }}</th>
+                <td>{{ grouped(pc.deposits.atStart) }}</td>
+              </tr>
+              <tr>
+                <th>{{ 'managementReports.Deposited' | translate }}</th>
+                <td>{{ grouped(pc.deposits.deposited) }}</td>
+              </tr>
+              <tr>
+                <th>{{ 'managementReports.Withdrawn' | translate }}</th>
+                <td>{{ grouped(pc.deposits.withdrawn) }}</td>
+              </tr>
+              <tr>
+                <th>{{ 'managementReports.InterestPosted' | translate }}</th>
+                <td>{{ grouped(pc.deposits.interestPosted) }}</td>
+              </tr>
+              <tr>
+                <th>{{ 'managementReports.AtEnd' | translate }}</th>
+                <td>{{ grouped(pc.deposits.atEnd) }}</td>
+              </tr>
+            </tbody>
+          </table>
+          @if (pc.deposits.byProduct.length) {
+            <table class="print-table print-table--list">
+              <thead>
+                <tr>
+                  <th>{{ 'managementReports.Product' | translate }}</th>
+                  <th class="num">{{ 'managementReports.Accounts' | translate }}</th>
+                  <th class="num">{{ 'managementReports.Balance' | translate }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (d of pc.deposits.byProduct; track d.product) {
+                  <tr>
+                    <td>{{ d.product }}</td>
+                    <td class="num">{{ d.accounts }}</td>
+                    <td class="num">{{ grouped(d.balance) }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+        </section>
+
+        <section class="print-section">
+          <h3>{{ 'managementReports.sections.Loans' | translate }}</h3>
+          <table class="print-table">
+            <tbody>
+              <tr>
+                <th>{{ 'managementReports.OutstandingAtStart' | translate }}</th>
+                <td>{{ grouped(pc.loans.outstandingAtStart) }}</td>
+              </tr>
+              <tr>
+                <th>{{ 'managementReports.LoansDisbursed' | translate }}</th>
+                <td>{{ pc.loans.loansDisbursed }}</td>
+              </tr>
+              <tr>
+                <th>{{ 'managementReports.Disbursed' | translate }}</th>
+                <td>{{ grouped(pc.loans.disbursed) }}</td>
+              </tr>
+              <tr>
+                <th>{{ 'managementReports.PrincipalCollected' | translate }}</th>
+                <td>{{ grouped(pc.loans.principalCollected) }}</td>
+              </tr>
+              <tr>
+                <th>{{ 'managementReports.InterestCollected' | translate }}</th>
+                <td>{{ grouped(pc.loans.interestCollected) }}</td>
+              </tr>
+              <tr>
+                <th>{{ 'managementReports.OutstandingAtEnd' | translate }}</th>
+                <td>{{ grouped(pc.loans.outstandingAtEnd) }}</td>
+              </tr>
+              <tr>
+                <th>{{ 'managementReports.LoansAtEnd' | translate }}</th>
+                <td>{{ pc.loans.loansAtEnd }}</td>
+              </tr>
+              <tr>
+                <th>{{ 'managementReports.ProvisionRequired' | translate }}</th>
+                <td>{{ grouped(pc.loans.provisionRequired) }}</td>
+              </tr>
+              <tr>
+                <th>{{ 'managementReports.Overdue30Percent' | translate }}</th>
+                <td>{{ percent(pc.loans.overdue30Percent) }}</td>
+              </tr>
+              <tr>
+                <th>{{ 'managementReports.NonPerformingPercent' | translate }}</th>
+                <td>{{ percent(pc.loans.nonPerformingPercent) }}</td>
+              </tr>
+            </tbody>
+          </table>
+          @if (pc.loans.classes.length) {
+            <table class="print-table print-table--list">
+              <thead>
+                <tr>
+                  <th>{{ 'managementReports.LoanClass' | translate }}</th>
+                  <th class="num">{{ 'managementReports.Loans' | translate }}</th>
+                  <th class="num">{{ 'managementReports.Outstanding' | translate }}</th>
+                  <th class="num">{{ 'managementReports.ProvisionRate' | translate }}</th>
+                  <th class="num">{{ 'managementReports.Provision' | translate }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (cl of pc.loans.classes; track cl.code) {
+                  <tr>
+                    <td>{{ 'managementReports.loanClass.' + cl.code | translate }}</td>
+                    <td class="num">{{ cl.loans }}</td>
+                    <td class="num">{{ grouped(cl.outstanding) }}</td>
+                    <td class="num">{{ percent(cl.provisionRate, 0) }}</td>
+                    <td class="num">{{ grouped(cl.provision) }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+          @if (pc.loans.largest.length) {
+            <h4>{{ 'managementReports.LargestLoans' | translate }}</h4>
+            <table class="print-table print-table--list">
+              <thead>
+                <tr>
+                  <th>{{ 'labels.inputs.name' | translate }}</th>
+                  <th>{{ 'managementReports.AccountNo' | translate }}</th>
+                  <th class="num">{{ 'managementReports.Outstanding' | translate }}</th>
+                  <th class="num">{{ 'managementReports.DaysOverdue' | translate }}</th>
+                  <th>{{ 'managementReports.LoanClass' | translate }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (l of pc.loans.largest; track l.accountNo) {
+                  <tr>
+                    <td>{{ l.borrower }}</td>
+                    <td>{{ l.accountNo }}</td>
+                    <td class="num">{{ grouped(l.outstanding) }}</td>
+                    <td class="num">{{ l.daysOverdue }}</td>
+                    <td>{{ l.loanClass }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+        </section>
+
+        <section class="print-section">
+          <h3>{{ 'managementReports.sections.Income' | translate }}</h3>
+          <table class="print-table">
+            <tbody>
+              <tr>
+                <th>{{ 'managementReports.Income' | translate }}</th>
+                <td>{{ grouped(pc.income.income) }}</td>
+              </tr>
+              <tr>
+                <th>{{ 'managementReports.Expense' | translate }}</th>
+                <td>{{ grouped(pc.income.expense) }}</td>
+              </tr>
+              <tr>
+                <th>{{ 'managementReports.Surplus' | translate }}</th>
+                <td>{{ grouped(pc.income.surplus) }}</td>
+              </tr>
+            </tbody>
+          </table>
+          @if (pc.income.accounts.length) {
+            <table class="print-table print-table--list">
+              <thead>
+                <tr>
+                  <th>{{ 'managementReports.GlCode' | translate }}</th>
+                  <th>{{ 'labels.inputs.name' | translate }}</th>
+                  <th>{{ 'labels.inputs.Type' | translate }}</th>
+                  <th class="num">{{ 'managementReports.Amount' | translate }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (a of pc.income.accounts; track a.glCode) {
+                  <tr>
+                    <td>{{ a.glCode }}</td>
+                    <td>{{ a.name }}</td>
+                    <td>{{ 'managementReports.accountType.' + a.type | translate }}</td>
+                    <td class="num">{{ grouped(a.amount) }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+        </section>
+
+        <section class="print-section">
+          <h3>{{ 'managementReports.sections.Spread' | translate }}</h3>
+          <table class="print-table">
+            <tbody>
+              <tr>
+                <th>{{ 'managementReports.LoanYield' | translate }}</th>
+                <td>{{ percent(pc.spread.loanYield) }}</td>
+              </tr>
+              <tr>
+                <th>{{ 'managementReports.DepositCost' | translate }}</th>
+                <td>{{ percent(pc.spread.depositCost) }}</td>
+              </tr>
+              <tr>
+                <th>{{ 'managementReports.Spread' | translate }}</th>
+                <td>
+                  {{ percent(pc.spread.spread) }}
+                  @if (pc.spread.withinCap !== null) {
+                    {{
+                      (pc.spread.withinCap ? 'managementReports.WithinCap' : 'managementReports.OverCap') | translate
+                    }}
+                  }
+                </td>
+              </tr>
+              @if (pc.spread.cap !== null) {
+                <tr>
+                  <th>{{ 'managementReports.Cap' | translate }}</th>
+                  <td>{{ percent(pc.spread.cap) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </section>
+
+        <section class="print-section">
+          <h3>{{ 'managementReports.sections.Pearls' | translate }}</h3>
+          <table class="print-table print-table--list">
+            <thead>
+              <tr>
+                <th>{{ 'coopDashboard.Indicator' | translate }}</th>
+                <th class="num">{{ 'coopDashboard.Value' | translate }}</th>
+                <th>{{ 'coopDashboard.Status' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (i of pc.pearls.indicators; track i.code) {
+                <tr>
+                  <td>{{ 'coopDashboard.pearls.' + i.code + '.name' | translate }}</td>
+                  <td class="num">
+                    {{ i.value === null ? '–' : i.unit === 'PERCENT' ? percent(i.value) : grouped(i.value) }}
+                  </td>
+                  <td>{{ 'coopDashboard.pearlsStatus.' + i.status | translate }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </section>
+
+        @if (pc.relatedParties; as rp) {
+          <section class="print-section">
+            <h3>{{ 'managementReports.sections.RelatedParties' | translate }}</h3>
+            <table class="print-table">
+              <tbody>
+                <tr>
+                  <th>{{ 'managementReports.Borrowers' | translate }}</th>
+                  <td>{{ rp.borrowers }}</td>
+                </tr>
+                <tr>
+                  <th>{{ 'managementReports.RelatedOutstanding' | translate }}</th>
+                  <td>{{ grouped(rp.relatedOutstanding) }}</td>
+                </tr>
+                <tr>
+                  <th>{{ 'managementReports.DirectorsOutstanding' | translate }}</th>
+                  <td>{{ grouped(rp.directorsOutstanding) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        }
+
+        <section class="print-section">
+          <h3>{{ 'managementReports.sections.Compliance' | translate }}</h3>
+          <table class="print-table">
+            <tbody>
+              <tr>
+                <th>{{ 'managementReports.ThresholdReportsFiled' | translate }}</th>
+                <td>{{ pc.compliance.thresholdReportsFiled }}</td>
+              </tr>
+              <tr>
+                <th>{{ 'managementReports.SuspiciousReportsFiled' | translate }}</th>
+                <td>{{ pc.compliance.suspiciousReportsFiled }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <footer class="print-seal">{{ 'managementReports.Sha256' | translate }}: {{ r.contentSha256 }}</footer>
+      </div>
+    }
   }
 </div>

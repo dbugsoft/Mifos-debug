@@ -171,12 +171,19 @@
   margin-top: 12px;
 
   &.top {
-    margin: 12px 0;
+    margin: 16px 0;
   }
 }
 
 .notes-block {
   margin-top: 12px;
+}
+
+// A thin rule above the actions row and the notes block, so the header card reads as three distinct regions
+// (facts, actions, note) instead of everything running together in one stack.
+.divider {
+  padding-top: 16px;
+  border-top: 1px solid var(--dk-border, #e2e8f0);
 }
 
 .section-label {
@@ -284,19 +291,160 @@ table.blue td.num {
   word-break: break-all;
 }
 
-.pdf-note {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 16px 4px 0;
-  color: var(--dk-text-muted, rgb(127 127 127));
-  font-size: 0.8rem;
+// The print view (fineract-dbug #145): hidden on screen, shown (and the on-screen page hidden) only when printing,
+// so Save-as-PDF never captures the toolbar, sidebar or the editable page - only the sealed content.
+.print-only {
+  display: none;
+}
 
-  mat-icon {
-    flex: none;
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
+@media print {
+  .screen-only {
+    display: none;
+  }
+
+  .print-only {
+    display: block;
+    position: relative;
+  }
+
+  // A physical page margin needs a physical unit; nowhere else in the app prints a fixed page size, so this is
+  // the only rule that needs one.
+  // stylelint-disable unit-allowed-list
+  @page {
+    size: a4;
+    margin: 16mm;
+  }
+  // stylelint-enable unit-allowed-list
+
+  // Every colour a report card/chip/table uses elsewhere on this page is dropped here in favour of plain black
+  // text on white and hairline borders, so the print stays legible on a black-and-white printer.
+  .print-header,
+  .print-section {
+    color: #000;
+    background: none;
+  }
+
+  .print-header {
+    padding-bottom: 10px;
+    border-bottom: 2px solid #000;
+  }
+
+  .print-header h1 {
+    margin: 0;
+    font-size: 1.4rem;
+    letter-spacing: 0.01em;
+  }
+
+  .print-header h2 {
+    margin: 2px 0 12px;
+    color: #444;
+    font-size: 0.95rem;
+    font-weight: 400;
+  }
+
+  .print-section {
+    break-inside: avoid;
+    margin-top: 16px;
+
+    h3 {
+      margin: 0 0 6px;
+      padding-bottom: 3px;
+      border-bottom: 1px solid #000;
+      color: #000;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    h4 {
+      margin: 10px 0 4px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+  }
+
+  .print-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+
+    th,
+    td {
+      padding: 4px 7px;
+      text-align: left;
+      border: 1px solid #999;
+    }
+
+    td.num,
+    th.num {
+      text-align: right;
+    }
+
+    // A plain label/value table (no header row): the label column reads as a heading without needing its own
+    // <thead>, matched to the list tables' real <th> weight so both read consistently.
+    &:not(.print-table--list) th {
+      width: 45%;
+      background: #f3f3f3;
+      font-weight: 600;
+    }
+  }
+
+  .print-table--list {
+    margin-top: 6px;
+
+    thead {
+      display: table-header-group;
+    }
+
+    tr {
+      break-inside: avoid;
+    }
+
+    // Faint zebra striping instead of a flat white body, so a long list of loans or GL accounts stays easy to
+    // scan on paper the way the on-screen tables already are.
+    tbody tr:nth-child(even) {
+      background: #fafafa;
+    }
+
+    th {
+      background: #e9e9e9;
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.02em;
+    }
+  }
+
+  .print-watermark {
+    position: fixed;
+    top: 45%;
+    left: 0;
+    width: 100%;
+    color: rgb(0 0 0 / 15%);
+    font-size: 4rem;
+    font-weight: 700;
+    text-align: center;
+    text-transform: uppercase;
+    transform: rotate(-30deg);
+    pointer-events: none;
+  }
+
+  .print-seal {
+    margin-top: 20px;
+    padding-top: 8px;
+    border-top: 2px solid #000;
+    color: #444;
+    font-family: monospace;
+    font-size: 0.65rem;
+    word-break: break-all;
+  }
+
+  // The app shell (toolbar, sidenav, breadcrumb) already hides itself in print (core/shell/shell.component.scss);
+  // this only needs to stop its own progress bar/empty-state text, outside the report() block, from printing too.
+  mat-progress-bar,
+  .empty {
+    display: none;
   }
 }
 

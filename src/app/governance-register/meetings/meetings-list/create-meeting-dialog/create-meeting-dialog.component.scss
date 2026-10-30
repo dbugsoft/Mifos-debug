@@ -1,0 +1,161 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+:host {
+  display: block;
+}
+
+// Dialog title
+[mat-dialog-title] {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--dk-border, #e2e8f0);
+
+  mat-icon {
+    color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+  }
+}
+
+// Dialog content: spacing between fields comes entirely from this flex gap, so every field's own margin is
+// zeroed out below rather than stacking on top of it.
+mat-dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--dk-border, #cbd5e1) transparent;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background: var(--dk-border, #cbd5e1);
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: var(--dk-text-muted, #94a3b8);
+  }
+}
+
+// Kind + Committee side by side.
+.field-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+
+  .field {
+    flex: 1 1 200px;
+  }
+}
+
+.field {
+  display: block;
+  width: 100%;
+}
+
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: var(--dk-text-2, #334155);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+
+  mat-icon {
+    color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+
+  &.divider-top {
+    margin-top: 8px;
+    padding-top: 16px;
+    border-top: 1px solid var(--dk-border, #e2e8f0);
+  }
+}
+
+mifosx-nepali-date-input {
+  display: block;
+  width: 100%;
+}
+
+.notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 14px;
+  border: 1px solid var(--dk-primary-border, #bcd6f2);
+  border-radius: 8px;
+  background: var(--dk-primary-soft, #e0edf8);
+  color: var(--dk-text, #334155);
+  font-size: 0.875rem;
+
+  mat-icon {
+    flex: none;
+    color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+  }
+}
+
+.server-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 14px;
+  border-left: 3px solid var(--dk-danger, #c62828);
+  border-radius: 6px;
+  background: var(--dk-danger-soft, #ffebee);
+  color: var(--dk-danger, #c62828);
+  font-size: 14px;
+}
+
+mat-dialog-actions {
+  margin: 4px -24px -24px;
+  padding: 16px 24px;
+  background: var(--dk-surface-2, #f8fafc);
+  border-top: 1px solid var(--dk-border, #e2e8f0);
+}
+
+.spin {
+  margin-right: 6px;
+  animation: mfx-spin 1s linear infinite;
+}
+
+@keyframes mfx-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (width <= 600px) {
+  .field-row {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  mat-dialog-actions {
+    padding: 14px 16px;
+  }
+}

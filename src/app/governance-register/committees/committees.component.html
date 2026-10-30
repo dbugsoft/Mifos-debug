@@ -44,7 +44,7 @@
     <section class="committee-card mat-elevation-z2" [class.inactive]="!c.active">
       <div class="card-header">
         <div class="title-group">
-          <h2 class="title">{{ committeeLabel(c) | translate }}</h2>
+          <h2 class="title"><mat-icon>groups</mat-icon>{{ committeeLabel(c) | translate }}</h2>
           @if (c.termYears) {
             <span class="term-length">{{
               'governanceRegister.committees.yearTerm' | translate: { years: c.termYears }
@@ -74,6 +74,9 @@
       }
 
       @if (c.members.length) {
+        <h3 class="section-label">
+          <mat-icon>how_to_reg</mat-icon>{{ 'governanceRegister.people.CurrentlyServing' | translate }}
+        </h3>
         <div class="table-card mat-elevation-z8">
           <div class="table-scroll">
             <table class="blue">
@@ -110,31 +113,35 @@
                       }
                     </td>
                     <td *mifosxHasPermission="'UPDATE_GOVERNANCE'">
-                      <button
-                        mat-icon-button
-                        type="button"
-                        [matTooltip]="'governanceRegister.committees.ChangePosition' | translate"
-                        (click)="changePosition(c, t)"
-                      >
-                        <mat-icon>swap_horiz</mat-icon>
-                      </button>
-                      <button
-                        mat-icon-button
-                        type="button"
-                        [matTooltip]="'governanceRegister.committees.EndTerm' | translate"
-                        (click)="endTerm(t)"
-                      >
-                        <mat-icon>event_busy</mat-icon>
-                      </button>
-                      <button
-                        mat-icon-button
-                        color="warn"
-                        type="button"
-                        [matTooltip]="'governanceRegister.committees.Void' | translate"
-                        (click)="voidTerm(t)"
-                      >
-                        <mat-icon>block</mat-icon>
-                      </button>
+                      <span class="row-actions">
+                        <button
+                          mat-icon-button
+                          class="icon-btn"
+                          type="button"
+                          [matTooltip]="'governanceRegister.committees.ChangePosition' | translate"
+                          (click)="changePosition(c, t)"
+                        >
+                          <mat-icon>swap_horiz</mat-icon>
+                        </button>
+                        <button
+                          mat-icon-button
+                          class="icon-btn icon-btn--amber"
+                          type="button"
+                          [matTooltip]="'governanceRegister.committees.EndTerm' | translate"
+                          (click)="endTerm(t)"
+                        >
+                          <mat-icon>stop_circle</mat-icon>
+                        </button>
+                        <button
+                          mat-icon-button
+                          class="icon-btn icon-btn--red"
+                          type="button"
+                          [matTooltip]="'governanceRegister.committees.Void' | translate"
+                          (click)="voidTerm(t)"
+                        >
+                          <mat-icon>block</mat-icon>
+                        </button>
+                      </span>
                     </td>
                   </tr>
                 }
@@ -145,6 +152,61 @@
       } @else if (!c.warnings.length) {
         <p class="empty">{{ 'governanceRegister.committees.NobodyServing' | translate }}</p>
       }
+
+      <div class="past-members">
+        <button mat-button color="primary" type="button" (click)="togglePastMembers(c)">
+          <mat-icon>{{ pastMembersOpen().has(c.id) ? 'expand_less' : 'expand_more' }}</mat-icon>
+          {{ 'governanceRegister.committees.PastMembers' | translate }}
+        </button>
+        @if (pastMembersOpen().has(c.id)) {
+          @if (pastMembersLoading().has(c.id)) {
+            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+          } @else if (pastMembers()[c.id]?.length) {
+            <div class="table-card mat-elevation-z8">
+              <div class="table-scroll">
+                <table class="blue">
+                  <thead>
+                    <tr>
+                      <th>{{ 'governanceRegister.Person' | translate }}</th>
+                      <th>{{ 'governanceRegister.Position' | translate }}</th>
+                      <th>{{ 'governanceRegister.committees.StartedOn' | translate }}</th>
+                      <th>{{ 'governanceRegister.committees.EndedOn' | translate }}</th>
+                      <th>{{ 'governanceRegister.committees.Reason' | translate }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (t of pastMembers()[c.id]; track t.id) {
+                      <tr [class.voided]="t.voided">
+                        <td>
+                          @if (t.clientId) {
+                            <a [routerLink]="['/members', t.clientId]">{{ t.personName }}</a>
+                          } @else {
+                            {{ t.personName }}
+                          }
+                        </td>
+                        <td>{{ positionLabel(t) | translate }}</td>
+                        <td>{{ (t.startOn | adToBs) || t.startOn }}</td>
+                        <td>{{ (t.endedOn | adToBs) || t.endedOn || '-' }}</td>
+                        <td>
+                          @if (t.voided) {
+                            {{ 'governanceRegister.committees.Mistake' | translate }}: {{ t.voidReason }}
+                          } @else if (t.endReason) {
+                            {{ 'governanceRegister.endReason.' + t.endReason | translate }}
+                          } @else {
+                            -
+                          }
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          } @else {
+            <p class="empty">{{ 'governanceRegister.committees.NoPastMembers' | translate }}</p>
+          }
+        }
+      </div>
     </section>
   }
 </div>

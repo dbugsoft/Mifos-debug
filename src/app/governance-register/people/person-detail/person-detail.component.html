@@ -12,11 +12,24 @@
   }
 
   @if (person(); as p) {
-    <section class="frame">
-      <h2 class="legend">{{ p.name }}</h2>
-      <div class="actions top" *mifosxHasPermission="'UPDATE_GOVERNANCE'">
-        <button mat-stroked-button type="button" (click)="edit()">
-          {{ 'labels.buttons.Edit' | translate }}
+    <section class="person-card mat-elevation-z2">
+      <div class="card-header">
+        <h2 class="person-title">
+          <mat-icon>account_circle</mat-icon>{{ p.name }}
+          @if (p.clientId) {
+            <span class="chip" [class.green]="p.memberStatus === 'ACTIVE'" [class.grey]="p.memberStatus !== 'ACTIVE'">
+              {{ 'governanceRegister.people.status.' + (p.memberStatus ?? 'NOT_ACTIVE') | translate }}
+            </span>
+          }
+        </h2>
+        <button
+          mat-flat-button
+          color="primary"
+          type="button"
+          (click)="edit()"
+          *mifosxHasPermission="'UPDATE_GOVERNANCE'"
+        >
+          <mat-icon>edit</mat-icon>{{ 'labels.buttons.Edit' | translate }}
         </button>
       </div>
       <dl class="facts">
@@ -25,9 +38,6 @@
             <dt class="fact-label">{{ 'governanceRegister.people.Member' | translate }}</dt>
             <dd class="fact-value">
               <a [routerLink]="['/members', p.clientId]">{{ p.accountNo }}</a>
-              <span class="chip" [class.green]="p.memberStatus === 'ACTIVE'" [class.grey]="p.memberStatus !== 'ACTIVE'">
-                {{ 'governanceRegister.people.status.' + (p.memberStatus ?? 'NOT_ACTIVE') | translate }}
-              </span>
             </dd>
           </div>
         } @else {
@@ -57,7 +67,7 @@
         @if (p.address) {
           <div class="fact">
             <dt class="fact-label">{{ 'labels.inputs.Address' | translate }}</dt>
-            <dd class="fact-value">{{ p.address }}</dd>
+            <dd class="fact-value fact-value--plain">{{ p.address }}</dd>
           </div>
         }
         @if (p.note) {
@@ -69,200 +79,346 @@
       </dl>
     </section>
 
-    <section class="frame">
-      <h2 class="legend">{{ 'governanceRegister.people.CurrentPositions' | translate }}</h2>
-      @if (p.current.length) {
-        <div class="table-card mat-elevation-z8">
-          <div class="table-scroll">
-            <table class="blue">
-              <thead>
-                <tr>
-                  <th>{{ 'governanceRegister.Committee' | translate }}</th>
-                  <th>{{ 'governanceRegister.Position' | translate }}</th>
-                  <th>{{ 'governanceRegister.ServingSince' | translate }}</th>
-                  <th>{{ 'governanceRegister.TermEndsOn' | translate }}</th>
-                  <th *mifosxHasPermission="'UPDATE_GOVERNANCE'">{{ 'labels.inputs.Actions' | translate }}</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (t of p.current; track t.id) {
-                  <tr>
-                    <td>{{ t.committeeName }}</td>
-                    <td>{{ positionLabel(t) | translate }}</td>
-                    <td>{{ (t.servingSince | adToBs) || t.servingSince }}</td>
-                    <td>
-                      {{ (t.expectedEndOn | adToBs) || t.expectedEndOn || '-' }}
-                      @if (t.remaining?.ranOut) {
-                        <span class="chip amber">{{ 'governanceRegister.RanOut' | translate }}</span>
-                      }
-                    </td>
-                    <td *mifosxHasPermission="'UPDATE_GOVERNANCE'">
-                      <button mat-button type="button" (click)="changePosition(t)">
-                        {{ 'governanceRegister.committees.ChangePosition' | translate }}
-                      </button>
-                      <button mat-button type="button" (click)="endTerm(t)">
-                        {{ 'governanceRegister.committees.EndTerm' | translate }}
-                      </button>
-                      <button mat-button color="warn" type="button" (click)="voidTerm(t)">
-                        {{ 'governanceRegister.committees.Void' | translate }}
-                      </button>
-                    </td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-          </div>
-        </div>
-      } @else {
-        <p class="empty">{{ 'governanceRegister.people.NothingServing' | translate }}</p>
-      }
-    </section>
+    <mat-tab-group class="person-tabs" animationDuration="150ms">
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon>group_add</mat-icon>{{ 'relatedParties.RelatedParties' | translate }}
+        </ng-template>
+        <div class="tab-panel">
+          @if (parties(); as rp) {
+            <div class="login-strip">
+              <div class="login-identity">
+                <mat-icon>key</mat-icon>
+                <div>
+                  <span class="fact-label">{{ 'relatedParties.Login' | translate }}</span>
+                  <span class="fact-value">{{ rp.username || ('relatedParties.NoLogin' | translate) }}</span>
+                </div>
+              </div>
+              <div class="header-actions" *mifosxHasPermission="'UPDATE_GOVERNANCE'">
+                <button mat-stroked-button type="button" (click)="setLogin()">
+                  <mat-icon>key</mat-icon>{{ 'relatedParties.Login' | translate }}
+                </button>
+                <button mat-flat-button color="primary" type="button" (click)="addLink()">
+                  <mat-icon>link</mat-icon>{{ 'relatedParties.AddLink' | translate }}
+                </button>
+              </div>
+            </div>
 
-    <section class="frame">
-      <h2 class="legend">{{ 'governanceRegister.people.History' | translate }}</h2>
-      @if (p.history.length) {
-        <div class="table-card mat-elevation-z8">
-          <div class="table-scroll">
-            <table class="blue">
-              <thead>
-                <tr>
-                  <th>{{ 'governanceRegister.Committee' | translate }}</th>
-                  <th>{{ 'governanceRegister.Position' | translate }}</th>
-                  <th>{{ 'governanceRegister.committees.StartedOn' | translate }}</th>
-                  <th>{{ 'governanceRegister.committees.EndedOn' | translate }}</th>
-                  <th>{{ 'governanceRegister.committees.Reason' | translate }}</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (t of p.history; track t.id) {
-                  <tr [class.voided]="t.voided">
-                    <td>{{ t.committeeName }}</td>
-                    <td>{{ positionLabel(t) | translate }}</td>
-                    <td>{{ (t.startOn | adToBs) || t.startOn }}</td>
-                    <td>{{ (t.endedOn | adToBs) || t.endedOn || '-' }}</td>
-                    <td>
-                      @if (t.voided) {
-                        {{ 'governanceRegister.committees.Mistake' | translate }}: {{ t.voidReason }}
-                      } @else if (t.endReason) {
-                        {{ 'governanceRegister.endReason.' + t.endReason | translate }}
+            @if (rp.links.length) {
+              <h3 class="section-label divider-top">
+                <mat-icon>link</mat-icon>{{ 'relatedParties.LinksAdded' | translate }}
+              </h3>
+              <ul class="links">
+                @for (l of rp.links; track l.id) {
+                  <li [class.removed]="l.removed">
+                    <mat-icon class="row-icon">person</mat-icon>
+                    <span class="name">{{ l.name }}</span>
+                    <span class="sub"
+                      >{{ l.relationship }}
+                      @if (l.marriageEnded) {
+                        · {{ 'relatedParties.MarriageEnded' | translate }}
                       }
-                    </td>
-                  </tr>
+                    </span>
+                    @if (l.removed) {
+                      <span class="sub">{{ 'relatedParties.Removed' | translate }}: {{ l.removeReason }}</span>
+                    } @else {
+                      <button
+                        mat-button
+                        color="warn"
+                        type="button"
+                        (click)="removeLink(l)"
+                        *mifosxHasPermission="'UPDATE_GOVERNANCE'"
+                      >
+                        {{ 'relatedParties.RemoveLink' | translate }}
+                      </button>
+                    }
+                  </li>
                 }
-              </tbody>
-            </table>
-          </div>
-        </div>
-      } @else {
-        <p class="empty">{{ 'governanceRegister.people.NoHistory' | translate }}</p>
-      }
-    </section>
+              </ul>
+            }
 
-    <section class="frame">
-      <h2 class="legend">{{ 'governanceRegister.documents.Documents' | translate }}</h2>
-      <div class="actions top" *mifosxHasPermission="'UPDATE_GOVERNANCE'">
-        <button mat-stroked-button color="primary" type="button" (click)="addDocument()">
-          <mat-icon>attach_file</mat-icon>{{ 'governanceRegister.documents.AddDocument' | translate }}
-        </button>
-      </div>
-      @if (p.documents.length) {
-        <ul class="documents">
-          @for (d of p.documents; track d.id) {
-            <li [class.removed]="d.removed">
-              <span class="name">{{ d.title }}</span>
-              <span class="sub">{{ d.fileName }} · {{ (d.addedOn | adToBs) || d.addedOn }} · {{ d.addedBy }}</span>
-              @if (d.removed) {
-                <span class="sub">{{ 'governanceRegister.documents.TakenOut' | translate }}: {{ d.removeReason }}</span>
-              } @else {
-                <span class="row-actions">
-                  <button mat-button type="button" (click)="downloadDocument(d)">
-                    {{ 'labels.buttons.Download' | translate }}
-                  </button>
-                  <button
-                    mat-button
-                    color="warn"
-                    type="button"
-                    (click)="removeDocument(d)"
-                    *mifosxHasPermission="'UPDATE_GOVERNANCE'"
-                  >
-                    {{ 'governanceRegister.documents.TakeOut' | translate }}
-                  </button>
-                </span>
-              }
-            </li>
+            @if (rp.related.length) {
+              <h3 class="section-label divider-top">
+                <mat-icon>diversity_3</mat-icon>{{ 'relatedParties.RelatedMembers' | translate }}
+              </h3>
+              <ul class="related-members">
+                @for (m of rp.related; track m.clientId) {
+                  <li>
+                    <mat-icon class="row-icon">groups</mat-icon>
+                    <a [routerLink]="['/members', m.clientId]">{{ m.name }}</a>
+                    @for (w of m.ways; track w.kin) {
+                      <span class="chip grey">{{ 'relatedParties.kin.' + w.kin | translate }}</span>
+                    }
+                  </li>
+                }
+              </ul>
+            }
+
+            @if (!rp.links.length && !rp.related.length) {
+              <p class="empty">{{ 'relatedParties.NothingLinked' | translate }}</p>
+            }
           }
-        </ul>
-      } @else {
-        <p class="empty">{{ 'governanceRegister.documents.Empty' | translate }}</p>
-      }
-    </section>
+        </div>
+      </mat-tab>
 
-    @if (p.canSeeDeclarations) {
-      <section class="frame">
-        <h2 class="legend">{{ 'governanceRegister.declarations.Declarations' | translate }}</h2>
-        <div class="actions top" *mifosxHasPermission="'CREATE_GOVERNANCEDECLARATION'">
-          <button mat-stroked-button color="primary" type="button" (click)="addDeclaration()">
-            <mat-icon>attach_file</mat-icon>{{ 'governanceRegister.declarations.AddDeclaration' | translate }}
-          </button>
+      <mat-tab>
+        <ng-template mat-tab-label
+          ><mat-icon>work</mat-icon>{{ 'governanceRegister.positions.Positions' | translate }}</ng-template
+        >
+        <div class="tab-panel">
+          <h3 class="section-label">{{ 'governanceRegister.people.CurrentPositions' | translate }}</h3>
+          @if (p.current.length) {
+            <div class="table-card mat-elevation-z8">
+              <div class="table-scroll">
+                <table class="blue">
+                  <thead>
+                    <tr>
+                      <th>{{ 'governanceRegister.Committee' | translate }}</th>
+                      <th>{{ 'governanceRegister.Position' | translate }}</th>
+                      <th>{{ 'governanceRegister.ServingSince' | translate }}</th>
+                      <th>{{ 'governanceRegister.TermEndsOn' | translate }}</th>
+                      <th *mifosxHasPermission="'UPDATE_GOVERNANCE'">{{ 'labels.inputs.Actions' | translate }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (t of p.current; track t.id) {
+                      <tr>
+                        <td>{{ t.committeeName }}</td>
+                        <td>{{ positionLabel(t) | translate }}</td>
+                        <td>{{ (t.servingSince | adToBs) || t.servingSince }}</td>
+                        <td>
+                          {{ (t.expectedEndOn | adToBs) || t.expectedEndOn || '-' }}
+                          @if (t.remaining?.ranOut) {
+                            <span class="chip amber">{{ 'governanceRegister.RanOut' | translate }}</span>
+                          }
+                        </td>
+                        <td *mifosxHasPermission="'UPDATE_GOVERNANCE'">
+                          <span class="row-actions">
+                            <button
+                              mat-icon-button
+                              class="icon-btn"
+                              type="button"
+                              [matTooltip]="'governanceRegister.committees.ChangePosition' | translate"
+                              (click)="changePosition(t)"
+                            >
+                              <mat-icon>swap_horiz</mat-icon>
+                            </button>
+                            <button
+                              mat-icon-button
+                              class="icon-btn icon-btn--amber"
+                              type="button"
+                              [matTooltip]="'governanceRegister.committees.EndTerm' | translate"
+                              (click)="endTerm(t)"
+                            >
+                              <mat-icon>stop_circle</mat-icon>
+                            </button>
+                            <button
+                              mat-icon-button
+                              class="icon-btn icon-btn--red"
+                              type="button"
+                              [matTooltip]="'governanceRegister.committees.Void' | translate"
+                              (click)="voidTerm(t)"
+                            >
+                              <mat-icon>block</mat-icon>
+                            </button>
+                          </span>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          } @else {
+            <p class="empty">{{ 'governanceRegister.people.NothingServing' | translate }}</p>
+          }
+
+          <h3 class="section-label divider-top">{{ 'governanceRegister.people.History' | translate }}</h3>
+          @if (p.history.length) {
+            <div class="table-card mat-elevation-z8">
+              <div class="table-scroll">
+                <table class="blue">
+                  <thead>
+                    <tr>
+                      <th>{{ 'governanceRegister.Committee' | translate }}</th>
+                      <th>{{ 'governanceRegister.Position' | translate }}</th>
+                      <th>{{ 'governanceRegister.committees.StartedOn' | translate }}</th>
+                      <th>{{ 'governanceRegister.committees.EndedOn' | translate }}</th>
+                      <th>{{ 'governanceRegister.committees.Reason' | translate }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (t of p.history; track t.id) {
+                      <tr [class.voided]="t.voided">
+                        <td>{{ t.committeeName }}</td>
+                        <td>{{ positionLabel(t) | translate }}</td>
+                        <td>{{ (t.startOn | adToBs) || t.startOn }}</td>
+                        <td>{{ (t.endedOn | adToBs) || t.endedOn || '-' }}</td>
+                        <td>
+                          @if (t.voided) {
+                            {{ 'governanceRegister.committees.Mistake' | translate }}: {{ t.voidReason }}
+                          } @else if (t.endReason) {
+                            {{ 'governanceRegister.endReason.' + t.endReason | translate }}
+                          }
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          } @else {
+            <p class="empty">{{ 'governanceRegister.people.NoHistory' | translate }}</p>
+          }
         </div>
-        <div class="table-card mat-elevation-z8">
-          <div class="table-scroll">
-            <table class="blue">
-              <thead>
-                <tr>
-                  <th>{{ 'governanceRegister.declarations.Kind' | translate }}</th>
-                  <th>{{ 'governanceRegister.declarations.DeclaredOn' | translate }}</th>
-                  <th>{{ 'labels.inputs.Status' | translate }}</th>
-                  <th>{{ 'labels.inputs.Actions' | translate }}</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (d of declarations(); track d.id) {
-                  <tr [class.voided]="d.voided">
-                    <td>
-                      {{ 'governanceRegister.declarationKind.' + d.kind | translate }}
-                      @if (d.fiscalYearLabel) {
-                        <span class="sub">{{ d.fiscalYearLabel }}</span>
-                      }
-                      @if (d.subject) {
-                        <span class="sub">{{ d.subject }}</span>
-                      }
-                    </td>
-                    <td>{{ (d.declaredOn | adToBs) || d.declaredOn }}</td>
-                    <td>
-                      @if (d.voided) {
-                        {{ 'governanceRegister.committees.Mistake' | translate }}: {{ d.voidReason }}
-                      } @else {
-                        {{ 'governanceRegister.declarationStatus.' + d.status | translate }}
-                      }
-                    </td>
-                    <td>
-                      <button mat-button type="button" (click)="downloadDeclaration(d)">
-                        {{ 'labels.buttons.Download' | translate }}
-                      </button>
-                      @if (!d.voided) {
-                        <button
-                          mat-button
-                          color="warn"
-                          type="button"
-                          (click)="voidDeclaration(d)"
-                          *mifosxHasPermission="'CREATE_GOVERNANCEDECLARATION'"
-                        >
-                          {{ 'governanceRegister.committees.Void' | translate }}
-                        </button>
-                      }
-                    </td>
-                  </tr>
-                } @empty {
-                  <tr>
-                    <td colspan="4" class="empty-cell">{{ 'governanceRegister.declarations.Empty' | translate }}</td>
-                  </tr>
-                }
-              </tbody>
-            </table>
+      </mat-tab>
+
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon>folder_open</mat-icon>{{ 'governanceRegister.documents.Documents' | translate }}
+        </ng-template>
+        <div class="tab-panel">
+          <div class="tab-panel-header">
+            <span class="grow"></span>
+            <button
+              mat-flat-button
+              color="primary"
+              type="button"
+              (click)="addDocument()"
+              *mifosxHasPermission="'UPDATE_GOVERNANCE'"
+            >
+              <mat-icon>attach_file</mat-icon>{{ 'governanceRegister.documents.AddDocument' | translate }}
+            </button>
           </div>
+          @if (p.documents.length) {
+            <ul class="documents">
+              @for (d of p.documents; track d.id) {
+                <li [class.removed]="d.removed">
+                  @if (documentThumbs()[d.id]; as thumb) {
+                    <img class="doc-thumb" [src]="thumb" alt="" />
+                  } @else {
+                    <span class="doc-icon">
+                      <mat-icon>{{
+                        d.contentType === 'application/pdf' ? 'picture_as_pdf' : 'insert_drive_file'
+                      }}</mat-icon>
+                    </span>
+                  }
+                  <div class="doc-info">
+                    <span class="name">{{ d.title }}</span>
+                    <span class="sub"
+                      >{{ d.fileName }} · {{ (d.addedOn | adToBs) || d.addedOn }} · {{ d.addedBy }}</span
+                    >
+                    @if (d.removed) {
+                      <span class="sub"
+                        >{{ 'governanceRegister.documents.TakenOut' | translate }}: {{ d.removeReason }}</span
+                      >
+                    }
+                  </div>
+                  @if (!d.removed) {
+                    <span class="row-actions">
+                      <button mat-button type="button" (click)="downloadDocument(d)">
+                        <mat-icon>download</mat-icon>{{ 'labels.buttons.Download' | translate }}
+                      </button>
+                      <button
+                        mat-button
+                        color="warn"
+                        type="button"
+                        (click)="removeDocument(d)"
+                        *mifosxHasPermission="'UPDATE_GOVERNANCE'"
+                      >
+                        <mat-icon>delete_outline</mat-icon>{{ 'governanceRegister.documents.TakeOut' | translate }}
+                      </button>
+                    </span>
+                  }
+                </li>
+              }
+            </ul>
+          } @else {
+            <p class="empty">{{ 'governanceRegister.documents.Empty' | translate }}</p>
+          }
         </div>
-      </section>
-    }
+      </mat-tab>
+
+      @if (p.canSeeDeclarations) {
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <mat-icon>fact_check</mat-icon>{{ 'governanceRegister.declarations.Declarations' | translate }}
+          </ng-template>
+          <div class="tab-panel">
+            <div class="tab-panel-header">
+              <span class="grow"></span>
+              <button
+                mat-flat-button
+                color="primary"
+                type="button"
+                (click)="addDeclaration()"
+                *mifosxHasPermission="'CREATE_GOVERNANCEDECLARATION'"
+              >
+                <mat-icon>attach_file</mat-icon>{{ 'governanceRegister.declarations.AddDeclaration' | translate }}
+              </button>
+            </div>
+            <div class="table-card mat-elevation-z8">
+              <div class="table-scroll">
+                <table class="blue">
+                  <thead>
+                    <tr>
+                      <th>{{ 'governanceRegister.declarations.Kind' | translate }}</th>
+                      <th>{{ 'governanceRegister.declarations.DeclaredOn' | translate }}</th>
+                      <th>{{ 'labels.inputs.Status' | translate }}</th>
+                      <th>{{ 'labels.inputs.Actions' | translate }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (d of declarations(); track d.id) {
+                      <tr [class.voided]="d.voided">
+                        <td>
+                          {{ 'governanceRegister.declarationKind.' + d.kind | translate }}
+                          @if (d.fiscalYearLabel) {
+                            <span class="sub">{{ d.fiscalYearLabel }}</span>
+                          }
+                          @if (d.subject) {
+                            <span class="sub">{{ d.subject }}</span>
+                          }
+                        </td>
+                        <td>{{ (d.declaredOn | adToBs) || d.declaredOn }}</td>
+                        <td>
+                          @if (d.voided) {
+                            {{ 'governanceRegister.committees.Mistake' | translate }}: {{ d.voidReason }}
+                          } @else {
+                            {{ 'governanceRegister.declarationStatus.' + d.status | translate }}
+                          }
+                        </td>
+                        <td>
+                          <button mat-button type="button" (click)="downloadDeclaration(d)">
+                            {{ 'labels.buttons.Download' | translate }}
+                          </button>
+                          @if (!d.voided) {
+                            <button
+                              mat-button
+                              color="warn"
+                              type="button"
+                              (click)="voidDeclaration(d)"
+                              *mifosxHasPermission="'CREATE_GOVERNANCEDECLARATION'"
+                            >
+                              {{ 'governanceRegister.committees.Void' | translate }}
+                            </button>
+                          }
+                        </td>
+                      </tr>
+                    } @empty {
+                      <tr>
+                        <td colspan="4" class="empty-cell">
+                          {{ 'governanceRegister.declarations.Empty' | translate }}
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+      }
+    </mat-tab-group>
   }
 </div>
