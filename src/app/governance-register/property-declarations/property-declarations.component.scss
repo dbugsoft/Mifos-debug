@@ -23,6 +23,10 @@
   flex-wrap: wrap;
   gap: 12px;
   align-items: center;
+  // The shared shell gives every page under these tabs a 24px gap from the tab bar's own bottom border, but the
+  // field here is tall enough (centered against the shorter button beside it) to flush its own top edge against
+  // that gap, reading as touching the line - this adds the little extra room it needs on its own.
+  margin-top: 12px;
 
   .year {
     width: 140px;

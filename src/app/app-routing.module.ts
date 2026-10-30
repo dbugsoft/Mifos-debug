@@ -289,8 +289,40 @@ const routes: Routes = [
                   (m) => m.PropertyDeclarationsComponent
                 ),
               data: { title: 'Who has declared', breadcrumb: 'Who has declared' }
+            },
+            {
+              path: 'related-parties',
+              loadComponent: () =>
+                import('./governance-register/related-parties/related-parties.component').then(
+                  (m) => m.RelatedPartiesComponent
+                ),
+              data: { title: 'Related parties', breadcrumb: 'Related parties' }
+            },
+            {
+              path: 'meetings',
+              loadComponent: () =>
+                import('./governance-register/meetings/meetings-list/meetings-list.component').then(
+                  (m) => m.MeetingsListComponent
+                ),
+              data: { title: 'Meetings', breadcrumb: 'Meetings' }
             }
           ]
+        },
+        {
+          path: 'meetings/:id',
+          loadComponent: () =>
+            import('./governance-register/meetings/meeting-detail/meeting-detail.component').then(
+              (m) => m.MeetingDetailComponent
+            ),
+          // The default back link would go to the generic Governance register (its nearest route parent, since
+          // this page is a sibling of the tab shell, not nested under it); pointed at Meetings instead, the way
+          // person-detail points its own back link at People above.
+          data: {
+            title: 'Meeting',
+            breadcrumb: 'Meeting',
+            routeParamBreadcrumb: false,
+            parentBreadcrumb: { label: 'Meetings', url: '/governance-register/meetings' }
+          }
         },
         {
           path: 'people/:id',
@@ -298,7 +330,15 @@ const routes: Routes = [
             import('./governance-register/people/person-detail/person-detail.component').then(
               (m) => m.PersonDetailComponent
             ),
-          data: { title: 'Person', breadcrumb: 'Person', routeParamBreadcrumb: false }
+          // The default back link would go to the generic Governance register (its nearest route parent, since
+          // this page is a sibling of the tab shell, not nested under it); pointed at People instead, the way
+          // loan-aging points its own back link at Reports above.
+          data: {
+            title: 'Person',
+            breadcrumb: 'Person',
+            routeParamBreadcrumb: false,
+            parentBreadcrumb: { label: 'People', url: '/governance-register/people' }
+          }
         }
       ]
     },

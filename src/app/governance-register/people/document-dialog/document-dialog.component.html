@@ -6,14 +6,18 @@
   file, You can obtain one at http://mozilla.org/MPL/2.0/.
 -->
 
-<h2 mat-dialog-title>{{ 'governanceRegister.documents.AddDocument' | translate }}</h2>
+<h2 mat-dialog-title><mat-icon>attach_file</mat-icon>{{ 'governanceRegister.documents.AddDocument' | translate }}</h2>
 <form [formGroup]="form" (ngSubmit)="save()">
   <mat-dialog-content>
     @if (serverError()) {
-      <p class="server-error">{{ serverError() }}</p>
+      <div class="server-error">
+        <mat-icon>error_outline</mat-icon>
+        <span>{{ serverError() }}</span>
+      </div>
     }
 
     <mat-form-field class="field">
+      <mat-icon matPrefix>title</mat-icon>
       <mat-label>{{ 'governanceRegister.documents.Title' | translate }}</mat-label>
       <input matInput formControlName="title" maxlength="200" />
       @if (form.controls.title.hasError('server')) {
@@ -21,9 +25,23 @@
       }
     </mat-form-field>
 
-    <button mat-stroked-button type="button" (click)="filePicker.click()">
-      {{ file()?.name ?? ('governanceRegister.documents.ChooseAFile' | translate) }}
-    </button>
+    <span class="file-label">{{ 'governanceRegister.documents.File' | translate }}</span>
+    <div
+      class="file-field"
+      [class.has-file]="file()"
+      tabindex="0"
+      role="button"
+      (click)="filePicker.click()"
+      (keydown.enter)="filePicker.click()"
+    >
+      <mat-icon>{{ file() ? 'check_circle' : 'upload_file' }}</mat-icon>
+      <span class="file-field-text">
+        {{ file()?.name ?? ('governanceRegister.documents.ChooseAFile' | translate) }}
+      </span>
+      @if (file()) {
+        <span class="file-field-change">{{ 'governanceRegister.documents.Change' | translate }}</span>
+      }
+    </div>
     <input #filePicker type="file" hidden accept="application/pdf,image/*" (change)="onFileSelect($event)" />
 
     <mat-form-field class="field">
@@ -34,6 +52,9 @@
   <mat-dialog-actions align="end">
     <button mat-stroked-button type="button" mat-dialog-close>{{ 'labels.buttons.Cancel' | translate }}</button>
     <button mat-raised-button color="primary" type="submit" [disabled]="busy() || !file()">
+      @if (busy()) {
+        <mat-icon class="spin">autorenew</mat-icon>
+      }
       {{ 'labels.buttons.Submit' | translate }}
     </button>
   </mat-dialog-actions>

@@ -1,0 +1,40 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<h2 mat-dialog-title><mat-icon>check_circle</mat-icon>{{ 'meetings.ApproveTitle' | translate }}</h2>
+<form [formGroup]="form" (ngSubmit)="save()">
+  <mat-dialog-content>
+    @if (serverError()) {
+      <div class="server-error">
+        <mat-icon>error_outline</mat-icon>
+        <span>{{ serverError() }}</span>
+      </div>
+    }
+
+    <div class="notice">
+      <mat-icon>info</mat-icon>
+      <span>{{ 'meetings.ApproveMessage' | translate }}</span>
+    </div>
+
+    <mifosx-nepali-date-input
+      [inline]="true"
+      formControlName="approvedOn"
+      [label]="'meetings.ApprovedOn' | translate"
+      [maxDate]="today"
+    ></mifosx-nepali-date-input>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-stroked-button type="button" mat-dialog-close>{{ 'labels.buttons.Cancel' | translate }}</button>
+    <button mat-raised-button color="primary" type="submit" [disabled]="busy()">
+      @if (busy()) {
+        <mat-icon class="spin">autorenew</mat-icon>
+      }
+      {{ 'meetings.ApproveTitle' | translate }}
+    </button>
+  </mat-dialog-actions>
+</form>

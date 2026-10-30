@@ -1,0 +1,95 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<h2 mat-dialog-title><mat-icon>event_note</mat-icon>{{ 'meetings.RecordAMeeting' | translate }}</h2>
+<form [formGroup]="form" (ngSubmit)="save()">
+  <mat-dialog-content>
+    @if (serverError()) {
+      <div class="server-error">
+        <mat-icon>error_outline</mat-icon>
+        <span>{{ serverError() }}</span>
+      </div>
+    }
+
+    <div class="field-row">
+      <mat-form-field class="field">
+        <mat-label>{{ 'meetings.Kind' | translate }}</mat-label>
+        <mat-select formControlName="kind">
+          <mat-option value="COMMITTEE">{{ 'meetings.kind.COMMITTEE' | translate }}</mat-option>
+          <mat-option value="ANNUAL_GENERAL">{{ 'meetings.kind.ANNUAL_GENERAL' | translate }}</mat-option>
+          <mat-option value="SPECIAL_GENERAL">{{ 'meetings.kind.SPECIAL_GENERAL' | translate }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      @if (isCommittee) {
+        <mat-form-field class="field">
+          <mat-label>{{ 'governanceRegister.Committee' | translate }}</mat-label>
+          <mat-select formControlName="committeeId">
+            @for (c of data.committees; track c.id) {
+              <mat-option [value]="c.id">{{ c.name }}</mat-option>
+            }
+          </mat-select>
+          @if (form.controls.committeeId.hasError('server')) {
+            <mat-error>{{ form.controls.committeeId.getError('server') }}</mat-error>
+          }
+        </mat-form-field>
+      }
+    </div>
+
+    <h3 class="section-label divider-top"><mat-icon>event</mat-icon>{{ 'meetings.HeldOn' | translate }}</h3>
+    <mifosx-nepali-date-input
+      [inline]="true"
+      formControlName="heldOn"
+      [label]="'meetings.HeldOn' | translate"
+      [maxDate]="today"
+    ></mifosx-nepali-date-input>
+
+    <mat-form-field class="field">
+      <mat-label>{{ 'meetings.Place' | translate }}</mat-label>
+      <input matInput formControlName="place" maxlength="300" />
+    </mat-form-field>
+
+    <h3 class="section-label divider-top"><mat-icon>description</mat-icon>{{ 'meetings.Agenda' | translate }}</h3>
+    <mat-form-field class="field">
+      <mat-label>{{ 'meetings.Agenda' | translate }}</mat-label>
+      <textarea matInput formControlName="agenda" rows="3" maxlength="4000"></textarea>
+    </mat-form-field>
+
+    @if (!isCommittee) {
+      <mat-form-field class="field">
+        <mat-label>{{ 'meetings.MembersPresent' | translate }}</mat-label>
+        <input matInput type="number" min="0" formControlName="membersPresent" />
+        @if (form.controls.membersPresent.hasError('server')) {
+          <mat-error>{{ form.controls.membersPresent.getError('server') }}</mat-error>
+        }
+      </mat-form-field>
+    }
+
+    @if (isCommittee) {
+      <div class="notice">
+        <mat-icon>info</mat-icon>
+        <span>{{ 'meetings.MarkAttendanceHint' | translate }}</span>
+      </div>
+    }
+
+    <mat-form-field class="field">
+      <mat-label>{{ 'meetings.AttendanceNote' | translate }}</mat-label>
+      <textarea matInput formControlName="attendanceNote" rows="2" maxlength="1000"></textarea>
+      <mat-hint>{{ 'meetings.AttendanceNoteHint' | translate }}</mat-hint>
+    </mat-form-field>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-stroked-button type="button" mat-dialog-close>{{ 'labels.buttons.Cancel' | translate }}</button>
+    <button mat-raised-button color="primary" type="submit" [disabled]="busy()">
+      @if (busy()) {
+        <mat-icon class="spin">autorenew</mat-icon>
+      }
+      {{ 'labels.buttons.Submit' | translate }}
+    </button>
+  </mat-dialog-actions>
+</form>

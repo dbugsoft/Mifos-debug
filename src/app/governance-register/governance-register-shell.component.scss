@@ -45,5 +45,8 @@
 }
 
 .tab-panel {
-  padding: 20px 0 0;
+  // !important: MatTabNavPanel's own host styles (a same-specificity single class, .mat-mdc-tab-nav-panel) were
+  // winning the padding-top tie on source order, leaving every page's content flush against the tab bar's own
+  // bottom border - this is the one place that gap is set for every page under these tabs, not each page itself.
+  padding: 24px 0 0 !important;
 }

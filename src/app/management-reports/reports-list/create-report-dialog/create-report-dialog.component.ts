@@ -59,7 +59,7 @@ export class CreateReportDialogComponent {
     officeId: [this.data.replaces?.officeId ?? (null as number | null)],
     notes: [
       '',
-      Validators.maxLength(4000)
+      Validators.maxLength(8000)
     ]
   });
 

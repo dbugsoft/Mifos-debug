@@ -12,6 +12,7 @@
     <div class="shortcuts">
       @for (p of periods(); track p.code) {
         <button
+          class="shortcut-btn"
           mat-stroked-button
           color="primary"
           type="button"
@@ -52,6 +53,9 @@
     </mat-form-field>
     <button mat-raised-button color="primary" type="button" (click)="load()">
       <mat-icon>search</mat-icon>{{ 'managementReports.Find' | translate }}
+    </button>
+    <button class="approved-btn" mat-stroked-button type="button" (click)="showApproved()">
+      <mat-icon>check_circle</mat-icon>{{ 'managementReports.ApprovedReports' | translate }}
     </button>
     <span class="grow"></span>
     <button
@@ -105,7 +109,7 @@
                     'managementReports.status.' + r.status | translate
                   }}</span>
                 </td>
-                <td>{{ (r.generatedAt | date: 'mediumDate') || '-' }}</td>
+                <td>{{ (r.generatedAt | adToBs) || '-' }}</td>
                 <td>
                   @if (r.decidedAt) {
                     {{ r.decisionReference }}

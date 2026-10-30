@@ -38,6 +38,24 @@
     >
       {{ 'governanceRegister.declarations.WhoHasDeclared' | translate }}
     </a>
+    <a
+      mat-tab-link
+      [routerLink]="['./related-parties']"
+      routerLinkActive
+      #relatedParties="routerLinkActive"
+      [active]="relatedParties.isActive"
+    >
+      {{ 'relatedParties.RelatedParties' | translate }}
+    </a>
+    <a
+      mat-tab-link
+      [routerLink]="['./meetings']"
+      routerLinkActive
+      #meetings="routerLinkActive"
+      [active]="meetings.isActive"
+    >
+      {{ 'meetings.Meetings' | translate }}
+    </a>
   </nav>
 
   <mat-tab-nav-panel #tabPanel class="tab-panel">

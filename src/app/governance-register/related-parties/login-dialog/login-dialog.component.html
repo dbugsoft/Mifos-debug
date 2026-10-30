@@ -1,0 +1,61 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<h2 mat-dialog-title>
+  <mat-icon>key</mat-icon>
+  {{ 'relatedParties.LoginTitle' | translate }}
+  <span class="officer-name">· {{ data.person.name }}</span>
+</h2>
+<mat-dialog-content>
+  @if (serverError()) {
+    <div class="server-error">
+      <mat-icon>error_outline</mat-icon>
+      <span>{{ serverError() }}</span>
+    </div>
+  }
+
+  <div class="who" [class.picked]="data.person.username">
+    <mat-icon>{{ data.person.username ? 'verified_user' : 'person_off' }}</mat-icon>
+    <span>{{ data.person.username || ('relatedParties.NoLogin' | translate) }}</span>
+  </div>
+
+  <div class="notice">
+    <mat-icon>info</mat-icon>
+    <span>{{ 'relatedParties.LoginHint' | translate }}</span>
+  </div>
+
+  <mat-form-field class="field">
+    <mat-icon matPrefix>key</mat-icon>
+    <mat-label>{{ 'relatedParties.Login' | translate }}</mat-label>
+    <mat-select [formControl]="userId">
+      <mat-option [value]="null">{{ 'relatedParties.NoLogin' | translate }}</mat-option>
+      @for (u of users(); track u.id) {
+        <mat-option [value]="u.id"
+          >{{ u.username }}
+          @if (u.officeName) {
+            · {{ u.officeName }}
+          }
+        </mat-option>
+      }
+    </mat-select>
+    @if (loadingUsers()) {
+      <mat-hint>{{ 'relatedParties.LoadingLogins' | translate }}</mat-hint>
+    } @else if (usersForbidden()) {
+      <mat-hint class="failed">{{ 'relatedParties.LoginsForbidden' | translate }}</mat-hint>
+    }
+  </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-stroked-button type="button" mat-dialog-close>{{ 'labels.buttons.Cancel' | translate }}</button>
+  <button mat-raised-button color="primary" type="button" [disabled]="busy()" (click)="save()">
+    @if (busy()) {
+      <mat-icon class="spin">autorenew</mat-icon>
+    }
+    {{ 'labels.buttons.Submit' | translate }}
+  </button>
+</mat-dialog-actions>

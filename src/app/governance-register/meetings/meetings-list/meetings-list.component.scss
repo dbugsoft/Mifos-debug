@@ -1,0 +1,99 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+@use 'app/compliance/compliance' as compliance;
+
+@include compliance.page;
+
+.compliance-page {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  // The shared shell gives every page under these tabs a 24px gap from the tab bar's own bottom border, but the
+  // fields here are tall enough (centered against the shorter buttons beside them) to flush their own top edge
+  // against that gap, reading as touching the line - this adds the little extra room they need on their own.
+  margin-top: 12px;
+  margin-bottom: 16px;
+
+  .field {
+    width: 200px;
+    max-width: 100%;
+  }
+
+  .field--year {
+    width: 140px;
+  }
+
+  .grow {
+    flex: 1;
+  }
+}
+
+.row {
+  cursor: pointer;
+
+  &:hover {
+    background: rgb(127 127 127 / 6%);
+  }
+}
+
+.minutes-icon {
+  color: var(--dk-success, #16a34a);
+}
+
+table.blue {
+  border-collapse: collapse;
+}
+
+table.blue thead th {
+  padding: 16px 20px;
+  background: var(--md-sys-color-primary, var(--dk-fill, #2460b9));
+  color: #fff;
+  font-weight: 600;
+  border-bottom: none;
+  white-space: nowrap;
+}
+
+table.blue thead th:not(:last-child) {
+  border-right: 1px solid rgb(255 255 255 / 25%);
+}
+
+table.blue tbody td {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--dk-border, #e2e8f0);
+}
+
+table.blue tbody tr:last-child td {
+  border-bottom: none;
+}
+
+table.blue .num {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.table-card {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.table-card .table-scroll {
+  overflow-x: auto;
+}
+
+.table-card table.blue {
+  border: 0;
+  border-radius: 0;
+}
