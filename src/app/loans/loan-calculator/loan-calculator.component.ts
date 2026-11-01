@@ -20,7 +20,6 @@ import { Dates } from 'app/core/utils/dates';
 import { LoansService } from 'app/loans/loans.service';
 import { RepaymentSchedule, RepaymentSchedulePeriod } from 'app/loans/models/loan-account.model';
 import { SettingsService } from 'app/settings/settings.service';
-import { FormatNumberPipe } from 'app/pipes/format-number.pipe';
 import { DualDateComponent } from 'app/shared/dual-date/dual-date.component';
 import { LoanScheduleComponent, ScheduleTotals } from 'app/loans/loan-schedule/loan-schedule.component';
 import { NepaliDateInputComponent } from 'app/shared/nepali-date-input/nepali-date-input.component';
@@ -95,7 +94,6 @@ export function buildSchedulePayload(
     ...STANDALONE_SHARED_IMPORTS,
     MatAutocompleteModule,
     FaIconComponent,
-    FormatNumberPipe,
     DualDateComponent,
     NepaliDateInputComponent,
     LoanScheduleComponent
