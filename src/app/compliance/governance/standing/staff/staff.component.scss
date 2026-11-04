@@ -1,0 +1,221 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+@use 'app/compliance/compliance' as compliance;
+
+@include compliance.page;
+
+// A top-level page (fineract-dbug #144 moved here from inside the governance-register shell) - the shared mixin's
+// own centered 90%/84rem layout is exactly right on its own, the same as every other top-level Compliance page.
+
+.page-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  margin-top: 4px;
+}
+
+.page-lead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 220px;
+  margin: 0;
+  color: var(--dk-text-2, #334155);
+  font-size: 0.9rem;
+
+  mat-icon {
+    flex: none;
+    color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.tiles {
+  margin-top: 20px;
+}
+
+.tile {
+  border-left-color: var(--dk-border, rgb(127 127 127 / 25%));
+
+  &--active {
+    border-left-color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+  }
+
+  &--linked {
+    border-left-color: var(--dk-success, #16a34a);
+  }
+
+  &--unlinked {
+    border-left-color: var(--dk-warning, #c87f0a);
+  }
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 56px 24px;
+  border-radius: 14px;
+  background: var(--dk-surface-2, #f8fafc);
+  color: var(--dk-text-muted, rgb(127 127 127));
+  text-align: center;
+
+  mat-icon {
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+    color: var(--dk-text-muted, rgb(127 127 127));
+    opacity: 0.6;
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+.sub {
+  display: block;
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+.sub.flag {
+  color: var(--dk-warning, #92620a);
+  font-weight: 600;
+}
+
+.name-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+}
+
+.avatar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--dk-primary-soft, #e0edf8);
+  color: var(--md-sys-color-primary, var(--dk-primary, #0b5488));
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+table.blue {
+  border-collapse: collapse;
+}
+
+table.blue thead th {
+  padding: 16px 20px;
+  background: var(--md-sys-color-primary, var(--dk-fill, #2460b9));
+  color: #fff;
+  font-weight: 600;
+  border-bottom: none;
+  white-space: nowrap;
+}
+
+table.blue thead th:not(:last-child) {
+  border-right: 1px solid rgb(255 255 255 / 25%);
+}
+
+table.blue tbody td {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--dk-border, #e2e8f0);
+}
+
+table.blue tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.row {
+  transition: background-color 0.15s ease;
+
+  &:nth-child(even) {
+    background: var(--dk-surface-2, #f8fafc);
+  }
+}
+
+.table-card {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.table-card .table-scroll {
+  overflow-x: auto;
+}
+
+.table-card table.blue {
+  border: 0;
+  border-radius: 0;
+}
+
+@media (width <= 720px) {
+  .page-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  // Collapses the table into a stack of labelled cards - five columns don't fit a phone screen, and this keeps
+  // every value readable without the sideways scroll the compliance-page mixin otherwise forces.
+  .table-card .table-scroll {
+    overflow: visible;
+  }
+
+  .table-card table.blue {
+    min-width: 0;
+  }
+
+  table.blue thead {
+    display: none;
+  }
+
+  table.blue tbody tr {
+    display: block;
+    margin-bottom: 14px;
+    border: 1px solid var(--dk-border, #e2e8f0);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  table.blue tbody tr:last-child {
+    margin-bottom: 0;
+  }
+
+  table.blue tbody td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 14px;
+    text-align: right;
+    white-space: normal;
+  }
+
+  table.blue tbody td::before {
+    content: attr(data-label);
+    flex: none;
+    color: var(--dk-text-2, #334155);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-align: left;
+  }
+
+  .name-cell {
+    justify-content: flex-end;
+  }
+}

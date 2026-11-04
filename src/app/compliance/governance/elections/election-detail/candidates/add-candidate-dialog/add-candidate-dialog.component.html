@@ -1,0 +1,117 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<h2 mat-dialog-title>
+  <span class="icon-badge"><mat-icon>person_add</mat-icon></span>
+  {{ 'elections.AddCandidate' | translate }}
+</h2>
+
+@if (refused(); as r) {
+  <mat-dialog-content>
+    <div class="refused-notice">
+      <mat-icon>info</mat-icon>
+      <span>{{ 'elections.CandidateRefused' | translate: { name: r.name } }}</span>
+    </div>
+    <div class="problems">
+      @for (p of r.problems; track p.code) {
+        <div class="problem">
+          <mat-icon>error_outline</mat-icon>
+          <div>
+            <span class="problem-code">{{ 'elections.problem.' + p.code | translate }}</span>
+            <span class="problem-message">{{ p.message }}</span>
+          </div>
+        </div>
+      }
+    </div>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-raised-button color="primary" type="button" (click)="done()">
+      {{ 'labels.buttons.Close' | translate }}
+    </button>
+  </mat-dialog-actions>
+} @else {
+  <form [formGroup]="form" (ngSubmit)="save()">
+    <mat-dialog-content>
+      @if (serverError()) {
+        <div class="server-error">
+          <mat-icon>error_outline</mat-icon>
+          <span>{{ serverError() }}</span>
+        </div>
+      }
+
+      <h3 class="section-label">{{ 'elections.Candidate' | translate }}</h3>
+      @if (member(); as m) {
+        <div class="who picked">
+          <mat-icon>check_circle</mat-icon>
+          <span>{{ m.name }} · {{ m.accountNo }}</span>
+          <button mat-button color="primary" type="button" (click)="member.set(null)">
+            {{ 'governanceRegister.committees.ChoseAnother' | translate }}
+          </button>
+        </div>
+      } @else {
+        <mifosx-kym-member-picker
+          [label]="'governanceRegister.people.FindTheMember'"
+          (picked)="member.set($event)"
+        ></mifosx-kym-member-picker>
+      }
+
+      <mat-form-field class="field">
+        <mat-icon matPrefix>groups</mat-icon>
+        <mat-label>{{ 'governanceRegister.Committee' | translate }}</mat-label>
+        <mat-select formControlName="committeeId">
+          @for (c of data.election.committees; track c.id) {
+            <mat-option [value]="c.id">{{ committeeLabel(c) | translate }}</mat-option>
+          }
+        </mat-select>
+        @if (form.controls.committeeId.hasError('server')) {
+          <mat-error>{{ form.controls.committeeId.getError('server') }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field class="field">
+        <mat-icon matPrefix>work_outline</mat-icon>
+        <mat-label>{{ 'governanceRegister.Position' | translate }}</mat-label>
+        <mat-select formControlName="positionId">
+          @for (p of positions(); track p.id) {
+            <mat-option [value]="p.id">{{ positionLabel(p) | translate }}</mat-option>
+          }
+        </mat-select>
+        @if (form.controls.positionId.hasError('server')) {
+          <mat-error>{{ form.controls.positionId.getError('server') }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field class="field">
+        <mat-label>{{ 'elections.ProposedBy' | translate }}</mat-label>
+        <input matInput formControlName="proposedBy" maxlength="200" />
+      </mat-form-field>
+
+      <mifosx-nepali-date-input
+        [inline]="true"
+        formControlName="nominatedOn"
+        [label]="'elections.NominatedOn' | translate"
+        [maxDate]="today"
+      ></mifosx-nepali-date-input>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+      <button mat-stroked-button type="button" mat-dialog-close>{{ 'labels.buttons.Cancel' | translate }}</button>
+      <button
+        mat-raised-button
+        [color]="canSubmit ? 'primary' : null"
+        [class.submit-neutral]="!canSubmit"
+        type="submit"
+        [disabled]="busy()"
+      >
+        @if (busy()) {
+          <mat-icon class="spin">autorenew</mat-icon>
+        }
+        {{ 'labels.buttons.Submit' | translate }}
+      </button>
+    </mat-dialog-actions>
+  </form>
+}

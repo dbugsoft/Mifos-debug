@@ -1,0 +1,535 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+:host {
+  display: block;
+  min-width: 0;
+}
+
+// Same width/max-width/margin formula as the shared breadcrumb header (core/shell/breadcrumb) and every other
+// top-level Compliance page (Elections list, Blacklist, Staff - all via the compliance.page mixin): width: 90%,
+// max-width: 84rem, margin: 0 auto, no horizontal padding on the wrapper itself. This page had its own one-off
+// formula instead (max-width: 1480px plus 28px of wrapper padding), which is why its left edge never lined up
+// with the breadcrumb's - the two containers were never the same width in the first place, so no amount of
+// margin-nudging could fix it; the formula itself had to match.
+.compliance-page {
+  --election-primary: var(--mat-sys-primary, #2457a7);
+  --election-border: var(--mat-sys-outline-variant, #dfe5ed);
+  --election-muted: var(--mat-sys-on-surface-variant, #687586);
+
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  width: 90%;
+  max-width: 84rem;
+  margin: 0 auto;
+  padding-bottom: 28px;
+  color: var(--mat-sys-on-surface, #202b3c);
+}
+
+/* Cards */
+
+.report-card {
+  min-width: 0;
+  padding: 26px;
+  border: 1px solid var(--election-border);
+  border-radius: 16px;
+  background: var(--mat-sys-surface, #fff);
+  box-shadow: 0 3px 12px rgb(28 43 64 / 4%);
+}
+
+.report-card--header {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Election heading */
+
+.card-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.title-group {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  min-width: 0;
+}
+
+.period-title {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.5px;
+  overflow-wrap: anywhere;
+}
+
+.icon-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 48px;
+  width: 48px;
+  height: 48px;
+  border: 1px solid var(--election-border);
+  border-radius: 14px;
+  background: var(--mat-sys-primary-container, #eaf1ff);
+  color: var(--election-primary);
+}
+
+.icon-badge mat-icon {
+  width: 25px;
+  height: 25px;
+  font-size: 25px;
+}
+
+.committee-chips {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Status and committee chips */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  min-height: 30px;
+  padding: 5px 13px;
+  border: 1px solid var(--election-border);
+  border-radius: 8px;
+  background: var(--mat-sys-surface-container-low, #f5f7fa);
+  color: var(--mat-sys-on-surface, #344054);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.chip.blue {
+  border-color: var(--mat-sys-primary, #2457a7);
+  background: var(--mat-sys-primary-container, #edf3ff);
+  color: var(--mat-sys-primary, #2457a7);
+}
+
+/* Election status variants */
+
+.chip.grey {
+  border-color: #c7cfd9;
+  background: #eef1f4;
+  color: #52606d;
+}
+
+.chip.amber {
+  border-color: #f1dfa4;
+  background: #fff5d9;
+  color: #805600;
+}
+
+.chip.green {
+  border-color: #c6e8d2;
+  background: #e8f5ed;
+  color: #17633c;
+}
+
+.chip.red {
+  border-color: #f3cccc;
+  background: #fdecec;
+  color: #a52b2b;
+}
+
+/* Election information */
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.fact {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  min-height: 94px;
+  padding: 16px;
+  border: 1px solid var(--election-border);
+  border-radius: 12px;
+  background: var(--mat-sys-surface-container-low, #f8fafc);
+  transition:
+    border-color 160ms ease,
+    transform 160ms ease;
+}
+
+.fact:hover {
+  border-color: var(--mat-sys-outline, #aab5c3);
+  transform: translateY(-2px);
+}
+
+.fact-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--election-muted);
+  font-size: 12px;
+  font-weight: 550;
+}
+
+.fact-label mat-icon {
+  width: 18px;
+  height: 18px;
+  color: var(--election-primary);
+  font-size: 18px;
+}
+
+.fact-value {
+  color: var(--mat-sys-on-surface, #202b3c);
+  font-size: 15px;
+  font-weight: 650;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+/* Notes and declared election details */
+
+.fact--note .fact-value {
+  font-weight: 500;
+  white-space: pre-wrap;
+}
+
+.divider {
+  border-top: 1px solid var(--election-border);
+  padding-top: 22px;
+}
+
+.see-terms {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  width: fit-content;
+  padding: 10px 14px;
+  border: 1px solid var(--election-border);
+  border-radius: 9px;
+  background: var(--mat-sys-surface-container-low, #f8fafc);
+  color: var(--election-primary);
+  font-size: 13px;
+  font-weight: 650;
+  text-decoration: none;
+  transition: background 160ms ease;
+}
+
+.see-terms:hover {
+  background: var(--mat-sys-primary-container, #edf3ff);
+}
+
+.see-terms mat-icon {
+  width: 19px;
+  height: 19px;
+  font-size: 19px;
+}
+
+/* Action toolbar */
+
+.actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.actions button {
+  min-height: 42px;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.actions button mat-icon {
+  margin-right: 5px;
+}
+
+.grow {
+  flex: 1 1 auto;
+}
+
+/* Committee section */
+
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin: 0 0 22px;
+  color: var(--mat-sys-on-surface, #202b3c);
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+
+.card-title mat-icon {
+  width: 23px;
+  height: 23px;
+  color: var(--election-primary);
+  font-size: 23px;
+}
+
+.election-committee {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.election-committee li {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  align-items: center;
+  column-gap: 14px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--election-border);
+  border-radius: 12px;
+  background: var(--mat-sys-surface-container-low, #f8fafc);
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.election-committee li:hover {
+  border-color: var(--mat-sys-outline, #aab5c3);
+  box-shadow: 0 3px 10px rgb(28 43 64 / 5%);
+}
+
+.avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  grid-row: 1 / 3;
+  width: 46px;
+  height: 46px;
+  border: 1px solid var(--election-border);
+  border-radius: 12px;
+  background: var(--mat-sys-primary-container, #eaf1ff);
+  color: var(--election-primary);
+  font-size: 14px;
+  font-weight: 750;
+}
+
+.name {
+  min-width: 0;
+  color: var(--mat-sys-on-surface, #202b3c);
+  font-size: 14px;
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+
+.sub {
+  min-width: 0;
+  margin-top: 5px;
+  color: var(--election-muted);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+/* Staff warning */
+
+.notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 18px;
+  padding: 15px 17px;
+  border: 1px solid #e8c77d;
+  border-radius: 10px;
+  background: #fff9eb;
+  color: #795315;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.notice mat-icon {
+  flex: 0 0 auto;
+  color: #b7791f;
+}
+
+.notice a,
+.empty a {
+  color: var(--election-primary);
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.notice a:hover,
+.empty a:hover {
+  text-decoration: underline;
+}
+
+/* Empty state */
+
+.empty {
+  margin: 0;
+  padding: 22px;
+  border: 1px dashed var(--election-border);
+  border-radius: 12px;
+  background: var(--mat-sys-surface-container-low, #f8fafc);
+  color: var(--election-muted);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+/* Tabs */
+
+.election-tabs {
+  display: block;
+  overflow: hidden;
+  border: 1px solid var(--election-border);
+  border-radius: 14px;
+  background: var(--mat-sys-surface, #fff);
+  box-shadow: 0 3px 12px rgb(28 43 64 / 4%);
+}
+
+.tab-panel {
+  min-width: 0;
+  padding: 24px;
+}
+
+:host ::ng-deep .election-tabs .mat-mdc-tab-header {
+  background: var(--mat-sys-surface-container-low, #f8fafc);
+  border-bottom: 1px solid var(--election-border);
+}
+
+:host ::ng-deep .election-tabs .mat-mdc-tab {
+  min-width: 155px;
+  height: 54px;
+}
+
+:host ::ng-deep .election-tabs .mdc-tab__text-label {
+  gap: 9px;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+:host ::ng-deep .election-tabs .mdc-tab__text-label mat-icon {
+  width: 19px;
+  height: 19px;
+  font-size: 19px;
+}
+
+:host ::ng-deep .election-tabs .mat-mdc-tab-body-content {
+  overflow: visible;
+}
+
+:host ::ng-deep .election-tabs .mat-mdc-tab-body-wrapper {
+  min-width: 0;
+}
+
+/* Loading state */
+
+mat-progress-bar {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* Tablet */
+
+@media (width <= 900px) {
+  .compliance-page {
+    width: auto;
+    margin: 0 20px;
+    padding-bottom: 20px;
+  }
+
+  .facts {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .election-committee {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Mobile */
+
+@media (width <= 600px) {
+  .compliance-page {
+    gap: 14px;
+    width: auto;
+    margin: 0 12px;
+    padding-bottom: 12px;
+  }
+
+  .card-title-row {
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .period-title {
+    gap: 10px;
+    font-size: 20px;
+  }
+
+  .icon-badge {
+    flex-basis: 42px;
+    width: 42px;
+    height: 42px;
+  }
+
+  .facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .fact {
+    min-height: auto;
+    padding: 14px;
+  }
+
+  .actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .actions button {
+    width: 100%;
+  }
+
+  .grow {
+    display: none;
+  }
+
+  .card-title {
+    font-size: 17px;
+  }
+
+  .election-committee {
+    grid-template-columns: 1fr;
+  }
+
+  .tab-panel {
+    padding: 14px;
+  }
+
+  :host ::ng-deep .election-tabs .mat-mdc-tab {
+    min-width: 120px;
+  }
+}

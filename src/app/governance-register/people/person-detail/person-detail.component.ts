@@ -190,6 +190,14 @@ export class PersonDetailComponent implements OnInit {
     this.governance.downloadDocument(d.id).subscribe((blob) => saveBlob(blob, d.fileName));
   }
 
+  /** Opens an already-downloaded image thumbnail at full size in a new tab. */
+  viewDocument(d: PersonDocument): void {
+    const url = this.documentThumbs()[d.id];
+    if (url) {
+      window.open(url, '_blank');
+    }
+  }
+
   removeDocument(d: PersonDocument): void {
     this.dialog
       .open<InputDialogComponent, InputDialogData, { reason: string }>(InputDialogComponent, {

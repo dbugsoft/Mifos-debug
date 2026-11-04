@@ -1,0 +1,92 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+.voter-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 16px;
+
+  .field {
+    width: 220px;
+    max-width: 100%;
+  }
+
+  .grow {
+    flex: 1;
+  }
+}
+
+.toggle {
+  display: flex;
+  gap: 8px;
+
+  button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .selected {
+    border-color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+    background: var(--dk-primary-soft, #e0edf8);
+    color: var(--dk-text, inherit);
+    font-weight: 700;
+  }
+}
+
+table.blue {
+  border-collapse: collapse;
+}
+
+table.blue thead th {
+  padding: 14px 18px;
+  background: var(--md-sys-color-primary, var(--dk-fill, #2460b9));
+  color: #fff;
+  font-weight: 600;
+  border-bottom: none;
+  white-space: nowrap;
+}
+
+table.blue thead th:not(:last-child) {
+  border-right: 1px solid rgb(255 255 255 / 25%);
+}
+
+table.blue tbody td {
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--dk-border, #e2e8f0);
+}
+
+table.blue tbody tr:last-child td {
+  border-bottom: none;
+}
+
+table.blue .num {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.table-card {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.table-card .table-scroll {
+  overflow-x: auto;
+}
+
+.table-card table.blue {
+  border: 0;
+  border-radius: 0;
+}
+
+.empty {
+  margin: 0;
+  color: var(--mat-sys-on-surface-variant);
+}

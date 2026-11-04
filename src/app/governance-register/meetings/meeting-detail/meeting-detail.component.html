@@ -19,7 +19,7 @@
     <section class="report-card report-card--header mat-elevation-z2">
       <div class="card-title-row">
         <h1 class="period-title">
-          <mat-icon>event_note</mat-icon>
+          <span class="icon-badge"><mat-icon>event_note</mat-icon></span>
           {{ bodyName(m) | translate }} · {{ (m.heldOn | adToBs) || m.heldOn }} ({{ m.heldOn }} AD)
         </h1>
         <span class="chip" [class]="statusChipClass(m.status)">{{ 'meetings.status.' + m.status | translate }}</span>

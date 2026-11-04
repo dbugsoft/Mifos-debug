@@ -1,0 +1,112 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<h2 mat-dialog-title>
+  <mat-icon>how_to_vote</mat-icon>
+  {{ 'elections.EnterResults' | translate }}
+</h2>
+
+@if (step() === 'form') {
+  <mat-dialog-content>
+    @if (serverError()) {
+      <div class="server-error">
+        <mat-icon>error_outline</mat-icon>
+        <span>{{ serverError() }}</span>
+      </div>
+    }
+
+    <mat-form-field class="field">
+      <mat-icon matPrefix>event</mat-icon>
+      <mat-label>{{ 'elections.GeneralMeeting' | translate }}</mat-label>
+      <mat-select [value]="pickedMeeting()" (selectionChange)="pickMeeting($event.value)">
+        @for (m of meetings(); track m.id) {
+          <mat-option [value]="m">
+            {{ (m.heldOn | adToBs) || m.heldOn }} · {{ 'meetings.kind.' + m.kind | translate }} ·
+            {{ m.fiscalYearLabel }}
+          </mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mifosx-nepali-date-input
+      [inline]="true"
+      [formControl]="termsStartOn"
+      [label]="'elections.TermsStartOn' | translate"
+      [maxDate]="today"
+    ></mifosx-nepali-date-input>
+    @if (pickedMeeting() && termsStartInvalid) {
+      <p class="field-error">{{ 'elections.TermsStartInvalid' | translate }}</p>
+    }
+
+    @if (pickedDecision(); as d) {
+      <div class="who picked">
+        <mat-icon>gavel</mat-icon>
+        <span>{{ d.reference }}</span>
+        <button mat-button color="primary" type="button" (click)="clearDecision()">
+          {{ 'governanceRegister.committees.ChoseAnother' | translate }}
+        </button>
+      </div>
+    } @else if (pickedMeeting()) {
+      <mifosx-decision-picker
+        [label]="'elections.ResultDecision'"
+        [body]="'GENERAL_MEETING'"
+        [meetingId]="pickedMeeting()!.id"
+        (picked)="pickDecision($event)"
+      ></mifosx-decision-picker>
+    }
+
+    @if (!rows.length) {
+      <p class="empty">{{ 'elections.NoAcceptedCandidates' | translate }}</p>
+    } @else {
+      @for (g of groups; track g.committeeName + g.positionName) {
+        <h3 class="section-label">{{ g.committeeName }} · {{ g.positionName }}</h3>
+        <ul class="result-rows">
+          @for (r of g.rows; track r.nomination.id) {
+            <li>
+              <span class="name"
+                >{{ r.nomination.name }} <span class="sub">{{ r.nomination.accountNo }}</span></span
+              >
+              <mat-form-field class="votes-field" subscriptSizing="dynamic">
+                <mat-label>{{ 'elections.Votes' | translate }}</mat-label>
+                <input matInput type="number" min="0" [formControl]="r.votes" />
+              </mat-form-field>
+              <mat-checkbox [formControl]="r.elected">{{ 'elections.Elected' | translate }}</mat-checkbox>
+            </li>
+          }
+        </ul>
+      }
+    }
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-stroked-button type="button" mat-dialog-close>{{ 'labels.buttons.Cancel' | translate }}</button>
+    <button mat-raised-button color="primary" type="button" [disabled]="!formValid" (click)="next()">
+      {{ 'labels.buttons.Next' | translate }}
+      <mat-icon>arrow_forward</mat-icon>
+    </button>
+  </mat-dialog-actions>
+} @else {
+  <mat-dialog-content>
+    <div class="confirm-notice">
+      <mat-icon>warning_amber</mat-icon>
+      <span>{{ 'elections.ConfirmResultsMessage' | translate: { day: (termsStartOn.value | adToBs) || '' } }}</span>
+    </div>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-stroked-button type="button" (click)="back()">
+      <mat-icon>arrow_back</mat-icon>{{ 'labels.buttons.Back' | translate }}
+    </button>
+    <span class="grow"></span>
+    <button mat-stroked-button type="button" mat-dialog-close>{{ 'labels.buttons.Cancel' | translate }}</button>
+    <button mat-raised-button color="warn" type="button" [disabled]="busy()" (click)="confirm()">
+      @if (busy()) {
+        <mat-icon class="spin">autorenew</mat-icon>
+      }
+      {{ 'elections.ConfirmResults' | translate }}
+    </button>
+  </mat-dialog-actions>
+}

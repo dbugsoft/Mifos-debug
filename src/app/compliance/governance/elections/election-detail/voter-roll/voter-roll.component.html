@@ -1,0 +1,77 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="voter-toolbar">
+  <div class="toggle">
+    <button mat-stroked-button type="button" [class.selected]="included()" (click)="toggle(true)">
+      {{ 'elections.OnTheRoll' | translate }} ({{ votersIncluded ?? '-' }})
+    </button>
+    <button mat-stroked-button type="button" [class.selected]="!included()" (click)="toggle(false)">
+      {{ 'elections.LeftOut' | translate }} ({{ votersLeftOut ?? '-' }})
+    </button>
+  </div>
+  <mat-form-field class="field" subscriptSizing="dynamic">
+    <mat-icon matPrefix>search</mat-icon>
+    <mat-label>{{ 'governanceRegister.people.Search' | translate }}</mat-label>
+    <input matInput [formControl]="search" />
+  </mat-form-field>
+  <span class="grow"></span>
+  <button mat-stroked-button color="primary" type="button" (click)="download()">
+    <mat-icon>download</mat-icon>{{ 'labels.buttons.Download' | translate }}
+  </button>
+</div>
+
+@if (loading()) {
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
+
+@if (!loading() && !voters().length) {
+  <p class="empty">{{ 'elections.NoVoters' | translate }}</p>
+}
+
+@if (voters().length) {
+  <div class="table-card mat-elevation-z8">
+    <div class="table-scroll">
+      <table class="blue">
+        <thead>
+          <tr>
+            <th>{{ 'elections.AccountNumber' | translate }}</th>
+            <th>{{ 'labels.inputs.name' | translate }}</th>
+            <th>{{ 'labels.inputs.Office' | translate }}</th>
+            <th>{{ 'elections.JoinedOn' | translate }}</th>
+            <th class="num">{{ 'elections.Shares' | translate }}</th>
+            @if (!included()) {
+              <th>{{ 'elections.Reason' | translate }}</th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (v of paged; track v.clientId) {
+            <tr>
+              <td>{{ v.accountNo }}</td>
+              <td>{{ v.name }}</td>
+              <td>{{ v.officeName }}</td>
+              <td>{{ (v.joinedOn | adToBs) || v.joinedOn }}</td>
+              <td class="num">{{ v.shares }}</td>
+              @if (!included()) {
+                <td>{{ reasonLabel(v.reason) }}</td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <mat-paginator
+      [length]="voters().length"
+      [pageSize]="pageSize"
+      [pageIndex]="pageIndex()"
+      [hidePageSize]="true"
+      (page)="onPage($event)"
+    ></mat-paginator>
+  </div>
+}

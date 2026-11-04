@@ -80,9 +80,14 @@ const config: Config = {
     ]
   },
 
-  // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
+  // An array of regexp pattern strings that are matched against all source file paths, matched files will skip
+  // transformation. pnpm nests every package under its own node_modules/.pnpm/<pkg>@<version>/node_modules/<pkg>
+  // folder, so a path has two "node_modules/" segments: the outer one is always followed by ".pnpm/...", which
+  // doesn't match any package name below, so the lookahead fails there and the regex engine moves on to try again
+  // at the inner "node_modules/" - the one actually followed by the package's own name - where the real check
+  // happens. Listing ".pnpm/" as a pass-through here is what makes that deferral work.
   transformIgnorePatterns: [
-    'node_modules/(?!.*\\.mjs$|@angular|@fortawesome|@material/web|lit|lit-element|lit-html|@lit|@lit-labs)'
+    'node_modules/(?!.*\\.mjs$|\\.pnpm/|@angular|@fortawesome|@material/web|lit-element|lit-html|@lit-labs|@lit|lit)'
   ]
 };
 

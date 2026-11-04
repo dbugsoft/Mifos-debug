@@ -7,7 +7,9 @@
 -->
 
 <h2 mat-dialog-title>
-  <mat-icon>{{ changingPosition ? 'swap_horiz' : 'person_add' }}</mat-icon>
+  <span class="icon-badge"
+    ><mat-icon>{{ changingPosition ? 'swap_horiz' : 'person_add' }}</mat-icon></span
+  >
   {{
     (changingPosition ? 'governanceRegister.committees.ChangePosition' : 'governanceRegister.committees.AddPerson')
       | translate
@@ -33,7 +35,72 @@
         <h3 class="section-label">
           <mat-icon>work_outline</mat-icon>{{ 'governanceRegister.committees.TermDetails' | translate }}
         </h3>
-        <ng-container [ngTemplateOutlet]="termFields"></ng-container>
+
+        <!-- Written directly here rather than through an ng-template + ngTemplateOutlet (as this and the
+             stepper's own copy below used to share): that indirection, stamped inside a mat-step specifically,
+             silently broke the link from mat-select/mifosx-nepali-date-input back to this form's own controls -
+             the fields looked filled in but the control's actual value never changed. Two plain copies of the
+             same markup is the reliable, if less DRY, fix. -->
+        <mat-form-field class="field">
+          <mat-icon matPrefix>work_outline</mat-icon>
+          <mat-label>{{ 'governanceRegister.Position' | translate }}</mat-label>
+          <mat-select formControlName="positionId">
+            @for (p of positions(); track p.id) {
+              <mat-option [value]="p.id">{{ positionLabel(p) | translate }}</mat-option>
+            }
+          </mat-select>
+          @if (form.controls.positionId.hasError('required')) {
+            <mat-error>{{ 'governanceRegister.PositionRequired' | translate }}</mat-error>
+          } @else if (form.controls.positionId.hasError('server')) {
+            <mat-error>{{ form.controls.positionId.getError('server') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mifosx-nepali-date-input
+          [inline]="true"
+          formControlName="on"
+          [label]="'governanceRegister.committees.ChangedOn' | translate"
+          [maxDate]="today"
+        ></mifosx-nepali-date-input>
+
+        @if (pickedDecision(); as d) {
+          <div class="who picked">
+            <mat-icon>gavel</mat-icon>
+            <span>{{ d.reference }}</span>
+            <button mat-button color="primary" type="button" (click)="clearDecision()">
+              {{ 'governanceRegister.committees.ChoseAnother' | translate }}
+            </button>
+          </div>
+        } @else {
+          <mat-form-field class="field" subscriptSizing="dynamic">
+            <mat-icon matPrefix>gavel</mat-icon>
+            <mat-label>{{ 'governanceRegister.committees.FindADecision' | translate }}</mat-label>
+            <input matInput [formControl]="decisionSearch" [matAutocomplete]="decisionAuto" autocomplete="off" />
+            <mat-autocomplete #decisionAuto="matAutocomplete" (optionSelected)="pickDecision($event.option.value)">
+              @for (d of foundDecisions(); track d.id) {
+                <mat-option [value]="d">{{ d.reference }}</mat-option>
+              }
+            </mat-autocomplete>
+            <mat-hint>{{ 'governanceRegister.committees.DecisionHint' | translate }}</mat-hint>
+          </mat-form-field>
+          @if (decisionSearched() && !foundDecisions().length && (decisionSearch.value?.length ?? 0) >= 2) {
+            <p class="no-match">
+              <mat-icon>search_off</mat-icon>
+              <span>{{ 'governanceRegister.committees.NoDecisionMatch' | translate }}</span>
+            </p>
+          }
+
+          <mat-form-field class="field">
+            <mat-icon matPrefix>description</mat-icon>
+            <mat-label>{{ 'governanceRegister.DecisionReference' | translate }}</mat-label>
+            <input matInput formControlName="decisionReference" maxlength="200" />
+          </mat-form-field>
+        }
+
+        <mat-form-field class="field">
+          <mat-label>{{ 'labels.inputs.Note' | translate }}</mat-label>
+          <textarea matInput formControlName="note" rows="3" maxlength="1000"></textarea>
+        </mat-form-field>
       </div>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
@@ -151,7 +218,112 @@
       <mat-step>
         <ng-template matStepLabel>{{ 'governanceRegister.committees.TermDetails' | translate }}</ng-template>
 
-        <ng-container [ngTemplateOutlet]="termFields"></ng-container>
+        <!-- Written directly here, not through an ng-template + ngTemplateOutlet - see the comment on the
+             changingPosition copy above for why. -->
+        <mat-form-field class="field">
+          <mat-icon matPrefix>work_outline</mat-icon>
+          <mat-label>{{ 'governanceRegister.Position' | translate }}</mat-label>
+          <mat-select formControlName="positionId">
+            @for (p of positions(); track p.id) {
+              <mat-option [value]="p.id">{{ positionLabel(p) | translate }}</mat-option>
+            }
+          </mat-select>
+          @if (form.controls.positionId.hasError('required')) {
+            <mat-error>{{ 'governanceRegister.PositionRequired' | translate }}</mat-error>
+          } @else if (form.controls.positionId.hasError('server')) {
+            <mat-error>{{ form.controls.positionId.getError('server') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mifosx-nepali-date-input
+          [inline]="true"
+          formControlName="on"
+          [label]="'governanceRegister.committees.StartedOn' | translate"
+          [maxDate]="today"
+        ></mifosx-nepali-date-input>
+
+        <mifosx-nepali-date-input
+          [inline]="true"
+          formControlName="expectedEndOn"
+          [label]="'governanceRegister.committees.ExpectedEndOn' | translate"
+        ></mifosx-nepali-date-input>
+
+        <mat-checkbox [checked]="isHistorical()" (change)="isHistorical.set($event.checked)">
+          {{ 'governanceRegister.committees.ThisTermHasEnded' | translate }}
+        </mat-checkbox>
+
+        @if (isHistorical()) {
+          <div class="historical-fields">
+            <mifosx-nepali-date-input
+              [inline]="true"
+              formControlName="endedOn"
+              [label]="'governanceRegister.committees.EndedOn' | translate"
+              [maxDate]="today"
+            ></mifosx-nepali-date-input>
+
+            <mat-form-field class="field">
+              <mat-label>{{ 'governanceRegister.committees.Reason' | translate }}</mat-label>
+              <mat-select formControlName="endReason">
+                @for (r of endReasons; track r) {
+                  <mat-option [value]="r">{{ 'governanceRegister.endReason.' + r | translate }}</mat-option>
+                }
+              </mat-select>
+              @if (form.controls.endReason.hasError('required')) {
+                <mat-error>{{ 'governanceRegister.committees.EndReasonRequired' | translate }}</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field class="field">
+              <mat-label>{{ 'labels.inputs.Note' | translate }}</mat-label>
+              <textarea matInput formControlName="endNote" rows="2" maxlength="1000"></textarea>
+              @if (needsEndNote) {
+                <mat-hint>{{ 'governanceRegister.committees.noteRequiredForOther' | translate }}</mat-hint>
+              }
+              @if (form.controls.endNote.hasError('required')) {
+                <mat-error>{{ 'governanceRegister.committees.noteRequiredForOther' | translate }}</mat-error>
+              }
+            </mat-form-field>
+          </div>
+        }
+
+        @if (pickedDecision(); as d) {
+          <div class="who picked">
+            <mat-icon>gavel</mat-icon>
+            <span>{{ d.reference }}</span>
+            <button mat-button color="primary" type="button" (click)="clearDecision()">
+              {{ 'governanceRegister.committees.ChoseAnother' | translate }}
+            </button>
+          </div>
+        } @else {
+          <mat-form-field class="field" subscriptSizing="dynamic">
+            <mat-icon matPrefix>gavel</mat-icon>
+            <mat-label>{{ 'governanceRegister.committees.FindADecision' | translate }}</mat-label>
+            <input matInput [formControl]="decisionSearch" [matAutocomplete]="decisionAuto" autocomplete="off" />
+            <mat-autocomplete #decisionAuto="matAutocomplete" (optionSelected)="pickDecision($event.option.value)">
+              @for (d of foundDecisions(); track d.id) {
+                <mat-option [value]="d">{{ d.reference }}</mat-option>
+              }
+            </mat-autocomplete>
+            <mat-hint>{{ 'governanceRegister.committees.DecisionHint' | translate }}</mat-hint>
+          </mat-form-field>
+          @if (decisionSearched() && !foundDecisions().length && (decisionSearch.value?.length ?? 0) >= 2) {
+            <p class="no-match">
+              <mat-icon>search_off</mat-icon>
+              <span>{{ 'governanceRegister.committees.NoDecisionMatch' | translate }}</span>
+            </p>
+          }
+
+          <mat-form-field class="field">
+            <mat-icon matPrefix>description</mat-icon>
+            <mat-label>{{ 'governanceRegister.DecisionReference' | translate }}</mat-label>
+            <input matInput formControlName="decisionReference" maxlength="200" />
+          </mat-form-field>
+        }
+
+        <mat-form-field class="field">
+          <mat-label>{{ 'labels.inputs.Note' | translate }}</mat-label>
+          <textarea matInput formControlName="note" rows="3" maxlength="1000"></textarea>
+        </mat-form-field>
 
         <div class="step-actions">
           <button mat-stroked-button type="button" matStepperPrevious>
@@ -170,75 +342,3 @@
     </mat-stepper>
   }
 </form>
-
-<ng-template #termFields>
-  <mat-form-field class="field">
-    <mat-icon matPrefix>work_outline</mat-icon>
-    <mat-label>{{ 'governanceRegister.Position' | translate }}</mat-label>
-    <mat-select formControlName="positionId">
-      @for (p of positions(); track p.id) {
-        <mat-option [value]="p.id">{{ positionLabel(p) | translate }}</mat-option>
-      }
-    </mat-select>
-    @if (form.controls.positionId.hasError('server')) {
-      <mat-error>{{ form.controls.positionId.getError('server') }}</mat-error>
-    }
-  </mat-form-field>
-
-  <mifosx-nepali-date-input
-    [inline]="true"
-    formControlName="on"
-    [label]="
-      (changingPosition ? 'governanceRegister.committees.ChangedOn' : 'governanceRegister.committees.StartedOn')
-        | translate
-    "
-    [maxDate]="today"
-  ></mifosx-nepali-date-input>
-
-  @if (!changingPosition) {
-    <mifosx-nepali-date-input
-      [inline]="true"
-      formControlName="expectedEndOn"
-      [label]="'governanceRegister.committees.ExpectedEndOn' | translate"
-    ></mifosx-nepali-date-input>
-  }
-
-  @if (pickedDecision()) {
-    <div class="who picked">
-      <mat-icon>gavel</mat-icon>
-      <span>{{ pickedDecision()?.reference }}</span>
-      <button mat-button color="primary" type="button" (click)="clearDecision()">
-        {{ 'governanceRegister.committees.ChoseAnother' | translate }}
-      </button>
-    </div>
-  } @else {
-    <mat-form-field class="field" subscriptSizing="dynamic">
-      <mat-icon matPrefix>gavel</mat-icon>
-      <mat-label>{{ 'governanceRegister.committees.FindADecision' | translate }}</mat-label>
-      <input matInput [formControl]="decisionSearch" [matAutocomplete]="decisionAuto" autocomplete="off" />
-      <mat-autocomplete #decisionAuto="matAutocomplete" (optionSelected)="pickDecision($event.option.value)">
-        @for (d of foundDecisions(); track d.id) {
-          <mat-option [value]="d">{{ d.reference }}</mat-option>
-        }
-      </mat-autocomplete>
-      <mat-hint>{{ 'governanceRegister.committees.DecisionHint' | translate }}</mat-hint>
-    </mat-form-field>
-    @if (decisionSearched() && !foundDecisions().length && (decisionSearch.value?.length ?? 0) >= 2) {
-      <p class="no-match">
-        <mat-icon>search_off</mat-icon>
-        <span>{{ 'governanceRegister.committees.NoDecisionMatch' | translate }}</span>
-      </p>
-    }
-
-    <mat-form-field class="field">
-      <mat-icon matPrefix>description</mat-icon>
-      <mat-label>{{ 'governanceRegister.DecisionReference' | translate }}</mat-label>
-      <input matInput formControlName="decisionReference" maxlength="200" />
-    </mat-form-field>
-  }
-
-  <mat-form-field class="field">
-    <mat-label>{{ 'labels.inputs.Note' | translate }}</mat-label>
-    <textarea matInput formControlName="note" rows="3" maxlength="1000"></textarea>
-  </mat-form-field>
-</ng-template>
