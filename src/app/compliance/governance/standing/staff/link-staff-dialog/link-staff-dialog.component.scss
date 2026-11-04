@@ -1,0 +1,208 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+:host {
+  display: block;
+}
+
+[mat-dialog-title] {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 20px 24px;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--mat-sys-on-surface, #252525);
+  border-bottom: 1px solid var(--mat-sys-outline-variant, #e0e0e0);
+
+  mat-icon {
+    color: var(--mat-sys-primary, #3568a8);
+  }
+}
+
+mat-dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 420px;
+  padding: 24px !important;
+}
+
+.server-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid #f1b5b5;
+  border-radius: 8px;
+  background: #fff4f4;
+  color: #b3261e;
+  font-size: 13px;
+  line-height: 1.5;
+
+  mat-icon {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    font-size: 20px;
+  }
+}
+
+.staff-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid var(--mat-sys-outline-variant, #dce1e7);
+  border-radius: 10px;
+  background: var(--mat-sys-surface-container-low, #f7f8fa);
+}
+
+.avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--mat-sys-primary-container, #dce8f8);
+  color: var(--mat-sys-on-primary-container, #174778);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.staff-info {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.staff-name {
+  overflow: hidden;
+  color: var(--mat-sys-on-surface, #252525);
+  font-size: 15px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.staff-office {
+  overflow: hidden;
+  color: var(--mat-sys-on-surface-variant, #666);
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.status {
+  flex-shrink: 0;
+  padding: 5px 11px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+
+  &.green {
+    background: #e6f4ea;
+    color: #237a43;
+  }
+
+  &.grey {
+    background: #eee;
+    color: #666;
+  }
+}
+
+.who {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid #b8dfc4;
+  border-radius: 8px;
+  background: #f1f8f3;
+  font-size: 14px;
+
+  mat-icon {
+    flex-shrink: 0;
+    color: #27834a;
+  }
+
+  span {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    font-weight: 500;
+  }
+
+  button {
+    flex-shrink: 0;
+  }
+}
+
+mat-dialog-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 24px 20px;
+  border-top: 1px solid var(--mat-sys-outline-variant, #e0e0e0);
+
+  button {
+    min-width: 100px;
+    border-radius: 6px;
+  }
+
+  [type='submit'] {
+    min-width: 120px;
+  }
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (width <= 600px) {
+  [mat-dialog-title] {
+    padding: 16px 18px;
+    font-size: 18px;
+  }
+
+  mat-dialog-content {
+    min-width: 0;
+    padding: 18px !important;
+  }
+
+  mat-dialog-actions {
+    padding: 14px 18px;
+  }
+
+  .staff-card {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .status {
+    margin-left: 56px;
+  }
+
+  .who {
+    flex-wrap: wrap;
+  }
+}

@@ -1,0 +1,120 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="tab-panel-header">
+  <span class="grow"></span>
+  @if (canAddCandidate()) {
+    <button
+      mat-flat-button
+      color="primary"
+      type="button"
+      (click)="addCandidate()"
+      *mifosxHasPermission="'UPDATE_GOVERNANCE'"
+    >
+      <mat-icon>person_add</mat-icon>{{ 'elections.AddCandidate' | translate }}
+    </button>
+  }
+</div>
+
+@if (!election.nominations.length) {
+  <p class="empty">{{ 'elections.NoCandidates' | translate }}</p>
+} @else {
+  <div class="table-card mat-elevation-z8">
+    <div class="table-scroll">
+      <table class="blue">
+        <thead>
+          <tr>
+            <th class="num">S.N.</th>
+            <th>{{ 'elections.Candidate' | translate }}</th>
+            <th>{{ 'governanceRegister.Position' | translate }}</th>
+            <th>{{ 'elections.ProposedBy' | translate }}</th>
+            <th>{{ 'elections.NominatedOn' | translate }}</th>
+            <th>{{ 'labels.inputs.Status' | translate }}</th>
+            <th>{{ 'governanceRegister.Reason' | translate }}</th>
+            @if (!showResults) {
+              <th *mifosxHasPermission="'UPDATE_GOVERNANCE'">{{ 'labels.inputs.Actions' | translate }}</th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (n of orderedNominations; track n.id; let i = $index) {
+            <tr class="row" [class.withdrawn]="n.status === 'WITHDRAWN'">
+              <td class="num" data-label="S.N.">{{ i + 1 }}</td>
+              <td class="name-cell" [attr.data-label]="'elections.Candidate' | translate">
+                <a [routerLink]="['/members', n.clientId]">{{ n.name }}</a>
+                <span class="sub">{{ n.accountNo }}</span>
+              </td>
+              <td [attr.data-label]="'governanceRegister.Position' | translate">
+                {{ nominationCommitteeLabel(n) | translate }} ·
+                {{ positionLabel(n.positionCode, n.positionName) | translate }}
+              </td>
+              <td [attr.data-label]="'elections.ProposedBy' | translate">{{ n.proposedBy || '-' }}</td>
+              <td [attr.data-label]="'elections.NominatedOn' | translate">
+                {{ (n.nominatedOn | adToBs) || n.nominatedOn }}
+              </td>
+              <td [attr.data-label]="'labels.inputs.Status' | translate">
+                <span class="chip" [class]="statusChipClass(n.status)">{{
+                  'elections.nominationStatus.' + n.status | translate
+                }}</span>
+              </td>
+              <td class="reason-cell" [attr.data-label]="'governanceRegister.Reason' | translate">
+                @if (n.status === 'REFUSED' && n.problems.length) {
+                  <div class="problems">
+                    @for (p of n.problems; track p.code) {
+                      <div class="problem">
+                        <mat-icon>error_outline</mat-icon>
+                        <div>
+                          <span class="problem-code">{{ 'elections.problem.' + p.code | translate }}</span>
+                          <span class="problem-message">{{ p.message }}</span>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                }
+                @if (hasFamilyWarning(n)) {
+                  <div class="family-warning">
+                    <mat-icon>warning_amber</mat-icon>
+                    <span>{{ 'elections.warning.FAMILY_ALSO_STANDING' | translate }}</span>
+                  </div>
+                }
+                @if (n.status === 'WITHDRAWN' && n.withdrawReason) {
+                  <p class="sub withdraw-reason">{{ n.withdrawReason }}</p>
+                }
+                @if (showResults && n.status === 'ACCEPTED') {
+                  <div class="result-line">
+                    <span class="sub">{{ 'elections.Votes' | translate }}: {{ n.votes ?? '-' }}</span>
+                    @if (n.elected) {
+                      <span class="chip green">{{ 'elections.Elected' | translate }}</span>
+                    }
+                  </div>
+                }
+                @if (
+                  !(n.status === 'REFUSED' && n.problems.length) &&
+                  !hasFamilyWarning(n) &&
+                  !(n.status === 'WITHDRAWN' && n.withdrawReason) &&
+                  !(showResults && n.status === 'ACCEPTED')
+                ) {
+                  <span class="sub">-</span>
+                }
+              </td>
+              @if (!showResults) {
+                <td [attr.data-label]="'labels.inputs.Actions' | translate" *mifosxHasPermission="'UPDATE_GOVERNANCE'">
+                  @if (canWithdraw(n)) {
+                    <button mat-button color="warn" type="button" (click)="withdraw(n)">
+                      {{ 'labels.buttons.Withdraw' | translate }}
+                    </button>
+                  }
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+}

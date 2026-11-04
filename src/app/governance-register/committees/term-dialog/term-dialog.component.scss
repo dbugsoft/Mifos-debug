@@ -6,262 +6,399 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+/*
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 :host {
   display: block;
+  width: 100%;
+  color: #263445;
 }
 
-// Dialog heading
+/* Dialog heading */
 [mat-dialog-title] {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 10px;
-  padding-bottom: 16px;
-  margin-bottom: 20px;
-  border-bottom: 1px solid var(--dk-border, #e2e8f0);
+  gap: 12px;
+  margin: 0;
+  padding: 24px 24px 18px;
+  color: #1e293b;
+  font-size: 20px;
+  font-weight: 650;
+  line-height: 1.4;
+  letter-spacing: -0.3px;
+}
+
+.icon-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  border-radius: 12px;
+  background: #eaf2ff;
+  color: #2563eb;
 
   mat-icon {
-    color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+    width: 22px;
+    height: 22px;
+    font-size: 22px;
   }
 }
 
 .committee-name {
-  color: var(--dk-text-muted, rgb(127 127 127));
-  font-size: 0.9rem;
-  font-weight: 400;
+  min-width: 0;
+  overflow: hidden;
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-// Dialog content: Material's own 65vh cap is kept (the dialog's own maxHeight: 90vh, set where it's opened, keeps
-// the surface itself from ever needing a second, outer scrollbar on top of this one).
-mat-dialog-content {
-  display: block;
-  padding-top: 0;
-}
-
-// The "Change position" form (a plain scrolling dialog, not the stepper below): spacing here comes entirely from
-// this flex gap rather than each field's own margin, which is zeroed out below - the fields' margins are sized
-// for the stepper's plain block flow, where this wrapper doesn't apply, and stacking both on top of each other is
-// what used to read as an oversized gap between fields.
-.change-position-body {
+/* Form layout */
+form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-
-  .field,
-  mifosx-nepali-date-input,
-  .who,
-  .no-match {
-    margin: 0;
-  }
+  min-width: 0;
 }
 
-.section-label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin: 0;
-  color: var(--dk-text-2, #334155);
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-
-  mat-icon {
-    color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
-    font-size: 16px;
-    width: 16px;
-    height: 16px;
-  }
+mat-dialog-content {
+  max-height: 70vh;
+  padding: 8px 24px 20px;
+  overflow-x: hidden;
 }
 
-// Form fields: full width, stacked, one per row - the inline BS/AD picker (date text + calendar icon + the BS|AD
-// toggle + the converted date) needs more room than half a dialog gives it, so fields never sit side by side here.
 .field {
   display: block;
   width: 100%;
-  margin-bottom: 4px;
+  margin-bottom: 12px;
 }
 
-// Full width, one per row, same reason as .field above.
-mifosx-nepali-date-input {
-  margin-bottom: 16px;
+/* Error message */
+.server-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0 24px 12px;
+  padding: 12px 14px;
+  border: 1px solid #fecaca;
+  border-radius: 9px;
+  background: #fef2f2;
+  color: #b91c1c;
+  font-size: 13px;
+  line-height: 1.5;
+
+  mat-icon {
+    width: 19px;
+    height: 19px;
+    flex: 0 0 19px;
+    font-size: 19px;
+  }
 }
 
-// Person / picked-decision summary
+/* Person / decision selected information */
 .who {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin: 0 0 16px;
-  padding: 10px 14px;
-  border-radius: 8px;
-  background: var(--dk-surface-2, #f1f5f9);
-  font-weight: 600;
+  gap: 10px;
+  min-width: 0;
+  margin: 4px 0 18px;
+  padding: 12px 14px;
+  border: 1px solid #bbf7d0;
+  border-radius: 10px;
+  background: #f0fdf4;
+  color: #166534;
+  font-size: 14px;
+  font-weight: 500;
 
-  mat-icon {
-    color: var(--dk-text-muted, rgb(127 127 127));
+  > mat-icon {
+    flex: 0 0 auto;
+    color: #16a34a;
   }
 
-  &.picked {
-    border: 1px solid var(--dk-success-border, #bbf7d0);
-    background: var(--dk-success-soft, #f0fdf4);
-
-    mat-icon {
-      color: var(--dk-success, #16a34a);
-    }
+  > span {
+    min-width: 0;
+    overflow-wrap: anywhere;
   }
 
   button {
+    flex: 0 0 auto;
     margin-left: auto;
+    font-size: 12px;
+  }
+
+  &.picked {
+    border-color: #bfdbfe;
+    background: #eff6ff;
+
+    > mat-icon {
+      color: #2563eb;
+    }
   }
 }
 
-// Search result messages
-.no-match {
+/* Section heading */
+.section-label {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: 6px;
-  margin: -8px 0 16px;
-  color: var(--dk-text-muted, rgb(127 127 127));
+  gap: 9px;
+  margin: 22px 0 16px;
+  color: #334155;
+  font-size: 14px;
+  font-weight: 650;
+  letter-spacing: 0.1px;
+
+  mat-icon {
+    color: #2563eb;
+    font-size: 19px;
+  }
+}
+
+/* Stepper */
+// The stepper isn't a dialog-aware component and has no scroll boundary of its own, unlike mat-dialog-content
+// (used by the sibling "Change position" form above) - without this cap, a long step (Term details, with every
+// optional field expanded) could grow the whole dialog past the viewport with no way to reach the Back/Cancel/
+// Submit buttons at its end, since nothing inside it was scrollable.
+.term-stepper {
+  max-height: 65vh;
+  padding: 8px 24px 20px;
+  overflow: hidden auto;
+  background: transparent;
+
+  .mat-vertical-stepper-content {
+    padding-left: 8px;
+  }
+
+  .mat-vertical-content {
+    padding: 12px 0 20px 24px;
+  }
+}
+
+/* Step actions */
+.step-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px solid #e2e8f0;
+
+  button {
+    min-height: 40px;
+    border-radius: 8px;
+    font-weight: 600;
+
+    mat-icon {
+      margin: 0 4px;
+      font-size: 18px;
+    }
+  }
+
+  .grow {
+    flex: 1 1 auto;
+  }
+}
+
+/* Add new person */
+.add-new-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0 0 14px;
+  padding-left: 0;
   font-size: 13px;
+  font-weight: 600;
 
   mat-icon {
     font-size: 18px;
-    width: 18px;
-    height: 18px;
   }
 }
 
-.add-new-link {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin: -8px 0 16px;
-}
-
-// Informational notice
 .notice {
   display: flex;
   align-items: flex-start;
-  gap: 8px;
-  margin: 0 0 16px;
-  padding: 10px 14px;
-  border-left: 4px solid var(--md-sys-color-primary, var(--dk-primary, #2460b9));
-  border-radius: 0 8px 8px 0;
-  background: var(--dk-primary-soft, #e0edf8);
-  color: var(--dk-text, #334155);
-  font-size: 0.875rem;
+  gap: 10px;
+  margin: 12px 0 16px;
+  padding: 12px 14px;
+  border: 1px solid #bfdbfe;
+  border-radius: 9px;
+  background: #eff6ff;
+  color: #1e40af;
+  font-size: 13px;
+  line-height: 1.5;
 
   mat-icon {
-    flex: none;
-    color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+    flex: 0 0 auto;
+    font-size: 19px;
   }
 }
 
-// Member / non-member toggle
 .toggle {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 16px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 20px;
 
   button {
     display: flex;
     align-items: center;
-    gap: 6px;
-  }
-
-  .selected {
-    border-color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
-    background: var(--dk-primary-soft, #e0edf8);
-    color: var(--dk-text, inherit);
-    font-weight: 700;
+    justify-content: center;
+    gap: 8px;
+    min-height: 44px;
+    border-color: #cbd5e1;
+    border-radius: 9px;
+    color: #475569;
+    font-size: 13px;
+    font-weight: 600;
 
     mat-icon {
-      color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+      font-size: 19px;
+    }
+
+    &.selected {
+      border: 1px solid #2563eb;
+      background: #eff6ff;
+      color: #1d4ed8;
     }
   }
 }
 
-// The stepper replaces mat-dialog-content as the dialog's main scroll/layout area (fineract-dbug #138 redesign):
-// it isn't a dialog-aware component, so the 24px side inset mat-dialog-content gives for free has to be set here
-// instead, to keep fields lined up with the title and footer above and below it.
-.term-stepper {
-  padding: 0 24px 4px;
+/* Historical term fields */
+mat-checkbox {
+  display: block;
+  margin: 12px 0 18px;
+  color: #334155;
+  font-size: 13px;
+  font-weight: 500;
 }
 
-.step-actions {
+.historical-fields {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 4px;
+  margin: 12px 0 20px;
+  padding: 16px;
+  border: 1px solid #fed7aa;
+  border-left: 3px solid #f59e0b;
+  border-radius: 9px;
+  background: #fffbeb;
+}
+
+/* Empty search results */
+.no-match {
+  display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 8px;
-  margin-top: 20px;
-}
+  margin: -4px 0 16px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 12px;
 
-.grow {
-  flex: 1;
-}
-
-// Sits directly in the form, above the stepper/content (not inside mat-dialog-content), so it needs its own match
-// of the dialog's 24px side inset instead of inheriting one.
-.server-error {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  margin: 0 24px 16px;
-  padding: 10px 14px;
-  border-left: 3px solid var(--dk-danger, #c62828);
-  border-radius: 6px;
-  background: var(--dk-danger-soft, #ffebee);
-  color: var(--dk-danger, #c62828);
-  font-size: 14px;
-}
-
-mat-dialog-actions {
-  margin: 20px -24px -24px;
-  padding: 16px 24px;
-  background: var(--dk-surface-2, #f8fafc);
-  border-top: 1px solid var(--dk-border, #e2e8f0);
-}
-
-.spin {
-  margin-right: 6px;
-  animation: mfx-spin 1s linear infinite;
-}
-
-@keyframes mfx-spin {
-  from {
-    transform: rotate(0deg);
+  mat-icon {
+    color: #94a3b8;
+    font-size: 18px;
   }
 
+  button {
+    margin-left: auto;
+    font-weight: 600;
+  }
+}
+
+/* Dialog footer */
+mat-dialog-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin: 0;
+  padding: 16px 24px 20px;
+  border-top: 1px solid #e2e8f0;
+  background: #fff;
+
+  button {
+    min-width: 96px;
+    min-height: 40px;
+    border-radius: 8px;
+    font-weight: 600;
+  }
+}
+
+/* Loading icon */
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
   to {
     transform: rotate(360deg);
   }
 }
 
+/* Responsive */
 @media (width <= 600px) {
   [mat-dialog-title] {
-    padding-bottom: 12px;
+    gap: 9px;
+    padding: 18px 16px 14px;
+    font-size: 17px;
+  }
+
+  .icon-badge {
+    width: 36px;
+    height: 36px;
+    flex-basis: 36px;
+    border-radius: 10px;
+  }
+
+  .committee-name {
+    font-size: 12px;
+  }
+
+  mat-dialog-content {
+    padding: 8px 16px 16px;
   }
 
   .term-stepper {
-    padding: 0 16px 4px;
+    padding: 8px 12px 16px;
   }
 
   .server-error {
-    margin: 0 16px 16px;
+    margin-right: 16px;
+    margin-left: 16px;
   }
 
-  .toggle {
-    flex-direction: column;
+  .step-actions {
+    gap: 8px;
 
     button {
-      width: 100%;
+      font-size: 12px;
     }
   }
 
+  .toggle {
+    grid-template-columns: 1fr;
+  }
+
   mat-dialog-actions {
-    padding: 14px 16px;
+    padding: 12px 16px 16px;
+  }
+
+  .who {
+    flex-wrap: wrap;
+
+    button {
+      margin-left: auto;
+    }
   }
 }

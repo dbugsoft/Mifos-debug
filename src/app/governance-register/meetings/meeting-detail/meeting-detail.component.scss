@@ -13,8 +13,10 @@
 .report-card {
   margin: 16px 0 0;
   padding: 20px 22px;
+  border: 1px solid var(--dk-border, #e2e8f0);
   border-radius: 14px;
   background: var(--mat-sys-surface, var(--dk-surface, #fff));
+  box-shadow: 0 3px 14px rgb(28 43 64 / 5%);
 
   &:first-child {
     margin-top: 0;
@@ -25,6 +27,24 @@
   border-left: 4px solid var(--md-sys-color-primary, var(--dk-primary, #2460b9));
 }
 
+.icon-badge {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--dk-primary-soft, #e0edf8);
+  color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+
+  mat-icon {
+    width: 21px;
+    height: 21px;
+    font-size: 21px;
+  }
+}
+
 // Replaces the long stack of separate cards (Details, Attendance, Decisions, Minutes, Corrections) with one
 // elevated card holding a tab per area - the same change made to the person page, for the same reason: several
 // of those sections one after another, each with its own header, read as cluttered beneath the meeting's own
@@ -33,8 +53,10 @@
   display: block;
   margin: 16px 0 0;
   padding: 6px 0 18px;
+  border: 1px solid var(--dk-border, #e2e8f0);
   border-radius: 14px;
   background: var(--mat-sys-surface, var(--dk-surface, #fff));
+  box-shadow: 0 3px 14px rgb(28 43 64 / 5%);
 
   ::ng-deep .mat-mdc-tab-label-container {
     padding: 0 10px;
@@ -127,8 +149,17 @@
   align-items: flex-start;
   gap: 4px;
   padding: 12px 14px;
+  border: 1px solid transparent;
   border-radius: 10px;
   background: var(--dk-surface-2, #f1f5f9);
+  transition:
+    border-color 0.15s ease,
+    transform 0.15s ease;
+
+  &:hover {
+    border-color: var(--dk-border, #e2e8f0);
+    transform: translateY(-1px);
+  }
 }
 
 .fact-label {

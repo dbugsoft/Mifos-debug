@@ -193,6 +193,15 @@
       </nav>
     }
 
+    <!-- Elections (fineract-dbug #144): READ_GOVERNANCE is not an AML permission, so it isn't in
+         ComplianceService's /nepal/aml/access answer - can() would always say no here. The standard permission
+         directive is what every other READ_GOVERNANCE/UPDATE_GOVERNANCE check in the app actually uses. -->
+    <nav class="links" *mifosxHasPermission="'READ_GOVERNANCE'">
+      <a mat-stroked-button color="primary" [routerLink]="['governance/elections']">{{
+        'elections.Elections' | translate
+      }}</a>
+    </nav>
+
     @if (can('READ_AMLCOMPLIANCE')) {
       <section class="frame">
         <h2 class="legend">{{ 'compliance.Deadlines' | translate }}</h2>

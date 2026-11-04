@@ -7,7 +7,6 @@
  */
 
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
-import { NgTemplateOutlet } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -21,7 +20,7 @@ import { KymMemberPickerComponent } from 'app/clients/kym/member-picker/member-p
 import { KymPerson } from 'app/clients/kym/kym.models';
 import { GovernanceRegisterService } from '../../governance-register.service';
 import { applyServerErrors, isoDate } from '../../governance-register.utils';
-import { Committee, Person, PersonListItem, Position, Term } from '../../governance-register.models';
+import { Committee, Person, PersonListItem, Position, TERM_END_REASONS, Term } from '../../governance-register.models';
 import { MeetingsService } from '../../meetings/meetings.service';
 import { Decision } from '../../meetings/meetings.models';
 
@@ -46,7 +45,6 @@ export interface TermDialogData {
   styleUrls: ['./term-dialog.component.scss'],
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
-    NgTemplateOutlet,
     MatDialogModule,
     MatAutocomplete,
     MatAutocompleteTrigger,
@@ -94,6 +92,18 @@ export class TermDialogComponent {
   readonly decisionSearched = signal(false);
   readonly pickedDecision = signal<Decision | null>(null);
 
+  // ---- backfilling a term that has already ended (docs/governance-register.md, POST terms: "for a term of the
+  // past also endedOn, endReason, endNote"). Not offered for changingPosition - that command has its own
+  // past-tense handling (it ends the current term with POSITION_CHANGED by itself).
+
+  readonly isHistorical = signal(false);
+  /** POSITION_CHANGED is set by the server only, when changePosition ends a term - never a reason staff pick. */
+  readonly endReasons = TERM_END_REASONS.filter((r) => r !== 'POSITION_CHANGED');
+
+  get needsEndNote(): boolean {
+    return this.form.controls.endReason.value === 'OTHER';
+  }
+
   get personReady(): boolean {
     if (this.changingPosition || this.pickedPerson()) {
       return true;
@@ -116,6 +126,12 @@ export class TermDialogComponent {
       Validators.maxLength(200)
     ],
     note: [
+      '',
+      Validators.maxLength(1000)
+    ],
+    endedOn: [null as Date | null],
+    endReason: [null as string | null],
+    endNote: [
       '',
       Validators.maxLength(1000)
     ]
@@ -175,8 +191,33 @@ export class TermDialogComponent {
   }
 
   save(): void {
+    // Re-set rather than leave standing: these three only apply while backfilling a term that has already
+    // ended, and must not linger as required once the "already ended" checkbox is off again.
+    const historical = !this.changingPosition && this.isHistorical();
+    this.form.controls.endedOn.setValidators(historical ? Validators.required : null);
+    this.form.controls.endReason.setValidators(historical ? Validators.required : null);
+    this.form.controls.endNote.setValidators(
+      historical && this.needsEndNote ? [
+            Validators.required,
+            Validators.maxLength(1000)
+          ] : Validators.maxLength(1000)
+    );
+
+    // An earlier failed submit can leave a server-set error (applyServerErrors) sitting on a field that has
+    // no mat-error bound to show it - Started on, Expected end on, Decision reference and Note all go
+    // straight from the server's response to an invisible error with nothing to clear it, since a control
+    // only re-checks its own validity when ITS OWN value changes, not when some other field does. Re-running
+    // every control's real validators here means each attempt is judged on the form as it stands right now,
+    // not on what a previous attempt was rejected for.
+    Object.values(this.form.controls).forEach((c) => c.updateValueAndValidity({ emitEvent: false }));
+
     if (this.form.invalid || !this.personReady) {
       this.form.markAllAsTouched();
+      this.serverError.set(
+        !this.personReady
+          ? 'Go back to "Find a person" and pick, or register, somebody first.'
+          : 'Please fill in the required fields above (outlined in red) and try again.'
+      );
       return;
     }
     const v = this.form.getRawValue();
@@ -223,6 +264,7 @@ export class TermDialogComponent {
   }
 
   private addTermFor(personId: number, v: ReturnType<typeof this.form.getRawValue>): void {
+    const historical = this.isHistorical();
     this.governance
       .addTerm({
         personId,
@@ -232,7 +274,10 @@ export class TermDialogComponent {
         expectedEndOn: isoDate(v.expectedEndOn),
         decisionReference: v.decisionReference?.trim() || null,
         decisionId: this.pickedDecision()?.id ?? null,
-        note: v.note?.trim() || null
+        note: v.note?.trim() || null,
+        endedOn: historical ? isoDate(v.endedOn) : null,
+        endReason: historical ? v.endReason : null,
+        endNote: historical ? v.endNote?.trim() || null : null
       })
       .subscribe({
         next: (t) => this.ref.close(t),

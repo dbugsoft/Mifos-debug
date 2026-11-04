@@ -1,0 +1,208 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="compliance-page">
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
+
+  @if (loadFailed() && !loading()) {
+    <p class="empty">{{ 'elections.LoadOneFailed' | translate }}</p>
+  }
+
+  @if (election(); as e) {
+    <section class="report-card report-card--header">
+      <div class="card-title-row">
+        <div class="title-group">
+          <h1 class="period-title">
+            <span class="icon-badge"><mat-icon>how_to_vote</mat-icon></span>
+            {{ e.title }}
+          </h1>
+          <div class="committee-chips">
+            @for (c of e.committees; track c.id) {
+              <span class="chip blue">{{ committeeLabel(c) | translate }}</span>
+            }
+          </div>
+        </div>
+        <span class="chip" [class]="statusChipClass(e.status)">{{ 'elections.status.' + e.status | translate }}</span>
+      </div>
+
+      <div class="facts">
+        <div class="fact">
+          <span class="fact-label"><mat-icon>tag</mat-icon>{{ 'elections.ElectionId' | translate }}</span>
+          <span class="fact-value">{{ e.id }}</span>
+        </div>
+        <div class="fact">
+          <span class="fact-label"><mat-icon>event</mat-icon>{{ 'elections.ElectionDay' | translate }}</span>
+          <span class="fact-value">{{ (e.electionOn | adToBs) || e.electionOn }}</span>
+        </div>
+        <div class="fact">
+          <span class="fact-label"><mat-icon>event_busy</mat-icon>{{ 'elections.CutOffDay' | translate }}</span>
+          <span class="fact-value">{{ (e.cutOffOn | adToBs) || e.cutOffOn }}</span>
+        </div>
+        <div class="fact">
+          <span class="fact-label"><mat-icon>groups</mat-icon>{{ 'elections.MinMembership' | translate }}</span>
+          <span class="fact-value">{{ 'elections.monthsCount' | translate: { count: e.minMembershipMonths } }}</span>
+        </div>
+        @if (e.calledByDecision) {
+          <div class="fact">
+            <span class="fact-label"><mat-icon>gavel</mat-icon>{{ 'elections.CalledByDecision' | translate }}</span>
+            <span class="fact-value">{{ e.calledByDecision }}</span>
+          </div>
+        }
+        @if (e.rollFrozenOn) {
+          <div class="fact">
+            <span class="fact-label"><mat-icon>ac_unit</mat-icon>{{ 'elections.RollFrozenOn' | translate }}</span>
+            <span class="fact-value">{{ (e.rollFrozenOn | adToBs) || e.rollFrozenOn }}</span>
+          </div>
+        }
+        @if (e.listPublishedOn) {
+          <div class="fact">
+            <span class="fact-label"><mat-icon>campaign</mat-icon>{{ 'elections.ListPublishedOn' | translate }}</span>
+            <span class="fact-value">{{ (e.listPublishedOn | adToBs) || e.listPublishedOn }}</span>
+          </div>
+        }
+        @if (e.declaredOn) {
+          <div class="fact">
+            <span class="fact-label"><mat-icon>flag</mat-icon>{{ 'elections.DeclaredOn' | translate }}</span>
+            <span class="fact-value">{{ (e.declaredOn | adToBs) || e.declaredOn }}</span>
+          </div>
+        }
+        @if (e.note) {
+          <div class="fact fact--note">
+            <span class="fact-label"><mat-icon>notes</mat-icon>{{ 'labels.inputs.Note' | translate }}</span>
+            <span class="fact-value">{{ e.note }}</span>
+          </div>
+        }
+      </div>
+
+      @if (e.status === 'DECLARED') {
+        <div class="divider facts">
+          @if (e.meetingHeldOn) {
+            <div class="fact">
+              <span class="fact-label"><mat-icon>groups</mat-icon>{{ 'elections.GeneralMeeting' | translate }}</span>
+              <span class="fact-value">{{ (e.meetingHeldOn | adToBs) || e.meetingHeldOn }}</span>
+            </div>
+          }
+          @if (e.resultDecision) {
+            <div class="fact">
+              <span class="fact-label"><mat-icon>gavel</mat-icon>{{ 'elections.ResultDecision' | translate }}</span>
+              <span class="fact-value">{{ e.resultDecision }}</span>
+            </div>
+          }
+          @if (e.termsStartOn) {
+            <div class="fact">
+              <span class="fact-label"><mat-icon>event</mat-icon>{{ 'elections.TermsStartOn' | translate }}</span>
+              <span class="fact-value">{{ (e.termsStartOn | adToBs) || e.termsStartOn }}</span>
+            </div>
+          }
+        </div>
+        <a class="see-terms" routerLink="/governance-register/committees">
+          <mat-icon>groups</mat-icon>{{ 'elections.SeeTheNewTerms' | translate }}
+        </a>
+      }
+
+      @if (e.status === 'OPEN' || e.status === 'ROLL_FROZEN' || e.status === 'LIST_PUBLISHED') {
+        <div class="actions top divider" *mifosxHasPermission="'UPDATE_GOVERNANCE'">
+          @if (e.status === 'OPEN' || e.status === 'ROLL_FROZEN') {
+            <button mat-stroked-button type="button" (click)="edit()">
+              <mat-icon>edit</mat-icon>{{ 'labels.buttons.Edit' | translate }}
+            </button>
+          }
+          @if (e.status === 'OPEN') {
+            <button
+              mat-raised-button
+              color="primary"
+              type="button"
+              [disabled]="!canFreezeRoll"
+              [matTooltip]="!canFreezeRoll ? ('elections.FreezeRollTooSoon' | translate) : ''"
+              (click)="freezeRoll()"
+            >
+              <mat-icon>ac_unit</mat-icon>{{ 'elections.FreezeRoll' | translate }}
+            </button>
+          }
+          @if (e.status === 'ROLL_FROZEN') {
+            <button mat-raised-button color="primary" type="button" (click)="publish()">
+              <mat-icon>campaign</mat-icon>{{ 'elections.Publish' | translate }}
+            </button>
+          }
+          @if (e.status === 'LIST_PUBLISHED') {
+            <button mat-raised-button color="primary" type="button" (click)="enterResults()">
+              <mat-icon>how_to_vote</mat-icon>{{ 'elections.EnterResults' | translate }}
+            </button>
+          }
+          <span class="grow"></span>
+          <button mat-stroked-button color="warn" type="button" (click)="cancel()">
+            <mat-icon>cancel</mat-icon>{{ 'elections.CancelElection' | translate }}
+          </button>
+        </div>
+      }
+    </section>
+
+    <section class="report-card">
+      <h2 class="card-title"><mat-icon>groups</mat-icon>{{ 'elections.ElectionCommittee' | translate }}</h2>
+      @if (e.electionCommittee?.length) {
+        <ul class="election-committee">
+          @for (m of e.electionCommittee; track m.personId) {
+            <li>
+              <span class="avatar">{{ initials(m.name) }}</span>
+              <span class="name">{{ m.name }}</span>
+              <span class="sub">{{ positionLabel(m.positionCode, m.positionName) | translate }}</span>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="empty">
+          {{ 'elections.NoElectionCommittee' | translate }}
+          <a routerLink="/governance-register/committees">{{
+            'governanceRegister.committees.Committees' | translate
+          }}</a>
+        </p>
+      }
+
+      @if (e.staffNotLinked > 0) {
+        <div class="notice">
+          <mat-icon>warning_amber</mat-icon>
+          <span>
+            {{ 'elections.StaffNotLinked' | translate: { count: e.staffNotLinked } }}
+            <a routerLink="/compliance/governance/staff">{{ 'elections.StaffAndMembers' | translate }}</a>
+          </span>
+        </div>
+      }
+    </section>
+
+    @if (e.status !== 'OPEN') {
+      <mat-tab-group class="election-tabs" animationDuration="150ms">
+        <mat-tab>
+          <ng-template mat-tab-label
+            ><mat-icon>how_to_reg</mat-icon>{{ 'elections.Candidates' | translate }}</ng-template
+          >
+          <div class="tab-panel">
+            <mifosx-candidates
+              [election]="e"
+              [showResults]="e.status === 'DECLARED'"
+              (updated)="onUpdated($event)"
+            ></mifosx-candidates>
+          </div>
+        </mat-tab>
+        <mat-tab>
+          <ng-template mat-tab-label
+            ><mat-icon>fact_check</mat-icon>{{ 'elections.VoterRoll' | translate }}</ng-template
+          >
+          <div class="tab-panel">
+            <mifosx-voter-roll
+              [electionId]="e.id"
+              [votersIncluded]="e.votersIncluded"
+              [votersLeftOut]="e.votersLeftOut"
+            ></mifosx-voter-roll>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    }
+  }
+</div>

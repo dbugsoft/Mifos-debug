@@ -1,0 +1,108 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<h2 mat-dialog-title>
+  <mat-icon>how_to_vote</mat-icon>
+  {{ 'elections.NewElection' | translate }}
+</h2>
+<form [formGroup]="form" (ngSubmit)="save()">
+  <mat-dialog-content>
+    @if (serverError()) {
+      <div class="server-error">
+        <mat-icon>error_outline</mat-icon>
+        <span>{{ serverError() }}</span>
+      </div>
+    }
+
+    <mat-form-field class="field">
+      <mat-icon matPrefix>how_to_vote</mat-icon>
+      <mat-label>{{ 'elections.Title' | translate }}</mat-label>
+      <input matInput formControlName="title" maxlength="200" />
+      @if (form.controls.title.hasError('server')) {
+        <mat-error>{{ form.controls.title.getError('server') }}</mat-error>
+      }
+    </mat-form-field>
+
+    <mifosx-nepali-date-input
+      [inline]="true"
+      formControlName="electionOn"
+      [label]="'elections.ElectionDay' | translate"
+    ></mifosx-nepali-date-input>
+
+    <mifosx-nepali-date-input
+      [inline]="true"
+      formControlName="cutOffOn"
+      [maxDate]="form.controls.electionOn.value ?? undefined"
+      [label]="'elections.CutOffDay' | translate"
+    ></mifosx-nepali-date-input>
+    @if (cutOffAfterElection) {
+      <p class="field-error">{{ 'elections.CutOffAfterElection' | translate }}</p>
+    }
+
+    <mat-form-field class="field" subscriptSizing="dynamic">
+      <mat-icon matPrefix>groups</mat-icon>
+      <mat-label>{{ 'elections.MinMembership' | translate }}</mat-label>
+      <input matInput type="number" min="0" max="240" formControlName="minMembershipMonths" />
+      <mat-hint>{{ 'elections.MinMembershipHint' | translate }}</mat-hint>
+      @if (form.controls.minMembershipMonths.hasError('server')) {
+        <mat-error>{{ form.controls.minMembershipMonths.getError('server') }}</mat-error>
+      }
+    </mat-form-field>
+
+    @if (pickedDecision(); as d) {
+      <div class="who picked">
+        <mat-icon>gavel</mat-icon>
+        <span>{{ d.reference }}</span>
+        <button mat-button color="primary" type="button" (click)="clearDecision()">
+          {{ 'governanceRegister.committees.ChoseAnother' | translate }}
+        </button>
+      </div>
+    } @else {
+      <mifosx-decision-picker
+        [label]="'elections.CalledByDecision'"
+        [committeeId]="boardCommitteeId"
+        (picked)="pickDecision($event)"
+      ></mifosx-decision-picker>
+    }
+
+    <mat-form-field class="field">
+      <mat-label>{{ 'labels.inputs.Note' | translate }}</mat-label>
+      <textarea matInput formControlName="note" rows="2" maxlength="1000"></textarea>
+    </mat-form-field>
+
+    <button mat-button type="button" class="advanced-toggle" (click)="advancedOpen.set(!advancedOpen())">
+      <mat-icon>{{ advancedOpen() ? 'expand_less' : 'expand_more' }}</mat-icon>
+      {{ 'elections.AdvancedCommittees' | translate }}
+    </button>
+    @if (advancedOpen()) {
+      <div class="committee-checks">
+        <p class="hint">{{ 'elections.AdvancedCommitteesHint' | translate }}</p>
+        @for (c of committees(); track c.id) {
+          <mat-checkbox [checked]="selectedCommittees().has(c.id)" (change)="toggleCommittee(c, $event)">
+            {{ committeeLabel(c) | translate }}
+          </mat-checkbox>
+        }
+      </div>
+    }
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-stroked-button type="button" mat-dialog-close>{{ 'labels.buttons.Cancel' | translate }}</button>
+    <button
+      mat-raised-button
+      [color]="canSubmit ? 'primary' : null"
+      [class.submit-neutral]="!canSubmit"
+      type="submit"
+      [disabled]="busy()"
+    >
+      @if (busy()) {
+        <mat-icon class="spin">autorenew</mat-icon>
+      }
+      {{ 'labels.buttons.Submit' | translate }}
+    </button>
+  </mat-dialog-actions>
+</form>

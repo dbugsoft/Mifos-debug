@@ -295,7 +295,15 @@
               @for (d of p.documents; track d.id) {
                 <li [class.removed]="d.removed">
                   @if (documentThumbs()[d.id]; as thumb) {
-                    <img class="doc-thumb" [src]="thumb" alt="" />
+                    <button
+                      type="button"
+                      class="doc-thumb-wrap"
+                      [matTooltip]="'labels.buttons.View' | translate"
+                      (click)="viewDocument(d)"
+                    >
+                      <img class="doc-thumb" [src]="thumb" alt="" />
+                      <span class="view-overlay"><mat-icon>visibility</mat-icon></span>
+                    </button>
                   } @else {
                     <span class="doc-icon">
                       <mat-icon>{{
