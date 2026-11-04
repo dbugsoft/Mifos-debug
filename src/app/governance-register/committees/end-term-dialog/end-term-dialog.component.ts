@@ -9,6 +9,7 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatIcon } from '@angular/material/icon';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { NepaliDateInputComponent } from 'app/shared/nepali-date-input/nepali-date-input.component';
 import { GovernanceRegisterService } from '../../governance-register.service';
@@ -27,6 +28,7 @@ export interface EndTermDialogData {
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
     MatDialogModule,
+    MatIcon,
     NepaliDateInputComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -39,7 +41,8 @@ export class EndTermDialogComponent {
   readonly busy = signal(false);
   readonly serverError = signal<string | null>(null);
   readonly today = new Date();
-  readonly reasons = TERM_END_REASONS;
+  /** POSITION_CHANGED is set by the server only, when changePosition ends a term - not a reason staff pick here. */
+  readonly reasons = TERM_END_REASONS.filter((r) => r !== 'POSITION_CHANGED');
 
   readonly form = inject(FormBuilder).group({
     endedOn: [

@@ -12,23 +12,20 @@ import { MatCheckboxChange } from '@angular/material/checkbox';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatProgressBar } from '@angular/material/progress-bar';
-import { MatTooltip } from '@angular/material/tooltip';
-import { RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
-import { AdToBsPipe } from 'app/pipes/ad-to-bs.pipe';
 import { NepaliDateInputComponent } from 'app/shared/nepali-date-input/nepali-date-input.component';
-import { InputDialogComponent, InputDialogData } from 'app/compliance/input-dialog/input-dialog.component';
 import { GovernanceRegisterService } from '../governance-register.service';
 import { Committee, Term, BUILT_IN_COMMITTEE_CODES } from '../governance-register.models';
 import { isoDate } from '../governance-register.utils';
 import { CommitteeDialogComponent, CommitteeDialogData } from './committee-dialog/committee-dialog.component';
 import { TermDialogComponent, TermDialogData } from './term-dialog/term-dialog.component';
-import { EndTermDialogComponent, EndTermDialogData } from './end-term-dialog/end-term-dialog.component';
 import { PositionsDialogComponent } from './positions-dialog/positions-dialog.component';
 
 /**
- * The committees (board, accounts supervision, sub-committees, election committee, management) and who serves on
- * each today - or on any day in the past, with `asOf` (fineract-dbug #138; docs/governance-register.md).
+ * The committees (board, accounts supervision, sub-committees, election committee, management), one row each -
+ * who serves on a given one today (or on any day in the past, with `asOf`) is on its own detail page
+ * (fineract-dbug #138; docs/governance-register.md).
  */
 @Component({
   selector: 'mifosx-committees',
@@ -36,11 +33,8 @@ import { PositionsDialogComponent } from './positions-dialog/positions-dialog.co
   styleUrls: ['./committees.component.scss'],
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
-    RouterLink,
     MatIcon,
     MatProgressBar,
-    MatTooltip,
-    AdToBsPipe,
     NepaliDateInputComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -48,6 +42,7 @@ import { PositionsDialogComponent } from './positions-dialog/positions-dialog.co
 export class CommitteesComponent implements OnInit {
   private governance = inject(GovernanceRegisterService);
   private dialog = inject(MatDialog);
+  private router = inject(Router);
 
   readonly committees = signal<Committee[]>([]);
   readonly loading = signal(false);
@@ -55,10 +50,6 @@ export class CommitteesComponent implements OnInit {
   readonly asOf = new FormControl<Date | null>(null);
   readonly today = new Date();
   readonly builtInCodes = BUILT_IN_COMMITTEE_CODES;
-
-  readonly pastMembersOpen = signal<Set<number>>(new Set());
-  readonly pastMembersLoading = signal<Set<number>>(new Set());
-  readonly pastMembers = signal<Record<number, Term[]>>({});
 
   ngOnInit(): void {
     this.load();
@@ -79,6 +70,13 @@ export class CommitteesComponent implements OnInit {
       },
       error: () => this.loading.set(false)
     });
+  }
+
+  open(c: Committee): void {
+    this.router.navigate([
+      '/governance-register/committees',
+      c.id
+    ]);
   }
 
   managePositions(): void {
@@ -115,96 +113,13 @@ export class CommitteesComponent implements OnInit {
         data: { committee: c },
         width: '640px',
         maxWidth: '96vw',
-        maxHeight: '90vh',
         autoFocus: false
       })
       .afterClosed()
       .subscribe((added) => added && this.load());
   }
 
-  changePosition(c: Committee, t: Term): void {
-    this.dialog
-      .open<TermDialogComponent, TermDialogData, Term>(TermDialogComponent, {
-        data: { committee: c, changePositionOf: t },
-        width: '640px',
-        maxWidth: '96vw',
-        maxHeight: '90vh',
-        autoFocus: false
-      })
-      .afterClosed()
-      .subscribe((changed) => changed && this.load());
-  }
-
-  endTerm(t: Term): void {
-    this.dialog
-      .open<EndTermDialogComponent, EndTermDialogData, Term>(EndTermDialogComponent, {
-        data: { term: t },
-        width: '520px',
-        maxWidth: '96vw',
-        autoFocus: false
-      })
-      .afterClosed()
-      .subscribe((ended) => ended && this.load());
-  }
-
-  voidTerm(t: Term): void {
-    this.dialog
-      .open<InputDialogComponent, InputDialogData, { reason: string }>(InputDialogComponent, {
-        data: {
-          title: 'governanceRegister.committees.voidTermTitle',
-          message: t.personName,
-          fields: [
-            { name: 'reason', label: 'governanceRegister.Reason', type: 'textarea', required: true, maxLength: 500 }
-          ],
-          confirm: 'governanceRegister.committees.MarkAsAMistake',
-          danger: true
-        },
-        width: '520px',
-        maxWidth: '96vw'
-      })
-      .afterClosed()
-      .subscribe((r) => {
-        if (r?.reason) {
-          this.governance.voidTerm(t.id, r.reason).subscribe(() => this.load());
-        }
-      });
-  }
-
-  togglePastMembers(c: Committee): void {
-    const open = new Set(this.pastMembersOpen());
-    if (open.has(c.id)) {
-      open.delete(c.id);
-      this.pastMembersOpen.set(open);
-      return;
-    }
-    open.add(c.id);
-    this.pastMembersOpen.set(open);
-    if (this.pastMembers()[c.id]) {
-      return;
-    }
-    const loading = new Set(this.pastMembersLoading());
-    loading.add(c.id);
-    this.pastMembersLoading.set(loading);
-    this.governance.terms(c.id).subscribe({
-      next: (terms) => {
-        this.pastMembers.update((m) => ({ ...m, [c.id]: terms.filter((t) => !t.current) }));
-        const l = new Set(this.pastMembersLoading());
-        l.delete(c.id);
-        this.pastMembersLoading.set(l);
-      },
-      error: () => {
-        const l = new Set(this.pastMembersLoading());
-        l.delete(c.id);
-        this.pastMembersLoading.set(l);
-      }
-    });
-  }
-
   committeeLabel(c: Committee): string {
     return this.builtInCodes.includes(c.code) ? `governanceRegister.committee.${c.code}` : c.name;
-  }
-
-  positionLabel(t: Term): string {
-    return t.positionCode.startsWith('OWN_') ? t.positionName : `governanceRegister.position.${t.positionCode}`;
   }
 }

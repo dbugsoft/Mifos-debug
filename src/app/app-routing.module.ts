@@ -252,6 +252,49 @@ const routes: Routes = [
           data: { title: 'Governance', breadcrumb: 'Governance' }
         },
         {
+          // Elections (fineract-dbug #144): the board's and the accounts supervision committee's elections, next
+          // to the Compliance > Governance (AML) page above, per the backend's own placement for this feature.
+          path: 'governance/elections',
+          loadComponent: () =>
+            import('./compliance/governance/elections/elections-list/elections-list.component').then(
+              (m) => m.ElectionsListComponent
+            ),
+          data: { title: 'Elections', breadcrumb: 'Elections' }
+        },
+        {
+          path: 'governance/elections/:id',
+          loadComponent: () =>
+            import('./compliance/governance/elections/election-detail/election-detail.component').then(
+              (m) => m.ElectionDetailComponent
+            ),
+          data: {
+            title: 'Election',
+            breadcrumb: 'Election',
+            routeParamBreadcrumb: false,
+            parentBreadcrumb: { label: 'Elections', url: '/compliance/governance/elections' }
+          }
+        },
+        {
+          path: 'governance/blacklist',
+          loadComponent: () =>
+            import('./compliance/governance/standing/blacklist/blacklist.component').then((m) => m.BlacklistComponent),
+          data: {
+            title: 'Blacklist',
+            breadcrumb: 'Blacklist',
+            parentBreadcrumb: { label: 'Elections', url: '/compliance/governance/elections' }
+          }
+        },
+        {
+          path: 'governance/staff',
+          loadComponent: () =>
+            import('./compliance/governance/standing/staff/staff.component').then((m) => m.StaffComponent),
+          data: {
+            title: 'Staff and members',
+            breadcrumb: 'Staff and members',
+            parentBreadcrumb: { label: 'Elections', url: '/compliance/governance/elections' }
+          }
+        },
+        {
           path: 'risk-tables',
           loadComponent: () =>
             import('./compliance/pep/risk-tables/risk-tables.component').then((m) => m.RiskTablesComponent),
@@ -350,6 +393,20 @@ const routes: Routes = [
             breadcrumb: 'Person',
             routeParamBreadcrumb: false,
             parentBreadcrumb: { label: 'People', url: '/governance-register/people' }
+          }
+        },
+        {
+          // A committee's own page: a sibling of the tab shell too, same reasoning as people/:id above.
+          path: 'committees/:id',
+          loadComponent: () =>
+            import('./governance-register/committees/committee-detail/committee-detail.component').then(
+              (m) => m.CommitteeDetailComponent
+            ),
+          data: {
+            title: 'Committee',
+            breadcrumb: 'Committee',
+            routeParamBreadcrumb: false,
+            parentBreadcrumb: { label: 'Committees', url: '/governance-register/committees' }
           }
         }
       ]

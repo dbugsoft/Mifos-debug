@@ -1,0 +1,155 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="compliance-page">
+  @if (!clientId) {
+    <div class="filters">
+      @if (filterMember(); as m) {
+        <div class="who picked">
+          <mat-icon>check_circle</mat-icon>
+          <span
+            >{{ m.name }}
+            @if (m.accountNo) {
+              · {{ m.accountNo }}
+            }
+          </span>
+          <button mat-button color="primary" type="button" (click)="showAll()">
+            {{ 'elections.ShowAll' | translate }}
+          </button>
+        </div>
+      } @else {
+        <span class="picker-wrap" #pickerWrap>
+          <mifosx-kym-member-picker
+            [label]="'governanceRegister.people.FindTheMember'"
+            (picked)="pickFilter($event)"
+          ></mifosx-kym-member-picker>
+          <button mat-raised-button color="primary" type="button" (click)="focusMemberPicker()">
+            <mat-icon>search</mat-icon>{{ 'elections.Find' | translate }}
+          </button>
+        </span>
+      }
+    </div>
+  }
+
+  @if (!clientId && listings().length) {
+    <div class="tiles">
+      <div class="tile">
+        <span class="label">{{ 'elections.TotalListings' | translate }}</span>
+        <span class="value">{{ listings().length }}</span>
+      </div>
+      <div class="tile tile--onlist">
+        <span class="label">{{ 'elections.OnTheList' | translate }}</span>
+        <span class="value">{{ onListCount() }}</span>
+      </div>
+      <div class="tile tile--takenoff">
+        <span class="label">{{ 'elections.TakenOffTheList' | translate }}</span>
+        <span class="value">{{ takenOffCount() }}</span>
+      </div>
+      <div class="tile tile--mistake">
+        <span class="label">{{ 'elections.EnteredByMistake' | translate }}</span>
+        <span class="value">{{ mistakeCount() }}</span>
+      </div>
+    </div>
+  }
+
+  <div class="actions-row">
+    <span class="grow"></span>
+    <button
+      mat-raised-button
+      color="primary"
+      type="button"
+      (click)="add()"
+      *mifosxHasPermission="'CREATE_MEMBERBLACKLIST'"
+    >
+      <mat-icon>add</mat-icon>{{ 'elections.AddListing' | translate }}
+    </button>
+  </div>
+
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
+
+  @if (!loading() && !listings().length) {
+    <div class="empty-state">
+      <mat-icon>block</mat-icon>
+      <p>{{ 'elections.NoListings' | translate }}</p>
+    </div>
+  }
+
+  @if (listings().length) {
+    <div class="table-card mat-elevation-z8">
+      <div class="table-scroll">
+        <table class="blue">
+          <thead>
+            <tr>
+              <th>{{ 'labels.inputs.name' | translate }}</th>
+              <th>{{ 'elections.ListedOn' | translate }}</th>
+              <th>{{ 'elections.ListedByBody' | translate }}</th>
+              <th>{{ 'governanceRegister.Reason' | translate }}</th>
+              <th>{{ 'labels.inputs.Status' | translate }}</th>
+              <th *mifosxHasPermission="'CREATE_MEMBERBLACKLIST'">{{ 'labels.inputs.Actions' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (l of listings(); track l.id) {
+              <tr class="row" [class.voided]="l.voided">
+                <td class="name-cell" [attr.data-label]="'labels.inputs.name' | translate">
+                  <span class="avatar">{{ initials(l.name) }}</span>
+                  <span class="name-block">
+                    <a [routerLink]="['/members', l.clientId]">{{ l.name }}</a>
+                    <span class="sub">{{ l.accountNo }}</span>
+                  </span>
+                </td>
+                <td [attr.data-label]="'elections.ListedOn' | translate">
+                  {{ (l.listedOn | adToBs) || l.listedOn }}
+                </td>
+                <td [attr.data-label]="'elections.ListedByBody' | translate">{{ l.listedByBody || '-' }}</td>
+                <td [attr.data-label]="'governanceRegister.Reason' | translate">{{ l.reason }}</td>
+                <td [attr.data-label]="'labels.inputs.Status' | translate" class="status-cell">
+                  @if (l.voided) {
+                    <span class="sub">
+                      {{ 'governanceRegister.committees.Mistake' | translate }}: {{ l.voidReason }}
+                    </span>
+                  } @else if (l.removedOn) {
+                    <span class="chip grey">{{
+                      'elections.TakenOffOn' | translate: { day: (l.removedOn | adToBs) || l.removedOn }
+                    }}</span>
+                  } @else {
+                    <span class="chip red">{{ 'elections.OnTheList' | translate }}</span>
+                  }
+                  @if (l.fileName) {
+                    <button mat-button type="button" (click)="downloadNotice(l)">
+                      <mat-icon>download</mat-icon>{{ 'elections.Notice' | translate }}
+                    </button>
+                  }
+                </td>
+                <td
+                  [attr.data-label]="'labels.inputs.Actions' | translate"
+                  *mifosxHasPermission="'CREATE_MEMBERBLACKLIST'"
+                >
+                  @if (!l.voided) {
+                    <span class="row-actions">
+                      @if (!l.removedOn) {
+                        <button mat-button type="button" (click)="takenOff(l)">
+                          {{ 'elections.TakenOffTheList' | translate }}
+                        </button>
+                      }
+                      <button mat-button color="warn" type="button" (click)="voidEntry(l)">
+                        {{ 'elections.EnteredByMistake' | translate }}
+                      </button>
+                    </span>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+</div>

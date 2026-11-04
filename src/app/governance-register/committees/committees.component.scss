@@ -45,215 +45,45 @@
   }
 }
 
-// Replaces the shared "framed section with a legend floating on the border" look (used elsewhere for a single
-// section per page) with a plain elevated card: stacking many of them, as this page does, is what made the
-// floating-pill border read as cluttered. Angular's view encapsulation keeps this scoped to this component, so
-// Compliance's own pages (which still use the framed-section look) are unaffected.
-.committee-card {
-  margin: 16px 0 0;
-  padding: 18px 20px;
-  border-radius: 12px;
-  background: var(--mat-sys-surface, var(--dk-surface, #fff));
+// One row per committee instead of a full card each - clicking through to its own page (like the Elections list
+// does for an election) keeps this page scannable instead of stacking every committee's whole roster at once.
+.row {
+  cursor: pointer;
+  transition: background-color 0.15s ease;
 
-  &:first-child {
-    margin-top: 0;
+  &:hover {
+    background: var(--dk-surface-2, #f1f5f9);
   }
 
   &.inactive {
-    opacity: 0.75;
+    opacity: 0.7;
   }
 }
 
-.card-header {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  justify-content: space-between;
-  align-items: flex-start;
-}
-
-.title-group {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-}
-
-.title {
+.title-cell {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin: 0;
-  font-size: 1.05rem;
-  font-weight: 700;
+  gap: 10px;
 
-  mat-icon {
-    color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
-  }
-}
-
-.section-label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin: 14px 0 8px;
-  color: var(--dk-text-2, #334155);
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-
-  mat-icon {
-    color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
-    font-size: 16px;
-    width: 16px;
-    height: 16px;
-  }
-}
-
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
-}
-
-// A tinted banner instead of plain inline text, so a warning (an officer holding two seats, say) reads as
-// something that needs attention rather than another line of body copy.
-.notice {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  margin-top: 14px;
-  padding: 10px 14px;
-  border: 1px solid var(--dk-warning-border, #f0d08a);
-  border-radius: 8px;
-  background: var(--dk-warning-soft, #fff4dc);
-  color: var(--dk-text, #5c3d00);
-  font-size: 0.875rem;
-
-  &:not(:first-of-type) {
-    margin-top: 8px;
-  }
-
-  mat-icon {
+  .row-icon {
     flex: none;
-    color: var(--dk-warning, #c87f0a);
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
   }
 }
 
-.sub {
-  display: block;
-  font-size: 0.75rem;
-  opacity: 0.8;
+.name {
+  font-weight: 600;
 }
 
 .row-actions {
   display: inline-flex;
-  gap: 6px;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
-// Soft tinted circles instead of plain bordered squares - same recipe as the meeting page's decision edit/void
-// buttons, with a third (amber) variant for the "end term" action here.
-.icon-btn {
-  border-radius: 10px;
-  background: var(--dk-primary-soft, #e0edf8);
-  transition:
-    background-color 0.15s ease,
-    color 0.15s ease,
-    transform 0.15s ease;
-
-  mat-icon {
-    color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
-  }
-
-  &:hover {
-    background: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
-    transform: translateY(-1px);
-
-    mat-icon {
-      color: #fff;
-    }
-  }
-
-  &--amber {
-    background: var(--dk-warning-soft, #fff4dc);
-
-    mat-icon {
-      color: var(--dk-warning, #c87f0a);
-    }
-
-    &:hover {
-      background: var(--dk-warning, #c87f0a);
-
-      mat-icon {
-        color: #fff;
-      }
-    }
-  }
-
-  &--red {
-    background: var(--dk-danger-soft, #fdeceb);
-
-    mat-icon {
-      color: var(--dk-danger, #c62828);
-    }
-
-    &:hover {
-      background: var(--dk-danger, #c62828);
-
-      mat-icon {
-        color: #fff;
-      }
-    }
-  }
-}
-
-.term-length {
-  color: var(--dk-text-muted, rgb(127 127 127));
-  font-size: 0.75rem;
-  font-weight: 400;
-}
-
-.committee-card .empty {
-  margin-top: 14px;
-}
-
-.committee-card .table-card {
-  margin-top: 14px;
-}
-
-// The section label right above it already carries its own bottom margin, so the table doesn't need the
-// card-level spacing on top of that too.
-.section-label + .table-card {
-  margin-top: 0;
-}
-
-.past-members {
-  margin-top: 14px;
-  border-top: 1px solid var(--dk-border, #e2e8f0);
-  padding-top: 14px;
-
-  .table-card {
-    margin-top: 10px;
-  }
-
-  .empty {
-    margin: 10px 0 0;
-  }
-}
-
-// A mistake, crossed out but kept in the history (fineract-dbug #138: nothing is deleted).
-tr.voided {
-  color: var(--dk-text-muted, rgb(127 127 127));
-  text-decoration: line-through;
-}
-
-// table.blue's own header styling (in the shared compliance mixin) targets Angular Material's mat-table markup
-// (.mat-mdc-header-row/th.mat-mdc-header-cell); this is a plain <table><thead>, so it never matched. Same blue
-// header, aimed at the real markup instead.
-// A plain <table>'s default border-spacing (2px, not 0) left thin page-background seams between the header
-// cells and around the row - collapsing the borders removes those gaps so the blue reads as one solid bar.
 table.blue {
   border-collapse: collapse;
 }
@@ -271,21 +101,17 @@ table.blue thead th:not(:last-child) {
   border-right: 1px solid rgb(255 255 255 / 25%);
 }
 
-// Matched to the header's own padding: unstated, a plain <table>'s td padding falls back to the shared mixin's
-// much smaller 8px, which looks squeezed and small next to a 16px/20px header.
 table.blue tbody td {
   padding: 16px 20px;
-  border-bottom: 1px solid var(--dk-border, #e2e8f0);
 }
 
-table.blue tbody tr:last-child td {
-  border-bottom: none;
+table.blue .num {
+  text-align: right;
+  white-space: nowrap;
 }
 
-// A <table>'s own border-radius/overflow:hidden don't reliably clip its header's background in browsers
-// (border-collapse breaks it); the rounded corners have to come from a plain wrapping box instead - the same
-// mat-elevation-z8 box the Service Centers list (and the People page) already uses.
 .table-card {
+  margin-top: 16px;
   border-radius: 10px;
   overflow: hidden;
 }
@@ -297,4 +123,64 @@ table.blue tbody tr:last-child td {
 .table-card table.blue {
   border: 0;
   border-radius: 0;
+}
+
+@media (width <= 720px) {
+  // Collapses the table into a stack of labelled cards - several columns of committee data don't fit a phone
+  // screen, and this keeps every value readable without the sideways scroll the compliance-page mixin otherwise
+  // forces.
+  .table-card .table-scroll {
+    overflow: visible;
+  }
+
+  .table-card table.blue {
+    min-width: 0;
+  }
+
+  table.blue thead {
+    display: none;
+  }
+
+  table.blue tbody tr {
+    display: block;
+    margin-bottom: 14px;
+    border: 1px solid var(--dk-border, #e2e8f0);
+    border-radius: 10px;
+    overflow: hidden;
+
+    &:nth-child(even) {
+      background: var(--dk-surface-2, #f8fafc);
+    }
+  }
+
+  table.blue tbody tr:last-child {
+    margin-bottom: 0;
+  }
+
+  table.blue tbody td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 14px;
+    text-align: right;
+    white-space: normal;
+  }
+
+  table.blue tbody td::before {
+    content: attr(data-label);
+    flex: none;
+    color: var(--dk-text-2, #334155);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-align: left;
+  }
+
+  .title-cell {
+    justify-content: flex-end;
+  }
+
+  .row-actions {
+    justify-content: flex-end;
+  }
 }

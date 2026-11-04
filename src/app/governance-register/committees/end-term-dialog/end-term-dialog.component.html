@@ -6,7 +6,11 @@
   file, You can obtain one at http://mozilla.org/MPL/2.0/.
 -->
 
-<h2 mat-dialog-title>{{ 'governanceRegister.committees.EndTermTitle' | translate }} · {{ data.term.personName }}</h2>
+<h2 mat-dialog-title>
+  <span class="icon-badge"><mat-icon>stop_circle</mat-icon></span>
+  {{ 'governanceRegister.committees.EndTermTitle' | translate }}
+  <span class="person-name">· {{ data.term.personName }}</span>
+</h2>
 <form [formGroup]="form" (ngSubmit)="save()">
   <mat-dialog-content>
     @if (serverError()) {
@@ -27,7 +31,9 @@
           <mat-option [value]="r">{{ 'governanceRegister.endReason.' + r | translate }}</mat-option>
         }
       </mat-select>
-      @if (form.controls.reason.hasError('server')) {
+      @if (form.controls.reason.hasError('required')) {
+        <mat-error>{{ 'governanceRegister.committees.EndReasonRequired' | translate }}</mat-error>
+      } @else if (form.controls.reason.hasError('server')) {
         <mat-error>{{ form.controls.reason.getError('server') }}</mat-error>
       }
     </mat-form-field>
