@@ -245,6 +245,9 @@
       </mat-menu>
 
       <mat-menu #accountApplications="matMenu">
+        <button mat-menu-item *mifosxHasPermission="'READ_LOANELIGIBILITY'" (click)="checkLoanEligibility()">
+          {{ 'loanEligibility.Check loan eligibility' | translate }}
+        </button>
         <button mat-menu-item *mifosxHasPermission="'CREATE_LOAN'" [routerLink]="['loans-accounts', 'create']">
           {{ 'labels.buttons.New Loan Account' | translate }}
         </button>

@@ -16,3 +16,18 @@
   width: 90%;
   padding-bottom: 32px;
 }
+
+.check-eligibility {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  font-weight: 500;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}

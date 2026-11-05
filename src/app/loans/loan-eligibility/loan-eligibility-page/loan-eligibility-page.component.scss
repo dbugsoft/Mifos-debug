@@ -1,0 +1,372 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+// The same width/margin formula the shared breadcrumb component uses for its own wrapper (a sibling of the tab
+// shell, like the Person and Committee pages, not nested under it - so the mixin's own centered 90%/84rem
+// formula must stand as-is here, not be overridden).
+@use 'app/compliance/compliance' as compliance;
+
+@include compliance.page;
+
+.report-card {
+  min-width: 0;
+  padding: 24px 26px;
+  border: 1px solid var(--dk-border, #e2e8f0);
+  border-radius: 14px;
+  background: var(--mat-sys-surface, var(--dk-surface, #fff));
+  box-shadow: 0 3px 14px rgb(28 43 64 / 5%);
+}
+
+.form-wrap {
+  display: block;
+  min-width: 0;
+}
+
+.fields-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0 16px;
+}
+
+.field {
+  display: block;
+  width: 100%;
+}
+
+.check-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 10px;
+
+  .grow {
+    flex: 1;
+  }
+
+  button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 42px;
+    border-radius: 9px;
+    font-weight: 600;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+  }
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ───────────────────────── Result ───────────────────────── */
+
+.notice {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  border: 1px solid var(--dk-danger-soft, #fecaca);
+  border-left: 4px solid var(--dk-danger, #dc2626);
+  border-radius: 10px;
+  background: var(--dk-danger-soft, #fee2e2);
+  color: var(--dk-danger, #991b1b);
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.notice-icon {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--dk-danger-soft, #fecaca);
+  color: var(--dk-danger, #dc2626);
+
+  mat-icon {
+    width: 21px;
+    height: 21px;
+    font-size: 21px;
+  }
+}
+
+.notice-text {
+  min-width: 0;
+}
+
+.heading {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--dk-border, #e2e8f0);
+}
+
+.heading-icon {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+
+  mat-icon {
+    width: 26px;
+    height: 26px;
+    font-size: 26px;
+  }
+}
+
+.heading-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.heading-label {
+  font-size: 1.2rem;
+  font-weight: 750;
+  letter-spacing: -0.2px;
+}
+
+.heading.eligible {
+  .heading-icon {
+    background: var(--dk-success-soft, #dcfce7);
+    color: var(--dk-success, #16a34a);
+  }
+
+  .heading-label {
+    color: var(--dk-success, #15803d);
+  }
+}
+
+.heading.not-eligible {
+  .heading-icon {
+    background: var(--dk-danger-soft, #fee2e2);
+    color: var(--dk-danger, #c62828);
+  }
+
+  .heading-label {
+    color: var(--dk-danger, #b91c1c);
+  }
+}
+
+.eligible-from {
+  color: var(--dk-text-2, #334155);
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+
+.facts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.fact {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 12px 14px;
+  border: 1px solid var(--dk-border, #e2e8f0);
+  border-radius: 10px;
+  background: var(--dk-surface-2, #f8fafc);
+}
+
+.fact-label {
+  color: var(--dk-text-muted, rgb(100 116 139));
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  text-transform: uppercase;
+}
+
+.fact-value {
+  color: var(--dk-text, #1f2937);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.facts-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+
+  .chip {
+    padding: 3px 11px;
+    border-radius: 999px;
+    background: var(--dk-primary-soft, #e0edf8);
+    color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+}
+
+.deposit-valued {
+  margin: 0 0 14px;
+  padding: 8px 12px;
+  border-left: 3px solid var(--dk-primary-soft, #cfe0f3);
+  border-radius: 4px;
+  background: var(--dk-surface-2, #f8fafc);
+  color: var(--dk-text-2, #334155);
+  font-size: 0.82rem;
+  font-style: italic;
+}
+
+.rules-table {
+  width: 100%;
+  margin: 0 0 14px;
+  border: 1px solid var(--dk-border, #e2e8f0);
+  border-radius: 10px;
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+
+  tr:not(:last-child) td {
+    border-bottom: 1px solid var(--dk-border, #e2e8f0);
+  }
+
+  tr:nth-child(even) {
+    background: var(--dk-surface-2, #f8fafc);
+  }
+
+  td {
+    padding: 11px 14px;
+    vertical-align: top;
+  }
+
+  .col-status {
+    width: 1%;
+    white-space: nowrap;
+  }
+
+  .rule-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+
+    mat-icon {
+      width: 17px;
+      height: 17px;
+      font-size: 17px;
+    }
+  }
+
+  tr.pass .rule-icon {
+    background: var(--dk-success-soft, #dcfce7);
+    color: var(--dk-success, #16a34a);
+  }
+
+  tr.fail .rule-icon {
+    background: var(--dk-danger-soft, #fee2e2);
+    color: var(--dk-danger, #c62828);
+  }
+
+  tr.not_checked .rule-icon {
+    background: var(--dk-surface-2, #eceff1);
+    color: var(--dk-text-muted, rgb(127 127 127));
+  }
+
+  .col-name {
+    width: 190px;
+    font-weight: 650;
+  }
+
+  .col-reason {
+    min-width: 0;
+    color: var(--dk-text-2, #334155);
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+}
+
+.checked-again {
+  margin: 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--dk-border, #e2e8f0);
+  color: var(--dk-text-muted, rgb(127 127 127));
+  font-size: 0.78rem;
+}
+
+@media (width <= 900px) {
+  .fields-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (width <= 600px) {
+  .fields-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .heading {
+    gap: 10px;
+  }
+
+  .heading-icon {
+    width: 36px;
+    height: 36px;
+
+    mat-icon {
+      width: 22px;
+      height: 22px;
+      font-size: 22px;
+    }
+  }
+
+  .heading-label {
+    font-size: 1.05rem;
+  }
+
+  .rules-table {
+    .col-name,
+    .col-reason {
+      display: block;
+      width: auto;
+      padding: 4px 14px;
+    }
+
+    .col-status {
+      padding-bottom: 4px;
+    }
+
+    tr {
+      display: block;
+      padding: 8px 0;
+    }
+
+    tr:not(:last-child) td {
+      border-bottom: none;
+    }
+
+    tr:not(:last-child) {
+      border-bottom: 1px solid var(--dk-border, #e2e8f0);
+    }
+  }
+}

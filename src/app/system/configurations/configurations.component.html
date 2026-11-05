@@ -31,6 +31,13 @@
           </ng-template>
         </mat-tab>
       }
+      @if (showLoanEligibility) {
+        <mat-tab label="{{ 'loanEligibility.Loan eligibility' | translate }}">
+          <ng-template matTabContent>
+            <mifosx-loan-eligibility-settings></mifosx-loan-eligibility-settings>
+          </ng-template>
+        </mat-tab>
+      }
     </mat-tab-group>
   </mat-card-content>
 </mat-card>
