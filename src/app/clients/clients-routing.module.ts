@@ -297,6 +297,20 @@ const routes: Routes = [
               loadChildren: () => import('../loans/loans.module').then((m) => m.LoansModule)
             },
             {
+              // Loan eligibility (fineract-dbug #154): a page instead of a dialog, so it has its own URL and the
+              // shared breadcrumb's back link.
+              path: 'loan-eligibility',
+              data: {
+                title: 'Check loan eligibility',
+                breadcrumb: 'Check loan eligibility',
+                routeParamBreadcrumb: false
+              },
+              loadComponent: () =>
+                import('../loans/loan-eligibility/loan-eligibility-page/loan-eligibility-page.component').then(
+                  (m) => m.LoanEligibilityPageComponent
+                )
+            },
+            {
               path: 'client-collateral',
               loadChildren: () => import('../collaterals/collaterals.module').then((m) => m.CollateralsModule)
             },

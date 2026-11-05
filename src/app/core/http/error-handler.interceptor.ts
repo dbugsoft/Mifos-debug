@@ -30,6 +30,10 @@ import { AlertService } from '../alert/alert.service';
 import { TranslateService } from '@ngx-translate/core';
 import { PasswordRenewalService, isPasswordOutdatedError } from '../authentication/password-renewal.service';
 import { isHandledSignInRefusal, isStaffAccessUrl } from '../authentication/staff-access.service';
+import {
+  ELIGIBILITY_REFUSAL_CODE,
+  buildEligibilityRefusalMessage
+} from 'app/loans/loan-eligibility/eligibility-refusal';
 
 /** Initialize Logger */
 const log = new Logger('ErrorHandlerInterceptor');
@@ -142,6 +146,23 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
       const translated = this.translate.instant(nestedCode, firstError);
       nestedTranslated = translated !== nestedCode ? translated : null;
       nestedMessage = nestedTranslated || firstError.defaultUserMessage || null;
+    }
+
+    // A loan refused for breaking the cooperative's loan eligibility rules (fineract-dbug #154;
+    // docs/loan-eligibility.md): English keeps the backend's own sentence (it has the numbers in it); any other
+    // language is rebuilt from the rule codes in errors[0].args, so the member-facing reason is actually readable.
+    if (firstError?.userMessageGlobalisationCode === ELIGIBILITY_REFUSAL_CODE) {
+      const refusal = buildEligibilityRefusalMessage(
+        firstError.args,
+        request.urlWithParams,
+        firstError.defaultUserMessage,
+        this.translate.currentLang,
+        (key) => this.translate.instant(key)
+      );
+      if (refusal) {
+        nestedTranslated = refusal;
+        nestedMessage = refusal;
+      }
     }
 
     // Combine both messages if both exist and are distinct.

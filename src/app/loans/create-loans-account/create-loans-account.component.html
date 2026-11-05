@@ -99,6 +99,17 @@
         @if (loansAccountFormValid) {
           <mat-step state="preview" completed>
             <ng-template matStepLabel>{{ 'labels.inputs.PREVIEW' | translate }}</ng-template>
+            @if (loansAccountTemplate.clientId) {
+              <button
+                mat-stroked-button
+                type="button"
+                class="check-eligibility"
+                (click)="checkEligibility()"
+                *mifosxHasPermission="'READ_LOANELIGIBILITY'"
+              >
+                <mat-icon>fact_check</mat-icon>{{ 'loanEligibility.Check eligibility' | translate }}
+              </button>
+            }
             <mifosx-loans-account-preview-step
               [loansAccountTemplate]="loansAccountTemplate"
               [loansAccountProductTemplate]="loansAccountProductTemplate"

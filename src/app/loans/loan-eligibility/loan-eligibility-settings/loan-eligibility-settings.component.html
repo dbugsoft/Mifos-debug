@@ -1,0 +1,299 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="loan-eligibility-settings">
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
+
+  <header class="page-header">
+    <div class="title-group">
+      <span class="icon-badge-lg"><mat-icon>fact_check</mat-icon></span>
+      <div class="title-text">
+        <h2 class="page-title">
+          {{ 'loanEligibility.settings.pageTitle' | translate }}
+          <span class="status-chip" [class.on]="form.value.enabled" [class.off]="!form.value.enabled">{{
+            (form.value.enabled ? 'loanEligibility.settings.statusOn' : 'loanEligibility.settings.statusOff')
+              | translate
+          }}</span>
+        </h2>
+        <p class="page-subtitle">{{ 'loanEligibility.settings.pageDescription' | translate }}</p>
+        <p class="page-subtitle">{{ 'loanEligibility.settings.rulesOffHint' | translate }}</p>
+      </div>
+    </div>
+    <div class="status-toggle" [formGroup]="form">
+      <mat-slide-toggle formControlName="enabled">{{
+        (form.value.enabled ? 'loanEligibility.settings.statusEnabled' : 'loanEligibility.settings.statusDisabled')
+          | translate
+      }}</mat-slide-toggle>
+    </div>
+  </header>
+
+  <form [formGroup]="form" (ngSubmit)="save()">
+    <div class="frame-row">
+      <section class="frame">
+        <h3 class="legend">{{ 'loanEligibility.settings.sectionMembership' | translate }}</h3>
+        <div class="fields one">
+          <mat-form-field>
+            <mat-label>{{ 'loanEligibility.settings.membershipMonths' | translate }}</mat-label>
+            <input matInput type="number" min="0" max="600" formControlName="membershipMonths" />
+            <mat-hint>{{ 'loanEligibility.settings.policy' | translate }}: {{ policy('membershipMonths') }}</mat-hint>
+            @if (form.controls.membershipMonths.hasError('server')) {
+              <mat-error>{{ form.controls.membershipMonths.getError('server') }}</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>{{ 'loanEligibility.settings.unsecuredMembershipMonths' | translate }}</mat-label>
+            <input matInput type="number" min="0" max="600" formControlName="unsecuredMembershipMonths" />
+            <mat-hint>{{ 'loanEligibility.settings.sameAsAbove' | translate }}</mat-hint>
+            @if (form.controls.unsecuredMembershipMonths.hasError('server')) {
+              <mat-error>{{ form.controls.unsecuredMembershipMonths.getError('server') }}</mat-error>
+            }
+          </mat-form-field>
+        </div>
+      </section>
+
+      <section class="frame">
+        <h3 class="legend">{{ 'loanEligibility.settings.sectionChecks' | translate }}</h3>
+        <div class="fields one">
+          <mat-checkbox formControlName="kymRequired" class="wide">{{
+            'loanEligibility.settings.kymRequired' | translate
+          }}</mat-checkbox>
+          <mat-checkbox formControlName="noOverdueLoans" class="wide">{{
+            'loanEligibility.settings.noOverdueLoans' | translate
+          }}</mat-checkbox>
+          <mat-form-field class="wide">
+            <mat-label>{{ 'loanEligibility.settings.overdueGraceDays' | translate }}</mat-label>
+            <input matInput type="number" min="0" max="90" formControlName="overdueGraceDays" />
+            <mat-hint>{{ 'loanEligibility.settings.graceHint' | translate }}</mat-hint>
+            @if (form.controls.overdueGraceDays.hasError('server')) {
+              <mat-error>{{ form.controls.overdueGraceDays.getError('server') }}</mat-error>
+            }
+          </mat-form-field>
+        </div>
+      </section>
+    </div>
+
+    <section class="frame">
+      <h3 class="legend">{{ 'loanEligibility.settings.sectionLimits' | translate }}</h3>
+      <div class="fields two">
+        <mat-form-field>
+          <mat-label>{{ 'loanEligibility.settings.singleMemberPercent' | translate }}</mat-label>
+          <input matInput type="number" min="0" max="100" step="0.01" formControlName="singleMemberPercent" />
+          <span matSuffix>%</span>
+          <mat-hint>{{ 'loanEligibility.settings.policy' | translate }}: {{ policy('singleMemberPercent') }}%</mat-hint>
+          @if (form.controls.singleMemberPercent.hasError('server')) {
+            <mat-error>{{ form.controls.singleMemberPercent.getError('server') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>{{ 'loanEligibility.settings.guarantorsRequired' | translate }}</mat-label>
+          <input matInput type="number" min="0" max="10" formControlName="guarantorsRequired" />
+          <mat-hint>{{ 'loanEligibility.settings.policy' | translate }}: {{ policy('guarantorsRequired') }}</mat-hint>
+          @if (form.controls.guarantorsRequired.hasError('server')) {
+            <mat-error>{{ form.controls.guarantorsRequired.getError('server') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>{{ 'loanEligibility.settings.savingsMultiple' | translate }}</mat-label>
+          <input matInput type="number" min="0" step="0.01" formControlName="savingsMultiple" />
+          <mat-hint>{{ 'loanEligibility.settings.policy' | translate }}: {{ policy('savingsMultiple') }}</mat-hint>
+          @if (form.controls.savingsMultiple.hasError('server')) {
+            <mat-error>{{ form.controls.savingsMultiple.getError('server') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>{{ 'loanEligibility.settings.unsecuredCap' | translate }}</mat-label>
+          <input matInput type="number" min="0" formControlName="unsecuredCap" />
+          <mat-hint>{{ 'loanEligibility.settings.policy' | translate }}: {{ policy('unsecuredCap') }}</mat-hint>
+          @if (form.controls.unsecuredCap.hasError('server')) {
+            <mat-error>{{ form.controls.unsecuredCap.getError('server') }}</mat-error>
+          }
+        </mat-form-field>
+      </div>
+    </section>
+
+    <section class="frame">
+      <h3 class="legend">{{ 'loanEligibility.settings.sectionCollateralLimits' | translate }}</h3>
+      <div class="fields">
+        <mat-form-field>
+          <mat-label>{{ 'loanEligibility.settings.depositPercent' | translate }}</mat-label>
+          <input matInput type="number" min="0" max="100" step="0.01" formControlName="depositPercent" />
+          <span matSuffix>%</span>
+          <mat-hint>{{ 'loanEligibility.settings.policy' | translate }}: {{ policy('depositPercent') }}%</mat-hint>
+          @if (form.controls.depositPercent.hasError('server')) {
+            <mat-error>{{ form.controls.depositPercent.getError('server') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>{{ 'loanEligibility.settings.landPercentCity' | translate }}</mat-label>
+          <input matInput type="number" min="0" max="100" step="0.01" formControlName="landPercentCity" />
+          <span matSuffix>%</span>
+          <mat-hint>{{ 'loanEligibility.settings.policy' | translate }}: {{ policy('landPercentCity') }}%</mat-hint>
+          @if (form.controls.landPercentCity.hasError('server')) {
+            <mat-error>{{ form.controls.landPercentCity.getError('server') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>{{ 'loanEligibility.settings.landPercentElsewhere' | translate }}</mat-label>
+          <input matInput type="number" min="0" max="100" step="0.01" formControlName="landPercentElsewhere" />
+          <span matSuffix>%</span>
+          <mat-hint
+            >{{ 'loanEligibility.settings.policy' | translate }}: {{ policy('landPercentElsewhere') }}%</mat-hint
+          >
+          @if (form.controls.landPercentElsewhere.hasError('server')) {
+            <mat-error>{{ form.controls.landPercentElsewhere.getError('server') }}</mat-error>
+          }
+        </mat-form-field>
+      </div>
+    </section>
+
+    <section class="frame">
+      <h3 class="legend">{{ 'loanEligibility.settings.sectionAccounts' | translate }}</h3>
+      <div class="fields two">
+        <mat-form-field>
+          <mat-label>{{ 'loanEligibility.settings.capitalGlAccountIds' | translate }}</mat-label>
+          <mat-select formControlName="capitalGlAccountIds" multiple [compareWith]="compareIds">
+            @for (a of glAccountOptions(); track a.id) {
+              <mat-option [value]="a.id">{{ a.name }}</mat-option>
+            }
+          </mat-select>
+          @if (form.controls.capitalGlAccountIds.hasError('server')) {
+            <mat-error>{{ form.controls.capitalGlAccountIds.getError('server') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>{{ 'loanEligibility.settings.regularSavingsProductIds' | translate }}</mat-label>
+          <mat-select formControlName="regularSavingsProductIds" multiple [compareWith]="compareIds">
+            @for (p of savingsProductOptions(); track p.id) {
+              <mat-option [value]="p.id">{{ p.name }}</mat-option>
+            }
+          </mat-select>
+          <mat-hint>{{ 'loanEligibility.settings.regularSavingsHint' | translate }}</mat-hint>
+          @if (form.controls.regularSavingsProductIds.hasError('server')) {
+            <mat-error>{{ form.controls.regularSavingsProductIds.getError('server') }}</mat-error>
+          }
+        </mat-form-field>
+      </div>
+    </section>
+
+    <section class="frame">
+      <h3 class="legend">{{ 'loanEligibility.settings.sectionMapping' | translate }}</h3>
+
+      <h4 class="table-title">{{ 'loanEligibility.settings.collateralProducts' | translate }}</h4>
+      <div class="table-wrap">
+        <table class="list">
+          <thead>
+            <tr>
+              <th>{{ 'loanEligibility.Collateral' | translate }}</th>
+              <th>{{ 'loanEligibility.settings.Kind' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (p of collateralProductOptions(); track p.id) {
+              <tr>
+                <td>{{ p.name }}</td>
+                <td>
+                  <mat-form-field class="kind-select" subscriptSizing="dynamic">
+                    <mat-select
+                      [value]="productKindOf(p.id)"
+                      (selectionChange)="setProductKind(p.id, $event.value)"
+                      [disabled]="!canUpdate"
+                    >
+                      <mat-option value="UNMARKED">{{
+                        'loanEligibility.collateralKind.UNMARKED' | translate
+                      }}</mat-option>
+                      @for (kind of markableKinds; track kind) {
+                        <mat-option [value]="kind">{{
+                          'loanEligibility.collateralKind.' + kind | translate
+                        }}</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="2" class="empty">{{ 'loanEligibility.settings.collateralProducts' | translate }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <h4 class="table-title">{{ 'loanEligibility.settings.collateralTypes' | translate }}</h4>
+      <div class="table-wrap">
+        <table class="list">
+          <thead>
+            <tr>
+              <th>{{ 'loanEligibility.Collateral' | translate }}</th>
+              <th>{{ 'loanEligibility.settings.Kind' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (t of collateralTypeOptions(); track t.id) {
+              <tr>
+                <td>{{ t.name }}</td>
+                <td>
+                  <mat-form-field class="kind-select" subscriptSizing="dynamic">
+                    <mat-select
+                      [value]="typeKindOf(t.id)"
+                      (selectionChange)="setTypeKind(t.id, $event.value)"
+                      [disabled]="!canUpdate"
+                    >
+                      <mat-option value="UNMARKED">{{
+                        'loanEligibility.collateralKind.UNMARKED' | translate
+                      }}</mat-option>
+                      @for (kind of markableKinds; track kind) {
+                        <mat-option [value]="kind">{{
+                          'loanEligibility.collateralKind.' + kind | translate
+                        }}</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="2" class="empty">{{ 'loanEligibility.settings.collateralTypes' | translate }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    @if (canUpdate) {
+      <div class="actions">
+        <button mat-stroked-button type="button" [disabled]="resettingToDefault()" (click)="useDefaults()">
+          @if (resettingToDefault()) {
+            <mat-icon class="spin">autorenew</mat-icon>
+          } @else {
+            <mat-icon>restart_alt</mat-icon>
+          }
+          {{ 'loanEligibility.settings.useDefaults' | translate }}
+        </button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid || saving()">
+          @if (saving()) {
+            <mat-icon class="spin">autorenew</mat-icon>
+          }
+          {{ 'labels.buttons.Submit' | translate }}
+        </button>
+      </div>
+    }
+  </form>
+
+  <p class="audit-hint"><mat-icon>history</mat-icon>{{ 'loanEligibility.settings.auditHint' | translate }}</p>
+</div>
