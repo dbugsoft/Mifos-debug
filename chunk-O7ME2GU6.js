@@ -1,0 +1,1 @@
+import{a as n}from"./chunk-WNYME6QA.js";function l(i){return i.code==="MEMBERSHIP_AGE"&&i.outcome==="FAIL"&&i.limit==null?"loanEligibility.reason.MEMBERSHIP_AGE.FAIL_INACTIVE":`loanEligibility.reason.${i.code}.${i.outcome}`}function E(i,e){let o=l(i),t=e(o,{limit:i.limit!=null?n(i.limit):void 0,value:i.value!=null?n(i.value):void 0});return t!==o?t:i.reason}export{E as a};
