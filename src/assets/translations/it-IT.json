@@ -5491,6 +5491,167 @@
     "Provision rate": "Provision rate",
     "No loans to show": "No loans to show for this office."
   },
+  "loanEligibility": {
+    "Loan eligibility": "Loan Eligibility",
+    "Check loan eligibility": "Check loan eligibility",
+    "Check eligibility": "Check eligibility",
+    "Check": "Check",
+    "Amount": "Amount (Rs)",
+    "Collateral": "Collateral",
+    "Collateral value": "Collateral value (Rs)",
+    "depositValueHint": "Leave empty to use the member's deposits",
+    "Member guarantors": "Member guarantors",
+    "Collateral on this application": "Collateral on this application",
+    "Eligible": "Eligible",
+    "Not eligible": "Not eligible now",
+    "Eligible from": "Eligible from",
+    "rulesOff": "The cooperative's loan rules are switched off. Nothing is checked.",
+    "checkedAgain": "This is a check before the application. The same rules are checked again when the loan is approved and paid out.",
+    "Member since": "Member since",
+    "Owes now": "Owes now",
+    "Regular savings": "Regular savings",
+    "Primary capital": "Primary capital",
+    "Founding member": "Founding member",
+    "Director": "Director",
+    "Rs": "Rs",
+    "depositValuedAt": "Valued at {{amount}} (the member's deposits)",
+    "outcome": {
+      "PASS": "Met",
+      "FAIL": "Not met",
+      "NOT_CHECKED": "Not checked"
+    },
+    "collateralKind": {
+      "NONE": "No collateral",
+      "DEPOSIT": "Deposit (own savings or fixed deposit)",
+      "LAND_CITY": "Land in a metropolitan or sub-metropolitan city",
+      "LAND_ELSEWHERE": "Land elsewhere",
+      "GOLD_SILVER": "Gold or silver",
+      "OTHER": "Other collateral (vehicle, building…)",
+      "UNMARKED": "Not marked (no set limit)"
+    },
+    "rule": {
+      "MEMBERSHIP_AGE": "Membership period",
+      "KYM": "KYM",
+      "OVERDUE": "Overdue loans",
+      "WRITTEN_OFF": "Written-off loans",
+      "SINGLE_MEMBER_LIMIT": "One member's limit",
+      "DIRECTOR": "Directors",
+      "UNSECURED_LIMIT": "Without collateral",
+      "GUARANTORS": "Guarantors",
+      "DEPOSIT_LIMIT": "Against a deposit",
+      "LAND_LIMIT": "Against land",
+      "COLLATERAL": "Collateral"
+    },
+    "reason": {
+      "MEMBERSHIP_AGE": {
+        "PASS": "Member long enough to borrow.",
+        "FAIL": "A member may borrow {{limit}} months after joining.",
+        "FAIL_INACTIVE": "Only an active member may borrow."
+      },
+      "KYM": {
+        "PASS": "KYM is verified.",
+        "FAIL": "The member's KYM must be verified before a loan.",
+        "NOT_CHECKED": "This cooperative does not require verified KYM before a loan."
+      },
+      "OVERDUE": {
+        "PASS": "No loans overdue.",
+        "FAIL": "{{value}} loan(s) overdue: bring them up to date first."
+      },
+      "WRITTEN_OFF": {
+        "PASS": "No written-off loans left to recover.",
+        "FAIL": "{{value}} loan(s) written off and not yet repaid: recover them first."
+      },
+      "SINGLE_MEMBER_LIMIT": {
+        "PASS": "One member may owe at most Rs {{limit}}; with this loan Rs {{value}}.",
+        "FAIL": "One member may owe at most Rs {{limit}}; with this loan Rs {{value}}.",
+        "NOT_CHECKED": "Primary capital is not known, so this limit was not checked."
+      },
+      "DIRECTOR": {
+        "PASS": "Not a director, or borrowing against own deposits.",
+        "FAIL": "Directors may borrow only against their own deposits."
+      },
+      "UNSECURED_LIMIT": {
+        "PASS": "Without collateral up to Rs {{limit}}; asked Rs {{value}}.",
+        "FAIL": "Without collateral up to Rs {{limit}}; asked Rs {{value}}."
+      },
+      "GUARANTORS": {
+        "PASS": "Needs {{limit}} member guarantors; {{value}} given.",
+        "FAIL": "Needs {{limit}} member guarantors; {{value}} given."
+      },
+      "DEPOSIT_LIMIT": {
+        "PASS": "Against the deposit up to Rs {{limit}}; asked Rs {{value}}.",
+        "FAIL": "Against the deposit up to Rs {{limit}}; asked Rs {{value}}.",
+        "NOT_CHECKED": "The deposit's value is not known, so the limit was not checked."
+      },
+      "LAND_LIMIT": {
+        "PASS": "Against the land up to Rs {{limit}}; asked Rs {{value}}.",
+        "FAIL": "Against the land up to Rs {{limit}}; asked Rs {{value}}.",
+        "NOT_CHECKED": "The land's value is not known, so the limit was not checked."
+      },
+      "COLLATERAL": {
+        "FAIL": "Loans against gold or silver are not allowed.",
+        "NOT_CHECKED": "No set limit for this collateral; the loan committee values it."
+      }
+    },
+    "refusal": {
+      "approve": "This loan cannot be approved:",
+      "payout": "This loan cannot be paid out:",
+      "MEMBERSHIP_AGE": "The member has not been a member long enough.",
+      "KYM": "The member's KYM is not verified.",
+      "OVERDUE": "The member has an overdue loan.",
+      "WRITTEN_OFF": "The member has a written-off loan not yet recovered.",
+      "SINGLE_MEMBER_LIMIT": "It is more than one member may owe.",
+      "DIRECTOR": "A director may borrow only against their own deposits.",
+      "UNSECURED_LIMIT": "It is more than may be lent without collateral.",
+      "GUARANTORS": "There are not enough member guarantors.",
+      "DEPOSIT_LIMIT": "It is more than may be lent against the deposit.",
+      "LAND_LIMIT": "It is more than may be lent against the land.",
+      "COLLATERAL": "Loans against gold or silver are not allowed.",
+      "seeCheck": "For the numbers, use “Check loan eligibility” on the member's page."
+    },
+    "settings": {
+      "pageTitle": "Loan Eligibility Settings",
+      "statusOn": "On",
+      "statusOff": "Off",
+      "statusEnabled": "Enabled",
+      "statusDisabled": "Disabled",
+      "sectionRules": "Rules",
+      "sectionMembership": "Membership",
+      "sectionChecks": "Eligibility checks",
+      "sectionLimits": "Lending limits",
+      "sectionCollateralLimits": "Collateral limits",
+      "sectionAccounts": "Accounts & products",
+      "sectionMapping": "Collateral mapping",
+      "pageDescription": "Configure loan eligibility rules and limits.",
+      "Rules switched on": "Rules switched on",
+      "rulesOffHint": "Switch on after configuring KYM, collateral kinds and capital accounts.",
+      "membershipMonths": "Membership before a loan (months)",
+      "unsecuredMembershipMonths": "Membership before a loan without collateral (months)",
+      "sameAsAbove": "0 means the same as above",
+      "kymRequired": "Verified KYM required",
+      "noOverdueLoans": "No overdue or written-off loans",
+      "overdueGraceDays": "Grace days for a late installment",
+      "graceHint": "0: any late installment counts",
+      "singleMemberPercent": "One member at most (% of primary capital)",
+      "savingsMultiple": "Without collateral: times regular savings",
+      "unsecuredCap": "Without collateral: at most (Rs)",
+      "guarantorsRequired": "Member guarantors needed without collateral",
+      "depositPercent": "Against a deposit (% of the deposit)",
+      "landPercentCity": "Against land in a city (% of its value)",
+      "landPercentElsewhere": "Against land elsewhere (% of its value)",
+      "capitalGlAccountIds": "Primary capital: accounts added to share capital",
+      "regularSavingsProductIds": "Regular savings products",
+      "regularSavingsHint": "None chosen: every ordinary savings account counts (not fixed or recurring deposits)",
+      "collateralProducts": "Collateral products (picked on the loan application)",
+      "collateralTypes": "Collateral types (added from the loan's page)",
+      "Kind": "Kind",
+      "useDefaults": "Use the regulator's values",
+      "policy": "Policy",
+      "Saved": "Saved",
+      "Nothing changed": "Nothing changed",
+      "auditHint": "Every change is kept in Admin › Audit Trails."
+    }
+  },
   "membership": {
     "Membership": "Membership",
     "Membership Applications": "Membership Applications",

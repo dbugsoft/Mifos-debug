@@ -1,0 +1,164 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="compliance-page">
+  <form class="form-wrap" [formGroup]="form" (ngSubmit)="check()">
+    <div class="fields-row">
+      <mat-form-field class="field">
+        <mat-label>{{ 'loanEligibility.Amount' | translate }}</mat-label>
+        <input matInput type="number" min="0.01" step="0.01" formControlName="amount" />
+        @if (form.controls.amount.hasError('server')) {
+          <mat-error>{{ form.controls.amount.getError('server') }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field class="field">
+        <mat-label>{{ 'loanEligibility.Collateral' | translate }}</mat-label>
+        <mat-select formControlName="collateral">
+          @for (kind of collateralKinds; track kind) {
+            <mat-option [value]="kind">{{ 'loanEligibility.collateralKind.' + kind | translate }}</mat-option>
+          }
+        </mat-select>
+        @if (form.controls.collateral.hasError('server')) {
+          <mat-error>{{ form.controls.collateral.getError('server') }}</mat-error>
+        }
+      </mat-form-field>
+
+      @if (showCollateralValue) {
+        <mat-form-field class="field">
+          <mat-label>{{ 'loanEligibility.Collateral value' | translate }}</mat-label>
+          <input matInput type="number" min="0.01" step="0.01" formControlName="collateralValue" />
+          @if (collateralValueHint) {
+            <mat-hint>{{ collateralValueHint | translate }}</mat-hint>
+          }
+          @if (form.controls.collateralValue.hasError('server')) {
+            <mat-error>{{ form.controls.collateralValue.getError('server') }}</mat-error>
+          }
+        </mat-form-field>
+      }
+
+      @if (showGuarantors) {
+        <mat-form-field class="field">
+          <mat-label>{{ 'loanEligibility.Member guarantors' | translate }}</mat-label>
+          <input matInput type="number" min="0" step="1" formControlName="guarantors" />
+          @if (form.controls.guarantors.hasError('server')) {
+            <mat-error>{{ form.controls.guarantors.getError('server') }}</mat-error>
+          }
+        </mat-form-field>
+      }
+    </div>
+
+    <div class="check-row">
+      <span class="grow"></span>
+      <button mat-raised-button color="primary" type="submit" [disabled]="checking()">
+        @if (checking()) {
+          <mat-icon class="spin">autorenew</mat-icon>
+        }
+        {{ 'loanEligibility.Check' | translate }}
+      </button>
+    </div>
+  </form>
+
+  @if (response(); as r) {
+    <section class="report-card result">
+      @if (!r.result.rules.length) {
+        <div class="notice">
+          <span class="notice-icon"><mat-icon>warning</mat-icon></span>
+          <span class="notice-text">{{ 'loanEligibility.rulesOff' | translate }}</span>
+        </div>
+      } @else {
+        <div class="heading" [class.eligible]="r.result.eligible" [class.not-eligible]="!r.result.eligible">
+          <span class="heading-icon"
+            ><mat-icon>{{ r.result.eligible ? 'check_circle' : 'cancel' }}</mat-icon></span
+          >
+          <div class="heading-text">
+            <span class="heading-label">{{
+              (r.result.eligible ? 'loanEligibility.Eligible' : 'loanEligibility.Not eligible') | translate
+            }}</span>
+            @if (r.result.eligibleFrom) {
+              <span class="eligible-from">
+                {{ 'loanEligibility.Eligible from' | translate }}: {{ r.result.eligibleFrom | adToBs }} ({{
+                  r.result.eligibleFrom
+                }}
+                AD)
+              </span>
+            }
+          </div>
+        </div>
+
+        <div class="facts-grid">
+          <div class="fact">
+            <span class="fact-label">{{ 'loanEligibility.Member since' | translate }}</span>
+            <span class="fact-value">{{ r.facts.joinedOn | adToBs }}</span>
+          </div>
+          <div class="fact">
+            <span class="fact-label">{{ 'loanEligibility.Owes now' | translate }}</span>
+            <span class="fact-value">{{ 'loanEligibility.Rs' | translate }} {{ grouped(r.facts.outstanding) }}</span>
+          </div>
+          <div class="fact">
+            <span class="fact-label">{{ 'loanEligibility.Regular savings' | translate }}</span>
+            <span class="fact-value">{{ 'loanEligibility.Rs' | translate }} {{ grouped(r.facts.regularSavings) }}</span>
+          </div>
+          @if (r.facts.primaryCapital != null) {
+            <div class="fact">
+              <span class="fact-label">{{ 'loanEligibility.Primary capital' | translate }}</span>
+              <span class="fact-value"
+                >{{ 'loanEligibility.Rs' | translate }} {{ grouped(r.facts.primaryCapital) }}</span
+              >
+            </div>
+          }
+        </div>
+
+        @if (r.facts.foundingMember || r.facts.director) {
+          <div class="facts-chips">
+            @if (r.facts.foundingMember) {
+              <span class="chip">{{ 'loanEligibility.Founding member' | translate }}</span>
+            }
+            @if (r.facts.director) {
+              <span class="chip">{{ 'loanEligibility.Director' | translate }}</span>
+            }
+          </div>
+        }
+
+        @if (
+          form.value.collateral === 'DEPOSIT' && form.value.collateralValue == null && r.request.collateralValue != null
+        ) {
+          <p class="deposit-valued">
+            {{
+              'loanEligibility.depositValuedAt'
+                | translate: { amount: ('loanEligibility.Rs' | translate) + ' ' + grouped(r.request.collateralValue) }
+            }}
+          </p>
+        }
+
+        <table class="rules-table">
+          <tbody>
+            @for (rule of r.result.rules; track rule.code) {
+              <tr [class]="rule.outcome.toLowerCase()">
+                <td class="col-status">
+                  <span class="rule-icon" [matTooltip]="'loanEligibility.outcome.' + rule.outcome | translate">
+                    <mat-icon>{{
+                      rule.outcome === 'PASS'
+                        ? 'check_circle'
+                        : rule.outcome === 'FAIL'
+                          ? 'cancel'
+                          : 'remove_circle_outline'
+                    }}</mat-icon>
+                  </span>
+                </td>
+                <td class="col-name">{{ 'loanEligibility.rule.' + rule.code | translate }}</td>
+                <td class="col-reason">{{ reason(rule) }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+      <p class="checked-again">{{ 'loanEligibility.checkedAgain' | translate }}</p>
+    </section>
+  }
+</div>

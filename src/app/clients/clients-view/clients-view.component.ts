@@ -264,6 +264,11 @@ export class ClientsViewComponent implements OnInit {
     );
   }
 
+  /** Whether the member meets the cooperative's loan rules, before an application is made (fineract-dbug #154). */
+  checkLoanEligibility(): void {
+    this.router.navigate(['loan-eligibility'], { relativeTo: this.route });
+  }
+
   applyForMembership(mode: 'again' | 'existing'): void {
     const template = this.membershipTemplate();
     if (!template) {

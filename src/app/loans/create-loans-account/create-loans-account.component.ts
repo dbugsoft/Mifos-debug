@@ -20,11 +20,14 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
 
 /** Custom Services */
 import { LoansService } from '../loans.service';
 import { SettingsService } from 'app/settings/settings.service';
 import { ClientsService } from 'app/clients/clients.service';
+import { LoanEligibilityDialogComponent } from 'app/loans/loan-eligibility/loan-eligibility-dialog/loan-eligibility-dialog.component';
+import { ApplicationCollateralItem } from 'app/loans/loan-eligibility/loan-eligibility.models';
 
 /** Step Components */
 import { LoansAccountDetailsStepComponent } from '../loans-account-stepper/loans-account-details-step/loans-account-details-step.component';
@@ -32,6 +35,7 @@ import { LoansAccountTermsStepComponent } from '../loans-account-stepper/loans-a
 import { LoansAccountChargesStepComponent } from '../loans-account-stepper/loans-account-charges-step/loans-account-charges-step.component';
 import { LoansAccountDatatableStepComponent } from '../loans-account-stepper/loans-account-datatable-step/loans-account-datatable-step.component';
 import { MatStepper, MatStepperIcon, MatStep, MatStepLabel } from '@angular/material/stepper';
+import { MatIcon } from '@angular/material/icon';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { LoansAccountScheduleStepComponent } from '../loans-account-stepper/loans-account-schedule-step/loans-account-schedule-step.component';
 import { LoansAccountPreviewStepComponent } from '../loans-account-stepper/loans-account-preview-step/loans-account-preview-step.component';
@@ -59,7 +63,8 @@ import { Dates } from 'app/core/utils/dates';
     LoansAccountChargesStepComponent,
     LoansAccountScheduleStepComponent,
     LoansAccountDatatableStepComponent,
-    LoansAccountPreviewStepComponent
+    LoansAccountPreviewStepComponent,
+    MatIcon
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -71,6 +76,7 @@ export class CreateLoansAccountComponent extends LoanProductBaseComponent implem
   private clientService = inject(ClientsService);
   private cdr = inject(ChangeDetectorRef);
   private dateUtils = inject(Dates);
+  private dialog = inject(MatDialog);
 
   /** Imports all the step component */
   @ViewChild(LoansAccountDetailsStepComponent, { static: false })
@@ -204,7 +210,31 @@ export class CreateLoansAccountComponent extends LoanProductBaseComponent implem
 
   /** Gets principal Amount */
   get loanPrincipal() {
-    return this.loansAccountTermsStep?.loansAccountTermsForm.value.principal;
+    return this.loansAccountTermsStep?.loansAccountTermsForm.value.principalAmount;
+  }
+
+  /**
+   * "Collateral on this application" (fineract-dbug #154): each item added on the Terms step, by name and value
+   * (quantity × basePrice) - the clerk picks the matching kind when checking eligibility, since this list alone
+   * doesn't say which collateral product an item is.
+   */
+  get applicationCollateral(): ApplicationCollateralItem[] {
+    const items: any[] = this.loansAccountTermsStep?.collateralDataSource ?? [];
+    return items.map((item) => ({ name: item.type.name, value: item.value * item.type.basePrice }));
+  }
+
+  /** "Check eligibility" (fineract-dbug #154; docs/loan-eligibility.md): a member loan only, not group or GLIM. */
+  checkEligibility(): void {
+    this.dialog.open(LoanEligibilityDialogComponent, {
+      data: {
+        clientId: this.loansAccountTemplate.clientId,
+        amount: this.loanPrincipal ?? undefined,
+        applicationCollateral: this.applicationCollateral
+      },
+      width: '640px',
+      maxWidth: '96vw',
+      autoFocus: false
+    });
   }
 
   /** Retrieves Data of all forms except Currency to submit the data */
