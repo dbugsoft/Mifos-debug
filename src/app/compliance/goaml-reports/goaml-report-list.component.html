@@ -78,8 +78,14 @@
         @if (r.caseId && showCase()) {
           <a [routerLink]="['/compliance', 'cases', r.caseId]">{{ 'compliance.reports.Open the case' | translate }}</a>
         }
+        @if (r.createdBy) {
+          <span>{{ 'compliance.reports.Made by' | translate: { name: r.createdBy } }}</span>
+        }
         @if (r.submittedOn) {
           <span>{{ 'compliance.reports.Sent on date' | translate: { date: r.submittedOn | adToBs } }}</span>
+        }
+        @if (r.submittedBy) {
+          <span>{{ 'compliance.reports.Sent by' | translate: { name: r.submittedBy } }}</span>
         }
         @if (r.fiuReference) {
           <span>{{ 'compliance.reports.FIU reference' | translate: { reference: r.fiuReference } }}</span>

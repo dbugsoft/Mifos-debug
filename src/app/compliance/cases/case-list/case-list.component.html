@@ -46,6 +46,9 @@
                   </td>
                   <td>
                     {{ k.name ?? '—' }}
+                    @if (k.officerFamily) {
+                      <span class="chip amber">{{ 'compliance.officer.Officer family' | translate }}</span>
+                    }
                     @if (k.accountNo) {
                       <span class="sub">{{ k.accountNo }}</span>
                     }

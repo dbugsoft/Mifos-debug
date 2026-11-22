@@ -16,6 +16,7 @@ import { AuthenticationService } from 'app/core/authentication/authentication.se
 import { ComplianceService } from '../compliance.service';
 import { CompliancePlace } from '../compliance.models';
 import { COMPLIANCE_PLACES, PlaceTab } from '../compliance-places';
+import { WorkingAsComponent } from '../officer/working-as.component';
 
 /**
  * One place of the Compliance menu (fineract-dbug ADR 0060): its pages as tabs above the page, so everything the
@@ -24,6 +25,7 @@ import { COMPLIANCE_PLACES, PlaceTab } from '../compliance-places';
 @Component({
   selector: 'mifosx-compliance-place',
   template: `
+    <mifosx-working-as></mifosx-working-as>
     @if (tabs().length > 1) {
       <nav mat-tab-nav-bar class="place-tabs" [tabPanel]="panel" [attr.aria-label]="label() | translate">
         @for (tab of tabs(); track tab.label) {
@@ -77,7 +79,8 @@ import { COMPLIANCE_PLACES, PlaceTab } from '../compliance-places';
     RouterLink,
     RouterLinkActive,
     RouterOutlet,
-    TranslatePipe
+    TranslatePipe,
+    WorkingAsComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })

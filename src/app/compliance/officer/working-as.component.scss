@@ -1,0 +1,32 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+.working-as {
+  margin: 8px 16px 0;
+  color: var(--dk-text-2, #475569);
+  font-size: 0.8125rem;
+
+  &.acting {
+    color: var(--dk-warning, #7a4a00);
+    font-weight: 500;
+  }
+
+  &.missing {
+    color: var(--dk-danger, #b42318);
+  }
+
+  .told {
+    color: var(--dk-text-2, #475569);
+    font-weight: 400;
+  }
+}
+
+// inside a page that already has its own margin (Today)
+:host-context(.compliance-page) .working-as {
+  margin: 0 0 8px;
+}

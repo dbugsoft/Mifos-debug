@@ -103,6 +103,8 @@ export interface Case {
   decidedBy: string | null;
   decidedOn: string | null;
   reportDueOn: string | null;
+  /** The officer whose own family this member is (ADR-0064): someone else decides it and sends the report. */
+  officerFamily?: string;
   daysLeft?: number;
   goamlReportId: number | null;
   openedBy: string;

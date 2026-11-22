@@ -22,6 +22,7 @@ import {
   TodayItem,
   TodayKind
 } from '../compliance.models';
+import { WorkingAsComponent } from '../officer/working-as.component';
 import { DueChipComponent } from '../due-chip/due-chip.component';
 
 /** Which lines the list shows: everything, or what a tile stands for. */
@@ -59,7 +60,8 @@ const FIRST_LINES = 50;
     MatProgressBar,
     FormatNumberPipe,
     AdToBsPipe,
-    DueChipComponent
+    DueChipComponent,
+    WorkingAsComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -155,22 +157,7 @@ export class ComplianceHomeComponent implements OnInit {
 
   /** What the line asks the officer to do, as a translation key and its values. */
   whatToDo(i: TodayItem): { key: string; params: Record<string, unknown> } {
-    const base = 'compliance.today.do.';
-    switch (i.kind) {
-      case 'DUTY':
-        return { key: 'compliance.governance.prompt.' + i.detail, params: { date: i.dueOn ?? '' } };
-      case 'YEARLY':
-        return { key: base + 'YEARLY_' + i.action, params: { year: i.reference } };
-      case 'ALERT':
-      case 'REVIEWS':
-      case 'EDD_REVIEWS':
-      case 'CONCERN':
-      case 'MATCH':
-      case 'CASE':
-        return { key: base + i.kind, params: { count: i.count, reference: i.reference } };
-      default:
-        return { key: base + i.action, params: { count: i.action === 'DECIDE_LATE' ? i.count : i.detail } };
-    }
+    return whatToDo(i);
   }
 
   /** The second line under what to do, as a translation key or plain text: the rule, the case, the cash, the list. */
@@ -235,5 +222,25 @@ export class ComplianceHomeComponent implements OnInit {
   /** The button's verb. */
   button(i: TodayItem): string {
     return 'compliance.today.button.' + (i.kind === 'DUTY' || i.kind === 'YEARLY' ? 'OPEN' : i.action);
+  }
+}
+
+/** What a line of Today asks the officer to do, as a translation key and its values (also used by the handover). */
+export function whatToDo(i: TodayItem): { key: string; params: Record<string, unknown> } {
+  const base = 'compliance.today.do.';
+  switch (i.kind) {
+    case 'DUTY':
+      return { key: 'compliance.governance.prompt.' + i.detail, params: { date: i.dueOn ?? '' } };
+    case 'YEARLY':
+      return { key: base + 'YEARLY_' + i.action, params: { year: i.reference } };
+    case 'ALERT':
+    case 'REVIEWS':
+    case 'EDD_REVIEWS':
+    case 'CONCERN':
+    case 'MATCH':
+    case 'CASE':
+      return { key: base + i.kind, params: { count: i.count, reference: i.reference } };
+    default:
+      return { key: base + i.action, params: { count: i.action === 'DECIDE_LATE' ? i.count : i.detail } };
   }
 }
