@@ -15,7 +15,7 @@
     @if (settings()?.unclassified) {
       <div class="notice" role="status">
         <span>{{ 'compliance.Payment types not classified' | translate: { count: settings()?.unclassified } }}</span>
-        <a [routerLink]="['/system', 'configurations']">{{ 'compliance.Classify them' | translate }}</a>
+        <a [routerLink]="['/compliance', 'settings', 'report']">{{ 'compliance.Classify them' | translate }}</a>
       </div>
     }
 

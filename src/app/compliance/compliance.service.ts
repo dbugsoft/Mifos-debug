@@ -13,6 +13,8 @@ import { Observable, catchError, finalize, of, shareReplay, tap } from 'rxjs';
 import {
   AmlSettings,
   AmlSettingsView,
+  SettingsChange,
+  SettingsEffect,
   CashClass,
   ComplianceAccess,
   ComplianceToday,
@@ -123,10 +125,34 @@ export class ComplianceService {
     return this.http.get<AmlSettingsView>('/nepal/aml/settings');
   }
 
+  /** `reason`: why the change was made, kept with it (ADR-0063). */
   updateSettings(
-    changes: Partial<AmlSettings> & { paymentClasses?: { paymentTypeId: number; cashClass: CashClass }[] }
+    changes: Partial<AmlSettings> & {
+      paymentClasses?: { paymentTypeId: number; cashClass: CashClass }[];
+      reason?: string;
+    }
   ): Observable<any> {
     return this.http.put('/nepal/aml/settings', changes);
+  }
+
+  /** What these values would have done over the last 12 months; nothing is changed. */
+  settingsEffect(values: Partial<Record<keyof AmlSettings, string | number | boolean>>): Observable<SettingsEffect> {
+    let params = new HttpParams();
+    Object.entries(values).forEach(
+      ([
+        k,
+        v
+      ]) => (params = params.set(k, String(v)))
+    );
+    return this.http.get<SettingsEffect>('/nepal/aml/settings/effect', {
+      params,
+      context: new HttpContext().set(SILENT_ERRORS, true)
+    });
+  }
+
+  /** Changes to the settings, newest first. */
+  settingsHistory(limit = 100): Observable<SettingsChange[]> {
+    return this.http.get<SettingsChange[]>('/nepal/aml/settings/history', { params: { limit } });
   }
 
   ttrSummary(): Observable<TtrSummary> {

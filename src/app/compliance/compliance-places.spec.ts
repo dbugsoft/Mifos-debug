@@ -17,7 +17,9 @@ describe('compliance places', () => {
     expect(placeOf('/compliance/threshold-reports')).toBe('REPORTS');
     expect(placeOf('/compliance/suspicious-reports/str')).toBe('REPORTS');
     expect(placeOf('/compliance/sent-reports')).toBe('REPORTS');
-    expect(placeOf('/compliance/goaml-setup')).toBe('REPORTS');
+    expect(placeOf('/compliance/goaml-setup')).toBe('SETTINGS');
+    expect(placeOf('/compliance/settings/report')).toBe('SETTINGS');
+    expect(placeOf('/compliance/settings/changes')).toBe('SETTINGS');
     expect(placeOf('/compliance/cases/12')).toBe('SUSPICIONS');
     expect(placeOf('/compliance/members/5')).toBe('MEMBERS');
     expect(placeOf('/compliance/screening/matches/3')).toBe('MEMBERS');
@@ -40,7 +42,8 @@ describe('compliance places', () => {
       'REPORTS',
       'SUSPICIONS',
       'MEMBERS',
-      'DUTIES'
+      'DUTIES',
+      'SETTINGS'
     ]);
     expect(compliancePages.every((p) => Array.isArray(p.permission) && p.permission.length > 0)).toBe(true);
   });

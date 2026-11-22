@@ -38,7 +38,7 @@ export interface CompliancePlaceDef {
   tabs: PlaceTab[];
 }
 
-/** The places and the pages inside each (ADR-0060; Reports to FIU-Nepal's tabs: ADR-0062). */
+/** The places and the pages inside each (ADR-0060; Reports to FIU-Nepal's tabs: ADR-0062; Settings: ADR-0063). */
 export const COMPLIANCE_PLACES: Record<CompliancePlace, CompliancePlaceDef> = {
   REPORTS: {
     label: 'compliance.nav.Reports to FIU-Nepal',
@@ -61,10 +61,6 @@ export const COMPLIANCE_PLACES: Record<CompliancePlace, CompliancePlaceDef> = {
       { label: 'compliance.nav.Sent and answered', path: [
           '/compliance',
           'sent-reports'
-        ] },
-      { label: 'compliance.nav.goAML setup', path: [
-          '/compliance',
-          'goaml-setup'
         ] }
     ]
   },
@@ -130,6 +126,55 @@ export const COMPLIANCE_PLACES: Record<CompliancePlace, CompliancePlaceDef> = {
           'elections'
         ], permission: 'READ_GOVERNANCE' }
     ]
+  },
+  SETTINGS: {
+    label: 'compliance.nav.Settings',
+    compliance: [
+      'READ_AMLCOMPLIANCE',
+      'UPDATE_AMLSETTINGS'
+    ],
+    tabs: [
+      { label: 'compliance.nav.Getting ready', path: [
+          '/compliance',
+          'settings',
+          'ready'
+        ] },
+      { label: 'compliance.nav.goAML codes', path: [
+          '/compliance',
+          'settings',
+          'codes'
+        ] },
+      { label: 'compliance.nav.Reporting', path: [
+          '/compliance',
+          'settings',
+          'report'
+        ] },
+      { label: 'compliance.nav.Unusual activity', path: [
+          '/compliance',
+          'settings',
+          'unusual'
+        ] },
+      { label: 'compliance.nav.Members', path: [
+          '/compliance',
+          'settings',
+          'members'
+        ] },
+      { label: 'compliance.nav.Sanctions lists', path: [
+          '/compliance',
+          'settings',
+          'sanctions'
+        ] },
+      { label: 'compliance.nav.Records', path: [
+          '/compliance',
+          'settings',
+          'records'
+        ] },
+      { label: 'compliance.nav.Changes', path: [
+          '/compliance',
+          'settings',
+          'changes'
+        ] }
+    ]
   }
 };
 
@@ -149,8 +194,7 @@ export function placeOf(url: string): CompliancePlace | 'TODAY' | null {
   if ([
       'threshold-reports',
       'suspicious-reports',
-      'sent-reports',
-      'goaml-setup'
+      'sent-reports'
     ].includes(first)) {
     return 'REPORTS';
   }
@@ -168,6 +212,9 @@ export function placeOf(url: string): CompliancePlace | 'TODAY' | null {
   }
   if (first === 'governance' || first === 'reports') {
     return 'DUTIES';
+  }
+  if (first === 'settings' || first === 'goaml-setup') {
+    return 'SETTINGS';
   }
   return null;
 }
