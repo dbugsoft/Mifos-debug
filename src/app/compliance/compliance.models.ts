@@ -79,6 +79,27 @@ export interface AmlSettingsView {
   lastChange?: { at: string; username: string; name: string } | null;
 }
 
+/** What settings would have done over the last 12 months, beside the settings as they are (GET /nepal/aml/settings/effect). */
+export interface SettingsEffect {
+  from: string;
+  to: string;
+  thresholdReports: { now: number; then: number };
+  unusualYearly: { now: number; then: number };
+  sourceOfFunds: { now: number; then: number };
+}
+
+/** One change to the settings (GET /nepal/aml/settings/history). */
+export interface SettingsChange {
+  at: string;
+  username: string | null;
+  name: string | null;
+  /** Setting to its new value as text; `paymentClasses` maps a payment type id to its class. */
+  changes: Record<string, string | Record<string, string> | null>;
+  reason: string | null;
+  /** A change recorded before reasons existed, as recorded. */
+  text: string | null;
+}
+
 /** Counts for the Compliance home (GET /nepal/aml/ttr/summary). */
 export interface TtrSummary {
   toReport: number;
@@ -271,7 +292,7 @@ export function isoDate(value: string | number[] | null | undefined): string {
 }
 
 /** The places of the Compliance menu that count what waits in them (fineract-dbug ADR 0060). */
-export type CompliancePlace = 'REPORTS' | 'SUSPICIONS' | 'MEMBERS' | 'DUTIES';
+export type CompliancePlace = 'REPORTS' | 'SUSPICIONS' | 'MEMBERS' | 'DUTIES' | 'SETTINGS';
 
 /** How many wait in a place, how many are late, how many due within 3 days. */
 export interface PlaceTally {

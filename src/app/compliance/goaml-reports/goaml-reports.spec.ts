@@ -111,8 +111,14 @@ describe('goAML reports on screens (ADR-0062)', () => {
         'governance'
       ]);
       expect(fixLink('GOAML_CODES')).toEqual([
-        '/system',
-        'configurations'
+        '/compliance',
+        'settings',
+        'codes'
+      ]);
+      expect(fixLink('AML_SETTINGS')).toEqual([
+        '/compliance',
+        'settings',
+        'ready'
       ]);
       expect(fixLink('NONE')).toBeNull();
     });

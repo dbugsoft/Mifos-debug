@@ -18,8 +18,6 @@ import { BusinessDateTabComponent } from './business-date-tab/business-date-tab.
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { MembershipSettingsComponent } from 'app/clients/membership/membership-settings/membership-settings.component';
 import { MembershipService } from 'app/clients/membership/membership.service';
-import { ComplianceService } from 'app/compliance/compliance.service';
-import { ComplianceSettingsComponent } from 'app/compliance/compliance-settings/compliance-settings.component';
 import { LoanEligibilitySettingsComponent } from 'app/loans/loan-eligibility/loan-eligibility-settings/loan-eligibility-settings.component';
 import { LoanEligibilityService } from 'app/loans/loan-eligibility/loan-eligibility.service';
 
@@ -35,7 +33,6 @@ import { LoanEligibilityService } from 'app/loans/loan-eligibility/loan-eligibil
     GlobalConfigurationsTabComponent,
     BusinessDateTabComponent,
     MembershipSettingsComponent,
-    ComplianceSettingsComponent,
     LoanEligibilitySettingsComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -50,8 +47,6 @@ export class ConfigurationsComponent implements OnInit {
   isBusinessDateEnabled = false;
   /** Membership settings (fineract-dbug ADR 0023), for users who may read memberships */
   readonly showMembership = inject(MembershipService).canRead();
-  /** Compliance settings (fineract-dbug #196), for roles given the compliance permissions by name */
-  readonly compliance = inject(ComplianceService);
   /** Loan eligibility settings (fineract-dbug #154), for users who may read or update the rules */
   private loanEligibilityService = inject(LoanEligibilityService);
   readonly showLoanEligibility = this.loanEligibilityService.canRead() || this.loanEligibilityService.canUpdate();

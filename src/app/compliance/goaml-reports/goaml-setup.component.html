@@ -6,7 +6,7 @@
   file, You can obtain one at http://mozilla.org/MPL/2.0/.
 -->
 
-<div class="compliance-page">
+<div [class.compliance-page]="!embedded()" class="setup">
   @if (loading()) {
     <mat-progress-bar mode="indeterminate"></mat-progress-bar>
   }

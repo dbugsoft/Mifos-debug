@@ -184,10 +184,9 @@ const routes: Routes = [
               data: { title: 'Sent and answered', breadcrumb: 'Sent and answered' }
             },
             {
+              // moved to Settings › Getting ready (ADR-0063); kept for links and bookmarks
               path: 'goaml-setup',
-              loadComponent: () =>
-                import('./compliance/goaml-reports/goaml-setup.component').then((m) => m.GoamlSetupComponent),
-              data: { title: 'goAML setup', breadcrumb: 'goAML setup' }
+              redirectTo: '/compliance/settings/ready'
             }
           ]
         },
@@ -370,6 +369,64 @@ const routes: Routes = [
                 breadcrumb: 'Staff and members',
                 parentBreadcrumb: { label: 'Elections', url: '/compliance/governance/elections' }
               }
+            }
+          ]
+        },
+        {
+          // Settings (fineract-dbug ADR-0063): the compliance settings, a tab per question, moved from Admin
+          path: '',
+          loadComponent: () =>
+            import('./compliance/place/compliance-place.component').then((m) => m.CompliancePlaceComponent),
+          data: { place: 'SETTINGS', breadcrumb: '' },
+          children: [
+            { path: 'settings', redirectTo: 'settings/ready', pathMatch: 'full' },
+            {
+              path: 'settings/ready',
+              loadComponent: () =>
+                import('./compliance/settings/settings-group.component').then((m) => m.SettingsGroupComponent),
+              data: { group: 'READY', title: 'Getting ready', breadcrumb: 'Getting ready' }
+            },
+            {
+              path: 'settings/codes',
+              loadComponent: () =>
+                import('./compliance/settings/goaml-codes.component').then((m) => m.GoamlCodesComponent),
+              data: { title: 'goAML codes', breadcrumb: 'goAML codes' }
+            },
+            {
+              path: 'settings/report',
+              loadComponent: () =>
+                import('./compliance/settings/settings-group.component').then((m) => m.SettingsGroupComponent),
+              data: { group: 'REPORT', title: 'Reporting', breadcrumb: 'Reporting' }
+            },
+            {
+              path: 'settings/unusual',
+              loadComponent: () =>
+                import('./compliance/settings/settings-group.component').then((m) => m.SettingsGroupComponent),
+              data: { group: 'UNUSUAL', title: 'Unusual activity', breadcrumb: 'Unusual activity' }
+            },
+            {
+              path: 'settings/members',
+              loadComponent: () =>
+                import('./compliance/settings/settings-group.component').then((m) => m.SettingsGroupComponent),
+              data: { group: 'MEMBERS', title: 'Members', breadcrumb: 'Members' }
+            },
+            {
+              path: 'settings/sanctions',
+              loadComponent: () =>
+                import('./compliance/settings/settings-group.component').then((m) => m.SettingsGroupComponent),
+              data: { group: 'SANCTIONS', title: 'Sanctions lists', breadcrumb: 'Sanctions lists' }
+            },
+            {
+              path: 'settings/records',
+              loadComponent: () =>
+                import('./compliance/settings/settings-group.component').then((m) => m.SettingsGroupComponent),
+              data: { group: 'RECORDS', title: 'Records', breadcrumb: 'Records' }
+            },
+            {
+              path: 'settings/changes',
+              loadComponent: () =>
+                import('./compliance/settings/settings-changes.component').then((m) => m.SettingsChangesComponent),
+              data: { title: 'Changes', breadcrumb: 'Changes' }
             }
           ]
         }

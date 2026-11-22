@@ -1,0 +1,114 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+@use '../compliance' as compliance;
+
+@include compliance.page;
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sentences {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+// One setting: its sentence, then the quiet lines under it.
+.sentence {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--dk-border, #e2e8f0);
+
+  &:last-child {
+    border-bottom: 0;
+  }
+}
+
+.words {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+// A field inside the sentence: as wide as its value needs, and no taller than the line around it.
+.inline {
+  width: 110px;
+
+  --mat-form-field-container-height: 40px;
+  --mat-form-field-container-vertical-padding: 8px;
+  --mdc-outlined-text-field-container-shape: 6px;
+
+  &.amount {
+    width: 150px;
+  }
+
+  &.date {
+    display: inline-block;
+    width: 300px;
+  }
+
+  &.choice {
+    width: 320px;
+  }
+
+  &.wide {
+    width: min(520px, 100%);
+  }
+}
+
+.line {
+  margin: 6px 0 0;
+  color: var(--dk-text-2, #475569);
+  font-size: 0.875rem;
+}
+
+.policy {
+  color: var(--dk-warning, #8a5a00);
+}
+
+.effect {
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: var(--dk-surface-2, #f1f5f9);
+
+  &.changed {
+    background: var(--dk-warning-soft, #fff4dc);
+    color: var(--dk-text, #1f2937);
+  }
+}
+
+.inline-select {
+  width: 280px;
+  max-width: 100%;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+
+  .spacer {
+    flex: 1;
+  }
+}
+
+@media (width <= 600px) {
+  .inline.choice,
+  .inline.date,
+  .inline.wide {
+    width: 100%;
+  }
+}

@@ -27,10 +27,16 @@ export function fixLink(fix: GoamlFix, clientId?: number | null): string[] | nul
             String(clientId)
           ] : null;
     case 'AML_SETTINGS':
+      return [
+        '/compliance',
+        'settings',
+        'ready'
+      ];
     case 'GOAML_CODES':
       return [
-        '/system',
-        'configurations'
+        '/compliance',
+        'settings',
+        'codes'
       ];
     case 'OFFICER':
       return [

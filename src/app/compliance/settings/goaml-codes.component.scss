@@ -10,19 +10,6 @@
 
 @include compliance.page;
 
-.compliance-settings {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 16px 0;
-}
-
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
 .fields {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -33,10 +20,6 @@ form {
     width: 100%;
   }
 
-  .wide {
-    grid-column: 1 / -1;
-  }
-
   @media (width <= 960px) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -44,11 +27,6 @@ form {
   @media (width <= 600px) {
     grid-template-columns: 1fr;
   }
-}
-
-.inline-select {
-  width: 280px;
-  max-width: 100%;
 }
 
 /* ───────────────────────── FIU-Nepal's codes (fineract-dbug #288) ───────────────────────── */
