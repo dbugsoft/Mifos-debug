@@ -7161,7 +7161,9 @@
         "relationshipsFromList": "Typed relationships are refused, so every report names them the same way.",
         "unListUrl": "Change it only if the UN moves the list."
       }
-    }
+    },
+    "Due tomorrow": "Due tomorrow",
+    "One day late": "1 day late"
   },
   "kym": {
     "KYM": "KYM",

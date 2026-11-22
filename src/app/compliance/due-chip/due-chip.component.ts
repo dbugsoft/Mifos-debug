@@ -62,11 +62,11 @@ export class DueChipComponent {
       return 'compliance.No deadline';
     }
     if (d < 0) {
-      return 'compliance.Days late';
+      return d === -1 ? 'compliance.One day late' : 'compliance.Days late';
     }
     if (d === 0) {
       return 'compliance.Due today';
     }
-    return 'compliance.Due in days';
+    return d === 1 ? 'compliance.Due tomorrow' : 'compliance.Due in days';
   });
 }

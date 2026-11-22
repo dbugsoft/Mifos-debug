@@ -127,6 +127,8 @@ export class GoamlReportListComponent {
   readonly selectable = input(false);
   /** Show the member's name (not on the case page, which is about them). */
   readonly showMember = input(true);
+  /** Link to the case (not on the case page itself). */
+  readonly showCase = input(true);
 
   /** After a step changed a report: the page reloads. */
   readonly changed = output<GoamlReport | null>();

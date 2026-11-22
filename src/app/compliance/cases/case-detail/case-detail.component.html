@@ -79,6 +79,7 @@
           <mifosx-goaml-report-list
             [reports]="[r]"
             [showMember]="false"
+            [showCase]="false"
             (changed)="reportChanged()"
           ></mifosx-goaml-report-list>
         } @else if (canFile && k.status === 'DECIDED_REPORT') {
