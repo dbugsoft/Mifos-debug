@@ -75,7 +75,7 @@
             <span>{{ 'compliance.reports.Not a member' | translate }}</span>
           }
         }
-        @if (r.caseId) {
+        @if (r.caseId && showCase()) {
           <a [routerLink]="['/compliance', 'cases', r.caseId]">{{ 'compliance.reports.Open the case' | translate }}</a>
         }
         @if (r.submittedOn) {

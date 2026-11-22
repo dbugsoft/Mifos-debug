@@ -7055,7 +7055,9 @@
         "NOT_FOR_US": "does not apply to a cooperative",
         "NOT_CHECKED": "not checked yet: send the file to system support"
       }
-    }
+    },
+    "Due tomorrow": "Due tomorrow",
+    "One day late": "1 day late"
   },
   "kym": {
     "KYM": "KYM",
