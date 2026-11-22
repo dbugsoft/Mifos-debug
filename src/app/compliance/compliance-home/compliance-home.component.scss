@@ -50,12 +50,135 @@
   }
 }
 
-tr.mat-mdc-row {
+// Today (fineract-dbug ADR 0060)
+.today-title {
+  margin: 0 0 12px;
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+button.tile {
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:disabled {
+    cursor: default;
+  }
+
+  &.pressed {
+    outline: 2px solid var(--dk-primary, #2460b9);
+    outline-offset: -2px;
+  }
+}
+
+.legend .clear {
+  margin-left: 12px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--dk-primary, #2460b9);
+  font: inherit;
+  font-size: 0.8rem;
   cursor: pointer;
 }
 
-.links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+.today-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+// kind | what to do | member | amount | due | button
+.line {
+  display: grid;
+  grid-template-columns: 104px minmax(0, 2fr) minmax(0, 1.4fr) 110px 130px 96px;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 0;
+  border-top: 1px solid rgb(127 127 127 / 15%);
+
+  &:first-child {
+    border-top: 0;
+  }
+
+  .sub {
+    display: block;
+    color: var(--mat-sys-on-surface-variant);
+    font-size: 0.75rem;
+  }
+
+  .go {
+    justify-self: end;
+  }
+
+  .amount {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  // on a phone: the chip and what to do on top, the member and amount below, the deadline and button last
+  @media (width <= 768px) {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      'kind what what'
+      'member member amount'
+      'due due go';
+    gap: 6px 10px;
+
+    .kind {
+      grid-area: kind;
+    }
+
+    .what {
+      grid-area: what;
+    }
+
+    .member {
+      grid-area: member;
+    }
+
+    .amount {
+      grid-area: amount;
+    }
+
+    .due {
+      grid-area: due;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .go {
+      grid-area: go;
+    }
+  }
+}
+
+.what {
+  font-weight: 500;
+}
+
+.kind {
+  justify-self: start;
+  padding: 0 8px;
+  border-radius: 10px;
+  background: var(--dk-fill, rgb(127 127 127 / 15%));
+  color: var(--dk-text, inherit);
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 20px;
+  white-space: nowrap;
+
+  &.k-STR,
+  &.k-SAR,
+  &.k-MATCH {
+    background: var(--dk-danger-soft, #fdeceb);
+    color: var(--dk-danger, #9f1f17);
+  }
+
+  &.k-TTR {
+    background: var(--dk-primary-soft, #e3ecfa);
+    color: var(--dk-primary, #2460b9);
+  }
 }

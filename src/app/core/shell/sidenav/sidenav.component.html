@@ -96,15 +96,17 @@
         </button>
         <mat-menu #pagesMenu="matMenu" xPosition="after" class="sidenav-flyout">
           <div class="flyout-title">{{ item.label | translate }}</div>
-          @for (page of item.children; track $index) {
+          @for (page of pagesOf(item); track $index) {
             <a
               mat-menu-item
               *mifosxHasPermission="page.permission"
               [routerLink]="page.path"
               routerLinkActive="active"
               [routerLinkActiveOptions]="{ exact: !!page.exact }"
+              [class.place-active]="page.compliancePlace && page.compliancePlace === place()"
             >
               {{ page.label | translate }}
+              <ng-container *ngTemplateOutlet="count; context: { $implicit: page }"></ng-container>
             </a>
           }
         </mat-menu>
@@ -115,13 +117,14 @@
           <mat-icon class="chevron">expand_more</mat-icon>
         </button>
         <div class="pages" [hidden]="!openModules.has(item.label)">
-          @for (page of item.children; track $index) {
+          @for (page of pagesOf(item); track $index) {
             <a
               class="page"
               *mifosxHasPermission="page.permission"
               [routerLink]="page.path"
               routerLinkActive="active"
               [routerLinkActiveOptions]="{ exact: !!page.exact }"
+              [class.place-active]="page.compliancePlace && page.compliancePlace === place()"
               (click)="navigate.emit()"
             >
               <!-- A qualifier such as "(Office wise)" goes on its own line. -->
@@ -133,6 +136,7 @@
               } @else {
                 {{ label }}
               }
+              <ng-container *ngTemplateOutlet="count; context: { $implicit: page }"></ng-container>
             </a>
           }
         </div>
@@ -155,4 +159,11 @@
       {{ 'labels.buttons.Next' | translate }}
     </button>
   </div>
+</ng-template>
+
+<!-- What waits in a compliance place (fineract-dbug ADR 0060): red when something is late, amber when due soon. -->
+<ng-template #count let-page>
+  @if (countOf(page); as c) {
+    <span class="count" [class]="c.tone">{{ c.count }}</span>
+  }
 </ng-template>

@@ -6,26 +6,49 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatProgressBar } from '@angular/material/progress-bar';
-import { MatTableModule } from '@angular/material/table';
 import { forkJoin, of, switchMap, catchError } from 'rxjs';
 import { AdToBsPipe } from 'app/pipes/ad-to-bs.pipe';
 import { FormatNumberPipe } from 'app/pipes/format-number.pipe';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { ComplianceService } from '../compliance.service';
-import { RiskService } from '../risk/risk.service';
-import { EddSummary, RiskSummary } from '../risk/risk.models';
-import { AlertSummary, CaseSummary, CasesService } from '../cases/cases.service';
-import { ScreeningService, ScreeningSummary } from '../screening/screening.service';
-import { GovernanceService, Prompt, ReportDue } from '../governance/governance.service';
-import { AmlSettingsView, ComplianceAccess, LedgerStatus, TtrItem, TtrSummary, isoDate } from '../compliance.models';
+import {
+  AmlSettingsView,
+  ComplianceAccess,
+  KindCounts,
+  LedgerStatus,
+  TodayItem,
+  TodayKind
+} from '../compliance.models';
 import { DueChipComponent } from '../due-chip/due-chip.component';
 
+/** Which lines the list shows: everything, or what a tile stands for. */
+export type TodayFilter = 'ALL' | 'LATE' | 'SOON' | 'ALERTS';
+
+/** The order kinds are named in a tile's breakdown. */
+const KIND_ORDER: TodayKind[] = [
+  'TTR',
+  'STR',
+  'SAR',
+  'MATCH',
+  'CONCERN',
+  'ALERT',
+  'CASE',
+  'REVIEWS',
+  'EDD_REVIEWS',
+  'YEARLY',
+  'DUTY'
+];
+
+/** How many lines show before "show all". */
+const FIRST_LINES = 50;
+
 /**
- * The compliance officer's home (fineract-dbug #198): deadlines first, then what needs a decision. Shows only what
- * this user's compliance permissions allow; parts of the design not built yet are not shown at all.
+ * Today (fineract-dbug ADR 0060): everything waiting for the compliance officer in one list, soonest deadline first,
+ * each line saying what to do next. Those who see counts only (the chief executive, the board) get the counts and the
+ * officer's duties.
  */
 @Component({
   selector: 'mifosx-compliance-home',
@@ -34,7 +57,6 @@ import { DueChipComponent } from '../due-chip/due-chip.component';
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
     MatProgressBar,
-    MatTableModule,
     FormatNumberPipe,
     AdToBsPipe,
     DueChipComponent
@@ -43,34 +65,37 @@ import { DueChipComponent } from '../due-chip/due-chip.component';
 })
 export class ComplianceHomeComponent implements OnInit {
   private compliance = inject(ComplianceService);
-  private risk = inject(RiskService);
-  private casesService = inject(CasesService);
-  private screening = inject(ScreeningService);
-  private governance = inject(GovernanceService);
   private destroyRef = inject(DestroyRef);
 
   readonly loading = signal(true);
+  readonly loadingAll = signal(false);
   readonly access = signal<ComplianceAccess | null>(null);
-  readonly summary = signal<TtrSummary | null>(null);
-  readonly deadlines = signal<TtrItem[]>([]);
   readonly settings = signal<AmlSettingsView | null>(null);
   readonly ledger = signal<LedgerStatus | null>(null);
-  readonly riskSummary = signal<RiskSummary | null>(null);
-  readonly eddSummary = signal<EddSummary | null>(null);
-  readonly alertSummary = signal<AlertSummary | null>(null);
-  readonly caseSummary = signal<CaseSummary | null>(null);
-  readonly screeningSummary = signal<ScreeningSummary | null>(null);
-  readonly prompts = signal<Prompt[]>([]);
-  readonly reportsDue = signal<ReportDue[]>([]);
+  readonly filter = signal<TodayFilter>('ALL');
+  readonly expanded = signal(false);
 
-  readonly deadlineColumns = [
-    'dueOn',
-    'what',
-    'member',
-    'amount',
-    'status'
-  ];
-  readonly isoDate = isoDate;
+  /** The answer the sidebar shares, so the counts there and here are the same. */
+  readonly today = this.compliance.todayAnswer;
+
+  readonly lines = computed(() => {
+    const items = this.today()?.items ?? [];
+    switch (this.filter()) {
+      case 'LATE':
+        return items.filter((i) => i.daysLeft !== null && i.daysLeft < 0);
+      case 'SOON':
+        return items.filter((i) => i.daysLeft !== null && i.daysLeft >= 0 && i.daysLeft <= 3);
+      case 'ALERTS':
+        return items.filter((i) => i.kind === 'ALERT' || i.kind === 'CONCERN');
+      default:
+        return items;
+    }
+  });
+  readonly shown = computed(() => (this.expanded() ? this.lines() : this.lines().slice(0, FIRST_LINES)));
+  /** Lines not shown yet: those cut here and, for the whole list, those the server left out. */
+  readonly hidden = computed(
+    () => this.lines().length - this.shown().length + (this.filter() === 'ALL' ? (this.today()?.more ?? 0) : 0)
+  );
 
   ngOnInit(): void {
     this.compliance
@@ -80,55 +105,20 @@ export class ComplianceHomeComponent implements OnInit {
           this.access.set(access);
           const can = (...p: string[]) => p.some((x) => access.permissions.includes(x));
           return forkJoin({
-            summary: can('READ_AMLCOMPLIANCE', 'READ_AMLSUMMARY')
-              ? this.compliance.ttrSummary().pipe(catchError(() => of(null)))
-              : of(null),
-            deadlines: can('READ_AMLCOMPLIANCE')
-              ? this.compliance.ttrItems().pipe(catchError(() => of([] as TtrItem[])))
-              : of([] as TtrItem[]),
+            today: access.showMenu ? this.compliance.loadToday() : of(null),
             settings: can('READ_AMLCOMPLIANCE', 'UPDATE_AMLSETTINGS')
               ? this.compliance.settings().pipe(catchError(() => of(null)))
               : of(null),
             ledger: can('READ_AMLCOMPLIANCE', 'UPDATE_AMLSETTINGS')
               ? this.compliance.ledgerStatus().pipe(catchError(() => of(null)))
-              : of(null),
-            risk: can('READ_AMLCOMPLIANCE', 'READ_AMLSUMMARY')
-              ? this.risk.summary().pipe(catchError(() => of(null)))
-              : of(null),
-            edd: can('READ_AMLCOMPLIANCE', 'READ_AMLSUMMARY')
-              ? this.risk.eddSummary().pipe(catchError(() => of(null)))
-              : of(null),
-            alerts: can('READ_AMLCOMPLIANCE', 'READ_AMLSUMMARY')
-              ? this.casesService.alertSummary().pipe(catchError(() => of(null)))
-              : of(null),
-            cases: can('READ_AMLCOMPLIANCE', 'READ_AMLSUMMARY', 'READ_AMLDECISIONS')
-              ? this.casesService.caseSummary().pipe(catchError(() => of(null)))
-              : of(null),
-            screening: can('READ_AMLCOMPLIANCE', 'READ_AMLSUMMARY')
-              ? this.screening.summary().pipe(catchError(() => of(null)))
-              : of(null),
-            prompts: can('READ_AMLCOMPLIANCE', 'READ_AMLSUMMARY', 'READ_AMLDECISIONS', 'MANAGE_AMLGOVERNANCE')
-              ? this.governance.prompts().pipe(catchError(() => of([] as Prompt[])))
-              : of([] as Prompt[]),
-            reports: can('READ_AMLCOMPLIANCE', 'READ_AMLSUMMARY', 'READ_AMLDECISIONS')
-              ? this.governance.reports().pipe(catchError(() => of({ reports: [], due: [] as ReportDue[] })))
-              : of({ reports: [], due: [] as ReportDue[] })
+              : of(null)
           });
         }),
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe((data) => {
-        this.summary.set(data.summary);
-        this.deadlines.set(data.deadlines.slice(0, 10));
         this.settings.set(data.settings);
         this.ledger.set(data.ledger);
-        this.riskSummary.set(data.risk);
-        this.eddSummary.set(data.edd);
-        this.alertSummary.set(data.alerts);
-        this.caseSummary.set(data.cases);
-        this.screeningSummary.set(data.screening);
-        this.prompts.set(data.prompts);
-        this.reportsDue.set(data.reports.due);
         this.loading.set(false);
       });
   }
@@ -136,5 +126,114 @@ export class ComplianceHomeComponent implements OnInit {
   can(...permissions: string[]): boolean {
     const a = this.access();
     return !!a && permissions.some((p) => a.permissions.includes(p));
+  }
+
+  /** A tile narrows the list to what it counts; pressed again, the whole list returns. */
+  toggleFilter(f: TodayFilter): void {
+    this.filter.set(this.filter() === f ? 'ALL' : f);
+    this.expanded.set(false);
+  }
+
+  showAll(): void {
+    this.expanded.set(true);
+    if ((this.today()?.more ?? 0) > 0) {
+      this.loadingAll.set(true);
+      this.compliance
+        .loadToday(5000)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({ next: () => this.loadingAll.set(false), error: () => this.loadingAll.set(false) });
+    }
+  }
+
+  /** "3 TTR, 1 STR": the kinds behind a count, in a fixed order. */
+  breakdown(counts: KindCounts | undefined): { kind: string; count: number }[] {
+    if (!counts) {
+      return [];
+    }
+    return KIND_ORDER.filter((k) => counts[k]).map((k) => ({ kind: k, count: counts[k] as number }));
+  }
+
+  /** What the line asks the officer to do, as a translation key and its values. */
+  whatToDo(i: TodayItem): { key: string; params: Record<string, unknown> } {
+    const base = 'compliance.today.do.';
+    switch (i.kind) {
+      case 'DUTY':
+        return { key: 'compliance.governance.prompt.' + i.detail, params: { date: i.dueOn ?? '' } };
+      case 'YEARLY':
+        return { key: base + 'YEARLY_' + i.action, params: { year: i.reference } };
+      case 'ALERT':
+      case 'REVIEWS':
+      case 'EDD_REVIEWS':
+      case 'CONCERN':
+      case 'MATCH':
+      case 'CASE':
+        return { key: base + i.kind, params: { count: i.count, reference: i.reference } };
+      default:
+        return { key: base + i.action, params: { count: i.action === 'DECIDE_LATE' ? i.count : i.detail } };
+    }
+  }
+
+  /** The second line under what to do, as a translation key or plain text: the rule, the case, the cash, the list. */
+  subLine(i: TodayItem): string | null {
+    switch (i.kind) {
+      case 'ALERT':
+        return 'compliance.alert.rule.' + i.detail;
+      case 'STR':
+      case 'SAR':
+        return i.reference;
+      case 'TTR':
+        return i.detail === 'IN' || i.detail === 'OUT' ? 'compliance.today.direction.' + i.detail : null;
+      case 'MATCH':
+        return i.detail ? 'compliance.screening.source.' + i.detail : null;
+      case 'YEARLY':
+        return 'compliance.reports.type.' + i.detail;
+      default:
+        return null;
+    }
+  }
+
+  /** Where the line's button goes. */
+  link(i: TodayItem): { path: (string | number)[]; query?: Record<string, string> } {
+    switch (i.kind) {
+      case 'TTR':
+        return i.action === 'DECIDE_LATE'
+          ? { path: ['threshold-reports'], query: { status: 'HISTORICAL' } }
+          : { path: ['threshold-reports'] };
+      case 'STR':
+      case 'SAR':
+      case 'CASE':
+        return { path: [
+            'cases',
+            i.caseId as number
+          ] };
+      case 'ALERT':
+      case 'CONCERN':
+        return { path: [
+            'alerts',
+            i.id as number
+          ] };
+      case 'MATCH':
+        return { path: [
+            'screening',
+            'matches',
+            i.id as number
+          ] };
+      case 'REVIEWS':
+      case 'EDD_REVIEWS':
+        return { path: ['risk'] };
+      case 'YEARLY':
+        return { path: [
+            'reports',
+            i.detail as string,
+            i.id as number
+          ] };
+      default:
+        return { path: ['governance'] };
+    }
+  }
+
+  /** The button's verb. */
+  button(i: TodayItem): string {
+    return 'compliance.today.button.' + (i.kind === 'DUTY' || i.kind === 'YEARLY' ? 'OPEN' : i.action);
   }
 }

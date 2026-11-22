@@ -9,12 +9,13 @@
 import { HttpClient, HttpContext, HttpParams } from '@angular/common/http';
 import { SILENT_ERRORS } from 'app/core/http/error-handler.interceptor';
 import { Injectable, inject, signal } from '@angular/core';
-import { Observable, catchError, of, shareReplay, tap } from 'rxjs';
+import { Observable, catchError, finalize, of, shareReplay, tap } from 'rxjs';
 import {
   AmlSettings,
   AmlSettingsView,
   CashClass,
   ComplianceAccess,
+  ComplianceToday,
   GoamlCodeLists,
   GoamlLookup,
   GoamlReport,
@@ -38,6 +39,11 @@ export class ComplianceService {
   private http = inject(HttpClient);
   private access$?: Observable<ComplianceAccess>;
 
+  private today$?: Observable<ComplianceToday | null>;
+
+  /** The last Today answer: the Today page's list and the counts beside the Compliance menu's pages. */
+  readonly todayAnswer = signal<ComplianceToday | null>(null);
+
   /** The last access answer, for templates. */
   readonly access = signal<ComplianceAccess>(NO_ACCESS);
 
@@ -57,9 +63,34 @@ export class ComplianceService {
   }
 
   /** Forget the answer (after signing out or in as someone else). */
+  /**
+   * Everything waiting, asked afresh; a call already on its way is shared, so the sidebar and the page opening together
+   * ask once. A failure leaves the last answer and the menu without counts.
+   */
+  loadToday(limit?: number): Observable<ComplianceToday | null> {
+    if (limit) {
+      // the whole list, for the page's "show all"; the counts are the same
+      return this.http
+        .get<ComplianceToday>('/nepal/aml/today', { params: { limit } })
+        .pipe(tap((t) => this.todayAnswer.set(t)));
+    }
+    if (!this.today$) {
+      this.today$ = this.http
+        .get<ComplianceToday>('/nepal/aml/today', { context: new HttpContext().set(SILENT_ERRORS, true) })
+        .pipe(
+          tap((t) => this.todayAnswer.set(t)),
+          catchError(() => of(null)),
+          finalize(() => (this.today$ = undefined)),
+          shareReplay(1)
+        );
+    }
+    return this.today$;
+  }
+
   reset(): void {
     this.access$ = undefined;
     this.access.set(NO_ACCESS);
+    this.todayAnswer.set(null);
   }
 
   can(...anyOf: string[]): boolean {

@@ -22,8 +22,8 @@ import {
 } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import { NavigationEnd, Router, RouterLinkActive } from '@angular/router';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { filter } from 'rxjs/operators';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { filter, map } from 'rxjs/operators';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
 import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
@@ -34,7 +34,8 @@ import { ConfigurationWizardService } from '../../../configuration-wizard/config
 
 /** Custom Imports */
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
-import { NavModule, modulePermission, navSections } from './nav-items';
+import { NavModule, NavPage, modulePermission, navSections } from './nav-items';
+import { placeOf } from 'app/compliance/compliance-places';
 import { ComplianceService } from 'app/compliance/compliance.service';
 
 /**
@@ -74,6 +75,35 @@ export class SidenavComponent implements AfterViewInit {
 
   readonly sections = navSections;
   readonly modulePermission = modulePermission;
+  /** The compliance place of the current page, for the Compliance group's highlight. */
+  readonly place = toSignal(
+    this.router.events.pipe(
+      filter((event) => event instanceof NavigationEnd),
+      map((event) => placeOf((event as NavigationEnd).urlAfterRedirects))
+    ),
+    { initialValue: placeOf(this.router.url) }
+  );
+
+  /** A module's pages; the Compliance group's only where a compliance permission is held by name. */
+  pagesOf(item: NavModule): NavPage[] {
+    const pages = item.children ?? [];
+    return item.compliance ? pages.filter((page) => this.compliance.can(...[page.permission ?? []].flat())) : pages;
+  }
+
+  /** The count beside a compliance place: what waits there; red when something is late, amber when due soon. */
+  countOf(page: NavPage): { count: number; tone: 'bad' | 'warn' | '' } | null {
+    const today = this.compliance.todayAnswer();
+    if (!page.compliancePlace || !today) {
+      return null;
+    }
+    if (page.compliancePlace === 'TODAY') {
+      const count = today.late.total + today.soon.total;
+      return count ? { count, tone: today.late.total ? 'bad' : 'warn' } : null;
+    }
+    const t = today.places[page.compliancePlace];
+    return t?.waiting ? { count: t.waiting, tone: t.late ? 'bad' : t.soon ? 'warn' : '' } : null;
+  }
+
   /** Labels of the open modules; opening one closes the others. */
   openModules = new Set<string>();
 
@@ -116,17 +146,30 @@ export class SidenavComponent implements AfterViewInit {
    */
   ngAfterViewInit() {
     // asked afresh at each sign-in: the shell, and with it this sidebar, is created after signing in
-    this.compliance.loadAccess(true).pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
+    this.compliance
+      .loadAccess(true)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((access) => access.showMenu && this.refreshCounts());
     this.revealActive();
     this.router.events
       .pipe(
         filter((event) => event instanceof NavigationEnd),
         takeUntilDestroyed(this.destroyRef)
       )
-      .subscribe(() => this.revealActive());
+      .subscribe((event) => {
+        this.revealActive();
+        // the counts follow the officer's work: asked again on each compliance page
+        if (this.compliance.access().showMenu && placeOf((event as NavigationEnd).urlAfterRedirects)) {
+          this.refreshCounts();
+        }
+      });
     if (this.configurationWizardService.showSideNav && this.logo) {
       setTimeout(() => this.popoverService.open(this.templateLogo, this.logo.nativeElement, 'bottom', true, {}), 200);
     }
+  }
+
+  private refreshCounts() {
+    this.compliance.loadToday().pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
   }
 
   /**

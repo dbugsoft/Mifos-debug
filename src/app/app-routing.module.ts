@@ -142,163 +142,208 @@ const routes: Routes = [
       children: [
         {
           path: '',
+          // Today: everything waiting for the officer (fineract-dbug ADR 0060)
           loadComponent: () =>
             import('./compliance/compliance-home/compliance-home.component').then((m) => m.ComplianceHomeComponent)
         },
         {
-          path: 'threshold-reports',
+          // A place of the Compliance menu: its pages as tabs (fineract-dbug ADR 0060). The paths stay as they were.
+          path: '',
           loadComponent: () =>
-            import('./compliance/threshold-reports/threshold-reports.component').then(
-              (m) => m.ThresholdReportsComponent
-            ),
-          data: { title: 'Threshold reports', breadcrumb: 'Threshold reports' }
+            import('./compliance/place/compliance-place.component').then((m) => m.CompliancePlaceComponent),
+          data: { place: 'REPORTS', breadcrumb: '' },
+          children: [
+            {
+              path: 'threshold-reports',
+              loadComponent: () =>
+                import('./compliance/threshold-reports/threshold-reports.component').then(
+                  (m) => m.ThresholdReportsComponent
+                ),
+              data: { title: 'Threshold reports', breadcrumb: 'Threshold reports' }
+            }
+          ]
         },
         {
-          path: 'risk',
+          // A place of the Compliance menu: its pages as tabs (fineract-dbug ADR 0060). The paths stay as they were.
+          path: '',
           loadComponent: () =>
-            import('./compliance/risk/risk-list/risk-list.component').then((m) => m.RiskListComponent),
-          data: { title: 'Member risk', breadcrumb: 'Member risk' }
+            import('./compliance/place/compliance-place.component').then((m) => m.CompliancePlaceComponent),
+          data: { place: 'SUSPICIONS', breadcrumb: '' },
+          children: [
+            {
+              path: 'alerts',
+              loadComponent: () =>
+                import('./compliance/cases/alert-list/alert-list.component').then((m) => m.AlertListComponent),
+              data: { title: 'Alerts', breadcrumb: 'Alerts' }
+            },
+            {
+              path: 'alerts/:id',
+              loadComponent: () =>
+                import('./compliance/cases/alert-detail/alert-detail.component').then((m) => m.AlertDetailComponent),
+              data: { title: 'Alert', breadcrumb: 'Alert', routeParamBreadcrumb: false }
+            },
+            {
+              path: 'cases',
+              loadComponent: () =>
+                import('./compliance/cases/case-list/case-list.component').then((m) => m.CaseListComponent),
+              data: { title: 'Cases', breadcrumb: 'Cases' }
+            },
+            {
+              path: 'cases/:id',
+              loadComponent: () =>
+                import('./compliance/cases/case-detail/case-detail.component').then((m) => m.CaseDetailComponent),
+              data: { title: 'Case', breadcrumb: 'Case', routeParamBreadcrumb: false }
+            }
+          ]
         },
         {
-          path: 'members/:clientId',
+          // A place of the Compliance menu: its pages as tabs (fineract-dbug ADR 0060). The paths stay as they were.
+          path: '',
           loadComponent: () =>
-            import('./compliance/risk/member-risk/member-risk.component').then((m) => m.MemberRiskComponent),
-          data: { title: 'Compliance profile', breadcrumb: 'Compliance profile', routeParamBreadcrumb: false }
+            import('./compliance/place/compliance-place.component').then((m) => m.CompliancePlaceComponent),
+          data: { place: 'MEMBERS', breadcrumb: '' },
+          children: [
+            {
+              path: 'risk',
+              loadComponent: () =>
+                import('./compliance/risk/risk-list/risk-list.component').then((m) => m.RiskListComponent),
+              data: { title: 'Member risk', breadcrumb: 'Member risk' }
+            },
+            {
+              path: 'members/:clientId',
+              loadComponent: () =>
+                import('./compliance/risk/member-risk/member-risk.component').then((m) => m.MemberRiskComponent),
+              data: { title: 'Compliance profile', breadcrumb: 'Compliance profile', routeParamBreadcrumb: false }
+            },
+            {
+              path: 'peps',
+              loadComponent: () =>
+                import('./compliance/pep/pep-register/pep-register.component').then((m) => m.PepRegisterComponent),
+              data: { title: 'Politically exposed persons', breadcrumb: 'Politically exposed persons' }
+            },
+            {
+              path: 'peps/:id',
+              loadComponent: () =>
+                import('./compliance/pep/pep-detail/pep-detail.component').then((m) => m.PepDetailComponent),
+              data: {
+                title: 'Politically exposed person',
+                breadcrumb: 'Politically exposed person',
+                routeParamBreadcrumb: false
+              }
+            },
+            {
+              path: 'screening',
+              loadComponent: () =>
+                import('./compliance/screening/screening-home/screening-home.component').then(
+                  (m) => m.ScreeningHomeComponent
+                ),
+              data: { title: 'Screening', breadcrumb: 'Screening' }
+            },
+            {
+              path: 'screening/matches/:id',
+              loadComponent: () =>
+                import('./compliance/screening/match-review/match-review.component').then(
+                  (m) => m.MatchReviewComponent
+                ),
+              data: { title: 'Possible match', breadcrumb: 'Possible match', routeParamBreadcrumb: false }
+            },
+            {
+              path: 'screening/freezes',
+              loadComponent: () =>
+                import('./compliance/screening/freezes/freezes.component').then((m) => m.FreezesComponent),
+              data: { title: 'Funds held', breadcrumb: 'Funds held' }
+            },
+            {
+              path: 'screening/freezes/:id',
+              loadComponent: () =>
+                import('./compliance/screening/freeze-detail/freeze-detail.component').then(
+                  (m) => m.FreezeDetailComponent
+                ),
+              data: { title: 'Funds held', breadcrumb: 'Funds held', routeParamBreadcrumb: false }
+            },
+            {
+              path: 'risk-tables',
+              loadComponent: () =>
+                import('./compliance/pep/risk-tables/risk-tables.component').then((m) => m.RiskTablesComponent),
+              data: { title: 'Occupation and area grades', breadcrumb: 'Occupation and area grades' }
+            }
+          ]
         },
         {
-          path: 'peps',
+          // A place of the Compliance menu: its pages as tabs (fineract-dbug ADR 0060). The paths stay as they were.
+          path: '',
           loadComponent: () =>
-            import('./compliance/pep/pep-register/pep-register.component').then((m) => m.PepRegisterComponent),
-          data: { title: 'Politically exposed persons', breadcrumb: 'Politically exposed persons' }
-        },
-        {
-          path: 'peps/:id',
-          loadComponent: () =>
-            import('./compliance/pep/pep-detail/pep-detail.component').then((m) => m.PepDetailComponent),
-          data: {
-            title: 'Politically exposed person',
-            breadcrumb: 'Politically exposed person',
-            routeParamBreadcrumb: false
-          }
-        },
-        {
-          path: 'alerts',
-          loadComponent: () =>
-            import('./compliance/cases/alert-list/alert-list.component').then((m) => m.AlertListComponent),
-          data: { title: 'Alerts', breadcrumb: 'Alerts' }
-        },
-        {
-          path: 'alerts/:id',
-          loadComponent: () =>
-            import('./compliance/cases/alert-detail/alert-detail.component').then((m) => m.AlertDetailComponent),
-          data: { title: 'Alert', breadcrumb: 'Alert', routeParamBreadcrumb: false }
-        },
-        {
-          path: 'cases',
-          loadComponent: () =>
-            import('./compliance/cases/case-list/case-list.component').then((m) => m.CaseListComponent),
-          data: { title: 'Cases', breadcrumb: 'Cases' }
-        },
-        {
-          path: 'cases/:id',
-          loadComponent: () =>
-            import('./compliance/cases/case-detail/case-detail.component').then((m) => m.CaseDetailComponent),
-          data: { title: 'Case', breadcrumb: 'Case', routeParamBreadcrumb: false }
-        },
-        {
-          path: 'screening',
-          loadComponent: () =>
-            import('./compliance/screening/screening-home/screening-home.component').then(
-              (m) => m.ScreeningHomeComponent
-            ),
-          data: { title: 'Screening', breadcrumb: 'Screening' }
-        },
-        {
-          path: 'screening/matches/:id',
-          loadComponent: () =>
-            import('./compliance/screening/match-review/match-review.component').then((m) => m.MatchReviewComponent),
-          data: { title: 'Possible match', breadcrumb: 'Possible match', routeParamBreadcrumb: false }
-        },
-        {
-          path: 'screening/freezes',
-          loadComponent: () =>
-            import('./compliance/screening/freezes/freezes.component').then((m) => m.FreezesComponent),
-          data: { title: 'Funds held', breadcrumb: 'Funds held' }
-        },
-        {
-          path: 'screening/freezes/:id',
-          loadComponent: () =>
-            import('./compliance/screening/freeze-detail/freeze-detail.component').then((m) => m.FreezeDetailComponent),
-          data: { title: 'Funds held', breadcrumb: 'Funds held', routeParamBreadcrumb: false }
-        },
-        {
-          path: 'reports',
-          loadComponent: () =>
-            import('./compliance/governance/reports-home/reports-home.component').then((m) => m.ReportsHomeComponent),
-          data: { title: 'Yearly reports', breadcrumb: 'Yearly reports' }
-        },
-        {
-          path: 'reports/:type/:fiscalYear',
-          loadComponent: () =>
-            import('./compliance/governance/report-view/report-view.component').then((m) => m.ReportViewComponent),
-          data: { title: 'Yearly report', breadcrumb: 'Yearly report', routeParamBreadcrumb: false }
-        },
-        {
-          path: 'governance',
-          loadComponent: () =>
-            import('./compliance/governance/governance-page/governance-page.component').then(
-              (m) => m.GovernancePageComponent
-            ),
-          data: { title: 'Governance', breadcrumb: 'Governance' }
-        },
-        {
-          // Elections (fineract-dbug #144): the board's and the accounts supervision committee's elections, next
-          // to the Compliance > Governance (AML) page above, per the backend's own placement for this feature.
-          path: 'governance/elections',
-          loadComponent: () =>
-            import('./compliance/governance/elections/elections-list/elections-list.component').then(
-              (m) => m.ElectionsListComponent
-            ),
-          data: { title: 'Elections', breadcrumb: 'Elections' }
-        },
-        {
-          path: 'governance/elections/:id',
-          loadComponent: () =>
-            import('./compliance/governance/elections/election-detail/election-detail.component').then(
-              (m) => m.ElectionDetailComponent
-            ),
-          data: {
-            title: 'Election',
-            breadcrumb: 'Election',
-            routeParamBreadcrumb: false,
-            parentBreadcrumb: { label: 'Elections', url: '/compliance/governance/elections' }
-          }
-        },
-        {
-          path: 'governance/blacklist',
-          loadComponent: () =>
-            import('./compliance/governance/standing/blacklist/blacklist.component').then((m) => m.BlacklistComponent),
-          data: {
-            title: 'Blacklist',
-            breadcrumb: 'Blacklist',
-            parentBreadcrumb: { label: 'Elections', url: '/compliance/governance/elections' }
-          }
-        },
-        {
-          path: 'governance/staff',
-          loadComponent: () =>
-            import('./compliance/governance/standing/staff/staff.component').then((m) => m.StaffComponent),
-          data: {
-            title: 'Staff and members',
-            breadcrumb: 'Staff and members',
-            parentBreadcrumb: { label: 'Elections', url: '/compliance/governance/elections' }
-          }
-        },
-        {
-          path: 'risk-tables',
-          loadComponent: () =>
-            import('./compliance/pep/risk-tables/risk-tables.component').then((m) => m.RiskTablesComponent),
-          data: { title: 'Occupation and area grades', breadcrumb: 'Occupation and area grades' }
+            import('./compliance/place/compliance-place.component').then((m) => m.CompliancePlaceComponent),
+          data: { place: 'DUTIES', breadcrumb: '' },
+          children: [
+            {
+              path: 'reports',
+              loadComponent: () =>
+                import('./compliance/governance/reports-home/reports-home.component').then(
+                  (m) => m.ReportsHomeComponent
+                ),
+              data: { title: 'Yearly reports', breadcrumb: 'Yearly reports' }
+            },
+            {
+              path: 'reports/:type/:fiscalYear',
+              loadComponent: () =>
+                import('./compliance/governance/report-view/report-view.component').then((m) => m.ReportViewComponent),
+              data: { title: 'Yearly report', breadcrumb: 'Yearly report', routeParamBreadcrumb: false }
+            },
+            {
+              path: 'governance',
+              loadComponent: () =>
+                import('./compliance/governance/governance-page/governance-page.component').then(
+                  (m) => m.GovernancePageComponent
+                ),
+              data: { title: 'Governance', breadcrumb: 'Governance' }
+            },
+            {
+              // Elections (fineract-dbug #144): the board's and the accounts supervision committee's elections, next
+              // to the Compliance > Governance (AML) page above, per the backend's own placement for this feature.
+              path: 'governance/elections',
+              loadComponent: () =>
+                import('./compliance/governance/elections/elections-list/elections-list.component').then(
+                  (m) => m.ElectionsListComponent
+                ),
+              data: { title: 'Elections', breadcrumb: 'Elections' }
+            },
+            {
+              path: 'governance/elections/:id',
+              loadComponent: () =>
+                import('./compliance/governance/elections/election-detail/election-detail.component').then(
+                  (m) => m.ElectionDetailComponent
+                ),
+              data: {
+                title: 'Election',
+                breadcrumb: 'Election',
+                routeParamBreadcrumb: false,
+                parentBreadcrumb: { label: 'Elections', url: '/compliance/governance/elections' }
+              }
+            },
+            {
+              path: 'governance/blacklist',
+              loadComponent: () =>
+                import('./compliance/governance/standing/blacklist/blacklist.component').then(
+                  (m) => m.BlacklistComponent
+                ),
+              data: {
+                title: 'Blacklist',
+                breadcrumb: 'Blacklist',
+                parentBreadcrumb: { label: 'Elections', url: '/compliance/governance/elections' }
+              }
+            },
+            {
+              path: 'governance/staff',
+              loadComponent: () =>
+                import('./compliance/governance/standing/staff/staff.component').then((m) => m.StaffComponent),
+              data: {
+                title: 'Staff and members',
+                breadcrumb: 'Staff and members',
+                parentBreadcrumb: { label: 'Elections', url: '/compliance/governance/elections' }
+              }
+            }
+          ]
         }
       ]
     },

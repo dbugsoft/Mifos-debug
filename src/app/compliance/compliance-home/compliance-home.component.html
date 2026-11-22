@@ -19,235 +19,148 @@
       </div>
     }
 
-    @for (d of reportsDue(); track d.type) {
-      @if (d.daysLeft <= 30) {
-        <div class="notice" role="status">
-          <span>{{
-            'compliance.reports.homeDue'
-              | translate
-                : { report: ('compliance.reports.type.' + d.type | translate), year: d.label, days: d.daysLeft }
-          }}</span>
-          <a [routerLink]="['reports']">{{ 'compliance.reports.Reports' | translate }}</a>
-        </div>
-      }
-    }
-    @for (p of prompts(); track p.code) {
-      <div class="notice" role="status">
-        <span>{{
-          'compliance.governance.prompt.' + p.code | translate: { date: p.dueOn ? (p.dueOn | adToBs) || p.dueOn : '' }
-        }}</span>
-        <a [routerLink]="['governance']">{{ 'compliance.governance.Governance' | translate }}</a>
-      </div>
-    }
+    @if (today(); as t) {
+      <h2 class="today-title">{{ 'compliance.today.title' | translate: { date: t.today | adToBs } }}</h2>
 
-    @if (summary(); as s) {
       <div class="tiles">
-        <a class="tile" [class.warn]="s.dueSoon > 0" [class.bad]="s.overdue > 0" [routerLink]="['threshold-reports']">
-          <span class="label">{{ 'compliance.Threshold reports to send' | translate }}</span>
-          <span class="value">{{ s.toReport }}</span>
+        <button
+          type="button"
+          class="tile"
+          [class.bad]="t.late.total > 0"
+          [class.pressed]="filter() === 'LATE'"
+          [attr.aria-pressed]="filter() === 'LATE'"
+          [disabled]="!t.names"
+          (click)="toggleFilter('LATE')"
+        >
+          <span class="label">{{ 'compliance.Late' | translate }}</span>
+          <span class="value">{{ t.late.total }}</span>
           <span class="sub">
-            @if (s.nextDue) {
-              {{ 'compliance.Next due' | translate }} {{ s.nextDue | adToBs }}
-            } @else {
-              {{ 'compliance.Nothing waiting' | translate }}
+            @for (b of breakdown(t.late); track b.kind; let last = $last) {
+              {{ b.count }} {{ 'compliance.today.kind.' + b.kind | translate }}{{ last ? '' : ', ' }}
+            } @empty {
+              {{ 'compliance.today.Nothing late' | translate }}
             }
           </span>
-        </a>
-        <a class="tile" [class.bad]="s.overdue > 0" [routerLink]="['threshold-reports']">
-          <span class="label">{{ 'compliance.Late' | translate }}</span>
-          <span class="value">{{ s.overdue }}</span>
-          <span class="sub">{{ 'compliance.Past the 15 day deadline' | translate }}</span>
-        </a>
-        <a class="tile" [class.warn]="s.dueSoon > 0" [routerLink]="['threshold-reports']">
+        </button>
+        <button
+          type="button"
+          class="tile"
+          [class.warn]="t.soon.total > 0"
+          [class.pressed]="filter() === 'SOON'"
+          [attr.aria-pressed]="filter() === 'SOON'"
+          [disabled]="!t.names"
+          (click)="toggleFilter('SOON')"
+        >
           <span class="label">{{ 'compliance.Due within 3 days' | translate }}</span>
-          <span class="value">{{ s.dueSoon }}</span>
-        </a>
-        @if (s.historical > 0) {
-          <a class="tile warn" [routerLink]="['threshold-reports']" [queryParams]="{ status: 'HISTORICAL' }">
-            <span class="label">{{ 'compliance.Found after their deadline' | translate }}</span>
-            <span class="value">{{ s.historical }}</span>
-            <span class="sub">{{ 'compliance.Decide whether to report late' | translate }}</span>
-          </a>
-        }
-        @if (s.needsCorrection > 0) {
-          <a class="tile bad" [routerLink]="['threshold-reports']">
-            <span class="label">{{ 'compliance.Need a correction' | translate }}</span>
-            <span class="value">{{ s.needsCorrection }}</span>
-          </a>
-        }
-      </div>
-    }
-
-    @if (alertSummary() || caseSummary() || screeningSummary()) {
-      <div class="tiles">
-        @if (screeningSummary(); as sc) {
-          <a
+          <span class="value">{{ t.soon.total }}</span>
+          <span class="sub">
+            @for (b of breakdown(t.soon); track b.kind; let last = $last) {
+              {{ b.count }} {{ 'compliance.today.kind.' + b.kind | translate }}{{ last ? '' : ', ' }}
+            } @empty {
+              {{ 'compliance.today.Nothing due soon' | translate }}
+            }
+          </span>
+        </button>
+        @if (t.alerts; as a) {
+          <button
+            type="button"
             class="tile"
-            [class.warn]="sc.open > 0"
-            [class.bad]="sc.likely > 0"
-            [routerLink]="can('READ_AMLCOMPLIANCE') ? ['screening'] : null"
+            [class.warn]="a.open > 0"
+            [class.pressed]="filter() === 'ALERTS'"
+            [attr.aria-pressed]="filter() === 'ALERTS'"
+            [disabled]="!t.names"
+            (click)="toggleFilter('ALERTS')"
           >
-            <span class="label">{{ 'compliance.screening.Possible matches' | translate }}</span>
-            <span class="value">{{ sc.open }}</span>
-            <span class="sub">{{
-              (sc.lists.length ? 'compliance.screening.tileSub' : 'compliance.screening.noListsShort')
-                | translate: { likely: sc.likely, held: sc.confirmed }
-            }}</span>
-          </a>
-        }
-        @if (alertSummary(); as a) {
-          <a class="tile" [class.warn]="a.open > 0" [routerLink]="can('READ_AMLCOMPLIANCE') ? ['alerts'] : null">
-            <span class="label">{{ 'compliance.alert.Open alerts' | translate }}</span>
+            <span class="label">{{ 'compliance.today.New alerts to look at' | translate }}</span>
             <span class="value">{{ a.open }}</span>
-            <span class="sub">{{
-              'compliance.alert.openSub' | translate: { high: a.openHighRisk, concerns: a.concerns }
-            }}</span>
-          </a>
+            <span class="sub">{{ 'compliance.today.highRisk' | translate: { count: a.highRisk } }}</span>
+          </button>
         }
-        @if (caseSummary(); as k) {
-          <a
-            class="tile"
-            [class.warn]="k.toFile > 0"
-            [class.bad]="k.late > 0"
-            [routerLink]="can('READ_AMLCOMPLIANCE') ? ['cases'] : null"
-            [queryParams]="{ view: k.toFile > 0 ? 'decided_report' : 'open' }"
-          >
-            <span class="label">{{ 'compliance.case.Reports to file' | translate }}</span>
-            <span class="value">{{ k.toFile }}</span>
-            <span class="sub">{{ 'compliance.case.tileSub' | translate: { open: k.open, late: k.late } }}</span>
-          </a>
-        }
-      </div>
-    }
-
-    @if (riskSummary(); as r) {
-      <div class="tiles">
-        <a
-          class="tile"
-          [class.warn]="r.byGrade.HIGH > 0"
-          [routerLink]="can('READ_AMLCOMPLIANCE') ? ['risk'] : null"
-          [queryParams]="{ view: 'high' }"
-        >
-          <span class="label">{{ 'compliance.risk.High-risk members' | translate }}</span>
-          <span class="value">{{ r.byGrade.HIGH }}</span>
-          <span class="sub">{{
-            'compliance.risk.mediumNormal' | translate: { medium: r.byGrade.MEDIUM, normal: r.byGrade.NORMAL }
-          }}</span>
-        </a>
-        <a
-          class="tile"
-          [class.bad]="r.reviewsOverdue > 0"
-          [routerLink]="can('READ_AMLCOMPLIANCE') ? ['risk'] : null"
-          [queryParams]="{ view: 'review_due' }"
-        >
-          <span class="label">{{ 'compliance.risk.Reviews overdue' | translate }}</span>
-          <span class="value">{{ r.reviewsOverdue }}</span>
-        </a>
-        @if (eddSummary(); as e) {
-          <a
-            class="tile"
-            [class.warn]="e.reviewsDue > 0"
-            [routerLink]="can('READ_AMLCOMPLIANCE') ? ['risk'] : null"
-            [queryParams]="{ view: 'edd' }"
-          >
-            <span class="label">{{ 'compliance.edd.Under enhanced checks' | translate }}</span>
-            <span class="value">{{ e.open }}</span>
-            <span class="sub">{{ 'compliance.edd.reviewsDue' | translate: { count: e.reviewsDue } }}</span>
-          </a>
-        }
-      </div>
-    }
-
-    @if (can('READ_AMLCOMPLIANCE')) {
-      <nav class="links">
-        <a mat-stroked-button color="primary" [routerLink]="['alerts']">{{ 'compliance.alert.Alerts' | translate }}</a>
-        <a mat-stroked-button color="primary" [routerLink]="['cases']">{{ 'compliance.case.Cases' | translate }}</a>
-        <a mat-stroked-button color="primary" [routerLink]="['screening']">{{
-          'compliance.screening.Screening' | translate
-        }}</a>
-        <a mat-stroked-button color="primary" [routerLink]="['reports']">{{
-          'compliance.reports.Reports' | translate
-        }}</a>
-        <a mat-stroked-button color="primary" [routerLink]="['governance']">{{
-          'compliance.governance.Governance' | translate
-        }}</a>
-        <a mat-stroked-button color="primary" [routerLink]="['risk']">{{ 'compliance.risk.view.HIGH' | translate }}</a>
-        <a mat-stroked-button color="primary" [routerLink]="['peps']">{{
-          'compliance.pep.Politically exposed persons' | translate
-        }}</a>
-        <a mat-stroked-button color="primary" [routerLink]="['peps']" [queryParams]="{ view: 'suggestions' }">{{
-          'compliance.pep.To check' | translate
-        }}</a>
-        <a mat-stroked-button color="primary" [routerLink]="['risk-tables']">{{
-          'compliance.pep.Occupation and area grades' | translate
-        }}</a>
-      </nav>
-    } @else if (can('READ_AMLSUMMARY', 'READ_AMLDECISIONS', 'MANAGE_AMLGOVERNANCE')) {
-      <nav class="links">
-        <a mat-stroked-button color="primary" [routerLink]="['reports']">{{
-          'compliance.reports.Reports' | translate
-        }}</a>
-        <a mat-stroked-button color="primary" [routerLink]="['governance']">{{
-          'compliance.governance.Governance' | translate
-        }}</a>
-      </nav>
-    }
-
-    <!-- Elections (fineract-dbug #144): READ_GOVERNANCE is not an AML permission, so it isn't in
-         ComplianceService's /nepal/aml/access answer - can() would always say no here. The standard permission
-         directive is what every other READ_GOVERNANCE/UPDATE_GOVERNANCE check in the app actually uses. -->
-    <nav class="links" *mifosxHasPermission="'READ_GOVERNANCE'">
-      <a mat-stroked-button color="primary" [routerLink]="['governance/elections']">{{
-        'elections.Elections' | translate
-      }}</a>
-    </nav>
-
-    @if (can('READ_AMLCOMPLIANCE')) {
-      <section class="frame">
-        <h2 class="legend">{{ 'compliance.Deadlines' | translate }}</h2>
-        @if (deadlines().length) {
-          <div class="table-scroll">
-            <table mat-table [dataSource]="deadlines()" class="blue">
-              <ng-container matColumnDef="dueOn">
-                <th mat-header-cell *matHeaderCellDef>{{ 'compliance.Send by' | translate }}</th>
-                <td mat-cell *matCellDef="let i">
-                  {{ isoDate(i.dueOn) | adToBs }}
-                  <span class="sub">{{ isoDate(i.dueOn) }} AD</span>
-                </td>
-              </ng-container>
-              <ng-container matColumnDef="what">
-                <th mat-header-cell *matHeaderCellDef>{{ 'compliance.What' | translate }}</th>
-                <td mat-cell *matCellDef="let i">
-                  {{
-                    (i.direction === 'IN'
-                      ? 'compliance.Threshold report, cash in'
-                      : 'compliance.Threshold report, cash out'
-                    ) | translate
-                  }}
-                  <span class="sub">{{ isoDate(i.transactionDate) | adToBs }}</span>
-                </td>
-              </ng-container>
-              <ng-container matColumnDef="member">
-                <th mat-header-cell *matHeaderCellDef>{{ 'compliance.Member' | translate }}</th>
-                <td mat-cell *matCellDef="let i">
-                  {{ i.name }}
-                  <span class="sub">{{ i.accountNo }} · {{ i.office }}</span>
-                </td>
-              </ng-container>
-              <ng-container matColumnDef="amount">
-                <th mat-header-cell *matHeaderCellDef class="num">{{ 'compliance.Amount' | translate }}</th>
-                <td mat-cell *matCellDef="let i" class="num">{{ i.totalAmount | formatNumber }}</td>
-              </ng-container>
-              <ng-container matColumnDef="status">
-                <th mat-header-cell *matHeaderCellDef>{{ 'compliance.Deadline' | translate }}</th>
-                <td mat-cell *matCellDef="let i"><mifosx-due-chip [daysLeft]="i.daysLeft"></mifosx-due-chip></td>
-              </ng-container>
-              <tr mat-header-row *matHeaderRowDef="deadlineColumns"></tr>
-              <tr mat-row *matRowDef="let row; columns: deadlineColumns" [routerLink]="['threshold-reports']"></tr>
-            </table>
+        @if (t.sentThisMonth; as s) {
+          <div class="tile">
+            <span class="label">{{ 'compliance.today.Sent this month' | translate }}</span>
+            <span class="value">{{ s.total }}</span>
+            <span class="sub">
+              @for (b of breakdown(s); track b.kind; let last = $last) {
+                {{ b.count }} {{ 'compliance.today.kind.' + b.kind | translate }}{{ last ? '' : ', ' }}
+              } @empty {
+                {{ 'compliance.today.None yet' | translate }}
+              }
+            </span>
           </div>
+        }
+      </div>
+
+      <section class="frame">
+        <h2 class="legend">
+          {{ (t.names ? 'compliance.today.What waits' : 'compliance.today.Our own duties') | translate }}
+          @if (filter() !== 'ALL') {
+            <button type="button" class="clear" (click)="toggleFilter(filter())">
+              {{ 'compliance.today.Show everything' | translate }}
+            </button>
+          }
+        </h2>
+        @if (shown().length) {
+          <ol class="today-list">
+            @for (i of shown(); track $index) {
+              @let w = whatToDo(i);
+              @let sub = subLine(i);
+              @let to = link(i);
+              <li class="line" [class.late]="i.daysLeft !== null && i.daysLeft < 0">
+                <span class="kind" [class]="'kind k-' + i.kind">{{
+                  'compliance.today.kind.' + i.kind | translate
+                }}</span>
+                <span class="what">
+                  {{
+                    w.key
+                      | translate
+                        : {
+                            count: w.params.count,
+                            reference: w.params.reference,
+                            year: w.params.year,
+                            date: i.dueOn ? (i.dueOn | adToBs) : ''
+                          }
+                  }}
+                  @if (sub) {
+                    <span class="sub">{{ sub | translate }}</span>
+                  }
+                </span>
+                <span class="member">
+                  @if (i.name) {
+                    {{ i.name }}
+                    @if (i.accountNo || i.office) {
+                      <span class="sub">{{ i.accountNo }}{{ i.accountNo && i.office ? ' · ' : '' }}{{ i.office }}</span>
+                    }
+                  }
+                </span>
+                <span class="amount">
+                  @if (i.amount !== null) {
+                    {{ i.amount | formatNumber }}
+                  }
+                </span>
+                <span class="due">
+                  @if (i.dueOn) {
+                    <mifosx-due-chip [daysLeft]="i.daysLeft"></mifosx-due-chip>
+                    <span class="sub">{{ i.dueOn | adToBs }}</span>
+                  } @else {
+                    <span class="sub">{{ 'compliance.today.No deadline' | translate }}</span>
+                  }
+                </span>
+                <a mat-stroked-button color="primary" class="go" [routerLink]="to.path" [queryParams]="to.query">
+                  {{ button(i) | translate }}
+                </a>
+              </li>
+            }
+          </ol>
+          @if (hidden() > 0) {
+            <button type="button" mat-button color="primary" [disabled]="loadingAll()" (click)="showAll()">
+              {{ 'compliance.today.Show all' | translate: { count: hidden() } }}
+            </button>
+          }
         } @else {
-          <p class="empty">{{ 'compliance.No threshold reports waiting' | translate }}</p>
+          <p class="empty">
+            {{ (filter() === 'ALL' ? 'compliance.today.Nothing waits' : 'compliance.today.Nothing here') | translate }}
+          </p>
         }
       </section>
     }

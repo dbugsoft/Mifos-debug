@@ -195,7 +195,9 @@
   font-size: 0.85rem;
   line-height: 1.3;
 
-  &.active {
+  &.active,
+  // a compliance place stays lit on every page inside it (routerLinkActive owns .active)
+  &.place-active {
     background: var(--nav-active);
     color: #fff;
     font-weight: 600;
@@ -247,4 +249,43 @@
     font-weight: 600;
     color: var(--md-sys-color-primary, var(--dk-primary, #2460b9));
   }
+}
+
+// What waits in a compliance place (fineract-dbug ADR 0060)
+.page:has(.count) {
+  position: relative;
+  padding-right: 44px;
+}
+
+.count {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  min-width: 20px;
+  padding: 0 6px;
+  transform: translateY(-50%);
+  border-radius: 10px;
+  background: rgb(127 127 127 / 22%);
+  color: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 18px;
+  text-align: center;
+  box-sizing: border-box;
+
+  &.bad {
+    background: var(--dk-danger, #b3261e);
+    color: #fff;
+  }
+
+  &.warn {
+    background: var(--dk-warning-soft, #fff0d1);
+    color: var(--dk-warning, #7a4a00);
+  }
+}
+
+.sidenav-flyout .count {
+  position: static;
+  margin-left: 8px;
+  transform: none;
 }

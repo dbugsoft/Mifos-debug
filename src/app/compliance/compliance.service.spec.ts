@@ -10,7 +10,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComplianceService } from './compliance.service';
-import { isoDate } from './compliance.models';
+import { ComplianceToday, isoDate } from './compliance.models';
 
 describe('ComplianceService', () => {
   let service: ComplianceService;
@@ -79,6 +79,30 @@ describe('ComplianceService', () => {
         2
       ] });
     req.flush([]);
+  });
+
+  it('asks once for Today when the menu and the page ask together, and shares the answer', () => {
+    service.loadToday().subscribe();
+    service.loadToday().subscribe();
+    const answer: ComplianceToday = {
+      today: '2026-11-22',
+      names: true,
+      places: {},
+      late: { total: 0 },
+      soon: { total: 0 },
+      items: [],
+      more: 0
+    };
+    http.expectOne('/nepal/aml/today').flush(answer);
+    expect(service.todayAnswer()).toEqual(answer);
+    service.loadToday(5000).subscribe();
+    http.expectOne('/nepal/aml/today?limit=5000').flush({ ...answer, more: 0 });
+  });
+
+  it('keeps the last Today answer when the call fails', () => {
+    service.loadToday().subscribe();
+    http.expectOne('/nepal/aml/today').flush('no', { status: 500, statusText: 'Server Error' });
+    expect(service.todayAnswer()).toBeNull();
   });
 });
 

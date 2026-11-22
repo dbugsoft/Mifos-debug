@@ -194,3 +194,78 @@ export function isoDate(value: string | number[] | null | undefined): string {
   }
   return value.length > 10 ? value.slice(0, 10) : value;
 }
+
+/** The places of the Compliance menu that count what waits in them (fineract-dbug ADR 0060). */
+export type CompliancePlace = 'REPORTS' | 'SUSPICIONS' | 'MEMBERS' | 'DUTIES';
+
+/** How many wait in a place, how many are late, how many due within 3 days. */
+export interface PlaceTally {
+  waiting: number;
+  late: number;
+  soon: number;
+}
+
+export type TodayKind =
+  | 'MATCH'
+  | 'STR'
+  | 'SAR'
+  | 'TTR'
+  | 'CONCERN'
+  | 'ALERT'
+  | 'CASE'
+  | 'REVIEWS'
+  | 'EDD_REVIEWS'
+  | 'YEARLY'
+  | 'DUTY';
+
+export type TodayAction =
+  | 'MAKE'
+  | 'FIX'
+  | 'REBUILD'
+  | 'SEND'
+  | 'FILE_BY_HAND'
+  | 'CORRECT'
+  | 'DECIDE_LATE'
+  | 'LOOK_INTO'
+  | 'DECIDE'
+  | 'DECIDE_MATCH'
+  | 'REVIEW'
+  | 'DO';
+
+/** One line of the Today list. */
+export interface TodayItem {
+  kind: TodayKind;
+  action: TodayAction;
+  /** The report, threshold item, alert or match; for a yearly report, its fiscal year. */
+  id: number | null;
+  caseId: number | null;
+  reference: string | null;
+  clientId: number | null;
+  name: string | null;
+  accountNo: string | null;
+  office: string | null;
+  amount: number | null;
+  /** A code: the alert rule, the duty, the yearly report's type, the list, a direction, or a count of problems. */
+  detail: string | null;
+  /** For a line standing for several members. */
+  count: number | null;
+  dueOn: string | null;
+  daysLeft: number | null;
+}
+
+/** Counts by kind, with their total. */
+export type KindCounts = { total: number } & Partial<Record<TodayKind | string, number>>;
+
+/** GET /nepal/aml/today */
+export interface ComplianceToday {
+  today: string;
+  /** False for those who see counts only: the list then holds only the officer's duties. */
+  names: boolean;
+  places: Partial<Record<CompliancePlace, PlaceTally>>;
+  late: KindCounts;
+  soon: KindCounts;
+  alerts?: { open: number; highRisk: number };
+  sentThisMonth?: KindCounts;
+  items: TodayItem[];
+  more: number;
+}
