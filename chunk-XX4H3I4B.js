@@ -1,1 +1,0 @@
-import{b as s}from"./chunk-JHHJ4WOJ.js";import{Na as i,_ as e}from"./chunk-LAP2BKJW.js";var m=(()=>{class t{constructor(){this.bsCalendar=e(s)}transform(r){return this.bsCalendar.formatLong(this.bsCalendar.toBs(r))}static{this.\u0275fac=function(a){return new(a||t)}}static{this.\u0275pipe=i({name:"adToBs",type:t,pure:!0})}}return t})();export{m as a};
