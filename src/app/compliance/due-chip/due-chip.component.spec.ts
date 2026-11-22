@@ -37,6 +37,11 @@ describe('DueChipComponent', () => {
     expect(chip(0).label()).toBe('compliance.Due today');
   });
 
+  it('says one day as one day', () => {
+    expect(chip(1).label()).toBe('compliance.Due tomorrow');
+    expect(chip(-1).label()).toBe('compliance.One day late');
+  });
+
   it('is quiet further out', () => {
     const c = chip(10);
     expect(c.tone()).toBe('chip grey');
