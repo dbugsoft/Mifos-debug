@@ -8,11 +8,18 @@
 
 import type { MenuCard } from 'app/home/card-menu/card-menu.component';
 import { remittanceConfig } from 'app/remittances/remittance.config';
+import { COMPLIANCE_PLACES, TODAY_COMPLIANCE } from 'app/compliance/compliance-places';
+import type { CompliancePlace } from 'app/compliance/compliance.models';
 
 /** A page in the sidebar: a link, shown only with the permission. */
 export type NavPage = Pick<MenuCard, 'label' | 'path' | 'permission'> & {
   /** Highlight only on this exact path, for a page whose path starts its siblings' paths. */
   exact?: boolean;
+  /**
+   * A place of the Compliance group: highlighted on any of its pages, with the count of what waits there. Shown only
+   * when one of its `permission`s is held by name (the compliance access answer, fineract-dbug ADR 0036).
+   */
+  compliancePlace?: CompliancePlace | 'TODAY';
 };
 
 /** A sidebar module: a single link, or a group of pages that opens in place. */
@@ -52,6 +59,23 @@ export const memberManagementCards: MenuCard[] = [
     ],
     permission: 'READ_MEMBERSHIP'
   }
+];
+
+/** The Compliance group: one page per job of the compliance officer (fineract-dbug ADR 0060). */
+export const compliancePages: NavPage[] = [
+  {
+    label: 'compliance.nav.Today',
+    path: ['/compliance'],
+    exact: true,
+    permission: TODAY_COMPLIANCE,
+    compliancePlace: 'TODAY'
+  },
+  ...(Object.keys(COMPLIANCE_PLACES) as CompliancePlace[]).map((place) => ({
+    label: COMPLIANCE_PLACES[place].label,
+    path: COMPLIANCE_PLACES[place].tabs[0].path,
+    permission: COMPLIANCE_PLACES[place].compliance,
+    compliancePlace: place
+  }))
 ];
 
 /** Pages of the Reports landing page and sidebar group. */
@@ -210,7 +234,7 @@ export const navSections: NavSection[] = [
     items: [
       { label: 'labels.menus.Accounting', icon: 'account_balance', children: accountingPages },
       { label: 'labels.menus.Reports', icon: 'bar_chart', children: reportsCards },
-      { label: 'compliance.Compliance', icon: 'shield_person', path: ['/compliance'], compliance: true },
+      { label: 'compliance.Compliance', icon: 'shield_person', children: compliancePages, compliance: true },
       {
         label: 'governanceRegister.GovernanceRegister',
         icon: 'gavel',

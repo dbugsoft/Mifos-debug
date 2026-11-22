@@ -7057,6 +7057,87 @@
         "NO_TRAINING": "No AML training this fiscal year yet.",
         "STAFF_ACTIONS_OPEN": "A recommendation about staff is waiting for what was done."
       }
+    },
+    "nav": {
+      "Today": "Today",
+      "Reports to FIU-Nepal": "Reports to FIU-Nepal",
+      "Threshold (TTR)": "Threshold (TTR)",
+      "Suspicions": "Suspicions",
+      "Alerts": "Alerts",
+      "Cases": "Cases",
+      "Know our members": "Know our members",
+      "Risk grades": "Risk grades",
+      "Sanctions screening": "Sanctions screening",
+      "Politically exposed persons": "Politically exposed persons",
+      "Occupation and area grades": "Occupation and area grades",
+      "Our own duties": "Our own duties",
+      "Officer and board": "Officer and board",
+      "Yearly reports": "Yearly reports",
+      "Elections": "Elections"
+    },
+    "today": {
+      "title": "Today, {{date}}",
+      "kind": {
+        "TTR": "TTR",
+        "STR": "STR",
+        "SAR": "SAR",
+        "MATCH": "Match",
+        "CONCERN": "Concern",
+        "ALERT": "Alert",
+        "CASE": "Case",
+        "REVIEWS": "Reviews",
+        "EDD_REVIEWS": "Enhanced checks",
+        "YEARLY": "Yearly report",
+        "DUTY": "Duty"
+      },
+      "do": {
+        "MAKE": "Make the report",
+        "FIX": "Fix what is missing ({{count}}), then send",
+        "REBUILD": "Out of date: make it again",
+        "SEND": "Ready: download it and upload it in goAML",
+        "FILE_BY_HAND": "File it by hand in the goAML portal",
+        "CORRECT": "Rejected: correct it and send it again",
+        "DECIDE_LATE": "{{count}} found after their deadline: decide whether to report them late",
+        "ALERT": "Look into the alert",
+        "CONCERN": "Look into a staff member's concern",
+        "CASE": "Decide case {{reference}}",
+        "MATCH": "Decide whether the member is the listed person",
+        "REVIEWS": "{{count}} members' risk reviews are overdue",
+        "EDD_REVIEWS": "{{count}} enhanced checks are due for review",
+        "YEARLY_MAKE": "Make the yearly report for {{year}}",
+        "YEARLY_DO": "Finish and approve the yearly report for {{year}}"
+      },
+      "direction": {
+        "IN": "Cash in",
+        "OUT": "Cash out"
+      },
+      "button": {
+        "MAKE": "Make",
+        "FIX": "Fix",
+        "REBUILD": "Rebuild",
+        "SEND": "Send",
+        "FILE_BY_HAND": "File",
+        "CORRECT": "Correct",
+        "DECIDE_LATE": "Decide",
+        "LOOK_INTO": "Look into",
+        "DECIDE": "Decide",
+        "DECIDE_MATCH": "Decide",
+        "REVIEW": "Review",
+        "OPEN": "Open"
+      },
+      "Nothing late": "Nothing late",
+      "Nothing due soon": "Nothing due soon",
+      "New alerts to look at": "New alerts to look at",
+      "highRisk": "{{count}} about high-risk members",
+      "Sent this month": "Sent this month",
+      "None yet": "None yet",
+      "What waits": "What waits for you, soonest first",
+      "Our own duties": "Our own duties",
+      "Show everything": "Show everything",
+      "No deadline": "No deadline",
+      "Show all": "Show {{count}} more",
+      "Nothing waits": "Nothing waits for you: every report is sent and every alert looked into.",
+      "Nothing here": "Nothing here."
     }
   },
   "kym": {
