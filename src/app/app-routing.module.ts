@@ -326,6 +326,13 @@ const routes: Routes = [
               data: { title: 'Governance', breadcrumb: 'Governance' }
             },
             {
+              // What the Department's inspector asks for, for any period (fineract-dbug ADR-0065).
+              path: 'inspection-pack',
+              loadComponent: () =>
+                import('./compliance/inspection-pack/inspection-pack.component').then((m) => m.InspectionPackComponent),
+              data: { title: 'Inspection pack', breadcrumb: 'Inspection pack' }
+            },
+            {
               // The page a new compliance officer starts from (fineract-dbug ADR-0064).
               path: 'governance/handover',
               loadComponent: () => import('./compliance/officer/handover.component').then((m) => m.HandoverComponent),

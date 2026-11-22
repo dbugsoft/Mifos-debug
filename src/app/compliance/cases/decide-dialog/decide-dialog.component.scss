@@ -1,0 +1,52 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+.decide {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+legend {
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.choices {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.names {
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--dk-primary-soft, #e0edf8);
+  color: var(--dk-text, #1f2937);
+}
+
+.warn {
+  margin: 0;
+  color: var(--dk-warning, #7a4a00);
+}
+
+.field {
+  width: 100%;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 600;
+}

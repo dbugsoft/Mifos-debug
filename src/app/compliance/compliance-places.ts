@@ -124,7 +124,19 @@ export const COMPLIANCE_PLACES: Record<CompliancePlace, CompliancePlaceDef> = {
           '/compliance',
           'governance',
           'elections'
-        ], permission: 'READ_GOVERNANCE' }
+        ], permission: 'READ_GOVERNANCE' },
+      {
+        label: 'compliance.nav.Inspection pack',
+        path: [
+          '/compliance',
+          'inspection-pack'
+        ],
+        compliance: [
+          'READ_AMLCOMPLIANCE',
+          'READ_AMLSUMMARY',
+          'MANAGE_AMLGOVERNANCE'
+        ]
+      }
     ]
   },
   SETTINGS: {
@@ -210,7 +222,7 @@ export function placeOf(url: string): CompliancePlace | 'TODAY' | null {
     ].includes(first)) {
     return 'MEMBERS';
   }
-  if (first === 'governance' || first === 'reports') {
+  if (first === 'governance' || first === 'reports' || first === 'inspection-pack') {
     return 'DUTIES';
   }
   if (first === 'settings' || first === 'goaml-setup') {

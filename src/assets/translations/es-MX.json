@@ -6885,7 +6885,8 @@
       "Members": "Members",
       "Sanctions lists": "Sanctions lists",
       "Records": "Records",
-      "Changes": "Changes"
+      "Changes": "Changes",
+      "Inspection pack": "Inspection pack"
     },
     "today": {
       "title": "Today, {{date}}",
@@ -7226,6 +7227,73 @@
       "familyCase": "This member is {{name}} or {{name}}'s close family. The chief executive checks this case; someone other than {{name}} decides it and sends the report. Tell the board.",
       "Earlier cover": "Earlier cover ({{count}})",
       "takenBack": "taken back before {{date}}"
+    },
+    "decide": {
+      "Do you suspect": "Having looked into it, do you suspect money laundering or the financing of terrorism?",
+      "yesReport": "Yes: report it to FIU-Nepal",
+      "noReport": "No: close it without a report",
+      "What do you suspect": "What do you suspect?",
+      "basis": {
+        "MONEY_MOVED": "Money that went through the member's accounts",
+        "ATTEMPTED": "A transaction they tried, that was refused, or that they gave up",
+        "CONDUCT": "Who they are, their documents, or how they behave"
+      },
+      "thisIs": {
+        "STR": "This is a suspicious transaction report (STR).",
+        "SAR": "This is a suspicious activity report (SAR)."
+      },
+      "why": {
+        "STR": "Money went through the member's accounts, so the report lists those transactions.",
+        "SAR": "Nothing you suspect went through the member's accounts, so the report describes what happened."
+      },
+      "noTransactions": "This case's alerts hold no transactions. Add the alerts that hold them before making the report.",
+      "reasonReport": "What you found, in a few sentences. It goes in the report.",
+      "reasonNoReport": "Why there is nothing to report. The inspector may ask."
+    },
+    "pack": {
+      "lead": "Everything the Department's inspector asks for, for the period you choose. It names no member. Print it, or save it as a PDF from the print window.",
+      "From": "From",
+      "To": "To",
+      "Make the pack": "Make the pack",
+      "title": "Compliance inspection pack",
+      "period": "{{from}} to {{to}}",
+      "madeOn": "made on {{date}} by {{name}}",
+      "1 The compliance officer": "1. The compliance officer",
+      "until": "until {{date}}",
+      "noOfficer": "No compliance officer served in this period.",
+      "2 Board reviews": "2. Board reviews",
+      "noReview": "The board did not review the AML work in this period.",
+      "nextReview": "Next review due {{date}}.",
+      "3 Plan and yearly reports": "3. Action plan and yearly reports",
+      "planApproved": "action plan approved {{date}}",
+      "noPlan": "no action plan recorded",
+      "yearlyStatus": {
+        "DRAFT": "being prepared",
+        "APPROVED": "approved"
+      },
+      "4 Training": "4. Training",
+      "noTraining": "No training was held in this period.",
+      "5 Reports to FIU-Nepal": "5. Reports to FIU-Nepal",
+      "Sent": "Sent",
+      "On time": "On time",
+      "Late": "Late",
+      "Late and not sent at the end": "Late, not sent by the end",
+      "Every report sent": "Every report sent ({{count}})",
+      "due": "due {{date}}",
+      "sentOn": "sent {{date}}",
+      "6 Cases and risk": "6. Cases and risk grades",
+      "cases": {
+        "opened": "cases opened",
+        "decidedReport": "decided to report",
+        "decidedNoReport": "closed without a report",
+        "openAtEnd": "still open at the end"
+      },
+      "Risk grades today": "Members by risk grade today",
+      "7 Settings changed": "7. Compliance settings changed",
+      "because": "Why: {{reason}}",
+      "noChanges": "No setting was changed in this period.",
+      "paymentClasses": "Which payment types count as cash was changed.",
+      "8 Who can see compliance data": "8. Who can see compliance data"
     }
   },
   "kym": {
