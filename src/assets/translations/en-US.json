@@ -7219,7 +7219,7 @@
     },
     "settings": {
       "group": {
-        "READY": "Before the first report",
+        "READY": "Our details for FIU-Nepal",
         "REPORT": "What we report, and when",
         "UNUSUAL": "What raises an alert",
         "MEMBERS": "Risk grades and reviews",
@@ -7279,7 +7279,7 @@
         "reviewYearsMedium": "Review a medium-risk member's KYM every [1] years.",
         "reviewYearsNormal": "Review a normal-risk member's KYM every [1] years.",
         "kymGateEnabled": "Stop money going out while a member's KYM is incomplete.",
-        "kymGateAllFrom": "From [1], stop every transaction of a member whose KYM is incomplete.",
+        "kymGateAllFrom": "Stop every transaction of a member whose KYM is incomplete from [1].",
         "changeNoticeDays": "A member tells us of a change in their details within [1] days.",
         "relationshipsFromList": "Choose family relationships only from the list.",
         "screeningPossibleScore": "Show a name as a possible match from a score of [1].",
@@ -7302,7 +7302,8 @@
         "kymGateAllFrom": "Leave it empty for never. Give members time to bring their documents first.",
         "relationshipsFromList": "Typed relationships are refused, so every report names them the same way.",
         "unListUrl": "Change it only if the UN moves the list."
-      }
+      },
+      "date": "Date"
     },
     "Due tomorrow": "Due tomorrow",
     "One day late": "1 day late"

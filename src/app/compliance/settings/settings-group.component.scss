@@ -42,12 +42,25 @@ form {
   line-height: 1.6;
 }
 
-// A field inside the sentence: as wide as its value needs.
+// A field inside the sentence: as wide as its value needs, and no taller than the line around it.
 .inline {
-  width: 150px;
+  width: 110px;
+
+  --mat-form-field-container-height: 40px;
+  --mat-form-field-container-vertical-padding: 8px;
+  --mdc-outlined-text-field-container-shape: 6px;
 
   &.amount {
-    width: 190px;
+    width: 150px;
+  }
+
+  &.date {
+    display: inline-block;
+    width: 300px;
+  }
+
+  &.choice {
+    width: 320px;
   }
 
   &.wide {
@@ -93,8 +106,9 @@ form {
 }
 
 @media (width <= 600px) {
-  .inline,
-  .inline.amount {
+  .inline.choice,
+  .inline.date,
+  .inline.wide {
     width: 100%;
   }
 }

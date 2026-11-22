@@ -29,7 +29,22 @@
                 <p class="words">
                   @for (p of parts(s); track $index) {
                     @if (isField(p)) {
-                      <ng-container *ngTemplateOutlet="field; context: { f: p.field }"></ng-container>
+                      @if (p.field.kind === 'amount') {
+                        <span>Rs</span>
+                      }
+                      @if (p.field.kind === 'date') {
+                        <mifosx-nepali-date-input
+                          class="inline date"
+                          [inline]="true"
+                          [label]="'compliance.settings.date' | translate"
+                          [formControlName]="p.field.key"
+                        />
+                      } @else {
+                        <ng-container *ngTemplateOutlet="field; context: { f: p.field }"></ng-container>
+                      }
+                      @if (p.field.kind === 'percent') {
+                        <span>%</span>
+                      }
                     } @else {
                       <span>{{ p.text }}</span>
                     }
@@ -49,7 +64,7 @@
               @if (s.why) {
                 <p class="line why">{{ 'compliance.settings.why.' + s.id | translate }}</p>
               }
-              @if (s.effect && effectOf(s.effect); as e) {
+              @if (s.effect && effectShownOn().has(s.id) && effectOf(s.effect); as e) {
                 <p class="line effect" [class.changed]="e.then !== e.now">
                   {{ 'compliance.settings.effect.' + s.effect | translate: { count: e.now } }}
                   @if (e.then !== e.now) {
@@ -129,6 +144,7 @@
         class="inline"
         [class.wide]="f.wide"
         [class.amount]="f.kind === 'amount'"
+        [class.choice]="f.kind === 'choice'"
         subscriptSizing="dynamic"
       >
         @switch (f.kind) {
@@ -139,20 +155,11 @@
               }
             </mat-select>
           }
-          @case ('date') {
-            <input matInput type="date" [formControlName]="f.key" />
-          }
           @case ('text') {
             <input matInput [formControlName]="f.key" maxlength="500" />
           }
           @default {
-            @if (f.kind === 'amount') {
-              <span matTextPrefix>Rs&nbsp;</span>
-            }
             <input matInput type="number" [formControlName]="f.key" [min]="f.min ?? 1" [max]="f.max ?? null" />
-            @if (f.kind === 'percent') {
-              <span matTextSuffix>%</span>
-            }
           }
         }
       </mat-form-field>

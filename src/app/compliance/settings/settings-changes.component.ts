@@ -70,48 +70,7 @@ interface ShownChange {
       </section>
     </div>
   `,
-  styles: `
-    @use '../compliance' as compliance;
-    @include compliance.page;
-
-    .changes {
-      margin: 0;
-      padding: 0;
-      list-style: none;
-    }
-
-    .change {
-      padding: 12px 0;
-      border-bottom: 1px solid var(--dk-border, #e2e8f0);
-
-      &:last-child {
-        border-bottom: 0;
-      }
-
-      ul {
-        margin: 6px 0;
-        padding-left: 20px;
-      }
-    }
-
-    .when {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: baseline;
-      margin: 0;
-    }
-
-    .line {
-      margin: 4px 0 0;
-      color: var(--dk-text-2, #475569);
-      font-size: 0.875rem;
-    }
-
-    .label {
-      font-weight: 600;
-    }
-  `,
+  styleUrls: ['./settings-changes.component.scss'],
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
     MatProgressBar,
@@ -153,10 +112,11 @@ export class SettingsChangesComponent implements OnInit {
 
   private shown(c: SettingsChange, types: Map<string, string>): ShownChange {
     const lines: string[] = [];
+    const legacy = c.text ? legacyChanges(c.text) : null;
     for (const [
       key,
       value
-    ] of Object.entries(c.changes ?? {})) {
+    ] of Object.entries(legacy ?? c.changes ?? {})) {
       if (key === 'paymentClasses' && value && typeof value === 'object') {
         for (const [
           id,
@@ -178,9 +138,30 @@ export class SettingsChangesComponent implements OnInit {
       who: c.name || c.username || '',
       lines,
       reason: c.reason,
-      text: c.text
+      text: legacy ? null : c.text
     };
   }
+}
+
+/**
+ * A change recorded before reasons existed, as Java wrote it (`{ttrLine=900000, goamlBranchCode=null}`), read back into
+ * setting and value; null when it is not that shape or holds a payment type change (`paymentClasses={3=CASH}`).
+ */
+export function legacyChanges(text: string): Record<string, string | null> | null {
+  const m = /^\{(.*)\}$/.exec(text.trim());
+  if (!m || m[1].includes('{')) {
+    return null;
+  }
+  const out: Record<string, string | null> = {};
+  for (const pair of m[1].split(', ')) {
+    const eq = pair.indexOf('=');
+    if (eq < 1) {
+      return null;
+    }
+    const value = pair.slice(eq + 1);
+    out[pair.slice(0, eq)] = value === 'null' ? null : value;
+  }
+  return out;
 }
 
 /** A changed setting as its sentence with the new value in place; a setting with no sentence as `name: value`. */

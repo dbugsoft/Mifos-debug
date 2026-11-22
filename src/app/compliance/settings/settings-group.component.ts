@@ -21,6 +21,7 @@ import { AdToBsPipe } from 'app/pipes/ad-to-bs.pipe';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { ComplianceService } from '../compliance.service';
 import { AmlSettings, AmlSettingsView, CashClass, PaymentTypeClass, SettingsEffect } from '../compliance.models';
+import { NepaliDateInputComponent } from 'app/shared/nepali-date-input/nepali-date-input.component';
 import { GoamlSetupComponent } from '../goaml-reports/goaml-setup.component';
 import { InputDialogComponent, InputDialogData } from '../input-dialog/input-dialog.component';
 import {
@@ -60,7 +61,8 @@ const EFFECT_KEYS: Record<EffectKind, (keyof AmlSettings)[]> = {
     MatSlideToggle,
     MatTableModule,
     AdToBsPipe,
-    GoamlSetupComponent
+    GoamlSetupComponent,
+    NepaliDateInputComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -80,6 +82,18 @@ export class SettingsGroupComponent implements OnInit {
   readonly canEdit = signal(false);
   readonly saving = signal(false);
   readonly effect = signal<SettingsEffect | null>(null);
+  /** Each count is shown once, under the first sentence it depends on (the threshold line, not each switch too). */
+  readonly effectShownOn = computed(() => {
+    const seen = new Set<EffectKind>();
+    const ids = new Set<string>();
+    for (const s of this.sentences()) {
+      if (s.effect && !seen.has(s.effect)) {
+        seen.add(s.effect);
+        ids.add(s.id);
+      }
+    }
+    return ids;
+  });
   /** The form's values as typed, for the lines that follow them (the split deposit floor). */
   readonly typed = signal<Partial<AmlSettings>>({});
   readonly cashClasses: CashClass[] = [
@@ -190,7 +204,10 @@ export class SettingsGroupComponent implements OnInit {
   }
 
   parts(s: Sentence): SentencePart[] {
-    return sentenceParts(this.translate.instant('compliance.settings.sentence.' + s.id), s.fields);
+    const parts = sentenceParts(this.translate.instant('compliance.settings.sentence.' + s.id), s.fields);
+    // a full stop alone after the last field would sit apart from it
+    const last = parts[parts.length - 1];
+    return last && 'text' in last && /^[\s.।]*$/.test(last.text) ? parts.slice(0, -1) : parts;
   }
 
   isField(p: SentencePart): p is { field: SentenceField } {
@@ -244,7 +261,8 @@ export class SettingsGroupComponent implements OnInit {
     const raw = this.form.getRawValue();
     Object.keys(raw).forEach((k) => {
       const before = (v.settings as unknown as Record<string, unknown>)[k] ?? '';
-      const after = raw[k] ?? '';
+      // the date field gives a date; the backend takes yyyy-MM-dd
+      const after = raw[k] instanceof Date ? isoDay(raw[k]) : (raw[k] ?? '');
       if (String(before) !== String(after)) {
         changes[k] = after === '' ? null : after;
       }
@@ -314,4 +332,10 @@ export class SettingsGroupComponent implements OnInit {
       }
     }
   }
+}
+
+/** A date as yyyy-MM-dd, by the calendar day it shows (not shifted by the time zone). */
+export function isoDay(d: Date): string {
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }

@@ -186,7 +186,7 @@ const routes: Routes = [
             {
               // moved to Settings › Getting ready (ADR-0063); kept for links and bookmarks
               path: 'goaml-setup',
-              redirectTo: 'settings/ready'
+              redirectTo: '/compliance/settings/ready'
             }
           ]
         },

@@ -7,7 +7,8 @@
  */
 
 import { TranslateService } from '@ngx-translate/core';
-import { changeLine } from './settings-changes.component';
+import { changeLine, legacyChanges } from './settings-changes.component';
+import { isoDay } from './settings-group.component';
 import { SETTINGS_SENTENCES, SentenceField, sentenceOf, sentenceParts, structuringFloor } from './settings-sentences';
 
 const WORDS: Record<string, string> = {
@@ -61,6 +62,19 @@ describe('Compliance settings as sentences (ADR-0063)', () => {
         { text: ' B' }
       ]);
     });
+  });
+
+  it('reads a change recorded before reasons existed', () => {
+    expect(legacyChanges('{goamlEntityId=4321, goamlBranchCode=null}')).toEqual({
+      goamlEntityId: '4321',
+      goamlBranchCode: null
+    });
+    expect(legacyChanges('{paymentClasses={3=CASH}}')).toBeNull();
+    expect(legacyChanges('something else')).toBeNull();
+  });
+
+  it('sends a date as the day it shows', () => {
+    expect(isoDay(new Date(2026, 0, 5, 23, 30))).toBe('2026-01-05');
   });
 
   it('works out the lowest split deposit watched', () => {
