@@ -1,0 +1,64 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+@use '../compliance' as compliance;
+
+@include compliance.page;
+
+.compliance-page {
+  padding-top: 16px;
+}
+
+.to-make {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    gap: 8px 16px;
+    align-items: center;
+    padding: 10px 0;
+    border-top: 1px solid rgb(127 127 127 / 20%);
+
+    &:first-child {
+      border-top: 0;
+    }
+  }
+
+  .what {
+    display: flex;
+    flex-direction: column;
+    font-weight: 500;
+  }
+
+  .due {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .sub {
+    color: var(--mat-sys-on-surface-variant, #5b6578);
+    font-size: 0.75rem;
+    font-weight: 400;
+  }
+}
+
+@media (width <= 600px) {
+  .to-make li {
+    grid-template-columns: minmax(0, 1fr) auto;
+
+    a {
+      grid-column: 1 / -1;
+    }
+  }
+}

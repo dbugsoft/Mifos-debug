@@ -1,0 +1,182 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+// the status chips of the compliance pages (_compliance.scss), here without the page's layout
+.chip {
+  display: inline-block;
+  padding: 0 8px;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 20px;
+  white-space: nowrap;
+
+  &.red {
+    color: var(--dk-danger, #9f1f17);
+    background: var(--dk-danger-soft, #fdeceb);
+  }
+
+  &.amber {
+    color: var(--dk-warning, #7a4a00);
+    background: var(--dk-warning-soft, #fff0d1);
+  }
+
+  &.green {
+    color: var(--dk-success, #1b6b2a);
+    background: var(--dk-success-soft, #e3f3e6);
+  }
+
+  &.blue {
+    color: var(--dk-primary, #0b5488);
+    background: var(--dk-primary-soft, #e0edf8);
+  }
+
+  &.grey {
+    color: var(--dk-text-2, #3f4448);
+    background: var(--dk-surface-2, #eceff1);
+  }
+}
+
+.pack-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0 12px;
+}
+
+.reports {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.report {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  border: 1px solid rgb(127 127 127 / 25%);
+  border-left: 3px solid transparent;
+  border-radius: 6px;
+  background: var(--mat-sys-surface, var(--dk-surface, #fff));
+
+  &.late {
+    border-left-color: var(--dk-danger, #d84a3f);
+  }
+
+  &.chosen {
+    background: var(--dk-primary-soft, #e0edf8);
+  }
+}
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  align-items: center;
+}
+
+.pick {
+  margin: -8px -4px -8px -10px;
+}
+
+.reference {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.due {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.sub {
+  color: var(--mat-sys-on-surface-variant, #5b6578);
+  font-size: 0.75rem;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  font-size: 0.875rem;
+  color: var(--mat-sys-on-surface-variant, #5b6578);
+
+  a {
+    font-weight: 500;
+  }
+}
+
+.stale {
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: var(--dk-warning-soft, #fff4dc);
+  font-size: 0.875rem;
+}
+
+.note {
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.note-label {
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.kind {
+  display: inline-block;
+  padding: 0 7px;
+  border-radius: 4px;
+  font-family: 'Roboto Mono', monospace;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  line-height: 20px;
+}
+
+.k-TTR {
+  background: var(--dk-primary-soft, #e0edf8);
+  color: var(--dk-primary, #0b5488);
+}
+
+.k-STR {
+  background: var(--dk-danger-soft, #fdeceb);
+  color: var(--dk-danger, #9f1f17);
+}
+
+.k-SAR {
+  background: var(--dk-warning-soft, #fff0d1);
+  color: var(--dk-warning, #7a4a00);
+}
+
+.empty {
+  padding: 16px 0;
+  color: var(--mat-sys-on-surface-variant, #5b6578);
+}
+
+@media (width <= 600px) {
+  .actions button {
+    flex: 1 1 auto;
+  }
+}

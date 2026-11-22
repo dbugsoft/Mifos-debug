@@ -1,0 +1,138 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="compliance-page">
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
+
+  @if (readiness(); as r) {
+    <section class="frame">
+      <h2 class="legend">{{ 'compliance.setup.Before the first report' | translate }}</h2>
+      @if (r.ready) {
+        <p class="ready"><mat-icon>check_circle</mat-icon>{{ 'compliance.setup.Ready to file' | translate }}</p>
+      } @else {
+        <p class="hint">{{ 'compliance.setup.notReadyHint' | translate }}</p>
+      }
+      <ol class="checklist">
+        @for (i of r.items; track i.code) {
+          @let to = fixLink(i.fix);
+          <li [class.done]="i.ok" [class.todo]="!i.ok && i.required" [class.optional]="!i.ok && !i.required">
+            <span class="dot" aria-hidden="true">{{ i.ok ? '✓' : i.required ? '!' : '·' }}</span>
+            <span class="text">
+              {{ itemText(i, r) }}
+              <span class="sub">
+                {{
+                  (i.ok
+                    ? 'compliance.setup.Done'
+                    : i.required
+                      ? 'compliance.setup.Needed'
+                      : 'compliance.setup.Optional'
+                  ) | translate
+                }}
+              </span>
+            </span>
+            @if (!i.ok && to) {
+              <a mat-stroked-button color="primary" [routerLink]="to">{{
+                'compliance.gap.fix.' + i.fix | translate
+              }}</a>
+            }
+          </li>
+        }
+      </ol>
+
+      @if (r.codesEmpty.length || r.codesNotInList.length) {
+        <div class="codes">
+          @if (r.codesEmpty.length) {
+            <h3>{{ 'compliance.setup.Codes still empty' | translate: { count: r.codesEmpty.length } }}</h3>
+            <ul>
+              @for (c of r.codesEmpty; track c.type + c.ourValue) {
+                <li>
+                  <span class="mono">{{ c.type }}</span> · {{ c.description || c.ourValue }}
+                </li>
+              }
+            </ul>
+          }
+          @if (r.codesNotInList.length) {
+            <h3>{{ 'compliance.setup.Codes not in the list' | translate: { count: r.codesNotInList.length } }}</h3>
+            <ul>
+              @for (c of r.codesNotInList; track c.type + c.ourValue) {
+                <li>
+                  <span class="mono">{{ c.type }}</span> · {{ c.description || c.ourValue }} = <b>{{ c.code }}</b>
+                </li>
+              }
+            </ul>
+          }
+          <a mat-stroked-button color="primary" [routerLink]="fixLink('GOAML_CODES')">
+            {{ 'compliance.gap.fix.GOAML_CODES' | translate }}
+          </a>
+        </div>
+      }
+    </section>
+  }
+
+  @if (schema(); as s) {
+    <section class="frame">
+      <h2 class="legend">{{ 'compliance.setup.Schema file' | translate }}</h2>
+      <dl class="facts one-column">
+        <div class="fact">
+          <dt class="fact-label">{{ 'compliance.setup.In use' | translate }}</dt>
+          <dd class="fact-value">
+            @if (s.uploaded) {
+              {{ s.label }}
+              <span class="sub">
+                {{ 'compliance.setup.Uploaded on' | translate: { date: (s.uploaded_at ?? '').slice(0, 10) | adToBs } }}
+              </span>
+            } @else {
+              {{ s.publishedLabel }}
+            }
+          </dd>
+        </div>
+      </dl>
+      @if (s.note) {
+        <p class="hint">{{ 'compliance.setup.schemaNote' | translate }}</p>
+      }
+      @if (notChecked()) {
+        <div class="notice" role="alert">
+          {{ 'compliance.setup.notCheckedHint' | translate: { count: notChecked() } }}
+        </div>
+      }
+      @if (uploadError(); as e) {
+        <div class="notice" role="alert">{{ e | translate }}</div>
+      }
+      @if (canChange()) {
+        <div class="actions">
+          <input #file type="file" accept=".xsd,.xml,text/xml,application/xml" hidden (change)="upload(file)" />
+          <button mat-stroked-button color="primary" type="button" [disabled]="busy()" (click)="file.click()">
+            <mat-icon>upload_file</mat-icon>{{ 'compliance.setup.Upload a newer file' | translate }}
+          </button>
+          @if (s.uploaded) {
+            <button mat-stroked-button color="warn" type="button" [disabled]="busy()" (click)="usePublished()">
+              {{ 'compliance.setup.Go back to the file that came with the system' | translate }}
+            </button>
+          }
+        </div>
+      }
+      @if (s.rulesNotReadByTheChecker.length) {
+        <details class="rules">
+          <summary>
+            {{ 'compliance.setup.Rules checked another way' | translate: { count: s.rulesNotReadByTheChecker.length } }}
+          </summary>
+          <ul>
+            @for (rule of s.rulesNotReadByTheChecker; track $index) {
+              <li [class.unchecked]="rule.checkedBy === 'NOT_CHECKED'">
+                {{ rule.rule }}
+                <span class="sub">{{ 'compliance.setup.checkedBy.' + rule.checkedBy | translate }}</span>
+              </li>
+            }
+          </ul>
+        </details>
+      }
+    </section>
+  }
+</div>

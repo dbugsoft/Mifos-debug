@@ -19,6 +19,7 @@ import { FormatNumberPipe } from 'app/pipes/format-number.pipe';
 import { ComplianceService } from '../../compliance.service';
 import { GoamlReport } from '../../compliance.models';
 import { DueChipComponent } from '../../due-chip/due-chip.component';
+import { GoamlReportListComponent } from '../../goaml-reports/goaml-report-list.component';
 import { InputDialogComponent, InputDialogData } from '../../input-dialog/input-dialog.component';
 import { CaseDetail, CasesService, SUSPICIONS } from '../cases.service';
 
@@ -37,7 +38,8 @@ import { CaseDetail, CasesService, SUSPICIONS } from '../cases.service';
     MatProgressBar,
     AdToBsPipe,
     FormatNumberPipe,
-    DueChipComponent
+    DueChipComponent,
+    GoamlReportListComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -173,40 +175,9 @@ export class CaseDetailComponent implements OnInit {
     });
   }
 
-  downloadXml(r: GoamlReport): void {
-    this.compliance.reportXml(r.id).subscribe((blob) => this.save(blob, r.reference + '.xml'));
-  }
-
-  rebuild(r: GoamlReport): void {
-    this.busy.set(true);
-    this.compliance.decideReport(r.id, 'regenerate').subscribe({
-      next: () => this.load(this.item()!.id),
-      error: () => this.busy.set(false)
-    });
-  }
-
-  sent(r: GoamlReport): void {
-    this.dialog
-      .open<InputDialogComponent, InputDialogData, Record<string, string>>(InputDialogComponent, {
-        data: {
-          title: 'compliance.case.Record as sent',
-          message: 'compliance.case.sentLead',
-          fields: [{ name: 'fiuReference', label: 'compliance.case.FIU reference', required: true, maxLength: 100 }],
-          confirm: 'compliance.case.Record'
-        },
-        width: '520px',
-        maxWidth: '96vw'
-      })
-      .afterClosed()
-      .subscribe((v) => {
-        if (v) {
-          this.busy.set(true);
-          this.compliance.decideReport(r.id, 'submitted', { fiuReference: v['fiuReference'] }).subscribe({
-            next: () => this.load(this.item()!.id),
-            error: () => this.busy.set(false)
-          });
-        }
-      });
+  /** After a step on the report: the case shows where it now stands (filed, or back to decided). */
+  reportChanged(): void {
+    this.load(this.item()!.id);
   }
 
   private run(call: Observable<CaseDetail>, after?: () => void): void {

@@ -160,6 +160,34 @@ const routes: Routes = [
                   (m) => m.ThresholdReportsComponent
                 ),
               data: { title: 'Threshold reports', breadcrumb: 'Threshold reports' }
+            },
+            {
+              path: 'suspicious-reports/str',
+              loadComponent: () =>
+                import('./compliance/goaml-reports/suspicious-reports.component').then(
+                  (m) => m.SuspiciousReportsComponent
+                ),
+              data: { type: 'STR', title: 'Suspicious transaction reports', breadcrumb: 'Suspicious transaction (STR)' }
+            },
+            {
+              path: 'suspicious-reports/sar',
+              loadComponent: () =>
+                import('./compliance/goaml-reports/suspicious-reports.component').then(
+                  (m) => m.SuspiciousReportsComponent
+                ),
+              data: { type: 'SAR', title: 'Suspicious activity reports', breadcrumb: 'Suspicious activity (SAR)' }
+            },
+            {
+              path: 'sent-reports',
+              loadComponent: () =>
+                import('./compliance/goaml-reports/sent-reports.component').then((m) => m.SentReportsComponent),
+              data: { title: 'Sent and answered', breadcrumb: 'Sent and answered' }
+            },
+            {
+              path: 'goaml-setup',
+              loadComponent: () =>
+                import('./compliance/goaml-reports/goaml-setup.component').then((m) => m.GoamlSetupComponent),
+              data: { title: 'goAML setup', breadcrumb: 'goAML setup' }
             }
           ]
         },

@@ -1,0 +1,145 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+@use '../compliance' as compliance;
+
+@include compliance.page;
+
+.compliance-page {
+  padding-top: 16px;
+}
+
+.ready {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: 0 0 8px;
+  color: var(--dk-success, #1b6b2a);
+  font-weight: 600;
+}
+
+.checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: grid;
+    grid-template-columns: 24px minmax(0, 1fr) auto;
+    gap: 10px;
+    align-items: center;
+    padding: 9px 12px;
+    border: 1px solid rgb(127 127 127 / 25%);
+    border-radius: 6px;
+  }
+
+  .dot {
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  .done {
+    color: var(--mat-sys-on-surface-variant, #5b6578);
+
+    .dot {
+      color: var(--dk-success, #1b6b2a);
+      background: var(--dk-success-soft, #e3f3e6);
+    }
+  }
+
+  .todo .dot {
+    color: var(--dk-warning, #7a4a00);
+    background: var(--dk-warning-soft, #fff0d1);
+  }
+
+  .optional .dot {
+    background: var(--dk-surface-2, #eceff1);
+  }
+
+  .text {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.sub {
+  color: var(--mat-sys-on-surface-variant, #5b6578);
+  font-size: 0.75rem;
+}
+
+.codes {
+  margin-top: 16px;
+
+  h3 {
+    margin: 8px 0 4px;
+    font-size: 0.9375rem;
+    font-weight: 500;
+  }
+
+  ul {
+    margin: 0 0 8px;
+    padding-left: 20px;
+    font-size: 0.875rem;
+  }
+}
+
+.mono {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 0.8125rem;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.notice {
+  margin-top: 8px;
+}
+
+.rules {
+  margin-top: 16px;
+  font-size: 0.875rem;
+
+  summary {
+    cursor: pointer;
+  }
+
+  ul {
+    padding-left: 20px;
+  }
+
+  li {
+    margin: 4px 0;
+  }
+
+  .unchecked {
+    color: var(--dk-danger, #9f1f17);
+  }
+}
+
+@media (width <= 600px) {
+  .checklist li {
+    grid-template-columns: 24px minmax(0, 1fr);
+
+    a {
+      grid-column: 2;
+      justify-self: start;
+    }
+  }
+}

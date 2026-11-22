@@ -6943,7 +6943,80 @@
       "Approved by": "Approved by",
       "YES": "Yes",
       "NO": "No",
-      "homeDue": "{{report}} for {{year}} is due in {{days}} days."
+      "homeDue": "{{report}} for {{year}} is due in {{days}} days.",
+      "Note": "Note",
+      "rejectedHint": "Write what the goAML portal said. You then make a correction: a new report that replaces this one.",
+      "Make a correction": "Make a correction",
+      "correctHint": "A report already sent cannot be changed in goAML. A correction is a new report that names this one; send it the same way.",
+      "Discard this report": "Discard this report?",
+      "discardHint": "It was never sent. What it reported goes back to the list of things to report.",
+      "discardCorrectionHint": "This is a correction. Discarding it puts back the report it replaced, as it was.",
+      "Discard": "Discard",
+      "Record as filed by hand": "Record as filed by hand",
+      "byHandOnlyHint": "goAML needs details we do not hold for this one. Type it into the goAML portal, then record the reference FIU-Nepal gave it here.",
+      "byHandHint": "Use this when you typed the report into the goAML portal yourself, for example because the deadline is close. It counts as sent.",
+      "Why by hand": "Why it was filed by hand",
+      "byHandReason": "goAML needs details we do not hold, so it was typed into the portal.",
+      "Choose all ready": "Choose all ready ({{count}})",
+      "Download chosen as one zip": "Download {{count}} as one zip",
+      "Out of date": "Out of date: rebuild it",
+      "Filed by hand": "Filed by hand in the portal",
+      "Not a member": "Not a member",
+      "Open the case": "Open the case",
+      "Sent on date": "Sent {{date}}",
+      "FIU reference": "FIU-Nepal reference {{reference}}",
+      "A correction": "A correction",
+      "staleHint": "The books changed since this file was made: a transaction was reversed or added. Rebuild it before sending.",
+      "What FIU-Nepal said": "What FIU-Nepal said:",
+      "step": {
+        "REBUILD": "Rebuild",
+        "PACKAGE": "Download zip to upload",
+        "SENT": "Record as sent",
+        "FILE_BY_HAND": "Filed by hand",
+        "XML": "Download the file",
+        "ACCEPTED": "Accepted",
+        "REJECTED": "Rejected",
+        "CORRECT": "Make a correction",
+        "DISCARD": "Discard"
+      },
+      "No reports here": "No reports here.",
+      "explain": {
+        "TTR": "A member's cash of the threshold or more in one day, in or out, across all their accounts. Send it within 15 days of the transaction, whatever you think of it. One report per member per day.",
+        "STR": "You suspect money from crime, or meant for terrorism, behind one or more transactions. Send it as soon as you have decided: within 3 days. It is made from the case.",
+        "SAR": "You suspect an attempt or activity with no transaction: someone who walked away when asked for ID, for example. Send it as soon as you have decided: within 3 days. It is made from the case."
+      },
+      "Steps": "Where the reports stand",
+      "steps": {
+        "TO_MAKE": "To make",
+        "NEEDS_FIXING": "Needs fixing",
+        "READY": "Ready to send",
+        "SENT": "Sent, waiting",
+        "ACCEPTED": "Accepted"
+      },
+      "stepsSub": {
+        "TO_MAKE": "no report yet",
+        "NEEDS_FIXING": "something is missing",
+        "READY": "download and upload in goAML",
+        "SENT": "FIU-Nepal has not answered",
+        "ACCEPTED": "this fiscal year, {{year}}"
+      },
+      "lateLine": "{{late}} late, {{soon}} due within 3 days",
+      "Decided, not made yet": "Decided to report, not made yet",
+      "Make it on the case": "Make it on the case",
+      "No case waits for a report": "No case waits for its report.",
+      "On their way": "On their way",
+      "Show more": "Show more",
+      "Type": "Type",
+      "sent": {
+        "REACHED": "All sent",
+        "SUBMITTED": "Waiting for an answer",
+        "ACCEPTED": "Accepted",
+        "REJECTED": "Rejected",
+        "CORRECTED": "Replaced by a correction",
+        "DISCARDED": "Discarded, never sent"
+      },
+      "foundLateLine": "{{count}} threshold transactions were found after their deadline. Decide for each: report it late, or exempt it with a reason.",
+      "Decide them": "Decide them"
     },
     "governance": {
       "Governance": "Governance",
@@ -7073,7 +7146,11 @@
       "Our own duties": "Our own duties",
       "Officer and board": "Officer and board",
       "Yearly reports": "Yearly reports",
-      "Elections": "Elections"
+      "Elections": "Elections",
+      "Suspicious transaction (STR)": "Suspicious transaction (STR)",
+      "Suspicious activity (SAR)": "Suspicious activity (SAR)",
+      "Sent and answered": "Sent and answered",
+      "goAML setup": "goAML setup"
     },
     "today": {
       "title": "Today, {{date}}",
@@ -7138,7 +7215,135 @@
       "Show all": "Show {{count}} more",
       "Nothing waits": "Nothing waits for you: every report is sent and every alert looked into.",
       "Nothing here": "Nothing here."
-    }
+    },
+    "Record as accepted": "Record as accepted",
+    "gap": {
+      "Before it can be sent": "Before it can be sent:",
+      "Filled in, but check": "Filled in, but check ({{count}})",
+      "director": "A director: {{text}}",
+      "fix": {
+        "MEMBER": "Open the member",
+        "AML_SETTINGS": "Open compliance settings",
+        "GOAML_CODES": "Open goAML codes",
+        "OFFICER": "Open officer and board"
+      },
+      "member.name": "{{a0}} has no name.",
+      "member.name.long": "{{a0}} has a name longer than the 100 characters FIU-Nepal allows.",
+      "member.birthdate": "{{a0}} has no date of birth.",
+      "member.gender": "{{a0}} has no gender.",
+      "member.identity": "{{a0}} has no citizenship number or other identity document.",
+      "member.address": "{{a0}} has no address.",
+      "member.parents": "{{a0}} has no father's or mother's name on file. Add at least one of them as a family member.",
+      "member.citizenship.long": "{{a0}}'s citizenship number is longer than the 25 characters FIU-Nepal allows. Check how it was entered.",
+      "organisation.name": "{{a0}} has no name.",
+      "organisation.no.signatory": "{{a0}} has nobody on record who operates its account.",
+      "organisation.registration": "{{a0}} has no registration number on file.",
+      "organisation.pan": "{{a0}} has no PAN or VAT number on file.",
+      "organisation.pan.format": "{{a0}}'s PAN or VAT number is not 9 or 10 digits.",
+      "organisation.pan.same": "{{a0}}'s PAN or VAT number is the same as its registration number. One of them was entered wrongly.",
+      "account.name.company": "Account {{a0}} is held in a name that reads like a company's ({{a1}}), but the member is recorded as a person. If it is an organisation, record it as one.",
+      "code.indicator": "An STR or SAR needs an indicator for the suspected offence, and {{a0}} has no FIU-Nepal code. Set one in goAML codes, or choose another suspected offence on the case.",
+      "setup.institution.code": "The institution code in goAML codes says \"{{a0}}\", which FIU-Nepal refuses. Use a code of your own, such as the cooperative's PAN or a short form of its name, the same in every report.",
+      "setup.entity.id": "The reporting entity number from FIU-Nepal is not set, or is not a whole number. Set it in compliance settings.",
+      "setup.officer": "No compliance officer is on record. Record who it is before making reports.",
+      "code.missing": "The goAML code for {{a0}} \"{{a2}}\" is not set.",
+      "schema.changed": "The goAML file format changed ({{a0}}). Rebuild this report.",
+      "threshold.group.account": "Threshold item {{a0}} is a group account: goAML needs the person who made the deposit, which is not recorded for group accounts. Enter it in the goAML portal, then record it here as filed by hand.",
+      "threshold.item.withdrawn": "Threshold item {{a0}} no longer reaches the threshold, because a transaction was reversed. Discard this report and make it again from what is left.",
+      "threshold.day.another.open": "Another report for this member's day ({{a0}}) is also open. Discard one of them, so nothing is reported twice.",
+      "threshold.day.nothing": "There is no cash left to report for this member's day.",
+      "case.non.member": "The case is about someone who is not a member ({{a0}}): enter it in the goAML portal, then record it here as filed by hand.",
+      "case.str.no.transactions": "An STR reports transactions, and this case has none. Enter it in the goAML portal as a SAR, then record it here as filed by hand.",
+      "transaction.account": "The account of {{a0}} was not found.",
+      "member.occupation": "{{a0}} has no occupation on file, so it is written as \"Not Available\".",
+      "member.address.district": "{{a0}} has an address with no district, so it is written as \"Not Available\".",
+      "member.identity.nocode": "One of {{a0}}'s identity documents is left out: that kind of document has no FIU-Nepal code.",
+      "member.identity.issuer": "One of {{a0}}'s identity documents is left out: we cannot name who issues that kind of document.",
+      "member.passport.only": "{{a0}} has only a passport on file: check their nationality, because we report every member as Nepali.",
+      "member.pan.format": "{{a0}}'s PAN is not nine digits, so it is left out.",
+      "email.invalid": "{{a0}} ({{a1}}) is not in a form FIU-Nepal accepts, so it is left out.",
+      "organisation.phone": "{{a0}} has no phone number on file.",
+      "organisation.address": "{{a0}} has no address on file.",
+      "organisation.state": "{{a0}} has no registering office on file, so the registering authority is written as \"Not Available\".",
+      "organisation.registration.date": "{{a0}} has no registration date on file, so it is written as 1 January 1900.",
+      "organisation.business": "{{a0}} has no type of business on file, so it is written as \"Not Available\".",
+      "account.branch": "Account {{a0}} has no office, so its branch is written as \"Not Available\".",
+      "account.opened": "Account {{a0}} has no opening date, so it is written as 1 January 1900.",
+      "account.balance": "Account {{a0}} has no balance on file for that day, so it is written as 0.",
+      "setup.branch": "No branch code is set in compliance settings, so it is written as \"Not Available\".",
+      "setup.officer.not.notified": "FIU-Nepal has not been told who the compliance officer is."
+    },
+    "setup": {
+      "Before the first report": "Before the first report",
+      "Ready to file": "Ready to file: everything a report needs is set.",
+      "notReadyHint": "Reports stay as drafts until the lines marked needed are done. Each button opens the place to do it.",
+      "Done": "Done",
+      "Needed": "Needed",
+      "Optional": "Optional",
+      "item": {
+        "entity_id": {
+          "ok": "The reporting entity number from FIU-Nepal is set.",
+          "todo": "Enter the reporting entity number FIU-Nepal gave you when you registered on goAML."
+        },
+        "branch": {
+          "ok": "The branch code is set.",
+          "todo": "No branch code is set, so reports say \"Not Available\" there. Leave it if FIU-Nepal gave you none."
+        },
+        "institution": {
+          "ok": "The cooperative's name and institution code are set.",
+          "todo": "Enter the cooperative's name and its own institution code (its PAN or a short form of its name) in goAML codes."
+        },
+        "officer": {
+          "ok": "A compliance officer is on record.",
+          "todo": "Record who the compliance officer is: they are named on every report."
+        },
+        "officer_notified": {
+          "ok": "FIU-Nepal has been told who the compliance officer is.",
+          "todo": "Record the date FIU-Nepal was told who the compliance officer is."
+        },
+        "codes_complete": {
+          "ok": "Every goAML code reports need is set.",
+          "todo": "{{count}} goAML codes reports need are not set."
+        },
+        "codes_in_list": {
+          "ok": "Every code entered is in FIU-Nepal's lists.",
+          "todo": "{{count}} codes entered are not in FIU-Nepal's lists."
+        },
+        "schema": {
+          "ok": "Reports are checked against the goAML file format below."
+        }
+      },
+      "Codes still empty": "Codes still empty ({{count}})",
+      "Codes not in the list": "Codes not in FIU-Nepal's list ({{count}})",
+      "Schema file": "goAML file format",
+      "In use": "In use",
+      "Uploaded on": "uploaded {{date}}",
+      "schemaNote": "Every report is checked against this file before it can be sent. If FIU-Nepal gives you a newer one, upload it here.",
+      "notCheckedHint": "{{count}} rules in this file are not checked by the system yet. Send the file to system support.",
+      "Upload a newer file": "Upload a newer file from FIU-Nepal",
+      "Use this schema file": "Use this file",
+      "uploadHint": "From now on every report is checked against this file. Ready reports that do not pass it go back to draft.",
+      "Name of the file": "Name, as FIU-Nepal calls it",
+      "Go back to the file that came with the system": "Go back to the file that came with the system",
+      "goBackHint": "Use this if the uploaded file was the wrong one. The upload stays on record. Ready reports that do not pass go back to draft.",
+      "Go back": "Go back",
+      "Schema file in use": "The new file is in use.",
+      "Back to the file that came with the system": "Back to the file that came with the system.",
+      "backToDraft": "{{count}} ready reports went back to draft: rebuild them.",
+      "sendToSupport": "The system could not use this file. It is not necessarily broken: a newer file from FIU-Nepal may need a change on our side. Send it to system support.",
+      "fileEmpty": "The file is empty.",
+      "labelTooLong": "The name can be 100 characters at most.",
+      "uploadFailed": "The file could not be uploaded. Try again.",
+      "Rules checked another way": "Rules in the file checked another way ({{count}})",
+      "checkedBy": {
+        "OUR_RULES": "checked by our own rules: a draft says what to fix",
+        "FINERACT": "the system refuses such data in the first place",
+        "NOT_FOR_US": "does not apply to a cooperative",
+        "NOT_CHECKED": "not checked yet: send the file to system support"
+      }
+    },
+    "Due tomorrow": "Due tomorrow",
+    "One day late": "1 day late"
   },
   "kym": {
     "KYM": "KYM",

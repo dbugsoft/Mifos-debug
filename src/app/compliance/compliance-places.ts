@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { CompliancePlace } from './compliance.models';
+import { CompliancePlace, ReportType } from './compliance.models';
 
 /** Every compliance permission: Today and the officer's duties show to anyone holding one that sees counts or duties. */
 const COUNTS_OR_DUTIES = [
@@ -25,6 +25,8 @@ export interface PlaceTab {
   compliance?: string[];
   /** A Fineract permission that shows the tab instead (for a page that is not compliance data). */
   permission?: string;
+  /** The report type whose waiting reports the tab counts. */
+  count?: ReportType;
 }
 
 /** One place of the Compliance menu: one job of the compliance officer (fineract-dbug ADR 0060). */
@@ -36,18 +38,35 @@ export interface CompliancePlaceDef {
   tabs: PlaceTab[];
 }
 
-/**
- * The places and the pages inside each. The pages are today's; the places' own pages come in later phases
- * (Reports to FIU-Nepal gets its suspicious-report tabs next).
- */
+/** The places and the pages inside each (ADR-0060; Reports to FIU-Nepal's tabs: ADR-0062). */
 export const COMPLIANCE_PLACES: Record<CompliancePlace, CompliancePlaceDef> = {
   REPORTS: {
     label: 'compliance.nav.Reports to FIU-Nepal',
     compliance: ['READ_AMLCOMPLIANCE'],
-    tabs: [{ label: 'compliance.nav.Threshold (TTR)', path: [
+    tabs: [
+      { label: 'compliance.nav.Threshold (TTR)', path: [
           '/compliance',
           'threshold-reports'
-        ] }]
+        ], count: 'TTR' },
+      { label: 'compliance.nav.Suspicious transaction (STR)', path: [
+          '/compliance',
+          'suspicious-reports',
+          'str'
+        ], count: 'STR' },
+      { label: 'compliance.nav.Suspicious activity (SAR)', path: [
+          '/compliance',
+          'suspicious-reports',
+          'sar'
+        ], count: 'SAR' },
+      { label: 'compliance.nav.Sent and answered', path: [
+          '/compliance',
+          'sent-reports'
+        ] },
+      { label: 'compliance.nav.goAML setup', path: [
+          '/compliance',
+          'goaml-setup'
+        ] }
+    ]
   },
   SUSPICIONS: {
     label: 'compliance.nav.Suspicions',
@@ -127,7 +146,12 @@ export function placeOf(url: string): CompliancePlace | 'TODAY' | null {
   if (first === '') {
     return 'TODAY';
   }
-  if (first === 'threshold-reports') {
+  if ([
+      'threshold-reports',
+      'suspicious-reports',
+      'sent-reports',
+      'goaml-setup'
+    ].includes(first)) {
     return 'REPORTS';
   }
   if (first === 'alerts' || first === 'cases') {

@@ -22,15 +22,21 @@ import { FormatNumberPipe } from 'app/pipes/format-number.pipe';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { ComplianceService } from '../compliance.service';
 import { GoamlReport, TtrItem, TtrItemDetail, TtrStatus, isoDate } from '../compliance.models';
+import { GoamlReportListComponent } from '../goaml-reports/goaml-report-list.component';
+import { ReportStepsComponent, StepFilter } from '../goaml-reports/report-steps.component';
 import { DueChipComponent } from '../due-chip/due-chip.component';
 import { InputDialogComponent, InputDialogData } from '../input-dialog/input-dialog.component';
 
 type View = 'NEW' | 'HISTORICAL' | 'EXEMPT' | 'REPORTED' | 'ALL';
 
+/** How many sent or accepted reports one page shows. */
+const PAGE = 50;
+
 /**
- * Threshold reports (fineract-dbug #131, #134, #135): each member's cash in or out of the threshold in a day must reach
- * FIU-Nepal within 15 days. Choose items, make the goAML files, upload them in the goAML portal, and record what
- * happened. Nothing here is visible to anyone without the compliance permissions.
+ * Threshold reports (fineract-dbug #131, #134, #135; the TTR tab of Reports to FIU-Nepal, ADR-0062): each member's cash
+ * in or out of the threshold in a day must reach FIU-Nepal within 15 days. Choose items, make the goAML files, download
+ * the ready ones as one zip, upload it in the goAML portal, and record what happened. Nothing here is visible to anyone
+ * without the compliance permissions.
  */
 @Component({
   selector: 'mifosx-threshold-reports',
@@ -44,7 +50,9 @@ type View = 'NEW' | 'HISTORICAL' | 'EXEMPT' | 'REPORTED' | 'ALL';
     MatTableModule,
     FormatNumberPipe,
     AdToBsPipe,
-    DueChipComponent
+    DueChipComponent,
+    GoamlReportListComponent,
+    ReportStepsComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -67,7 +75,27 @@ export class ThresholdReportsComponent implements OnInit {
 
   readonly loading = signal(true);
   readonly items = signal<TtrItem[]>([]);
-  readonly reports = signal<GoamlReport[]>([]);
+  /** Drafts, ready and rejected threshold reports. */
+  readonly waiting = signal<GoamlReport[]>([]);
+  /** Sent or accepted ones, when that step is pressed. */
+  readonly done = signal<GoamlReport[]>([]);
+  readonly more = signal(false);
+  readonly step = signal<StepFilter>('ALL');
+  readonly foundLate = computed(() => this.compliance.reportSteps()?.foundLate ?? 0);
+  readonly shownReports = computed(() => {
+    const all = this.waiting();
+    switch (this.step()) {
+      case 'NEEDS_FIXING':
+        return all.filter((r) => !(r.status === 'READY' && !r.stale));
+      case 'READY':
+        return all.filter((r) => r.status === 'READY' && !r.stale);
+      case 'SENT':
+      case 'ACCEPTED':
+        return this.done();
+      default:
+        return all;
+    }
+  });
   readonly selected = signal<Set<number>>(new Set());
   readonly detail = signal<TtrItemDetail | null>(null);
   readonly busy = signal(false);
@@ -81,12 +109,6 @@ export class ThresholdReportsComponent implements OnInit {
     'amount',
     'dueOn',
     'status'
-  ];
-  readonly reportColumns = [
-    'reference',
-    'member',
-    'status',
-    'actions'
   ];
   readonly isoDate = isoDate;
 
@@ -116,11 +138,54 @@ export class ThresholdReportsComponent implements OnInit {
     this.loadReports();
   }
 
-  private loadReports(): void {
+  /** The reports and the steps' counts; the sidebar's counts follow. */
+  loadReports(): void {
+    this.compliance.loadReportSteps().pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
+    this.compliance.loadToday().pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
     this.compliance
-      .goamlReports()
+      .goamlReports({ status: 'DRAFT,READY,REJECTED', type: 'TTR' })
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((reports) => this.reports.set(reports.filter((r) => r.type === 'TTR').slice(0, 50)));
+      .subscribe((reports) =>
+        this.waiting.set([...reports].sort((a, b) => (a.dueOn ?? '9').localeCompare(b.dueOn ?? '9')))
+      );
+    if (this.step() === 'SENT' || this.step() === 'ACCEPTED') {
+      this.loadDone(false);
+    }
+  }
+
+  onStep(step: StepFilter): void {
+    this.step.set(step);
+    if (step === 'TO_MAKE' && this.view !== 'NEW') {
+      this.view = 'NEW';
+      this.load();
+    }
+    if (step === 'SENT' || step === 'ACCEPTED') {
+      this.loadDone(false);
+    }
+  }
+
+  /** Threshold items found after their deadline wait for a decision: report them late or exempt them. */
+  showFoundLate(): void {
+    this.step.set('TO_MAKE');
+    this.view = 'HISTORICAL';
+    this.load();
+  }
+
+  /** Sent or accepted reports, newest first, a page at a time. */
+  loadDone(next: boolean): void {
+    const offset = next ? this.done().length : 0;
+    this.compliance
+      .goamlReports({ status: this.step() === 'SENT' ? 'SUBMITTED' : 'ACCEPTED', type: 'TTR', limit: PAGE, offset })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((page) => {
+        this.done.set(
+          next ? [
+                ...this.done(),
+                ...page
+              ] : page
+        );
+        this.more.set(page.length === PAGE);
+      });
   }
 
   selectable(item: TtrItem): boolean {
@@ -185,80 +250,6 @@ export class ThresholdReportsComponent implements OnInit {
 
   reopen(item: TtrItem): void {
     this.compliance.decideTtr(item.id, 'reopen').subscribe(() => this.after('compliance.Moved to the queue'));
-  }
-
-  download(report: GoamlReport): void {
-    this.compliance.reportXml(report.id).subscribe((blob) => {
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = report.reference + '.xml';
-      a.click();
-      URL.revokeObjectURL(url);
-    });
-  }
-
-  regenerate(report: GoamlReport): void {
-    this.compliance.decideReport(report.id, 'regenerate').subscribe(() => this.after('compliance.Report rebuilt'));
-  }
-
-  submitted(report: GoamlReport): void {
-    this.ask({
-      title: 'compliance.Record as sent',
-      message: 'compliance.Record as sent explanation',
-      fields: [
-        { name: 'fiuReference', label: 'compliance.FIU reference number', required: true, maxLength: 100 },
-        {
-          name: 'submittedOn',
-          label: 'compliance.Sent on',
-          type: 'date',
-          required: true,
-          value: new Date().toISOString().slice(0, 10)
-        }
-      ],
-      confirm: 'compliance.Record as sent'
-    })
-      .pipe(switchMap((v) => this.compliance.decideReport(report.id, 'submitted', v)))
-      .subscribe(() => this.after('compliance.Recorded'));
-  }
-
-  accepted(report: GoamlReport): void {
-    this.compliance.decideReport(report.id, 'accepted').subscribe(() => this.after('compliance.Recorded'));
-  }
-
-  rejected(report: GoamlReport): void {
-    this.ask({
-      title: 'compliance.Record as rejected',
-      fields: [{ name: 'reason', label: 'compliance.What FIU-Nepal said', type: 'textarea', required: true }],
-      confirm: 'compliance.Record as rejected',
-      danger: true
-    })
-      .pipe(switchMap((v) => this.compliance.decideReport(report.id, 'rejected', v)))
-      .subscribe(() => this.after('compliance.Recorded'));
-  }
-
-  correct(report: GoamlReport): void {
-    this.compliance.decideReport(report.id, 'correct').subscribe(() => this.after('compliance.Correction made'));
-  }
-
-  discard(report: GoamlReport): void {
-    this.compliance.decideReport(report.id, 'discard').subscribe(() => this.after('compliance.Report discarded'));
-  }
-
-  statusTone(status: string): string {
-    switch (status) {
-      case 'READY':
-      case 'ACCEPTED':
-        return 'chip green';
-      case 'DRAFT':
-        return 'chip amber';
-      case 'REJECTED':
-        return 'chip red';
-      case 'SUBMITTED':
-        return 'chip blue';
-      default:
-        return 'chip grey';
-    }
   }
 
   private ask(data: InputDialogData): Observable<Record<string, string>> {

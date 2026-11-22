@@ -10,7 +10,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComplianceService } from './compliance.service';
-import { ComplianceToday, isoDate } from './compliance.models';
+import { ComplianceToday, ReportSteps, isoDate } from './compliance.models';
 
 describe('ComplianceService', () => {
   let service: ComplianceService;
@@ -103,6 +103,47 @@ describe('ComplianceService', () => {
     service.loadToday().subscribe();
     http.expectOne('/nepal/aml/today').flush('no', { status: 500, statusText: 'Server Error' });
     expect(service.todayAnswer()).toBeNull();
+  });
+
+  it('asks for reports of several statuses and one type, a page at a time', () => {
+    service.goamlReports({ status: 'DRAFT,READY,REJECTED', type: 'STR', limit: 50, offset: 0 }).subscribe();
+    const req = http.expectOne((r) => r.url === '/nepal/aml/goaml/reports');
+    expect(req.request.params.get('status')).toBe('DRAFT,READY,REJECTED');
+    expect(req.request.params.get('type')).toBe('STR');
+    expect(req.request.params.get('limit')).toBe('50');
+    expect(req.request.params.get('clientId')).toBeNull();
+    req.flush([]);
+  });
+
+  it('remembers where the reports stand, for the tabs, and forgets it on reset', () => {
+    service.loadReportSteps().subscribe();
+    const steps = {
+      today: '2026-11-22',
+      fiscalYear: 2083,
+      fiscalYearFrom: '2026-07-17',
+      types: {},
+      foundLate: 0
+    } as unknown as ReportSteps;
+    http.expectOne('/nepal/aml/today/reports').flush(steps);
+    expect(service.reportSteps()).toEqual(steps);
+    service.reset();
+    expect(service.reportSteps()).toBeNull();
+  });
+
+  it('downloads several ready threshold reports as one zip', () => {
+    service
+      .reportsPackage([
+        3,
+        4
+      ])
+      .subscribe();
+    const req = http.expectOne('/nepal/aml/goaml/reports/package');
+    expect(req.request.body).toEqual({ reportIds: [
+        3,
+        4
+      ] });
+    expect(req.request.responseType).toBe('blob');
+    req.flush(new Blob());
   });
 });
 

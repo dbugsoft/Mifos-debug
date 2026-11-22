@@ -76,45 +76,12 @@
       <section class="frame">
         <h3 class="legend">{{ 'compliance.case.goAML report' | translate }}</h3>
         @if (report(); as r) {
-          <dl class="facts">
-            <div class="fact">
-              <dt class="fact-label">{{ 'compliance.case.Report' | translate }}</dt>
-              <dd class="fact-value">{{ r.reference }} · {{ 'compliance.reportStatus.' + r.status | translate }}</dd>
-            </div>
-            @if (r.fiuReference) {
-              <div class="fact">
-                <dt class="fact-label">{{ 'compliance.case.FIU reference' | translate }}</dt>
-                <dd class="fact-value">{{ r.fiuReference }}</dd>
-              </div>
-            }
-          </dl>
-          @if (r.problems.length) {
-            <div class="notice">
-              <span>{{ 'compliance.case.Before it can be sent' | translate }}</span>
-              <ul>
-                @for (p of r.problems; track $index) {
-                  <li>{{ p }}</li>
-                }
-              </ul>
-            </div>
-          }
-          @if (canFile) {
-            <div class="actions">
-              <button mat-stroked-button type="button" (click)="downloadXml(r)">
-                <mat-icon>download</mat-icon>{{ 'compliance.case.Download the file' | translate }}
-              </button>
-              @if (r.status === 'DRAFT' || r.status === 'READY') {
-                <button mat-stroked-button type="button" (click)="rebuild(r)" [disabled]="busy()">
-                  {{ 'compliance.case.Rebuild' | translate }}
-                </button>
-              }
-              @if (r.status === 'READY') {
-                <button mat-raised-button color="primary" type="button" (click)="sent(r)" [disabled]="busy()">
-                  {{ 'compliance.case.Record as sent' | translate }}
-                </button>
-              }
-            </div>
-          }
+          <mifosx-goaml-report-list
+            [reports]="[r]"
+            [showMember]="false"
+            [showCase]="false"
+            (changed)="reportChanged()"
+          ></mifosx-goaml-report-list>
         } @else if (canFile && k.status === 'DECIDED_REPORT') {
           <div class="frame-head">
             <p class="hint">{{ 'compliance.case.makeLead' | translate }}</p>
