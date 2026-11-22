@@ -18,8 +18,12 @@ import {
   ComplianceToday,
   GoamlCodeLists,
   GoamlLookup,
+  GoamlReadiness,
   GoamlReport,
+  GoamlSchemaInfo,
   LedgerStatus,
+  ReportSteps,
+  ReportType,
   TtrItem,
   TtrItemDetail,
   TtrStatus,
@@ -44,6 +48,9 @@ export class ComplianceService {
   /** The last Today answer: the Today page's list and the counts beside the Compliance menu's pages. */
   readonly todayAnswer = signal<ComplianceToday | null>(null);
 
+  /** The last report steps answer: the Reports to FIU-Nepal steps and the counts on its tabs. */
+  readonly reportSteps = signal<ReportSteps | null>(null);
+
   /** The last access answer, for templates. */
   readonly access = signal<ComplianceAccess>(NO_ACCESS);
 
@@ -62,7 +69,6 @@ export class ComplianceService {
     return this.access$;
   }
 
-  /** Forget the answer (after signing out or in as someone else). */
   /**
    * Everything waiting, asked afresh; a call already on its way is shared, so the sidebar and the page opening together
    * ask once. A failure leaves the last answer and the menu without counts.
@@ -87,10 +93,25 @@ export class ComplianceService {
     return this.today$;
   }
 
+  /**
+   * Where each report type stands, for the Reports to FIU-Nepal steps and tab counts (ADR-0062). A failure leaves the
+   * tabs without counts.
+   */
+  loadReportSteps(): Observable<ReportSteps | null> {
+    return this.http
+      .get<ReportSteps>('/nepal/aml/today/reports', { context: new HttpContext().set(SILENT_ERRORS, true) })
+      .pipe(
+        tap((r) => this.reportSteps.set(r)),
+        catchError(() => of(null))
+      );
+  }
+
+  /** Forget the answers (after signing out or in as someone else). */
   reset(): void {
     this.access$ = undefined;
     this.access.set(NO_ACCESS);
     this.todayAnswer.set(null);
+    this.reportSteps.set(null);
   }
 
   can(...anyOf: string[]): boolean {
@@ -131,8 +152,22 @@ export class ComplianceService {
     return this.http.post<TtrItem>(`/nepal/aml/ttr/${id}`, reason ? { reason } : {}, { params: { command } });
   }
 
-  goamlReports(status?: string): Observable<GoamlReport[]> {
-    return this.http.get<GoamlReport[]>('/nepal/aml/goaml/reports', status ? { params: { status } } : {});
+  /** Reports, newest first; `status` may name several, comma separated. A page full means there is more. */
+  goamlReports(
+    filter: { status?: string; type?: ReportType; clientId?: number; limit?: number; offset?: number } = {}
+  ): Observable<GoamlReport[]> {
+    let params = new HttpParams();
+    Object.entries(filter).forEach(
+      ([
+        k,
+        v
+      ]) => {
+        if (v !== undefined && v !== null && v !== '') {
+          params = params.set(k, v);
+        }
+      }
+    );
+    return this.http.get<GoamlReport[]>('/nepal/aml/goaml/reports', { params });
   }
 
   makeTtrReports(ttrItemIds: number[]): Observable<GoamlReport[]> {
@@ -141,7 +176,7 @@ export class ComplianceService {
 
   decideReport(
     id: number,
-    command: 'regenerate' | 'submitted' | 'accepted' | 'rejected' | 'correct' | 'discard',
+    command: 'regenerate' | 'submitted' | 'filed-by-hand' | 'accepted' | 'rejected' | 'correct' | 'discard',
     body: Record<string, string> = {}
   ): Observable<GoamlReport> {
     return this.http.post<GoamlReport>(`/nepal/aml/goaml/reports/${id}`, body, { params: { command } });
@@ -149,6 +184,40 @@ export class ComplianceService {
 
   reportXml(id: number): Observable<Blob> {
     return this.http.get(`/nepal/aml/goaml/reports/${id}/xml`, { responseType: 'blob' });
+  }
+
+  /** A zip FIU-Nepal takes: the file with, for an STR or SAR, its case's documents. */
+  reportPackage(id: number): Observable<Blob> {
+    return this.http.get(`/nepal/aml/goaml/reports/${id}/package`, { responseType: 'blob' });
+  }
+
+  /** One zip of several ready threshold reports. */
+  reportsPackage(reportIds: number[]): Observable<Blob> {
+    return this.http.post('/nepal/aml/goaml/reports/package', { reportIds }, { responseType: 'blob' });
+  }
+
+  /** What is still missing before the first report (the goAML setup checklist). */
+  goamlReadiness(): Observable<GoamlReadiness> {
+    return this.http.get<GoamlReadiness>('/nepal/aml/goaml/readiness');
+  }
+
+  goamlSchema(): Observable<GoamlSchemaInfo> {
+    return this.http.get<GoamlSchemaInfo>('/nepal/aml/goaml/schema');
+  }
+
+  /** Use a newer schema file from FIU-Nepal; the answer says how many ready reports went back to draft. */
+  uploadGoamlSchema(label: string, xsd: string): Observable<GoamlSchemaInfo> {
+    // the page says what a refused file means, in place of the usual error box
+    return this.http.put<GoamlSchemaInfo>('/nepal/aml/goaml/schema', xsd, {
+      params: { label },
+      headers: { 'Content-Type': 'text/plain' },
+      context: new HttpContext().set(SILENT_ERRORS, true)
+    });
+  }
+
+  /** Go back to the schema file that ships with the system. */
+  usePublishedGoamlSchema(): Observable<GoamlSchemaInfo> {
+    return this.http.delete<GoamlSchemaInfo>('/nepal/aml/goaml/schema');
   }
 
   ledgerStatus(): Observable<LedgerStatus> {

@@ -1,0 +1,58 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="compliance-page">
+  <mifosx-report-steps [type]="type" [step]="step()" (stepChange)="onStep($event)"></mifosx-report-steps>
+
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
+
+  @if (showToMake()) {
+    <section class="frame">
+      <h2 class="legend">{{ 'compliance.reports.Decided, not made yet' | translate }}</h2>
+      @if (toMake().length) {
+        <ol class="to-make">
+          @for (i of toMake(); track i.caseId) {
+            <li>
+              <span class="what">
+                {{ i.name }}
+                <span class="sub">{{ i.reference }}{{ i.accountNo ? ' · ' + i.accountNo : '' }}</span>
+              </span>
+              <span class="due">
+                @if (i.dueOn) {
+                  <mifosx-due-chip [daysLeft]="i.daysLeft"></mifosx-due-chip>
+                  <span class="sub">{{ i.dueOn | adToBs }}</span>
+                }
+              </span>
+              <a mat-stroked-button color="primary" [routerLink]="['/compliance', 'cases', i.caseId]">
+                {{ 'compliance.reports.Make it on the case' | translate }}
+              </a>
+            </li>
+          }
+        </ol>
+      } @else {
+        <p class="empty">{{ 'compliance.reports.No case waits for a report' | translate }}</p>
+      }
+    </section>
+  }
+
+  @if (step() !== 'TO_MAKE') {
+    <section class="frame">
+      <h2 class="legend">
+        {{ (step() === 'ALL' ? 'compliance.reports.On their way' : 'compliance.reports.steps.' + step()) | translate }}
+      </h2>
+      <mifosx-goaml-report-list [reports]="shownReports()" (changed)="changed()"></mifosx-goaml-report-list>
+      @if ((step() === 'SENT' || step() === 'ACCEPTED') && more()) {
+        <button mat-button color="primary" type="button" (click)="loadDone(true)">
+          {{ 'compliance.reports.Show more' | translate }}
+        </button>
+      }
+    </section>
+  }
+</div>

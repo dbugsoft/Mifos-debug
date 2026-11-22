@@ -1,0 +1,134 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+@if (selectable() && canFile() && packable().length) {
+  <div class="pack-bar">
+    <mat-checkbox
+      [checked]="selected().size === packable().length"
+      [indeterminate]="selected().size > 0 && selected().size < packable().length"
+      (change)="toggleAll()"
+    >
+      {{ 'compliance.reports.Choose all ready' | translate: { count: packable().length } }}
+    </mat-checkbox>
+    <button
+      mat-raised-button
+      color="primary"
+      type="button"
+      [disabled]="!selected().size || busy()"
+      (click)="packChosen()"
+    >
+      <mat-icon>folder_zip</mat-icon>
+      {{ 'compliance.reports.Download chosen as one zip' | translate: { count: selected().size } }}
+    </button>
+  </div>
+}
+
+<ol class="reports">
+  @for (r of reports(); track r.id) {
+    @let due = dueIn(r);
+    @let next = canFile() ? steps(r) : [];
+    <li class="report" [class.late]="due !== null && due < 0" [class.chosen]="selected().has(r.id)">
+      <div class="head">
+        @if (selectable() && canFile()) {
+          <mat-checkbox
+            class="pick"
+            [disabled]="!canPack(r)"
+            [checked]="selected().has(r.id)"
+            (change)="toggle(r)"
+            [attr.aria-label]="r.reference"
+          ></mat-checkbox>
+        }
+        <span class="reference">{{ r.reference }}</span>
+        @if (showType()) {
+          <span class="kind" [class]="'kind k-' + r.type">{{ 'compliance.today.kind.' + r.type | translate }}</span>
+        }
+        <span [class]="statusTone(r)">
+          {{
+            (r.stale && (r.status === 'DRAFT' || r.status === 'READY')
+              ? 'compliance.reports.Out of date'
+              : 'compliance.reportStatus.' + r.status
+            ) | translate
+          }}
+        </span>
+        @if (r.filedByHand) {
+          <span class="chip grey">{{ 'compliance.reports.Filed by hand' | translate }}</span>
+        }
+        <span class="spacer"></span>
+        @if (due !== null) {
+          <span class="due">
+            <mifosx-due-chip [daysLeft]="due"></mifosx-due-chip>
+            <span class="sub">{{ r.dueOn! | adToBs }}</span>
+          </span>
+        }
+      </div>
+
+      <div class="meta">
+        @if (showMember()) {
+          @if (r.clientId) {
+            <a [routerLink]="['/members', r.clientId]">{{ r.clientName }}</a>
+          } @else {
+            <span>{{ 'compliance.reports.Not a member' | translate }}</span>
+          }
+        }
+        @if (r.caseId) {
+          <a [routerLink]="['/compliance', 'cases', r.caseId]">{{ 'compliance.reports.Open the case' | translate }}</a>
+        }
+        @if (r.submittedOn) {
+          <span>{{ 'compliance.reports.Sent on date' | translate: { date: r.submittedOn | adToBs } }}</span>
+        }
+        @if (r.fiuReference) {
+          <span>{{ 'compliance.reports.FIU reference' | translate: { reference: r.fiuReference } }}</span>
+        }
+        @if (r.replacesReportId) {
+          <span>{{ 'compliance.reports.A correction' | translate }}</span>
+        }
+      </div>
+
+      @if (r.stale && (r.status === 'DRAFT' || r.status === 'READY')) {
+        <p class="stale">{{ 'compliance.reports.staleHint' | translate }}</p>
+      }
+      @if (r.status === 'DRAFT' || r.status === 'READY' || r.status === 'REJECTED') {
+        <mifosx-goaml-gaps [report]="r"></mifosx-goaml-gaps>
+      }
+      @if (r.outcomeNote) {
+        <p class="note">
+          <span class="note-label">{{ 'compliance.reports.What FIU-Nepal said' | translate }}</span> {{ r.outcomeNote }}
+        </p>
+      }
+      @if (r.handReason) {
+        <p class="note">
+          <span class="note-label">{{ 'compliance.reports.Why by hand' | translate }}</span> {{ r.handReason }}
+        </p>
+      }
+
+      @if (next.length) {
+        <div class="actions">
+          @for (s of next; track s; let first = $first) {
+            @if (first) {
+              <button mat-raised-button color="primary" type="button" [disabled]="busy()" (click)="run(s, r)">
+                {{ 'compliance.reports.step.' + s | translate }}
+              </button>
+            } @else {
+              <button
+                mat-stroked-button
+                type="button"
+                [color]="s === 'DISCARD' ? 'warn' : 'primary'"
+                [disabled]="busy()"
+                (click)="run(s, r)"
+              >
+                {{ 'compliance.reports.step.' + s | translate }}
+              </button>
+            }
+          }
+        </div>
+      }
+    </li>
+  } @empty {
+    <li class="empty">{{ 'compliance.reports.No reports here' | translate }}</li>
+  }
+</ol>

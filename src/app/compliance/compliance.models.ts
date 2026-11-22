@@ -168,6 +168,81 @@ export interface GoamlReport {
   fiuReference?: string | null;
   outcomeNote?: string | null;
   replacesReportId?: number | null;
+  caseId?: number | null;
+  warnings?: string[];
+  notes?: GoamlNote[];
+  /** The books changed since the file was made: rebuild it before sending. */
+  stale?: boolean;
+  filedByHand?: boolean;
+  handReason?: string | null;
+  /** The same as problems, for translating and linking; empty on a report made before details existed. */
+  problemDetails?: GoamlGap[];
+  warningDetails?: GoamlGap[];
+}
+
+/** Where a gap is fixed (docs/goaml-reports.md, "Problems and warnings for screens"). */
+export type GoamlFix = 'MEMBER' | 'AML_SETTINGS' | 'GOAML_CODES' | 'OFFICER' | 'NONE';
+
+/** Something that keeps a report a draft (a problem) or was filled in with a stand-in (a warning). */
+export interface GoamlGap {
+  code: string;
+  message: string;
+  arguments: string[];
+  fix: GoamlFix;
+  clientId?: number | null;
+}
+
+/** Something the officer should know about what just happened to a report. */
+export interface GoamlNote {
+  code: string;
+  message: string;
+  arguments: string[];
+}
+
+export type ReportType = 'TTR' | 'STR' | 'SAR';
+
+/** Where each report type stands (GET /nepal/aml/today/reports, ADR-0062). */
+export interface ReportStepCounts {
+  toMake: number;
+  needsFixing: number;
+  ready: number;
+  sent: number;
+  accepted: number;
+  late: number;
+  soon: number;
+}
+
+export interface ReportSteps {
+  today: string;
+  fiscalYear: number;
+  fiscalYearFrom: string;
+  types: Record<ReportType, ReportStepCounts>;
+  /** Threshold items found after their deadline, waiting for a decision. */
+  foundLate: number;
+}
+
+/** The goAML setup checklist (GET /nepal/aml/goaml/readiness). */
+export interface GoamlReadiness {
+  ready: boolean;
+  items: { code: string; ok: boolean; required: boolean; message: string; fix: GoamlFix }[];
+  codesEmpty: GoamlLookup[];
+  codesNotInList: GoamlLookup[];
+}
+
+export type SchemaRuleCheck = 'OUR_RULES' | 'FINERACT' | 'NOT_FOR_US' | 'NOT_CHECKED';
+
+/** The goAML schema in use (GET /nepal/aml/goaml/schema). */
+export interface GoamlSchemaInfo {
+  uploaded: boolean;
+  inUse: 'PUBLISHED' | 'UPLOADED';
+  publishedLabel?: string;
+  note?: string;
+  id?: number;
+  label?: string;
+  uploaded_at?: string;
+  size?: number;
+  rulesNotReadByTheChecker: { rule: string; checkedBy: SchemaRuleCheck }[];
+  reportsBackToDraft?: number;
 }
 
 export interface LedgerStatus {

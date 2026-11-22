@@ -15,6 +15,9 @@ describe('compliance places', () => {
     expect(placeOf('/compliance')).toBe('TODAY');
     expect(placeOf('/compliance?x=1')).toBe('TODAY');
     expect(placeOf('/compliance/threshold-reports')).toBe('REPORTS');
+    expect(placeOf('/compliance/suspicious-reports/str')).toBe('REPORTS');
+    expect(placeOf('/compliance/sent-reports')).toBe('REPORTS');
+    expect(placeOf('/compliance/goaml-setup')).toBe('REPORTS');
     expect(placeOf('/compliance/cases/12')).toBe('SUSPICIONS');
     expect(placeOf('/compliance/members/5')).toBe('MEMBERS');
     expect(placeOf('/compliance/screening/matches/3')).toBe('MEMBERS');
