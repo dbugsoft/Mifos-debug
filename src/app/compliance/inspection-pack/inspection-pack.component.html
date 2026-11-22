@@ -1,0 +1,253 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="compliance-page pack">
+  <section class="frame no-print">
+    <p class="hint">{{ 'compliance.pack.lead' | translate }}</p>
+    <div class="period">
+      <mifosx-nepali-date-input class="date" [label]="'compliance.pack.From' | translate" [formControl]="from" />
+      <mifosx-nepali-date-input class="date" [label]="'compliance.pack.To' | translate" [formControl]="to" />
+      <button mat-raised-button color="primary" type="button" (click)="make()" [disabled]="loading()">
+        {{ 'compliance.pack.Make the pack' | translate }}
+      </button>
+      @if (pack()) {
+        <button mat-stroked-button type="button" (click)="print()">{{ 'compliance.officer.Print' | translate }}</button>
+      }
+    </div>
+  </section>
+
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
+
+  @if (pack(); as p) {
+    <header class="head">
+      <h2 class="title">{{ 'compliance.pack.title' | translate }}</h2>
+      <p class="hint">
+        {{ 'compliance.pack.period' | translate: { from: (p.from | adToBs), to: (p.to | adToBs) } }} ·
+        {{ 'compliance.pack.madeOn' | translate: { date: (p.madeOn | adToBs), name: p.madeBy } }}
+      </p>
+    </header>
+
+    <section class="frame">
+      <h3 class="legend">{{ 'compliance.pack.1 The compliance officer' | translate }}</h3>
+      @for (o of p.officers; track o.appointedOn) {
+        <p>
+          <strong>{{ o.name }}</strong> · {{ 'compliance.governance.Appointed on' | translate }}
+          {{ o.appointedOn | adToBs }}
+          @if (o.boardDecision) {
+            <span class="sub">({{ o.boardDecision }})</span>
+          }
+          @if (o.endedOn) {
+            · {{ 'compliance.pack.until' | translate: { date: (o.endedOn | adToBs) } }}
+          }
+        </p>
+        <p class="sub">
+          {{ 'compliance.officer.FIU-Nepal told' | translate }}:
+          {{ o.notifiedFiuOn ? (o.notifiedFiuOn | adToBs) : '—' }} ·
+          {{ 'compliance.officer.Department told' | translate }}:
+          {{ o.notifiedDepartmentOn ? (o.notifiedDepartmentOn | adToBs) : '—' }}
+        </p>
+      } @empty {
+        <p class="warn">{{ 'compliance.pack.noOfficer' | translate }}</p>
+      }
+      @for (c of p.covers; track c.fromOn) {
+        <p>
+          {{
+            'compliance.officer.coverLine'
+              | translate: { name: c.name, from: (c.fromOn | adToBs), to: (c.lastDay | adToBs) }
+          }}
+          @if (c.boardDecision) {
+            <span class="sub">({{ c.boardDecision }})</span>
+          }
+        </p>
+      }
+    </section>
+
+    <section class="frame">
+      <h3 class="legend">{{ 'compliance.pack.2 Board reviews' | translate }}</h3>
+      @if (p.boardReviews.length) {
+        <table class="plain">
+          <tbody>
+            @for (r of p.boardReviews; track $index) {
+              <tr>
+                <td>{{ r.metOn | adToBs }}</td>
+                <td>{{ r.periodFrom | adToBs }} – {{ r.periodTo | adToBs }}</td>
+                <td>{{ r.minuteReference ?? '' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      } @else {
+        <p class="warn">{{ 'compliance.pack.noReview' | translate }}</p>
+      }
+      @if (p.nextReviewDueOn) {
+        <p class="sub">{{ 'compliance.pack.nextReview' | translate: { date: (p.nextReviewDueOn | adToBs) } }}</p>
+      }
+    </section>
+
+    <section class="frame">
+      <h3 class="legend">{{ 'compliance.pack.3 Plan and yearly reports' | translate }}</h3>
+      @for (y of p.fiscalYears; track y) {
+        <p>
+          <strong>{{ yearLabel(y) }}</strong> ·
+          @if (planOf(p, y); as plan) {
+            {{
+              'compliance.pack.planApproved' | translate: { date: plan.approvedOn ? (plan.approvedOn | adToBs) : '—' }
+            }}
+          } @else {
+            <span class="warn">{{ 'compliance.pack.noPlan' | translate }}</span>
+          }
+        </p>
+        <ul class="plain-list">
+          @for (r of p.yearlyReports; track r.type + r.fiscalYear) {
+            @if (r.fiscalYear === y) {
+              <li>
+                {{ 'compliance.reports.type.' + r.type | translate }}:
+                {{ 'compliance.pack.yearlyStatus.' + r.status | translate }}
+                @if (r.approvedOn) {
+                  ({{ r.approvedOn | adToBs }})
+                }
+              </li>
+            }
+          }
+        </ul>
+      }
+    </section>
+
+    <section class="frame">
+      <h3 class="legend">{{ 'compliance.pack.4 Training' | translate }}</h3>
+      @if (p.trainings.length) {
+        <table class="plain">
+          <tbody>
+            @for (t of p.trainings; track $index) {
+              <tr>
+                <td>{{ t.heldOn | adToBs }}</td>
+                <td>{{ t.topic }}</td>
+                <td>{{ t.audience ? ('compliance.governance.audience.' + t.audience | translate) : '' }}</td>
+                <td class="num">{{ t.attendees ?? '' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      } @else {
+        <p class="warn">{{ 'compliance.pack.noTraining' | translate }}</p>
+      }
+    </section>
+
+    <section class="frame">
+      <h3 class="legend">{{ 'compliance.pack.5 Reports to FIU-Nepal' | translate }}</h3>
+      <table class="plain counts">
+        <thead>
+          <tr>
+            <th></th>
+            <th class="num">{{ 'compliance.pack.Sent' | translate }}</th>
+            <th class="num">{{ 'compliance.pack.On time' | translate }}</th>
+            <th class="num">{{ 'compliance.pack.Late' | translate }}</th>
+            <th class="num">{{ 'compliance.pack.Late and not sent at the end' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (t of types; track t) {
+            <tr>
+              <td>{{ 'compliance.today.kind.' + t | translate }}</td>
+              <td class="num">{{ p.sentByType[t].sent }}</td>
+              <td class="num">{{ p.sentByType[t].onTime }}</td>
+              <td class="num" [class.bad]="p.sentByType[t].late">{{ p.sentByType[t].late }}</td>
+              <td class="num" [class.bad]="lateAt(p, t)">{{ lateAt(p, t) }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+      @if (p.reportsSent.length) {
+        <h4 class="sub-legend">
+          {{ 'compliance.pack.Every report sent' | translate: { count: p.reportsSent.length } }}
+        </h4>
+        <table class="plain">
+          <tbody>
+            @for (r of p.reportsSent; track r.reference) {
+              <tr>
+                <td>{{ r.reference }}</td>
+                <td>{{ 'compliance.pack.due' | translate: { date: r.dueOn ? (r.dueOn | adToBs) : '—' } }}</td>
+                <td>{{ 'compliance.pack.sentOn' | translate: { date: (r.submittedOn | adToBs) } }}</td>
+                <td [class.bad]="!r.onTime">
+                  {{ (r.onTime ? 'compliance.pack.On time' : 'compliance.pack.Late') | translate }}
+                </td>
+                <td class="sub">{{ r.fiuReference ?? '' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </section>
+
+    <section class="frame">
+      <h3 class="legend">{{ 'compliance.pack.6 Cases and risk' | translate }}</h3>
+      <ul class="tallies">
+        <li>
+          <span class="count">{{ p.cases.opened }}</span> {{ 'compliance.pack.cases.opened' | translate }}
+        </li>
+        <li>
+          <span class="count">{{ p.cases.decidedReport }}</span> {{ 'compliance.pack.cases.decidedReport' | translate }}
+        </li>
+        <li>
+          <span class="count">{{ p.cases.decidedNoReport }}</span>
+          {{ 'compliance.pack.cases.decidedNoReport' | translate }}
+        </li>
+        <li>
+          <span class="count">{{ p.cases.openAtEnd }}</span> {{ 'compliance.pack.cases.openAtEnd' | translate }}
+        </li>
+      </ul>
+      <p class="sub-legend">{{ 'compliance.pack.Risk grades today' | translate }}</p>
+      <ul class="tallies">
+        @for (g of grades(p); track g.grade) {
+          <li>
+            <span class="count">{{ g.count }}</span> {{ 'compliance.grade.' + g.grade | translate }}
+          </li>
+        }
+      </ul>
+    </section>
+
+    <section class="frame">
+      <h3 class="legend">{{ 'compliance.pack.7 Settings changed' | translate }}</h3>
+      @for (c of p.settingsChanges; track c.at) {
+        <div class="change">
+          <p class="sub">{{ c.at.slice(0, 10) | adToBs }} · {{ c.name || c.username }}</p>
+          @for (l of lines(c); track $index) {
+            <p>{{ l }}</p>
+          }
+          @if (c.text) {
+            <p>{{ c.text }}</p>
+          }
+          @if (c.reason) {
+            <p class="sub">{{ 'compliance.pack.because' | translate: { reason: c.reason } }}</p>
+          }
+        </div>
+      } @empty {
+        <p class="empty">{{ 'compliance.pack.noChanges' | translate }}</p>
+      }
+    </section>
+
+    <section class="frame">
+      <h3 class="legend">{{ 'compliance.pack.8 Who can see compliance data' | translate }}</h3>
+      <table class="plain">
+        <tbody>
+          @for (h of p.accessHolders; track h.userId) {
+            <tr>
+              <td>
+                {{ h.name || h.username }} <span class="sub">{{ h.username }}</span>
+              </td>
+              <td>{{ h.roles.join(', ') }}</td>
+              <td class="sub">{{ h.office }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </section>
+  }
+</div>

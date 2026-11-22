@@ -208,7 +208,14 @@ export class CasesService {
 
   decide(
     id: number,
-    decision: { decision: string; reportType?: string | null; suspicion?: string | null; reason: string }
+    decision: {
+      decision: string;
+      /** What is suspected (ADR-0065): MONEY_MOVED gives an STR, ATTEMPTED or CONDUCT a SAR. */
+      basis?: string | null;
+      reportType?: string | null;
+      suspicion?: string | null;
+      reason: string;
+    }
   ): Observable<CaseDetail> {
     return this.http.post<CaseDetail>(`/nepal/aml/cases/${id}/decide`, decision);
   }

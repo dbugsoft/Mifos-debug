@@ -1,0 +1,66 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<h2 mat-dialog-title class="title">{{ 'compliance.case.Decide' | translate }}</h2>
+<form [formGroup]="form" (ngSubmit)="decide()">
+  <mat-dialog-content class="decide">
+    <fieldset>
+      <legend>{{ 'compliance.decide.Do you suspect' | translate }}</legend>
+      <mat-radio-group formControlName="decision" class="choices">
+        <mat-radio-button value="REPORT">{{ 'compliance.decide.yesReport' | translate }}</mat-radio-button>
+        <mat-radio-button value="NO_REPORT">{{ 'compliance.decide.noReport' | translate }}</mat-radio-button>
+      </mat-radio-group>
+    </fieldset>
+
+    @if (report()) {
+      <fieldset>
+        <legend>{{ 'compliance.decide.What do you suspect' | translate }}</legend>
+        <mat-radio-group formControlName="basis" class="choices">
+          @for (b of bases; track b) {
+            <mat-radio-button [value]="b">{{ 'compliance.decide.basis.' + b | translate }}</mat-radio-button>
+          }
+        </mat-radio-group>
+      </fieldset>
+
+      @if (type(); as t) {
+        <p class="names" role="status">
+          <strong>{{ 'compliance.decide.thisIs.' + t | translate }}</strong>
+          {{ 'compliance.decide.why.' + t | translate }}
+        </p>
+        @if (t === 'STR' && !data.hasTransactions) {
+          <p class="warn">{{ 'compliance.decide.noTransactions' | translate }}</p>
+        }
+      }
+
+      <mat-form-field appearance="outline" class="field">
+        <mat-label>{{ 'compliance.case.What is suspected' | translate }}</mat-label>
+        <mat-select formControlName="suspicion">
+          @for (s of suspicions; track s) {
+            <mat-option [value]="s">{{ 'compliance.case.suspicion.' + s | translate }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    }
+
+    @if (value().decision) {
+      <mat-form-field appearance="outline" class="field">
+        <mat-label>{{ 'compliance.case.Reason' | translate }}</mat-label>
+        <textarea matInput rows="4" formControlName="reason" maxlength="4000"></textarea>
+        <mat-hint>{{
+          (report() ? 'compliance.decide.reasonReport' : 'compliance.decide.reasonNoReport') | translate
+        }}</mat-hint>
+      </mat-form-field>
+    }
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-stroked-button type="button" mat-dialog-close>{{ 'labels.buttons.Cancel' | translate }}</button>
+    <button mat-raised-button color="primary" type="submit" [disabled]="!ready()">
+      {{ 'compliance.case.Decide' | translate }}
+    </button>
+  </mat-dialog-actions>
+</form>

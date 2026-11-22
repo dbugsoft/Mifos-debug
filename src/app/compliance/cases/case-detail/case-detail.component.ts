@@ -20,8 +20,8 @@ import { ComplianceService } from '../../compliance.service';
 import { GoamlReport } from '../../compliance.models';
 import { DueChipComponent } from '../../due-chip/due-chip.component';
 import { GoamlReportListComponent } from '../../goaml-reports/goaml-report-list.component';
-import { InputDialogComponent, InputDialogData } from '../../input-dialog/input-dialog.component';
-import { CaseDetail, CasesService, SUSPICIONS } from '../cases.service';
+import { CaseDetail, CasesService } from '../cases.service';
+import { DecideDialogComponent, DecideDialogData, DecideResult } from '../decide-dialog/decide-dialog.component';
 
 /**
  * A compliance case (fineract-dbug #133, #134, #135; mockup "case and report decision"): its alerts, notes and
@@ -109,60 +109,20 @@ export class CaseDetailComponent implements OnInit {
     this.cases.document(this.item()!.id, documentId).subscribe((blob) => this.save(blob, fileName));
   }
 
+  /** The guided decision (ADR-0065): the officer says what they suspect, the dialog names the report. */
   decide(): void {
+    const k = this.item()!;
     this.dialog
-      .open<InputDialogComponent, InputDialogData, Record<string, string>>(InputDialogComponent, {
-        data: {
-          title: 'compliance.case.Decide',
-          message: 'compliance.case.decideLead',
-          fields: [
-            {
-              name: 'decision',
-              label: 'compliance.case.Decision',
-              type: 'select',
-              required: true,
-              options: [
-                { value: 'REPORT', label: 'compliance.case.decision.REPORT' },
-                { value: 'NO_REPORT', label: 'compliance.case.decision.NO_REPORT' }
-              ]
-            },
-            {
-              name: 'reportType',
-              label: 'compliance.case.Report',
-              type: 'select',
-              hint: 'compliance.case.reportTypeHint',
-              options: [
-                { value: 'STR', label: 'compliance.case.reportType.STR' },
-                { value: 'SAR', label: 'compliance.case.reportType.SAR' }
-              ]
-            },
-            {
-              name: 'suspicion',
-              label: 'compliance.case.What is suspected',
-              type: 'select',
-              hint: 'compliance.case.reportTypeHint',
-              options: SUSPICIONS.map((s) => ({ value: s, label: 'compliance.case.suspicion.' + s }))
-            },
-            { name: 'reason', label: 'compliance.case.Reason', type: 'textarea', required: true, maxLength: 4000 }
-          ],
-          confirm: 'compliance.case.Decide'
-        },
-        width: '600px',
+      .open<DecideDialogComponent, DecideDialogData, DecideResult>(DecideDialogComponent, {
+        data: { hasTransactions: k.alerts.some((a) => a.amount !== null) },
+        width: '620px',
         maxWidth: '96vw',
         autoFocus: false
       })
       .afterClosed()
       .subscribe((r) => {
         if (r) {
-          const report = r['decision'] === 'REPORT';
-          this.run(
-            this.cases.decide(this.item()!.id, {
-              decision: r['decision'],
-              reportType: report ? r['reportType'] || null : null,
-              suspicion: report ? r['suspicion'] || null : null,
-              reason: r['reason']
-            })
-          );
+          this.run(this.cases.decide(k.id, r));
         }
       });
   }
