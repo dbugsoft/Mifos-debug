@@ -1,0 +1,146 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="compliance-page handover">
+  @if (failed()) {
+    <p class="empty">{{ 'compliance.You have no compliance access' | translate }}</p>
+  } @else if (handover(); as h) {
+    <header class="head">
+      <div>
+        <h2 class="title">{{ 'compliance.officer.handoverTitle' | translate }}</h2>
+        <p class="hint">{{ 'compliance.officer.handoverAsOf' | translate: { date: (h.asOf | adToBs) } }}</p>
+      </div>
+      <button mat-stroked-button type="button" class="no-print" (click)="print()">
+        {{ 'compliance.officer.Print' | translate }}
+      </button>
+    </header>
+
+    <section class="frame">
+      <h3 class="legend">{{ 'compliance.officer.Who' | translate }}</h3>
+      @if (h.officer; as o) {
+        <p>
+          <strong>{{ o.name }}</strong>
+          · {{ 'compliance.governance.Appointed on' | translate }} {{ o.appointedOn | adToBs }}
+          @if (o.boardDecision) {
+            <span class="sub">({{ o.boardDecision }})</span>
+          }
+        </p>
+        <p class="sub">
+          {{ 'compliance.officer.FIU-Nepal told' | translate }}:
+          {{ o.notifiedFiuOn ? (o.notifiedFiuOn | adToBs) : '—' }} ·
+          {{ 'compliance.officer.Department told' | translate }}:
+          {{ o.notifiedDepartmentOn ? (o.notifiedDepartmentOn | adToBs) : '—' }}
+        </p>
+      } @else {
+        <p class="warn">{{ 'compliance.officer.noOfficer' | translate }}</p>
+      }
+      @for (c of covers(); track c.id) {
+        <p>
+          {{
+            'compliance.officer.coverLine'
+              | translate: { name: c.name, from: (c.fromOn | adToBs), to: (c.lastDay | adToBs) }
+          }}
+        </p>
+      }
+      @if (h.chiefExecutive; as ce) {
+        <p class="sub">{{ 'compliance.officer.chiefExecutive' | translate: { name: ce.name } }}</p>
+      }
+    </section>
+
+    <section class="frame">
+      <h3 class="legend">{{ 'compliance.officer.What waits' | translate }}</h3>
+      <ul class="tallies">
+        @for (p of places(); track p.label) {
+          <li>
+            <span class="count">{{ p.waiting }}</span> {{ p.label | translate }}
+            @if (p.late) {
+              <span class="chip red">{{ 'compliance.officer.late' | translate: { count: p.late } }}</span>
+            }
+          </li>
+        }
+      </ul>
+      @if (deadlines().length) {
+        <h4 class="sub-legend">{{ 'compliance.officer.Deadlines' | translate }}</h4>
+        <table class="plain">
+          <tbody>
+            @for (i of deadlines(); track $index) {
+              @let w = what(i);
+              <tr [class.late]="i.daysLeft !== null && i.daysLeft < 0">
+                <td class="due">{{ i.dueOn | adToBs }}</td>
+                <td>{{ 'compliance.today.kind.' + i.kind | translate }}</td>
+                <td>
+                  {{
+                    w.key
+                      | translate
+                        : {
+                            count: w.params.count,
+                            reference: w.params.reference,
+                            year: w.params.year,
+                            date: i.dueOn ? (i.dueOn | adToBs) : ''
+                          }
+                  }}
+                </td>
+                <td>{{ i.name ?? '' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+        @if (moreDeadlines()) {
+          <p class="sub">{{ 'compliance.officer.moreOnToday' | translate: { count: moreDeadlines() } }}</p>
+        }
+      }
+    </section>
+
+    <section class="frame">
+      <h3 class="legend">{{ 'compliance.officer.Open cases' | translate: { count: h.openCases.length } }}</h3>
+      @if (h.openCases.length) {
+        <table class="plain">
+          <tbody>
+            @for (k of h.openCases; track k.id) {
+              <tr>
+                <td>
+                  <a [routerLink]="['/compliance', 'cases', k.id]">{{ k.reference }}</a>
+                </td>
+                <td>{{ k.name ?? '' }}</td>
+                <td>{{ 'compliance.case.status.' + k.status | translate }}</td>
+                <td class="sub">
+                  {{ k.openedOn ? (k.openedOn | adToBs) : '' }}
+                  @if (k.reportDueOn) {
+                    · {{ 'compliance.officer.reportDue' | translate: { date: (k.reportDueOn | adToBs) } }}
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      } @else {
+        <p class="empty">{{ 'compliance.officer.noOpenCases' | translate }}</p>
+      }
+    </section>
+
+    <section class="frame">
+      <h3 class="legend">{{ 'compliance.officer.Last board review' | translate }}</h3>
+      @if (h.lastReview; as r) {
+        <p>
+          {{ 'compliance.governance.Met on' | translate }} {{ r.metOn | adToBs }} · {{ r.periodFrom | adToBs }} –
+          {{ r.periodTo | adToBs }}
+          @if (r.minuteReference) {
+            <span class="sub">({{ r.minuteReference }})</span>
+          }
+        </p>
+        @if (r.notes) {
+          <p class="notes">{{ r.notes }}</p>
+        }
+      } @else {
+        <p class="empty">{{ 'compliance.officer.noReview' | translate }}</p>
+      }
+    </section>
+  } @else {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
+</div>

@@ -76,6 +76,7 @@
       } @else {
         <p class="empty">{{ 'compliance.governance.noOfficer' | translate }}</p>
       }
+      <mifosx-officer-panel part="checks" [canManage]="canManage"></mifosx-officer-panel>
       @if (canManage) {
         <div class="actions">
           <button mat-stroked-button color="primary" type="button" (click)="appoint()" [disabled]="busy()">
@@ -101,6 +102,7 @@
           </ul>
         </details>
       }
+      <mifosx-officer-panel part="cover" [canManage]="canManage"></mifosx-officer-panel>
     </section>
 
     <section class="frame">

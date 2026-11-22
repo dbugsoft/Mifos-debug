@@ -28,6 +28,11 @@
           <mifosx-due-chip [daysLeft]="k.daysLeft"></mifosx-due-chip>
         }
       </div>
+      @if (k.officerFamily) {
+        <div class="notice family" role="status">
+          {{ 'compliance.officer.familyCase' | translate: { name: k.officerFamily } }}
+        </div>
+      }
       <p class="summary">{{ k.summary }}</p>
       <dl class="facts">
         <div class="fact">

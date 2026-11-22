@@ -1,0 +1,134 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+@if (officer.view(); as v) {
+  @if (part() === 'checks') {
+    @if (v.officer; as o) {
+      <ul class="checks">
+        @for (p of problems(o); track p) {
+          <li class="warn">
+            {{ p | translate: { name: o.name, username: o.username ?? '' } }}
+            @if (p === 'compliance.officer.loginLacks') {
+              <span class="lacks">
+                @for (m of o.missing; track m) {
+                  <span class="chip amber">{{ 'compliance.officer.can.' + m | translate }}</span>
+                }
+              </span>
+            }
+            @if (o.userId) {
+              <a [routerLink]="['/appusers', o.userId]">{{ 'compliance.officer.Open the login' | translate }}</a>
+            }
+          </li>
+        }
+        @if (o.userId && !problems(o).length) {
+          <li class="ok">{{ 'compliance.officer.loginOk' | translate: { username: o.username ?? '' } }}</li>
+        }
+        @if (o.userId && o.memberLinked === false) {
+          <li class="warn">{{ 'compliance.officer.familyUnknown' | translate: { name: o.name } }}</li>
+        }
+        @if (v.othersWhoDecide === 0) {
+          <li class="warn">{{ 'compliance.officer.nobodyElseDecides' | translate }}</li>
+        }
+        <li [class.warn]="!v.chiefExecutive">
+          @if (v.chiefExecutive; as ce) {
+            {{ 'compliance.officer.chiefExecutive' | translate: { name: ce.name } }}
+          } @else {
+            {{ 'compliance.officer.noChiefExecutive' | translate }}
+          }
+        </li>
+      </ul>
+      @if (v.othersWhoFile?.length) {
+        <details class="others">
+          <summary>{{ 'compliance.officer.othersWhoFile' | translate: { count: v.othersWhoFile!.length } }}</summary>
+          <ul class="plain-list">
+            @for (u of v.othersWhoFile; track u.userId) {
+              <li>
+                {{ u.name || u.username }} <span class="sub">{{ u.username }}</span>
+              </li>
+            }
+          </ul>
+        </details>
+      }
+    }
+  } @else {
+    <h3 class="sub-legend">{{ 'compliance.officer.Cover while the officer is away' | translate }}</h3>
+    <p class="hint">{{ 'compliance.officer.coverExplain' | translate }}</p>
+    @if (active(v.covers).length) {
+      <ul class="covers">
+        @for (c of active(v.covers); track c.id) {
+          <ng-container *ngTemplateOutlet="row; context: { c: c }"></ng-container>
+        }
+      </ul>
+    } @else {
+      <p class="empty">{{ 'compliance.officer.noCover' | translate }}</p>
+    }
+    @if (earlier(v.covers).length) {
+      <details class="others">
+        <summary>{{ 'compliance.officer.Earlier cover' | translate: { count: earlier(v.covers).length } }}</summary>
+        <ul class="covers">
+          @for (c of earlier(v.covers); track c.id) {
+            <ng-container *ngTemplateOutlet="row; context: { c: c }"></ng-container>
+          }
+        </ul>
+      </details>
+    }
+    <div class="actions">
+      @if (canManage()) {
+        <button mat-stroked-button color="primary" type="button" (click)="cover()" [disabled]="busy()">
+          {{ 'compliance.officer.Someone covers' | translate }}
+        </button>
+      }
+      <a mat-stroked-button [routerLink]="['/compliance', 'governance', 'handover']">
+        {{ 'compliance.officer.Handover' | translate }}
+      </a>
+    </div>
+  }
+}
+
+<ng-template #row let-c="c">
+  <li class="cover" [class.over]="c.status === 'OVER'">
+    <div class="cover-line">
+      <strong>{{ c.name }}</strong>
+      @if (c.lastDay < c.fromOn) {
+        <span class="sub">{{ 'compliance.officer.takenBack' | translate: { date: (c.fromOn | adToBs) } }}</span>
+      } @else {
+        <span class="sub">{{ c.fromOn | adToBs }} – {{ c.lastDay | adToBs }}</span>
+      }
+      @if (c.status !== 'OVER') {
+        <span class="chip" [class.amber]="c.status === 'NOW'" [class.blue]="c.status === 'LATER'">{{
+          'compliance.officer.coverStatus.' + c.status | translate
+        }}</span>
+      }
+      @if (canManage() && c.status !== 'OVER') {
+        <button mat-stroked-button type="button" (click)="endCover(c)" [disabled]="busy()">
+          {{ 'compliance.officer.End early' | translate }}
+        </button>
+      }
+    </div>
+    @if (c.boardDecision || c.endReason) {
+      <p class="sub">
+        {{ c.boardDecision ?? '' }}
+        @if (c.endReason) {
+          · {{ 'compliance.officer.endedBecause' | translate: { reason: c.endReason } }}
+        }
+      </p>
+    }
+    @if (c.status !== 'OVER') {
+      @for (p of problems(c); track p) {
+        <p class="warn">
+          {{ p | translate: { name: c.name, username: c.username ?? '' } }}
+          @if (p === 'compliance.officer.loginLacks') {
+            @for (m of c.missing ?? []; track m) {
+              <span class="chip amber">{{ 'compliance.officer.can.' + m | translate }}</span>
+            }
+          }
+        </p>
+      }
+    }
+  </li>
+</ng-template>

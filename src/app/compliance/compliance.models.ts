@@ -185,6 +185,9 @@ export interface GoamlReport {
   dueOn?: string | null;
   problems: string[];
   createdAt?: string;
+  /** The login that made it, and the one that recorded it sent (ADR-0064). */
+  createdBy?: string | null;
+  submittedBy?: string | null;
   submittedOn?: string | null;
   fiuReference?: string | null;
   outcomeNote?: string | null;

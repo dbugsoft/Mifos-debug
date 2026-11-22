@@ -1,0 +1,30 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+@if (officer.view(); as v) {
+  @if (v.workingAs; as w) {
+    <p class="working-as" [class.acting]="w.acting">
+      @if (w.acting) {
+        {{ 'compliance.officer.workingAsActing' | translate: { name: w.name, until: (w.until ?? '' | adToBs) } }}
+      } @else {
+        {{ 'compliance.officer.workingAs' | translate: { name: w.name } }}
+      }
+      @if (v.officer && !w.acting) {
+        <span class="told">
+          · {{ 'compliance.officer.FIU-Nepal told' | translate }} {{ v.officer.notifiedFiuOn ? '✓' : '✗' }} ·
+          {{ 'compliance.officer.Department told' | translate }} {{ v.officer.notifiedDepartmentOn ? '✓' : '✗' }}
+        </span>
+      }
+    </p>
+  } @else {
+    <p class="working-as missing">
+      {{ 'compliance.officer.noOfficer' | translate }}
+      <a [routerLink]="['/compliance', 'governance']">{{ 'compliance.officer.Record the officer' | translate }}</a>
+    </p>
+  }
+}

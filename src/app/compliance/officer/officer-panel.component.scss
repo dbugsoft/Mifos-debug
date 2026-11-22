@@ -1,0 +1,91 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+@use '../compliance' as compliance;
+
+@include compliance.page;
+
+.checks,
+.covers {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.875rem;
+}
+
+.checks li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.checks li.ok {
+  display: block;
+}
+
+.ok::before {
+  content: '✓ ';
+  color: var(--dk-success, #1b7f4b);
+}
+
+.warn {
+  color: var(--dk-warning, #7a4a00);
+}
+
+.lacks {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.others {
+  margin-top: 8px;
+  font-size: 0.875rem;
+}
+
+.sub-legend {
+  margin: 20px 0 4px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.cover {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--dk-border, #e2e8f0);
+
+  &.over {
+    opacity: 0.7;
+  }
+
+  p {
+    margin: 4px 0 0;
+  }
+}
+
+.cover-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.sub {
+  color: var(--dk-text-2, #475569);
+  font-size: 0.8125rem;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 12px;
+}

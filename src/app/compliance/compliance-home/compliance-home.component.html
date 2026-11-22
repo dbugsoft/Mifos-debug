@@ -12,6 +12,7 @@
   } @else if (!access()?.showMenu) {
     <p class="empty">{{ 'compliance.You have no compliance access' | translate }}</p>
   } @else {
+    <mifosx-working-as></mifosx-working-as>
     @if (settings()?.unclassified) {
       <div class="notice" role="status">
         <span>{{ 'compliance.Payment types not classified' | translate: { count: settings()?.unclassified } }}</span>

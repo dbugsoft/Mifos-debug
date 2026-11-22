@@ -6730,7 +6730,9 @@
         "DISCARDED": "Discarded, never sent"
       },
       "foundLateLine": "{{count}} threshold transactions were found after their deadline. Decide for each: report it late, or exempt it with a reason.",
-      "Decide them": "Decide them"
+      "Decide them": "Decide them",
+      "Made by": "Made by {{name}}",
+      "Sent by": "Recorded sent by {{name}}"
     },
     "governance": {
       "Governance": "Governance",
@@ -7154,7 +7156,67 @@
       "date": "Date"
     },
     "Due tomorrow": "Due tomorrow",
-    "One day late": "1 day late"
+    "One day late": "1 day late",
+    "officer": {
+      "workingAs": "Working as compliance officer: {{name}}",
+      "workingAsActing": "{{name}} is covering for the compliance officer until {{until}}",
+      "FIU-Nepal told": "FIU-Nepal told",
+      "Department told": "Department told",
+      "noOfficer": "No compliance officer is on record.",
+      "Record the officer": "Record the officer",
+      "noLogin": "{{name}} has no login on record, so the system cannot check what they can do. Record the officer again with their login.",
+      "loginOff": "The login {{username}} is switched off.",
+      "loginLacks": "The login {{username}} cannot yet:",
+      "can": {
+        "READ_AMLCOMPLIANCE": "see alerts and cases",
+        "MANAGE_AMLCASE": "decide cases",
+        "FILE_GOAML": "make and send reports"
+      },
+      "Open the login": "Open the login",
+      "loginOk": "The login {{username}} can see alerts and cases, decide cases and send reports.",
+      "familyUnknown": "{{name}}'s family cannot be checked: add them to the governance register, linked to their member record and to this login.",
+      "nobodyElseDecides": "Nobody but the officer can decide cases. A suspicion about the officer's family would wait: give a second person the right to decide cases.",
+      "chiefExecutive": "Chief executive: {{name}}. They check suspicions about the officer's family.",
+      "noChiefExecutive": "No chief executive is in the governance register. Suspicions about the officer's family need one to check them.",
+      "othersWhoFile": "Others who can send reports ({{count}})",
+      "Cover while the officer is away": "Cover while the officer is away",
+      "coverExplain": "When the officer is away, the board names someone to cover. Reports made in that time carry their name. The cover ends by itself after its last day.",
+      "coverStatus": {
+        "NOW": "Covering now",
+        "LATER": "Starts later",
+        "OVER": "Over"
+      },
+      "End early": "End early",
+      "endedBecause": "ended early: {{reason}}",
+      "noCover": "Nobody has covered yet.",
+      "Someone covers": "Someone covers",
+      "coverLead": "Who covers, from when to when, and the board's decision.",
+      "Their login": "Their login",
+      "First day": "First day",
+      "Last day": "Last day",
+      "End the cover early": "End the cover early",
+      "endLead": "Give the new last day. To take back a cover that has not started, give the day before it starts.",
+      "Why": "Why",
+      "Handover": "Handover page",
+      "handoverTitle": "Handover for the compliance officer",
+      "handoverAsOf": "As of {{date}}",
+      "Print": "Print",
+      "Who": "Who is officer",
+      "coverLine": "{{name}} covers from {{from}} to {{to}}.",
+      "What waits": "What waits",
+      "late": "{{count}} late",
+      "Deadlines": "Deadlines",
+      "moreOnToday": "{{count}} more on Today.",
+      "Open cases": "Open cases ({{count}})",
+      "reportDue": "report due {{date}}",
+      "noOpenCases": "No open cases.",
+      "Last board review": "Last board review",
+      "noReview": "No board review is recorded yet.",
+      "Officer family": "Officer's family",
+      "familyCase": "This member is {{name}} or {{name}}'s close family. The chief executive checks this case; someone other than {{name}} decides it and sends the report. Tell the board.",
+      "Earlier cover": "Earlier cover ({{count}})",
+      "takenBack": "taken back before {{date}}"
+    }
   },
   "kym": {
     "KYM": "KYM",

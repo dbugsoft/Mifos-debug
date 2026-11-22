@@ -326,6 +326,16 @@ const routes: Routes = [
               data: { title: 'Governance', breadcrumb: 'Governance' }
             },
             {
+              // The page a new compliance officer starts from (fineract-dbug ADR-0064).
+              path: 'governance/handover',
+              loadComponent: () => import('./compliance/officer/handover.component').then((m) => m.HandoverComponent),
+              data: {
+                title: 'Handover',
+                breadcrumb: 'Handover',
+                parentBreadcrumb: { label: 'Governance', url: '/compliance/governance' }
+              }
+            },
+            {
               // Elections (fineract-dbug #144): the board's and the accounts supervision committee's elections, next
               // to the Compliance > Governance (AML) page above, per the backend's own placement for this feature.
               path: 'governance/elections',

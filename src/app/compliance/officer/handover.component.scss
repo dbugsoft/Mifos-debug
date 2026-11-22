@@ -1,0 +1,95 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+@use '../compliance' as compliance;
+
+@include compliance.page;
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 12px;
+
+  .title {
+    margin: 0;
+    font-size: 1.25rem;
+  }
+}
+
+.handover p {
+  margin: 4px 0;
+}
+
+.sub {
+  color: var(--dk-text-2, #475569);
+  font-size: 0.8125rem;
+}
+
+.warn {
+  color: var(--dk-warning, #7a4a00);
+}
+
+.tallies {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  .count {
+    font-size: 1.125rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.sub-legend {
+  margin: 16px 0 4px;
+  font-size: 0.9375rem;
+}
+
+table.plain {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+
+  td {
+    padding: 6px 8px 6px 0;
+    border-bottom: 1px solid var(--dk-border, #e2e8f0);
+    vertical-align: top;
+  }
+
+  .due {
+    white-space: nowrap;
+  }
+
+  tr.late .due {
+    color: var(--dk-danger, #b42318);
+    font-weight: 600;
+  }
+}
+
+.notes {
+  white-space: pre-line;
+}
+
+@media print {
+  .no-print {
+    display: none;
+  }
+}
+
+@media (width <= 600px) {
+  table.plain td:nth-child(2) {
+    display: none;
+  }
+}

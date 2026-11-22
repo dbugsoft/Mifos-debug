@@ -13,6 +13,8 @@ import { MatIcon } from '@angular/material/icon';
 import { MatProgressBar } from '@angular/material/progress-bar';
 import { Observable } from 'rxjs';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { OfficerPanelComponent } from '../../officer/officer-panel.component';
+import { OfficerService } from '../../officer/officer.service';
 import { AdToBsPipe } from 'app/pipes/ad-to-bs.pipe';
 import { ComplianceService } from '../../compliance.service';
 import { InputDialogComponent, InputDialogData, InputDialogField } from '../../input-dialog/input-dialog.component';
@@ -39,7 +41,8 @@ import {
     ...STANDALONE_SHARED_IMPORTS,
     MatIcon,
     MatProgressBar,
-    AdToBsPipe
+    AdToBsPipe,
+    OfficerPanelComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -48,6 +51,7 @@ export class GovernancePageComponent implements OnInit {
   private governance = inject(GovernanceService);
   private dialog = inject(MatDialog);
   private destroyRef = inject(DestroyRef);
+  private officers = inject(OfficerService);
 
   readonly allowed = signal<boolean | null>(null);
   readonly data = signal<Governance | null>(null);
@@ -82,17 +86,29 @@ export class GovernancePageComponent implements OnInit {
   }
 
   appoint(): void {
-    this.ask(
-      'compliance.governance.Record the officer',
-      'compliance.governance.officerLead',
-      [
-        { name: 'name', label: 'compliance.governance.Name', required: true, maxLength: 200 },
-        { name: 'phone', label: 'compliance.governance.Phone', maxLength: 50 },
-        { name: 'email', label: 'compliance.governance.Email', maxLength: 200 },
-        { name: 'appointedOn', label: 'compliance.governance.Appointed on', type: 'date', required: true },
-        { name: 'boardDecision', label: 'compliance.governance.Board decision', maxLength: 200 }
-      ],
-      (v) => this.run(this.governance.appointOfficer(v))
+    // the officer's login, so the system can check it can do the job (ADR-0064)
+    this.officers.logins().subscribe((logins) =>
+      this.ask(
+        'compliance.governance.Record the officer',
+        'compliance.governance.officerLead',
+        [
+          { name: 'name', label: 'compliance.governance.Name', required: true, maxLength: 200 },
+          {
+            name: 'userId',
+            label: 'compliance.officer.Their login',
+            type: 'select',
+            options: logins.map((l) => ({
+              value: String(l.id),
+              label: (l.name || l.username) + ' (' + l.username + ')'
+            }))
+          },
+          { name: 'phone', label: 'compliance.governance.Phone', maxLength: 50 },
+          { name: 'email', label: 'compliance.governance.Email', maxLength: 200 },
+          { name: 'appointedOn', label: 'compliance.governance.Appointed on', type: 'date', required: true },
+          { name: 'boardDecision', label: 'compliance.governance.Board decision', maxLength: 200 }
+        ],
+        (v) => this.run(this.governance.appointOfficer(v), () => this.officers.refresh().subscribe())
+      )
     );
   }
 
