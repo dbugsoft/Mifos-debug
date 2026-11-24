@@ -1,6 +1,6 @@
 ﻿{
   "error.msg.upload.file.too.big": "Faili uliyochagua ni kubwa kuliko kikomo cha MB {{args.0.value}}. Tafadhali chagua faili ndogo zaidi na ujaribu tena.",
-  "APP_NAME": "COFMIS",
+  "APP_NAME": "GroFiniX",
   "APP_FULL_NAME": "Cooperative Financial Management & Information System",
   "Logged in as": "Imeingia kama",
   "Remember me": "Nikumbuke",
@@ -4871,6 +4871,8 @@
         "SAME": "Same as permanent address",
         "DIFFERENT": "A different address"
       },
+      "search": "Search",
+      "noResults": "No results found",
       "hints": {
         "optional": "Optional",
         "chooseProvinceFirst": "Choose a province first",

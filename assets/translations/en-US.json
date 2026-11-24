@@ -1,5 +1,5 @@
 ﻿{
-  "APP_NAME": "COFMIS",
+  "APP_NAME": "GroFiniX",
   "APP_FULL_NAME": "Cooperative Financial Management & Information System",
   "Logged in as": "Logged in as",
   "Remember me": "Remember me",
@@ -3357,6 +3357,7 @@
       "the Transaction Type": "the Transaction Type"
     },
     "text": {
+      "Calculated from Date of Birth": "Calculated from Date of Birth",
       "Welcome back": "Welcome back, {{name}}!",
       "Home subtitle": "Manage and monitor your cooperative efficiently with {{app}}.",
       "Total Members": "Total Members",
@@ -5008,6 +5009,8 @@
         "SAME": "Same as permanent address",
         "DIFFERENT": "A different address"
       },
+      "search": "Search",
+      "noResults": "No results found",
       "hints": {
         "optional": "Optional",
         "chooseProvinceFirst": "Choose a province first",
