@@ -1,0 +1,1 @@
+import{a as i}from"./chunk-HNOA62Z3.js";import{W as r,_ as e}from"./chunk-W3JJRWQV.js";var m=(()=>{class t{constructor(){this.organizationService=e(i)}resolve(){return this.organizationService.getOffices()}static{this.\u0275fac=function(o){return new(o||t)}}static{this.\u0275prov=r({token:t,factory:t.\u0275fac})}}return t})();export{m as a};

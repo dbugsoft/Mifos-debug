@@ -1,0 +1,1 @@
+import"./chunk-P7HBC3MT.js";var t=[{path:"",pathMatch:"full",redirectTo:"valuers"},{path:"valuers",loadComponent:()=>import("./valuers-list.component-EXZFRJ7V.js").then(a=>a.ValuersListComponent),data:{title:"Valuers",breadcrumb:"Valuers",parentBreadcrumb:{label:"Organization",url:"/organization"}}}];export{t as LENDING_ROUTES};
