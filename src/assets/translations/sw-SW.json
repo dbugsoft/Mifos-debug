@@ -4102,7 +4102,9 @@
       "Remove from favourites": "Ondoa kwenye vipendwa",
       "“Maker-Checker” principle requires every tasks": "Kanuni ya \"Mtengenezaji-Kikagua\" inahitaji kila kazi kukamilishwa na watu wawili ili kupunguza uwezekano wa makosa na matumizi mabaya. Mtu mmoja anaanzisha mchakato na wa pili anakamilisha.",
       "Pick a member from the search results": "Pick a member from the search results",
-      "Copied to clipboard": "Copied to clipboard"
+      "Copied to clipboard": "Copied to clipboard",
+      "No members found": "No members found",
+      "No groups found": "No groups found"
     },
     "permissions": {
       "actions": {
@@ -4835,6 +4837,18 @@
       "takeSurvey": {
         "success": "Utafiti umewasilishwa kwa mafanikio.",
         "failure": "Imeshindwa kuwasilisha utafiti."
+      },
+      "photo": {
+        "updated": "Photo updated.",
+        "deleted": "Photo deleted."
+      },
+      "signature": {
+        "saved": "Signature saved.",
+        "deleted": "Signature deleted.",
+        "loadFailed": "Signature could not be loaded."
+      },
+      "unassignStaff": {
+        "success": "Staff unassigned from the member."
       }
     },
     "memberAddress": {

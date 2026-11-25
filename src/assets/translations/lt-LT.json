@@ -4106,7 +4106,9 @@
       "Remove from favourites": "Pašalinti iš mėgstamų",
       "“Maker-Checker” principle requires every tasks": "„Maker-Checker“ principas reikalauja, kad kiekvieną užduotį atliktų du žmonės, kad būtų sumažinta klaidų ir netinkamo naudojimo galimybė. Vienas asmuo pradeda procesą, o antrasis jį užbaigia.",
       "Pick a member from the search results": "Pick a member from the search results",
-      "Copied to clipboard": "Copied to clipboard"
+      "Copied to clipboard": "Copied to clipboard",
+      "No members found": "No members found",
+      "No groups found": "No groups found"
     },
     "permissions": {
       "actions": {
@@ -4839,6 +4841,18 @@
       "takeSurvey": {
         "success": "Apklausa sėkmingai pateikta.",
         "failure": "Nepavyko pateikti apklausos."
+      },
+      "photo": {
+        "updated": "Photo updated.",
+        "deleted": "Photo deleted."
+      },
+      "signature": {
+        "saved": "Signature saved.",
+        "deleted": "Signature deleted.",
+        "loadFailed": "Signature could not be loaded."
+      },
+      "unassignStaff": {
+        "success": "Staff unassigned from the member."
       }
     },
     "memberAddress": {

@@ -92,15 +92,19 @@
   </div>
 
   <mat-autocomplete autoActiveFirstOption #clientsAutocomplete="matAutocomplete" [displayWith]="displayClient">
-    @for (client of clientsData; track client) {
+    @for (client of clientsData(); track client.id) {
       <mat-option [value]="client">
         {{ client.displayName }}
       </mat-option>
+    } @empty {
+      @if (clientsData()) {
+        <mat-option disabled>{{ 'labels.text.No members found' | translate }}</mat-option>
+      }
     }
   </mat-autocomplete>
 
   <div class="members-section">
-    @if (clientChoice.value) {
+    @if (pickedClient; as client) {
       <div class="mat-table">
         <div class="mat-header-row">
           <div class="mat-header-cell">{{ 'labels.inputs.Client Details' | translate }}</div>
@@ -110,15 +114,15 @@
         </div>
         <div class="mat-row">
           <div class="mat-cell">{{ 'labels.inputs.name' | translate }}</div>
-          <div class="mat-cell">{{ clientChoice.value.displayName }}</div>
+          <div class="mat-cell">{{ client.displayName }}</div>
         </div>
         <div class="mat-row">
           <div class="mat-cell">{{ 'labels.inputs.Id' | translate }}</div>
-          <div class="mat-cell">{{ clientChoice.value.id }}</div>
+          <div class="mat-cell">{{ client.id }}</div>
         </div>
         <div class="mat-row">
           <div class="mat-cell">{{ 'labels.inputs.Office' | translate }}</div>
-          <div class="mat-cell">{{ clientChoice.value.officeName }}</div>
+          <div class="mat-cell">{{ client.officeName }}</div>
         </div>
       </div>
     }

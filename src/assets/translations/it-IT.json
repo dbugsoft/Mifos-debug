@@ -4106,7 +4106,9 @@
       "Remove from favourites": "Rimuovi dai preferiti",
       "“Maker-Checker” principle requires every tasks": "Il principio “Maker-Checker” richiede che ogni attività venga completata da due persone per ridurre la possibilità di errori e usi impropri. Una persona avvia il processo e la seconda lo completa.",
       "Pick a member from the search results": "Pick a member from the search results",
-      "Copied to clipboard": "Copied to clipboard"
+      "Copied to clipboard": "Copied to clipboard",
+      "No members found": "No members found",
+      "No groups found": "No groups found"
     },
     "permissions": {
       "actions": {
@@ -4839,6 +4841,18 @@
       "takeSurvey": {
         "success": "Sondaggio inviato con successo.",
         "failure": "Impossibile inviare il sondaggio."
+      },
+      "photo": {
+        "updated": "Photo updated.",
+        "deleted": "Photo deleted."
+      },
+      "signature": {
+        "saved": "Signature saved.",
+        "deleted": "Signature deleted.",
+        "loadFailed": "Signature could not be loaded."
+      },
+      "unassignStaff": {
+        "success": "Staff unassigned from the member."
       }
     },
     "memberAddress": {

@@ -5,3 +5,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
+
+// Signatures are dark ink, often on a transparent background: keep a light backing so they stay readable in dark mode.
+.signature {
+  display: block;
+  max-width: 100%;
+  background: #fff;
+}

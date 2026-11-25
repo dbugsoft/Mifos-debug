@@ -4106,7 +4106,9 @@
       "Remove from favourites": "Odebrat z oblíbených",
       "“Maker-Checker” principle requires every tasks": "Princip „Maker-Checker“ vyžaduje, aby každý úkol prováděli dva lidé, aby se snížila pravděpodobnost chyb a zneužití. Jedna osoba proces iniciuje a druhá jej dokončí.",
       "Pick a member from the search results": "Pick a member from the search results",
-      "Copied to clipboard": "Copied to clipboard"
+      "Copied to clipboard": "Copied to clipboard",
+      "No members found": "No members found",
+      "No groups found": "No groups found"
     },
     "permissions": {
       "actions": {
@@ -5128,6 +5130,18 @@
       "takeSurvey": {
         "success": "Průzkum byl úspěšně odeslán.",
         "failure": "Nepodařilo se odeslat průzkum."
+      },
+      "photo": {
+        "updated": "Photo updated.",
+        "deleted": "Photo deleted."
+      },
+      "signature": {
+        "saved": "Signature saved.",
+        "deleted": "Signature deleted.",
+        "loadFailed": "Signature could not be loaded."
+      },
+      "unassignStaff": {
+        "success": "Staff unassigned from the member."
       }
     },
     "memberAddress": {

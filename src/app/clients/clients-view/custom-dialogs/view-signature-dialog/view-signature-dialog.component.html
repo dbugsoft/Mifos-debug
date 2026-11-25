@@ -10,7 +10,13 @@
 
 @if (signatureId) {
   <div mat-dialog-content>
-    <img [src]="signatureImage" alt="Signature" />
+    @if (signatureImage(); as image) {
+      <img class="signature" [src]="image" [alt]="'labels.heading.View Client Signature' | translate" />
+    } @else if (loadFailed()) {
+      <p>{{ 'clients.actions.signature.loadFailed' | translate }}</p>
+    } @else {
+      <mat-spinner diameter="40"></mat-spinner>
+    }
   </div>
 }
 

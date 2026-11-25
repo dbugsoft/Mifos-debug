@@ -14,33 +14,39 @@
     </mat-form-field>
 
     <mat-autocomplete autoActiveFirstOption #groupsAutocomplete="matAutocomplete" [displayWith]="displayGroup">
-      @for (group of groupsData; track group) {
+      @for (group of groupsData(); track group.id) {
         <mat-option [value]="group">
           {{ group.name }}
         </mat-option>
+      } @empty {
+        @if (groupsData()) {
+          <mat-option disabled>{{ 'labels.text.No groups found' | translate }}</mat-option>
+        }
       }
     </mat-autocomplete>
 
-    <div class="mat-table">
-      <div class="mat-header-row">
-        <div class="mat-header-cell">{{ 'labels.inputs.Group Details' | translate }}</div>
-        <button mat-icon-button (click)="addGroup()">
-          <fa-icon icon="plus"></fa-icon>
-        </button>
+    @if (pickedGroup; as group) {
+      <div class="mat-table">
+        <div class="mat-header-row">
+          <div class="mat-header-cell">{{ 'labels.inputs.Group Details' | translate }}</div>
+          <button mat-icon-button type="button" (click)="addGroup()">
+            <fa-icon icon="plus"></fa-icon>
+          </button>
+        </div>
+        <div class="mat-row">
+          <div class="mat-cell">{{ 'labels.inputs.name' | translate }}</div>
+          <div class="mat-cell">{{ group.name }}</div>
+        </div>
+        <div class="mat-row">
+          <div class="mat-cell">{{ 'labels.inputs.Id' | translate }}</div>
+          <div class="mat-cell">{{ group.id }}</div>
+        </div>
+        <div class="mat-row">
+          <div class="mat-cell">{{ 'labels.inputs.Office' | translate }}</div>
+          <div class="mat-cell">{{ group.officeName }}</div>
+        </div>
       </div>
-      <div class="mat-row">
-        <div class="mat-cell">{{ 'labels.inputs.name' | translate }}</div>
-        <div class="mat-cell">{{ groupChoice.value.name }}</div>
-      </div>
-      <div class="mat-row">
-        <div class="mat-cell">{{ 'labels.inputs.Id' | translate }}</div>
-        <div class="mat-cell">{{ groupChoice.value.id }}</div>
-      </div>
-      <div class="mat-row">
-        <div class="mat-cell">{{ 'labels.inputs.Office' | translate }}</div>
-        <div class="mat-cell">{{ groupChoice.value.officeName }}</div>
-      </div>
-    </div>
+    }
   </mat-card>
 
   <mat-card class="flex-50">

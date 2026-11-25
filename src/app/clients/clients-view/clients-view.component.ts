@@ -9,6 +9,7 @@
 /** Angular Imports */
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   DestroyRef,
   OnInit,
@@ -168,6 +169,7 @@ export class ClientsViewComponent implements OnInit {
   private clientsService = inject(ClientsService);
   dialog = inject(MatDialog);
   private destroyRef = inject(DestroyRef);
+  private cdr = inject(ChangeDetectorRef);
 
   clientViewData: any;
   clientDatatables: any;
@@ -201,6 +203,9 @@ export class ClientsViewComponent implements OnInit {
           membershipApplication: MembershipApplication | null;
         }) => {
           this.clientViewData = data.clientViewData;
+          // The page is reused when going from one member to another, so load each member's own photo.
+          this.releaseClientImage();
+          this.loadClientImage();
           this.membershipApplication.set(data.membershipApplication ?? null);
           const status = data.clientViewData?.status?.value;
           if (status === 'Pending' || status === 'Rejected') {
@@ -325,11 +330,19 @@ export class ClientsViewComponent implements OnInit {
   ngOnInit() {
     // A blob: URL points at memory held for this page; release it when the page goes away.
     this.destroyRef.onDestroy(() => this.releaseClientImage());
+  }
+
+  /** Fetches the member's photo into `clientImage`; also used to refresh it in place after a change. */
+  private loadClientImage() {
+    const clientId = this.clientViewData.id;
     this.clientsService
-      .getClientProfileImage(this.clientViewData.id)
+      .getClientProfileImage(clientId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (image: Blob | null) => {
+          if (this.clientViewData.id !== clientId) {
+            return; // a slower answer for the member shown before
+          }
           this.releaseClientImage();
           // A null image means the client has no profile image. A blob: URL passes Angular's URL
           // sanitizer as it is, so no bypassSecurityTrust call is needed.
@@ -427,12 +440,20 @@ export class ClientsViewComponent implements OnInit {
   }
 
   /**
-   * Refetches data for the component
-   * TODO: Replace by a custom reload component instead of hard-coded back-routing.
+   * Refetches the member's details in place. Earlier this went through `/members` and back,
+   * which flashed the Members list for a moment (fineract-dbug #331).
    */
-  reload() {
-    const url: string = this.router.url;
-    this.router.navigateByUrl(`/members`, { skipLocationChange: true }).then(() => this.router.navigate([url]));
+  private refreshClient() {
+    this.clientsService.getClientData(this.clientViewData.id).subscribe((client: any) => {
+      this.clientViewData = client;
+      this.cdr.markForCheck();
+    });
+  }
+
+  /** Refreshes the photo in place and confirms the change. */
+  private photoChanged(messageKey: string) {
+    this.loadClientImage();
+    this.notifier.notify(messageKey);
   }
 
   /**
@@ -467,7 +488,8 @@ export class ClientsViewComponent implements OnInit {
         this.clientsService
           .executeClientCommand(this.clientViewData.id, 'unassignStaff', { staffId: this.clientViewData.staffId })
           .subscribe(() => {
-            this.reload();
+            this.refreshClient();
+            this.notifier.notify('clients.actions.unassignStaff.success');
           });
       }
     });
@@ -506,9 +528,9 @@ export class ClientsViewComponent implements OnInit {
     const uploadSignatureDialogRef = this.dialog.open(UploadSignatureDialogComponent);
     uploadSignatureDialogRef.afterClosed().subscribe((signature: File) => {
       if (signature) {
-        this.clientsService.uploadClientSignatureImage(this.clientViewData.id, signature).subscribe(() => {
-          this.reload();
-        });
+        this.clientsService
+          .uploadClientSignatureImage(this.clientViewData.id, signature)
+          .subscribe(() => this.notifier.notify('clients.actions.signature.saved'));
       }
     });
   }
@@ -520,9 +542,9 @@ export class ClientsViewComponent implements OnInit {
     const drawSignatureDialogRef = this.dialog.open(DrawSignatureDialogComponent);
     drawSignatureDialogRef.afterClosed().subscribe((signature: File) => {
       if (signature) {
-        this.clientsService.uploadClientSignatureImage(this.clientViewData.id, signature).subscribe(() => {
-          this.reload();
-        });
+        this.clientsService
+          .uploadClientSignatureImage(this.clientViewData.id, signature)
+          .subscribe(() => this.notifier.notify('clients.actions.signature.saved'));
       }
     });
   }
@@ -540,9 +562,9 @@ export class ClientsViewComponent implements OnInit {
           return;
         }
         if (response.delete) {
-          this.clientsService.deleteClientDocument(this.clientViewData.id, response.id).subscribe(() => {
-            this.reload();
-          });
+          this.clientsService
+            .deleteClientDocument(this.clientViewData.id, response.id)
+            .subscribe(() => this.notifier.notify('clients.actions.signature.deleted'));
         } else if (response.upload) {
           this.uploadSignature();
         }
@@ -557,9 +579,9 @@ export class ClientsViewComponent implements OnInit {
     const captureImageDialogRef = this.dialog.open(CaptureImageDialogComponent);
     captureImageDialogRef.afterClosed().subscribe((imageURL: string) => {
       if (imageURL) {
-        this.clientsService.uploadCapturedClientProfileImage(this.clientViewData.id, imageURL).subscribe(() => {
-          this.reload();
-        });
+        this.clientsService
+          .uploadCapturedClientProfileImage(this.clientViewData.id, imageURL)
+          .subscribe(() => this.photoChanged('clients.actions.photo.updated'));
       }
     });
   }
@@ -571,9 +593,9 @@ export class ClientsViewComponent implements OnInit {
     const uploadImageDialogRef = this.dialog.open(UploadImageDialogComponent);
     uploadImageDialogRef.afterClosed().subscribe((image: File) => {
       if (image) {
-        this.clientsService.uploadClientProfileImage(this.clientViewData.id, image).subscribe(() => {
-          this.reload();
-        });
+        this.clientsService
+          .uploadClientProfileImage(this.clientViewData.id, image)
+          .subscribe(() => this.photoChanged('clients.actions.photo.updated'));
       }
     });
   }
@@ -586,10 +608,10 @@ export class ClientsViewComponent implements OnInit {
       data: { deleteContext: `the profile image of ${this.clientViewData.displayName}` }
     });
     deleteClientImageDialogRef.afterClosed().subscribe((response: any) => {
-      if (response.delete) {
-        this.clientsService.deleteClientProfileImage(this.clientViewData.id).subscribe(() => {
-          this.reload();
-        });
+      if (response?.delete) {
+        this.clientsService
+          .deleteClientProfileImage(this.clientViewData.id)
+          .subscribe(() => this.photoChanged('clients.actions.photo.deleted'));
       }
     });
   }

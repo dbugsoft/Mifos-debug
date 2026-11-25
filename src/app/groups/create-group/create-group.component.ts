@@ -7,7 +7,8 @@
  */
 
 /** Angular Imports */
-import { ChangeDetectionStrategy, Component, OnInit, AfterViewInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import {
   UntypedFormGroup,
   UntypedFormBuilder,
@@ -28,6 +29,8 @@ import { MatIconButton, MatButton } from '@angular/material/button';
 import { NepaliDateInputComponent } from 'app/shared/nepali-date-input/nepali-date-input.component';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { autocompleteResults, pickedOption } from 'app/shared/utils/autocomplete-search.util';
+import { map } from 'rxjs';
 
 /**
  * Create Group component.
@@ -47,7 +50,7 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CreateGroupComponent implements OnInit, AfterViewInit {
+export class CreateGroupComponent implements OnInit {
   private formBuilder = inject(UntypedFormBuilder);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -64,14 +67,21 @@ export class CreateGroupComponent implements OnInit, AfterViewInit {
   groupForm: UntypedFormGroup;
   /** Office data. */
   officeData: any;
-  /** Client data. */
-  clientsData: any = [];
   /** Staff data. */
   staffData: any;
   /** Client Members. */
   clientMembers: any[] = [];
   /** ClientChoice. */
   clientChoice = new UntypedFormControl('');
+  /** Search results for the typed text; null until a search for it returns. */
+  readonly clientsData = toSignal(
+    autocompleteResults<any>(this.clientChoice.valueChanges, (text) =>
+      this.clientsService
+        .getFilteredClients('displayName', 'ASC', true, text, this.groupForm.get('officeId').value)
+        .pipe(map((data: any) => data.pageItems))
+    ),
+    { initialValue: null }
+  );
 
   /**
    * Retrieves the offices data from `resolve`.
@@ -95,21 +105,6 @@ export class CreateGroupComponent implements OnInit, AfterViewInit {
   ngOnInit() {
     this.maxDate = this.settingsService.businessDate;
     this.createGroupForm();
-  }
-
-  /**
-   * Subscribes to Clients search filter:
-   */
-  ngAfterViewInit() {
-    this.clientChoice.valueChanges.subscribe((value: string) => {
-      if (value.length >= 2) {
-        this.clientsService
-          .getFilteredClients('displayName', 'ASC', true, value, this.groupForm.get('officeId').value)
-          .subscribe((data: any) => {
-            this.clientsData = data.pageItems;
-          });
-      }
-    });
   }
 
   /**
@@ -163,13 +158,23 @@ export class CreateGroupComponent implements OnInit, AfterViewInit {
     });
   }
 
+  /** The member picked from the dropdown, or null while the field only holds typed text. */
+  get pickedClient(): any {
+    return pickedOption(this.clientChoice.value);
+  }
+
   /**
-   * Add client.
+   * Adds the picked member, once, and clears the field.
    */
   addClient() {
-    if (!this.clientMembers.includes(this.clientChoice.value)) {
-      this.clientMembers.push(this.clientChoice.value);
+    const client = this.pickedClient;
+    if (!client) {
+      return;
     }
+    if (!this.clientMembers.some((member) => member.id === client.id)) {
+      this.clientMembers.push(client);
+    }
+    this.clientChoice.setValue('');
   }
 
   /**
