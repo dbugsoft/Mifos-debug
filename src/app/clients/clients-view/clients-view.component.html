@@ -17,6 +17,7 @@
             <img
               class="profile-image"
               [class.clickable]="!!clientImage()"
+              [class.has-photo]="!!clientImage()"
               [src]="clientImage() ?? 'assets/images/user_placeholder.png'"
               [alt]="clientImage() ? clientViewData.displayName : ''"
               (click)="clientImage() && openPhoto()"

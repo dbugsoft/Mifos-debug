@@ -211,10 +211,10 @@ body.dark-theme {
     border-bottom: lightgray;
   }
 
-  // Changing the logo color for dark mode
+  // Changing the logo and placeholder colour for dark mode. Not a real photo (.has-photo): inverting it shows a negative.
   .img-button,
   .app-user-photo,
-  .profile-image {
+  .profile-image:not(.has-photo) {
     filter: invert(100%);
   }
 

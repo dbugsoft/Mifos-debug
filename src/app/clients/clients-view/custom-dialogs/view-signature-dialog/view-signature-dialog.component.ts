@@ -7,7 +7,7 @@
  */
 
 /** Angular Imports */
-import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import {
   MatDialogRef,
   MAT_DIALOG_DATA,
@@ -16,13 +16,11 @@ import {
   MatDialogActions,
   MatDialogClose
 } from '@angular/material/dialog';
-import { DomSanitizer } from '@angular/platform-browser';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 /** Custom Services */
 import { ClientsService } from 'app/clients/clients.service';
 
-/** Node Types */
-import { Buffer } from 'buffer';
 import { CdkScrollable } from '@angular/cdk/scrolling';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
@@ -39,14 +37,15 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     CdkScrollable,
     MatDialogContent,
     MatDialogActions,
-    MatDialogClose
+    MatDialogClose,
+    MatProgressSpinner
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ViewSignatureDialogComponent implements OnInit {
   dialogRef = inject<MatDialogRef<ViewSignatureDialogComponent>>(MatDialogRef);
   private clientsService = inject(ClientsService);
-  private sanitizer = inject(DomSanitizer);
+  private destroyRef = inject(DestroyRef);
   data = inject<{
     documents: any[];
     id: string;
@@ -54,15 +53,16 @@ export class ViewSignatureDialogComponent implements OnInit {
 
   /** Id of client signature in documents */
   signatureId: any;
-  /** Signature Image */
-  signatureImage: any;
   /** Client Id */
   clientId: any;
-
   /**
-   * @param {MatDialogRef} dialogRef Component reference to dialog.
-   * @param {any} data Documents data
+   * blob: URL of the signature once loaded. Signals, because this dialog is OnPush: a plain field set in
+   * the HTTP callback never re-rendered, so the <img> kept an empty src and showed as broken (fineract-dbug #332).
    */
+  readonly signatureImage = signal<string | null>(null);
+  /** True when the signature file could not be downloaded. */
+  readonly loadFailed = signal(false);
+
   constructor() {
     const signature = this.data.documents.find((document: any) => document.name === 'clientSignature') || {};
     this.signatureId = signature.id;
@@ -70,14 +70,17 @@ export class ViewSignatureDialogComponent implements OnInit {
   }
 
   ngOnInit() {
-    if (this.signatureId) {
-      this.clientsService.getClientSignatureImage(this.clientId, this.signatureId).subscribe(
-        async (blob: any) => {
-          const buffer = Buffer.from(await blob.arrayBuffer());
-          this.signatureImage = 'data:' + blob.type + ';base64,' + buffer.toString('base64');
-        },
-        (error: any) => {}
-      );
+    if (!this.signatureId) {
+      return;
     }
+    this.clientsService.getClientSignatureImage(this.clientId, this.signatureId).subscribe({
+      next: (blob: Blob) => {
+        // A blob: URL passes Angular's URL sanitizer as it is; release it when the dialog closes.
+        const url = URL.createObjectURL(blob);
+        this.destroyRef.onDestroy(() => URL.revokeObjectURL(url));
+        this.signatureImage.set(url);
+      },
+      error: () => this.loadFailed.set(true)
+    });
   }
 }

@@ -14,7 +14,8 @@ import {
   ElementRef,
   AfterViewInit,
   OnDestroy,
-  inject
+  inject,
+  signal
 } from '@angular/core';
 import { MatDialogRef, MatDialogTitle, MatDialogActions, MatDialogClose } from '@angular/material/dialog';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
@@ -46,8 +47,8 @@ export class DrawSignatureDialogComponent implements AfterViewInit, OnDestroy {
   /** Signature pad instance */
   private signaturePad: SignaturePad;
 
-  /** Whether the pad has content */
-  isEmpty = true;
+  /** Whether the pad is empty. A signal: it changes in a SignaturePad listener, which does not re-render an OnPush view. */
+  readonly isEmpty = signal(true);
 
   ngAfterViewInit() {
     const canvas = this.signatureCanvas.nativeElement;
@@ -56,7 +57,7 @@ export class DrawSignatureDialogComponent implements AfterViewInit, OnDestroy {
     });
 
     this.signaturePad.addEventListener('endStroke', () => {
-      this.isEmpty = this.signaturePad.isEmpty();
+      this.isEmpty.set(this.signaturePad.isEmpty());
     });
 
     this.resizeCanvas();
@@ -81,7 +82,7 @@ export class DrawSignatureDialogComponent implements AfterViewInit, OnDestroy {
   /** Clears the signature pad */
   clear() {
     this.signaturePad.clear();
-    this.isEmpty = true;
+    this.isEmpty.set(true);
   }
 
   /** Converts the drawn signature to a File and closes the dialog */

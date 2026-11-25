@@ -4114,7 +4114,9 @@
       "Remove from favourites": "मनपर्नेबाट हटाउनुहोस्",
       "“Maker-Checker” principle requires every tasks": "\"मेकर-चेकर\" सिद्धान्तले त्रुटि र दुरुपयोगको सम्भावना कम गर्न प्रत्येक कार्यहरू दुई व्यक्तिद्वारा पूरा गर्न आवश्यक छ। एक व्यक्तिले प्रक्रिया सुरु गर्छ र दोस्रोले यसलाई पूरा गर्दछ।",
       "Pick a member from the search results": "खोज नतिजाबाट सदस्य छान्नुहोस्",
-      "Copied to clipboard": "क्लिपबोर्डमा कपी भयो"
+      "Copied to clipboard": "क्लिपबोर्डमा कपी भयो",
+      "No members found": "कुनै सदस्य भेटिएन",
+      "No groups found": "कुनै समूह भेटिएन"
     },
     "permissions": {
       "actions": {
@@ -4847,6 +4849,18 @@
       "takeSurvey": {
         "success": "सर्वेक्षण सफलतापूर्वक बुझाइयो।",
         "failure": "सर्वेक्षण बुझाउन असफल भयो।"
+      },
+      "photo": {
+        "updated": "फोटो अद्यावधिक गरियो।",
+        "deleted": "फोटो हटाइयो।"
+      },
+      "signature": {
+        "saved": "हस्ताक्षर सुरक्षित गरियो।",
+        "deleted": "हस्ताक्षर हटाइयो।",
+        "loadFailed": "हस्ताक्षर लोड गर्न सकिएन।"
+      },
+      "unassignStaff": {
+        "success": "सदस्यबाट कर्मचारी हटाइयो।"
       }
     },
     "memberAddress": {
