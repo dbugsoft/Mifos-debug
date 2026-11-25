@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 360" fill="#fff">
+  <!-- Decorative bank building for the sign-in page; the page sets its opacity. -->
+  <path d="M200 20 L380 92 L20 92 Z" fill-opacity="0.55"/>
+  <path d="M200 44 L330 88 L70 88 Z" fill-opacity="0.25"/>
+  <rect x="28" y="96" width="344" height="18" rx="2" fill-opacity="0.6"/>
+  <rect x="40" y="118" width="320" height="8" rx="2" fill-opacity="0.45"/>
+  <g fill-opacity="0.5">
+    <rect x="52" y="132" width="26" height="160" rx="3"/>
+    <rect x="108" y="132" width="26" height="160" rx="3"/>
+    <rect x="164" y="132" width="26" height="160" rx="3"/>
+    <rect x="210" y="132" width="26" height="160" rx="3"/>
+    <rect x="266" y="132" width="26" height="160" rx="3"/>
+    <rect x="322" y="132" width="26" height="160" rx="3"/>
+  </g>
+  <rect x="40" y="296" width="320" height="10" rx="2" fill-opacity="0.5"/>
+  <rect x="24" y="310" width="352" height="12" rx="2" fill-opacity="0.4"/>
+  <rect x="8" y="326" width="384" height="14" rx="2" fill-opacity="0.3"/>
+</svg>

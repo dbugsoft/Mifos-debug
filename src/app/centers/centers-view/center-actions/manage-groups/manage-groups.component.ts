@@ -7,7 +7,8 @@
  */
 
 /** Angular Imports */
-import { ChangeDetectionStrategy, Component, AfterViewInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { UntypedFormControl, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
@@ -24,6 +25,7 @@ import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { MatListSubheaderCssMatStyler, MatNavList } from '@angular/material/list';
 import { MatLine } from '@angular/material/grid-list';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { autocompleteResults, pickedOption } from 'app/shared/utils/autocomplete-search.util';
 
 @Component({
   selector: 'mifosx-manage-groups',
@@ -41,20 +43,26 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ManageGroupsComponent implements AfterViewInit {
+export class ManageGroupsComponent {
   private route = inject(ActivatedRoute);
   private centersService = inject(CentersService);
   private groupsService = inject(GroupsService);
   dialog = inject(MatDialog);
+  private cdr = inject(ChangeDetectorRef);
 
   /** Center Data */
   centerData: any;
-  /** Group data. */
-  groupsData: any = [];
   /** Group Members. */
   groupMembers: any[] = [];
   /** GroupChoice. */
   groupChoice = new UntypedFormControl('');
+  /** Search results for the typed text; null until a search for it returns. */
+  readonly groupsData = toSignal(
+    autocompleteResults<any>(this.groupChoice.valueChanges, (text) =>
+      this.groupsService.getFilteredGroups('name', 'ASC', text, this.centerData.officeId, 'true')
+    ),
+    { initialValue: null }
+  );
 
   /**
    * Fetches center action data from `resolve`
@@ -70,44 +78,30 @@ export class ManageGroupsComponent implements AfterViewInit {
     });
   }
 
-  /**
-   * Subscribes to Groups search filter:
-   */
-  ngAfterViewInit() {
-    this.groupChoice.valueChanges.subscribe((value: string) => {
-      if (value.length >= 2) {
-        this.groupsService
-          .getFilteredGroups('name', 'ASC', value, this.centerData.officeId, 'true')
-          .subscribe((data: any) => {
-            this.groupsData = data;
-          });
-      }
-    });
+  /** The group picked from the dropdown, or null while the field only holds typed text. */
+  get pickedGroup(): any {
+    return pickedOption(this.groupChoice.value);
   }
 
   /**
-   * Add group.
+   * Adds the picked group to the center, once, and clears the field.
    */
   addGroup() {
-    if (this.groupMembers !== null && this.groupMembers !== undefined) {
-      if (!this.groupMembers.includes(this.groupChoice.value)) {
-        this.centersService
-          .executeCenterActionCommand(this.centerData.id, 'associateGroups', {
-            groupMembers: [this.groupChoice.value.id]
-          })
-          .subscribe(() => {
-            this.groupMembers.push(this.groupChoice.value);
-          });
-      }
-    } else {
-      this.centersService
-        .executeCenterActionCommand(this.centerData.id, 'associateGroups', {
-          groupMembers: [this.groupChoice.value.id]
-        })
-        .subscribe(() => {
-          this.groupMembers.push(this.groupChoice.value);
-        });
+    const group = this.pickedGroup;
+    const members = this.groupMembers ?? [];
+    if (!group || members.some((member) => member.id === group.id)) {
+      return;
     }
+    this.centersService
+      .executeCenterActionCommand(this.centerData.id, 'associateGroups', { groupMembers: [group.id] })
+      .subscribe(() => {
+        this.groupMembers = [
+          ...members,
+          group
+        ];
+        this.groupChoice.setValue('');
+        this.cdr.markForCheck();
+      });
   }
 
   /**
@@ -119,11 +113,12 @@ export class ManageGroupsComponent implements AfterViewInit {
       data: { deleteContext: `group member: ${group.name}` }
     });
     removeMemberDialogRef.afterClosed().subscribe((response: any) => {
-      if (response.delete) {
+      if (response?.delete) {
         this.centersService
           .executeCenterActionCommand(this.centerData.id, 'disassociateGroups', { groupMembers: [group.id] })
           .subscribe(() => {
             this.groupMembers.splice(index, 1);
+            this.cdr.markForCheck();
           });
       }
     });

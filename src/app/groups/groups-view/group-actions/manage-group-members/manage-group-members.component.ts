@@ -7,7 +7,8 @@
  */
 
 /** Angular Imports */
-import { ChangeDetectionStrategy, Component, OnInit, AfterViewInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormGroup, FormBuilder, UntypedFormControl, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 
@@ -25,6 +26,8 @@ import { MatListSubheaderCssMatStyler, MatNavList } from '@angular/material/list
 import { MatLine } from '@angular/material/grid-list';
 import { MatTooltip } from '@angular/material/tooltip';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { autocompleteResults, pickedOption } from 'app/shared/utils/autocomplete-search.util';
+import { map } from 'rxjs';
 
 /**
  * Manage Group Members Component
@@ -46,20 +49,28 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ManageGroupMembersComponent implements AfterViewInit {
+export class ManageGroupMembersComponent {
   private route = inject(ActivatedRoute);
   private groupsService = inject(GroupsService);
   private clientsService = inject(ClientsService);
   dialog = inject(MatDialog);
+  private cdr = inject(ChangeDetectorRef);
 
   /** Group Data */
   groupData: any;
-  /** Client data. */
-  clientsData: any = [];
   /** Client Members. */
   clientMembers: any[] = [];
   /** Client Choice. */
   clientChoice = new UntypedFormControl('');
+  /** Search results for the typed text; null until a search for it returns. */
+  readonly clientsData = toSignal(
+    autocompleteResults<any>(this.clientChoice.valueChanges, (text) =>
+      this.clientsService
+        .getFilteredClients('displayName', 'ASC', true, text, this.groupData.officeId)
+        .pipe(map((data: any) => data.pageItems))
+    ),
+    { initialValue: null }
+  );
 
   /**
    * Fetches group action data from `resolve`
@@ -75,32 +86,29 @@ export class ManageGroupMembersComponent implements AfterViewInit {
     });
   }
 
-  /**
-   * Subscribes to Clients search filter:
-   */
-  ngAfterViewInit() {
-    this.clientChoice.valueChanges.subscribe((value: string) => {
-      if (value.length >= 2) {
-        this.clientsService
-          .getFilteredClients('displayName', 'ASC', true, value, this.groupData.officeId)
-          .subscribe((data: any) => {
-            this.clientsData = data.pageItems;
-          });
-      }
-    });
+  /** The member picked from the dropdown, or null while the field only holds typed text. */
+  get pickedClient(): any {
+    return pickedOption(this.clientChoice.value);
   }
 
   /**
-   * Add client.
+   * Adds the picked member to the group, once, and clears the field.
    */
   addClient() {
-    if (!this.clientMembers.includes(this.clientChoice.value)) {
-      this.groupsService
-        .executeGroupCommand(this.groupData.id, 'associateClients', { clientMembers: [this.clientChoice.value.id] })
-        .subscribe(() => {
-          this.clientMembers.push(this.clientChoice.value);
-        });
+    const client = this.pickedClient;
+    if (!client || this.clientMembers.some((member) => member.id === client.id)) {
+      return;
     }
+    this.groupsService
+      .executeGroupCommand(this.groupData.id, 'associateClients', { clientMembers: [client.id] })
+      .subscribe(() => {
+        this.clientMembers = [
+          ...this.clientMembers,
+          client
+        ];
+        this.clientChoice.setValue('');
+        this.cdr.markForCheck();
+      });
   }
 
   /**
@@ -113,11 +121,12 @@ export class ManageGroupMembersComponent implements AfterViewInit {
       data: { deleteContext: `client member: ${client.displayName}` }
     });
     removeMemberDialogRef.afterClosed().subscribe((response: any) => {
-      if (response.delete) {
+      if (response?.delete) {
         this.groupsService
           .executeGroupCommand(this.groupData.id, 'disassociateClients', { clientMembers: [client.id] })
           .subscribe(() => {
             this.clientMembers.splice(index, 1);
+            this.cdr.markForCheck();
           });
       }
     });

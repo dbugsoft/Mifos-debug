@@ -21,7 +21,7 @@
 
   <mat-dialog-actions align="end">
     <button mat-raised-button mat-dialog-close>{{ 'labels.buttons.Cancel' | translate }}</button>
-    <button mat-raised-button color="primary" [disabled]="isEmpty" (click)="confirm()">
+    <button mat-raised-button color="primary" [disabled]="isEmpty()" (click)="confirm()">
       {{ 'labels.buttons.Confirm' | translate }}
     </button>
   </mat-dialog-actions>

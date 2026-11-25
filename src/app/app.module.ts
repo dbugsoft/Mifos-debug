@@ -22,7 +22,6 @@ import { NotFoundComponent } from './not-found/not-found.component';
 
 /** Custom Modules */
 import { CoreModule } from './core/core.module';
-import { HomeModule } from './home/home.module';
 import { ConfigurationWizardModule } from './configuration-wizard/configuration-wizard.module';
 import { PortalModule } from '@angular/cdk/portal';
 
@@ -74,7 +73,6 @@ export class CustomMissingTranslationHandler implements MissingTranslationHandle
     BrowserAnimationsModule,
     PortalModule,
     CoreModule,
-    HomeModule,
     ConfigurationWizardModule,
     AppRoutingModule,
     NotFoundComponent,

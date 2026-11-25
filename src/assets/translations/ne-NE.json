@@ -1,7 +1,7 @@
 ﻿{
   "error.msg.upload.file.too.big": "चयन गरिएको फाइल {{args.0.value}} MB सीमाभन्दा ठूलो छ। कृपया सानो फाइल छान्नुहोस् र फेरि प्रयास गर्नुहोस्।",
   "APP_NAME": "GroFiniX",
-  "APP_FULL_NAME": "Cooperative Financial Management & Information System",
+  "APP_FULL_NAME": "Integrated Financial Management & Core Banking Platform",
   "Logged in as": "को रूपमा लग इन गरियो",
   "Remember me": "मलाई सम्झनुहोस्",
   "errors": {
@@ -4114,7 +4114,9 @@
       "Remove from favourites": "मनपर्नेबाट हटाउनुहोस्",
       "“Maker-Checker” principle requires every tasks": "\"मेकर-चेकर\" सिद्धान्तले त्रुटि र दुरुपयोगको सम्भावना कम गर्न प्रत्येक कार्यहरू दुई व्यक्तिद्वारा पूरा गर्न आवश्यक छ। एक व्यक्तिले प्रक्रिया सुरु गर्छ र दोस्रोले यसलाई पूरा गर्दछ।",
       "Pick a member from the search results": "खोज नतिजाबाट सदस्य छान्नुहोस्",
-      "Copied to clipboard": "क्लिपबोर्डमा कपी भयो"
+      "Copied to clipboard": "क्लिपबोर्डमा कपी भयो",
+      "No members found": "कुनै सदस्य भेटिएन",
+      "No groups found": "कुनै समूह भेटिएन"
     },
     "permissions": {
       "actions": {
@@ -4847,6 +4849,18 @@
       "takeSurvey": {
         "success": "सर्वेक्षण सफलतापूर्वक बुझाइयो।",
         "failure": "सर्वेक्षण बुझाउन असफल भयो।"
+      },
+      "photo": {
+        "updated": "फोटो अद्यावधिक गरियो।",
+        "deleted": "फोटो हटाइयो।"
+      },
+      "signature": {
+        "saved": "हस्ताक्षर सुरक्षित गरियो।",
+        "deleted": "हस्ताक्षर हटाइयो।",
+        "loadFailed": "हस्ताक्षर लोड गर्न सकिएन।"
+      },
+      "unassignStaff": {
+        "success": "सदस्यबाट कर्मचारी हटाइयो।"
       }
     },
     "memberAddress": {
@@ -4982,6 +4996,16 @@
       "Code sent": "{{email}} मा प्रमाणीकरण कोड पठाइयो।",
       "Email already used": "यो इमेल ठेगाना अर्को कर्मचारीले प्रयोग गरिसकेका छन्",
       "New email must be verified": "प्रयोगकर्ताले फेरि साइन इन गर्नुअघि नयाँ ठेगाना प्रमाणित गर्नुपर्छ"
+    },
+    "landing": {
+      "Tagline": "स्मार्ट वित्त। सबल संस्था।",
+      "Heading": "एकीकृत वित्तीय व्यवस्थापन तथा",
+      "Heading accent": "कोर बैंकिङ प्लेटफर्म",
+      "Description": "लघुवित्त संस्था, सहकारी र विकास बैंकहरूलाई एकीकृत, सुरक्षित र बौद्धिक वित्तीय समाधानद्वारा सशक्त बनाउँदै।",
+      "Closing line": "उज्ज्वल भविष्यका लागि वित्तीय सेवाको डिजिटल रूपान्तरण।",
+      "Welcome back": "फेरि स्वागत छ!",
+      "Sign in subtitle": "जारी राख्न आफ्नो {{app}} खातामा साइन इन गर्नुहोस्",
+      "Modules": "ग्राहक तथा सदस्य व्यवस्थापन, केवाईसी, बचत तथा निक्षेप, कर्जा तथा कर्जा व्यवस्थापन प्रणाली (LMS), किस्ता भुक्तानी, शेयर व्यवस्थापन, लाभांश, लेखा र वित्तीय सञ्चालनका लागि एउटै एकीकृत प्लेटफर्म।"
     }
   },
   "bsCalendar": {
