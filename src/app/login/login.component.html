@@ -1,4 +1,4 @@
-﻿<!--
+<!--
   Copyright since 2025 Mifos Initiative
 
   This Source Code Form is subject to the terms of the Mozilla Public
@@ -12,26 +12,42 @@
 
   <div class="login-stage">
     <div class="login-shell">
-      <!-- Left Panel - Welcome -->
+      <!-- Left panel: brand and what the platform covers -->
       <aside class="hero-panel">
-        <img class="hero-logo" src="assets/images/grofinix-dark.png" alt="GroFiniX" />
-        <h1 class="hero-title">Welcome to {{ 'APP_NAME' | translate }}</h1>
-        <p class="hero-full-name">{{ 'APP_FULL_NAME' | translate }}</p>
-        <hr class="hero-divider" />
-        <p class="hero-subtitle">
-          Your trusted cooperative banking platform for savings, loans, share management, and seamless financial
-          services. Manage member savings, fixed and recurring deposits, loan applications, disbursements and
-          repayments, and member shares and dividends in a single platform.
-        </p>
+        <img class="hero-art" src="assets/images/login-bank.svg" alt="" aria-hidden="true" />
+        <div class="hero-content">
+          <img class="hero-logo" src="assets/images/grofinix-dark.png" [alt]="'APP_NAME' | translate" />
+          <p class="hero-tagline">{{ 'staffAccess.landing.Tagline' | translate }}</p>
+          <h1 class="hero-title">
+            {{ 'staffAccess.landing.Heading' | translate }}
+            <span class="hero-title-accent">{{ 'staffAccess.landing.Heading accent' | translate }}</span>
+          </h1>
+          <p class="hero-description">{{ 'staffAccess.landing.Description' | translate }}</p>
+
+          <p class="hero-description">{{ 'staffAccess.landing.Modules' | translate }}</p>
+
+          <p class="hero-closing">{{ 'staffAccess.landing.Closing line' | translate }}</p>
+        </div>
+        <svg class="hero-wave" viewBox="0 0 600 120" preserveAspectRatio="none" aria-hidden="true">
+          <defs>
+            <linearGradient id="login-wave" x1="0" x2="1" y1="0" y2="0">
+              <stop offset="0" stop-color="#1fbf75" stop-opacity="0" />
+              <stop offset="1" stop-color="#1fbf75" stop-opacity="0.9" />
+            </linearGradient>
+          </defs>
+          <path d="M0 120 C 180 120 300 40 600 10 L600 120 Z" fill="url(#login-wave)" />
+        </svg>
       </aside>
 
-      <!-- Right Panel - Login Form -->
+      <!-- Right panel: sign in -->
       <main class="login-card">
-        <div class="card-avatar"><mifosx-m3-icon name="person" [filled]="true"></mifosx-m3-icon></div>
+        <div class="card-avatar"><mifosx-m3-icon name="lock" [filled]="true" [size]="24"></mifosx-m3-icon></div>
 
         @if (!staffAccess.step()) {
-          <h2 class="card-title">{{ 'staffAccess.signIn.Sign in' | translate }}</h2>
-          <p class="card-subtitle">{{ 'staffAccess.signIn.Sign in subtitle' | translate }}</p>
+          <h2 class="card-title">{{ 'staffAccess.landing.Welcome back' | translate }}</h2>
+          <p class="card-subtitle">
+            {{ 'staffAccess.landing.Sign in subtitle' | translate: { app: ('APP_NAME' | translate) } }}
+          </p>
         }
 
         <!-- Tenant Selector -->
