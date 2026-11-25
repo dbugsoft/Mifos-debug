@@ -12,7 +12,8 @@ $text-dark: #1e293b;
 $text-muted: #64748b;
 $input-bg: #f1f5f9;
 $input-border: #e2e8f0;
-$input-fill: #eef3fc;
+$input-border-strong: #cfd9ea;
+$royal: #1f5fd1;
 
 // ===== Main Form Container =====
 #login-form {
@@ -80,9 +81,9 @@ $input-fill: #eef3fc;
 
   ::ng-deep {
     .mat-mdc-text-field-wrapper {
-      background: var(--dk-primary-soft, #{$input-fill}) !important;
-      border-radius: 6px !important;
-      border: 1px solid transparent !important;
+      background: var(--dk-surface, #fff) !important;
+      border-radius: 10px !important;
+      border: 1px solid var(--dk-border, #{$input-border-strong}) !important;
       transition:
         border-color 0.2s ease,
         box-shadow 0.2s ease;
@@ -121,7 +122,7 @@ $input-fill: #eef3fc;
       &:-webkit-autofill,
       &:-webkit-autofill:hover,
       &:-webkit-autofill:focus {
-        box-shadow: 0 0 0 1000px $input-fill inset !important;
+        box-shadow: 0 0 0 1000px var(--dk-surface, #fff) inset !important;
       }
     }
 
@@ -197,15 +198,17 @@ $input-fill: #eef3fc;
     font-weight: 600;
     letter-spacing: 0.02em;
 
-    --md-filled-button-container-color: var(--dk-primary, #{$brand-blue});
-    --md-filled-button-container-shape: 6px;
+    --md-filled-button-container-color: var(--dk-primary, #{$royal});
+    --md-filled-button-container-shape: 10px;
+    --md-filled-button-icon-color: var(--dk-on-accent, #fff);
+    --md-filled-button-hover-icon-color: var(--dk-on-accent, #fff);
     --md-filled-button-label-text-color: var(--dk-on-accent, #fff);
     --md-filled-button-hover-label-text-color: var(--dk-on-accent, #fff);
     --md-filled-button-focus-label-text-color: var(--dk-on-accent, #fff);
     --md-filled-button-pressed-label-text-color: var(--dk-on-accent, #fff);
 
-    border-radius: 6px;
-    box-shadow: 0 4px 12px rgb(var(--dk-ink-rgb, 36 96 185) / 25%);
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgb(var(--dk-ink-rgb, 31 95 209) / 30%);
     transition:
       box-shadow 0.2s ease,
       opacity 0.2s ease;

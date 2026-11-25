@@ -9,29 +9,23 @@
 /** Angular Imports */
 import { Route as ngRoute, Routes } from '@angular/router';
 
-/** Custom Components */
-import { ShellComponent } from '../shell/shell.component';
-
-/** Custom Guards */
-import { AuthenticationGuard } from '../authentication/authentication.guard';
-
 /**
  * Provides helper methods to create routes.
  */
 export class Route {
   /**
-   * Creates routes using the shell component and authentication.
+   * Groups a feature's routes that are shown inside the shell.
+   *
+   * The shell (sidebar, top bar) and the sign-in guard are set once, on the signed-in route in
+   * app-routing.module.ts, and every feature module is lazy-loaded below it. A shell per feature module made
+   * the whole layout rebuild, and its calls repeat, on every module change (fineract-dbug #338).
    * @param routes The routes to add.
-   * @return {Route} The new route using shell as the base.
+   * @return {Route} A path-less route holding them.
    */
   static withShell(routes: Routes): ngRoute {
     return {
       path: '',
-      component: ShellComponent,
-      children: routes,
-      canActivate: [AuthenticationGuard]
-      // Reuse ShellComponent instance when navigating between child views
-      // data: { reuse: true }
+      children: routes
     };
   }
 }

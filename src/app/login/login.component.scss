@@ -7,17 +7,31 @@
  */
 
 // ===== Colors =====
-// Blue of the Emblem of Nepal; the welcome panel and the footer share it
+$navy: #0a2559;
+$royal: #1f5fd1;
 $brand-blue: #2460b9;
-$text-dark: #1e293b;
+$green: #2fd07f;
+$text-dark: #0f1f3d;
 $text-muted: #64748b;
 
 // ===== Page =====
 .login-wrapper {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  background: var(--dk-surface, #fff);
+  // html and body don't scroll in this app (the shell scrolls its own content), so this page scrolls itself
+  height: 100vh;
+  overflow-y: auto;
+  background:
+    radial-gradient(ellipse at 0% 0%, rgb(31 95 209 / 10%), transparent 55%),
+    radial-gradient(ellipse at 100% 100%, rgb(31 95 209 / 12%), transparent 50%), var(--dk-surface-2, #f3f7fd);
+}
+
+// Sits above the card, at the top-right of the page
+.login-lang-selector {
+  display: flex;
+  justify-content: flex-end;
+  padding: 4px 16px 0;
+  color: var(--dk-text-muted, #{$text-muted});
 }
 
 .login-stage {
@@ -25,106 +39,158 @@ $text-muted: #64748b;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px 16px;
+  padding: 4px 24px 16px;
 }
 
-// ===== Card: blue welcome half + white form half =====
+// ===== Card: navy brand panel + white sign-in panel =====
 .login-shell {
   display: flex;
   width: 100%;
-  max-width: 832px;
-  border-radius: 12px;
+  max-width: 1040px;
+  border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 8px 32px rgb(15 23 42 / 12%);
+  background: var(--dk-surface, #fff);
+  box-shadow:
+    0 24px 64px rgb(10 37 89 / 18%),
+    0 2px 8px rgb(10 37 89 / 6%);
   animation: fade-in-up 0.4s ease-out;
 }
 
+// ===== Brand panel =====
 .hero-panel {
-  flex: 1 1 50%;
+  position: relative;
+  flex: 1 1 52%;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  padding: 32px 40px 56px;
+  color: #fff;
+  background:
+    radial-gradient(ellipse at 85% 20%, rgb(64 140 255 / 45%), transparent 55%),
+    linear-gradient(135deg, $navy 0%, #0f3a8a 55%, $royal 100%);
+}
+
+.hero-art {
+  position: absolute;
+  top: 40px;
+  right: -88px;
+  width: 320px;
+  opacity: 0.1;
+  pointer-events: none;
+}
+
+.hero-wave {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 56px;
+  pointer-events: none;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  padding: 40px;
-  background: var(--dk-fill, #{$brand-blue});
-  color: #fff;
+  gap: 12px;
+  max-width: 520px;
 }
 
 .hero-logo {
   display: block;
   width: auto;
-  height: 56px;
-  margin: 0 auto 24px;
+  height: 40px;
+  align-self: flex-start;
+}
+
+.hero-tagline {
+  margin: 0;
+  padding-bottom: 12px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: rgb(255 255 255 / 85%);
+  position: relative;
+
+  // Short green rule under the tagline
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 64px;
+    height: 3px;
+    border-radius: 2px;
+    background: $green;
+  }
 }
 
 .hero-title {
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: 700;
-  text-align: center;
+  margin: 4px 0 0;
+  font-size: clamp(1.5rem, 2.2vw, 2rem);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
 }
 
-.hero-full-name {
-  margin: 8px 0 0;
-  font-size: 0.85rem;
-  font-weight: 500;
+.hero-title-accent {
+  display: block;
+  color: $green;
+}
+
+.hero-description {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.55;
   color: rgb(255 255 255 / 85%);
-  text-align: center;
 }
 
-.hero-divider {
-  width: 100%;
-  margin: 16px 0 24px;
-  border: 0;
-  border-top: 1px solid rgb(255 255 255 / 30%);
-}
-
-.hero-subtitle {
-  margin: 0;
+.hero-closing {
+  margin: 4px 0 0;
+  padding-left: 12px;
+  border-left: 3px solid $green;
   font-size: 0.875rem;
-  line-height: 1.8;
+  font-style: italic;
+  line-height: 1.5;
   color: rgb(255 255 255 / 90%);
 }
 
+// ===== Sign-in panel =====
 .login-card {
-  flex: 1 1 50%;
-  padding: 32px 40px;
-  background: var(--dk-surface, #fff);
-}
-
-// Sits above the card, at the top-right of the page
-.login-lang-selector {
+  flex: 1 1 48%;
   display: flex;
-  justify-content: flex-end;
-  padding: 8px 16px 0;
-  color: var(--dk-text-muted, #{$text-muted});
+  flex-direction: column;
+  justify-content: center;
+  padding: 32px 48px;
+  background: var(--dk-surface, #fff);
 }
 
 .card-avatar {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
-  margin: 0 auto 16px;
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 12px;
   border-radius: 50%;
-  background: var(--dk-fill, #{$brand-blue});
-  color: #fff;
+  background: var(--dk-primary-soft, #e6eefc);
 
   // m3-icon reads its colour from this variable, not from `color`
-  --md-icon-prefix-label-text-color: #fff;
+  --md-icon-prefix-label-text-color: var(--dk-primary, #{$royal});
 }
 
 .card-title {
   margin: 0 0 4px;
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: var(--dk-primary, #{$brand-blue});
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--dk-text, #{$text-dark});
   text-align: center;
 }
 
 .card-subtitle {
   margin: 0 0 24px;
-  font-size: 0.85rem;
+  font-size: 0.875rem;
   color: var(--dk-text-muted, #{$text-muted});
   text-align: center;
 }
@@ -138,14 +204,14 @@ $text-muted: #64748b;
   width: 100%;
 }
 
-// ===== Footer band =====
 // "or", then the public loan calculator as the secondary action: same size and corners as Login, outlined.
 .or-divider {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin: 20px 0 12px;
+  margin: 16px 0;
   font-size: 0.8125rem;
+  text-transform: uppercase;
   color: var(--dk-text-muted, #{$text-muted});
 
   &::before,
@@ -162,9 +228,9 @@ $text-muted: #64748b;
   justify-content: center;
   gap: 8px;
   min-height: 48px;
-  border: 1px solid var(--dk-primary, #{$brand-blue});
-  border-radius: 6px;
-  color: var(--dk-primary, #{$brand-blue});
+  border: 1.5px solid var(--dk-primary, #{$royal});
+  border-radius: 10px;
+  color: var(--dk-primary, #{$royal});
   font-size: 0.95rem;
   font-weight: 600;
   letter-spacing: 0.02em;
@@ -174,8 +240,8 @@ $text-muted: #64748b;
     box-shadow 0.2s ease;
 
   &:hover {
-    background: var(--dk-primary-soft, rgb(36 96 185 / 6%));
-    box-shadow: 0 4px 12px rgb(36 96 185 / 15%);
+    background: var(--dk-primary-soft, rgb(31 95 209 / 6%));
+    box-shadow: 0 4px 12px rgb(31 95 209 / 15%);
   }
 
   // The icon takes the button's colour, not its own.
@@ -184,18 +250,19 @@ $text-muted: #64748b;
   }
 
   &:focus-visible {
-    outline: 2px solid var(--dk-primary, #{$brand-blue});
+    outline: 2px solid var(--dk-primary, #{$royal});
     outline-offset: 2px;
   }
 }
 
+// ===== Footer band =====
 .login-footer {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
   gap: 8px;
-  padding: 24px 96px;
-  background: var(--dk-fill, #{$brand-blue});
+  padding: 16px 96px;
+  background: $navy;
   color: rgb(255 255 255 / 85%);
   font-size: 0.8rem;
 
@@ -206,18 +273,49 @@ $text-muted: #64748b;
 }
 
 // ===== Dark Mode =====
+// Brand panel and footer follow the app's dark greys; the green accents stay.
 :host-context(.dark-theme),
 :host-context([data-theme='dark']) {
   .login-wrapper {
     background: #121212;
   }
 
+  .hero-panel {
+    background:
+      radial-gradient(ellipse at 85% 20%, rgb(158 202 255 / 8%), transparent 55%),
+      linear-gradient(135deg, #181818 0%, #222 100%);
+    border-right: 1px solid #2c2c2c;
+  }
+
+  .hero-art {
+    opacity: 0.05;
+  }
+
+  .hero-wave {
+    opacity: 0.6;
+  }
+
+  .login-footer {
+    background: #1e1e1e;
+    border-top: 1px solid #2c2c2c;
+  }
+
+  .login-shell {
+    box-shadow: 0 24px 64px rgb(0 0 0 / 50%);
+  }
+
   .login-card {
     background: #1e1e1e;
   }
 
+  .card-avatar {
+    background: rgb(158 202 255 / 12%);
+
+    --md-icon-prefix-label-text-color: #9ecaff;
+  }
+
   .card-title {
-    color: var(--dk-primary, #9ecaff);
+    color: #fff;
   }
 
   .card-subtitle,
@@ -248,18 +346,46 @@ $text-muted: #64748b;
 // ===== Responsive =====
 
 /* stylelint-disable-next-line media-feature-range-notation -- Safari compatibility */
-@media (max-width: 768px) {
-  // Stack the welcome panel above the form rather than hiding it
-  .login-shell {
-    flex-direction: column;
-  }
-
+@media (max-width: 1024px) {
   .hero-panel {
-    padding: 24px 16px;
+    flex-basis: 52%;
+    padding: 40px 32px;
   }
 
   .login-card {
-    padding: 24px 16px;
+    flex-basis: 48%;
+    padding: 40px 32px;
+  }
+
+  .hero-art {
+    width: 280px;
+  }
+}
+
+/* stylelint-disable-next-line media-feature-range-notation -- Safari compatibility */
+@media (max-width: 768px) {
+  .login-stage {
+    padding: 8px 16px 24px;
+  }
+
+  // Sign-in first on small screens, the brand panel under it
+  .login-shell {
+    flex-direction: column;
+    border-radius: 20px;
+  }
+
+  .login-card {
+    order: -1;
+    padding: 32px 24px;
+  }
+
+  .hero-panel {
+    padding: 32px 24px 80px;
+  }
+
+  .hero-art {
+    top: 24px;
+    width: 200px;
   }
 
   .login-footer {

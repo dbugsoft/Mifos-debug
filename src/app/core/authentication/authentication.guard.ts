@@ -48,4 +48,12 @@ export class AuthenticationGuard {
     this.router.navigate(['/login'], { replaceUrl: true });
     return false;
   }
+
+  /**
+   * The same check on every navigation inside the shell: the shell route is entered once per sign-in, so
+   * canActivate alone would not run again when moving between modules.
+   */
+  canActivateChild(): boolean {
+    return this.canActivate();
+  }
 }

@@ -1,6 +1,6 @@
 ﻿{
   "APP_NAME": "GroFiniX",
-  "APP_FULL_NAME": "Cooperative Financial Management & Information System",
+  "APP_FULL_NAME": "Integrated Financial Management & Core Banking Platform",
   "Logged in as": "Angemeldet als",
   "Remember me": "Erinnere dich an mich",
   "error.resource.notImplemented.type": "Nicht implementierter Fehler",
@@ -5277,6 +5277,16 @@
       "Code sent": "A verification code was sent to {{email}}.",
       "Email already used": "Another staff member already uses this email address",
       "New email must be verified": "The user will have to verify the new address before signing in again"
+    },
+    "landing": {
+      "Tagline": "Smart Finance. Stronger Institutions.",
+      "Heading": "Integrated Financial Management &",
+      "Heading accent": "Core Banking Platform",
+      "Description": "Empowering Microfinance Institutions, Cooperatives, and Development Banks with a unified, secure, and intelligent financial solution.",
+      "Closing line": "Digitally Transforming Financial Services for a Smarter Tomorrow.",
+      "Welcome back": "Welcome Back!",
+      "Sign in subtitle": "Sign in to your {{app}} account to continue",
+      "Modules": "A single unified platform for customer and member management, KYC, savings and deposits, lending and loan management system (LMS), repayments, share management, dividends, accounting, and financial operations."
     }
   },
   "bsCalendar": {
