@@ -27,6 +27,18 @@ export const LENDING_ROUTES: Routes = [
     }
   },
   {
+    path: 'files/:loanId/appraisal',
+    loadComponent: () =>
+      import('./appraisal/appraisal-tab/appraisal-tab.component').then((m) => m.AppraisalTabComponent),
+    canDeactivate: [(tab: { canLeave(): boolean }) => tab.canLeave()],
+    data: {
+      title: 'Appraisal',
+      breadcrumb: 'Appraisal',
+      routeParamBreadcrumb: false,
+      parentBreadcrumb: { label: 'Lending', url: '/lending/files' }
+    }
+  },
+  {
     path: 'valuers',
     loadComponent: () => import('./valuers/valuers-list/valuers-list.component').then((m) => m.ValuersListComponent),
     // Kept with the cooperative's other lists under Admin › Organization.

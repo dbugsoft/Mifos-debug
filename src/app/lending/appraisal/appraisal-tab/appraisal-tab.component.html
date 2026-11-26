@@ -1,0 +1,220 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="container appraisal">
+  <mifosx-file-tabs [loanId]="loanId" [file]="file()" />
+
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
+
+  @if (appraisal(); as a) {
+    <div class="summary" role="status">
+      <div class="figures">
+        <div>
+          <span class="label">{{ 'lending.appraisalTab.Score' | translate }}</span>
+          <span class="value">{{ score | number: '1.0-2' }} / 100</span>
+        </div>
+        <div>
+          <span class="label">{{ 'lending.appraisalTab.Band' | translate }}</span>
+          <span class="value">{{ bandText() || '—' }}</span>
+        </div>
+        <div>
+          <span class="label">{{ 'lending.appraisalTab.Max loan' | translate }}</span>
+          <span class="value">{{ (a.result?.maxLoan | number: '1.0-2') ?? '—' }}</span>
+        </div>
+        <div>
+          <span class="label">{{ 'lending.appraisalTab.Valuers limit' | translate }}</span>
+          <span class="value">{{ (a.recommended | number: '1.0-2') ?? '—' }}</span>
+        </div>
+        <div>
+          <span class="label">{{ 'lending.work.Amount' | translate }}</span>
+          <span class="value">{{ a.amount | number: '1.0-2' }}</span>
+        </div>
+      </div>
+      @if (form.dirty) {
+        <p class="unsaved">{{ 'lending.appraisalTab.unsaved' | translate }}</p>
+      }
+      @for (p of a.result?.problems ?? []; track $index) {
+        <p class="problem">{{ p }}</p>
+      }
+    </div>
+
+    @if (!a.required) {
+      <p class="note">{{ 'lending.appraisalTab.notRequired' | translate }}</p>
+    }
+    @if (!a.editable) {
+      <p class="note">{{ 'lending.appraisalTab.readOnly' | translate }}</p>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="save()">
+      <div formGroupName="answers">
+        @for (area of a.form; track area.code) {
+          <mat-card class="section">
+            <mat-card-content>
+              <div class="area-head">
+                <h3>{{ label(area.code, area.label) }}</h3>
+                <span class="points">
+                  {{ areaPoints(area) | number: '1.0-2' }} / {{ areaMax(area) | number: '1.0-2' }}
+                </span>
+              </div>
+              <ul class="lines">
+                @for (line of area.lines; track line.code) {
+                  <li [class.unanswered]="isUnanswered(line.code)">
+                    <span class="line-label">{{ label(line.code, line.label) }}</span>
+                    <mat-button-toggle-group
+                      [formControlName]="line.code"
+                      [attr.aria-label]="label(line.code, line.label)"
+                      hideSingleSelectionIndicator
+                    >
+                      @for (ans of answers; track ans) {
+                        <mat-button-toggle [value]="ans">
+                          {{ 'lending.appraisalTab.answer.' + ans | translate }}
+                        </mat-button-toggle>
+                      }
+                    </mat-button-toggle-group>
+                  </li>
+                }
+              </ul>
+            </mat-card-content>
+          </mat-card>
+        }
+      </div>
+
+      <mat-card class="section">
+        <mat-card-content>
+          <div class="row">
+            <mat-form-field>
+              <mat-label>{{ 'lending.appraisalTab.Project cost' | translate }}</mat-label>
+              <input matInput type="number" min="0" formControlName="projectCost" />
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>{{ 'lending.appraisalTab.Purpose' | translate }}</mat-label>
+              <input matInput formControlName="purpose" maxlength="500" />
+            </mat-form-field>
+          </div>
+          <mat-form-field class="full">
+            <mat-label>{{ 'lending.appraisalTab.Opinion' | translate }}</mat-label>
+            <textarea matInput formControlName="opinion" rows="3" maxlength="2000"></textarea>
+          </mat-form-field>
+          @if (editable) {
+            <div class="actions">
+              <button mat-raised-button color="primary" type="submit" [disabled]="busy()">
+                {{ 'lending.file.Save' | translate }}
+              </button>
+              @if (form.dirty) {
+                <span class="unsaved">{{ 'lending.appraisalTab.unsaved' | translate }}</span>
+              } @else if (a.updatedAt) {
+                <span class="hint">
+                  {{ 'lending.appraisalTab.savedBy' | translate: { who: a.updatedBy ?? '', when: date(a.updatedAt) } }}
+                </span>
+              }
+            </div>
+          }
+        </mat-card-content>
+      </mat-card>
+    </form>
+
+    <mat-card class="section">
+      <mat-card-content>
+        <div class="area-head">
+          <h3>{{ 'lending.appraisalTab.Valuations' | translate }}</h3>
+          @if (a.editable) {
+            <button
+              mat-stroked-button
+              color="primary"
+              type="button"
+              *mifosxHasPermission="'APPRAISE_LOANFILE'"
+              [disabled]="busy()"
+              (click)="openValuation()"
+            >
+              {{ 'lending.appraisalTab.Add valuation' | translate }}
+            </button>
+          }
+        </div>
+        @if (a.hold) {
+          <p class="note">{{ 'lending.appraisalTab.holdNote' | translate }}</p>
+        }
+        @if (a.valuations.length) {
+          <div class="table-scroll">
+            <table mat-table [dataSource]="a.valuations" class="members-table valuations">
+              <ng-container matColumnDef="owner">
+                <th mat-header-cell *matHeaderCellDef>{{ 'lending.appraisalTab.Owner' | translate }}</th>
+                <td mat-cell *matCellDef="let v">{{ v.ownerName ?? '—' }}</td>
+              </ng-container>
+              <ng-container matColumnDef="place">
+                <th mat-header-cell *matHeaderCellDef>{{ 'lending.appraisalTab.Place' | translate }}</th>
+                <td mat-cell *matCellDef="let v">{{ place(v) || '—' }}</td>
+              </ng-container>
+              <ng-container matColumnDef="land">
+                <th mat-header-cell *matHeaderCellDef class="num">
+                  {{ 'lending.appraisalTab.Land value' | translate }}
+                </th>
+                <td mat-cell *matCellDef="let v" class="num">{{ v.landValue | number: '1.0-2' }}</td>
+              </ng-container>
+              <ng-container matColumnDef="house">
+                <th mat-header-cell *matHeaderCellDef class="num">
+                  {{ 'lending.appraisalTab.House value' | translate }}
+                </th>
+                <td mat-cell *matCellDef="let v" class="num">{{ v.houseValue | number: '1.0-2' }}</td>
+              </ng-container>
+              <ng-container matColumnDef="tenancy">
+                <th mat-header-cell *matHeaderCellDef class="num">
+                  {{ 'lending.appraisalTab.Tenancy value' | translate }}
+                </th>
+                <td mat-cell *matCellDef="let v" class="num">{{ v.tenancyValue | number: '1.0-2' }}</td>
+              </ng-container>
+              <ng-container matColumnDef="net">
+                <th mat-header-cell *matHeaderCellDef class="num">
+                  {{ 'lending.appraisalTab.Net value' | translate }}
+                </th>
+                <td mat-cell *matCellDef="let v" class="num">
+                  <strong>{{ v.netValue | number: '1.0-2' }}</strong>
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="recommended">
+                <th mat-header-cell *matHeaderCellDef class="num">
+                  {{ 'lending.appraisalTab.Recommended' | translate }}
+                </th>
+                <td mat-cell *matCellDef="let v" class="num">
+                  <strong>{{ v.recommended | number: '1.0-2' }}</strong>
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="valuer">
+                <th mat-header-cell *matHeaderCellDef>{{ 'lending.appraisalTab.Valuer' | translate }}</th>
+                <td mat-cell *matCellDef="let v">{{ v.valuer?.name ?? '—' }}</td>
+              </ng-container>
+              <ng-container matColumnDef="valuedOn">
+                <th mat-header-cell *matHeaderCellDef>{{ 'lending.appraisalTab.Valued on' | translate }}</th>
+                <td mat-cell *matCellDef="let v">{{ date(v.valuedOn) }}</td>
+              </ng-container>
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef></th>
+                <td mat-cell *matCellDef="let v" class="row-actions">
+                  <ng-container *mifosxHasPermission="'APPRAISE_LOANFILE'">
+                    <button mat-button type="button" [disabled]="busy()" (click)="openValuation(v)">
+                      {{ 'lending.valuers.Edit' | translate }}
+                    </button>
+                    <button mat-button type="button" [disabled]="busy()" (click)="removeValuation(v)">
+                      {{ 'lending.appraisalTab.Remove' | translate }}
+                    </button>
+                  </ng-container>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="valuationColumns(a)"></tr>
+              <tr mat-row *matRowDef="let row; columns: valuationColumns(a)"></tr>
+            </table>
+          </div>
+        } @else {
+          <p class="hint">{{ 'lending.appraisalTab.noValuations' | translate }}</p>
+        }
+      </mat-card-content>
+    </mat-card>
+  }
+</div>
