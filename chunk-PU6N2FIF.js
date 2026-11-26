@@ -1,0 +1,1 @@
+import{c as n}from"./chunk-5HIWDDQQ.js";import{b as o}from"./chunk-VUOKVBXO.js";import{P as i,_ as a,o as r}from"./chunk-Z4KKTQ5F.js";function c(){let e=a(n);return o(e.onLangChange.pipe(r(t=>t.lang),i(e.currentLang),r(t=>!!t?.toLowerCase().startsWith("ne"))),{initialValue:!1})}export{c as a};

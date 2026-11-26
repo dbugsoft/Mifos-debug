@@ -1,0 +1,1 @@
+import{o as t}from"./chunk-5HIWDDQQ.js";import{De as i,_ as n}from"./chunk-Z4KKTQ5F.js";function m(){let e=n(t).getCredentials()?.permissions??[];return o=>!i.productionModeEnableRBAC||e.includes("ALL_FUNCTIONS")||e.includes(o)}export{m as a};

@@ -1,1 +1,0 @@
-import{A as e,P as p,Q as i,j as r}from"./chunk-WG2LH4IV.js";var l=2;function f(t,c){return t.pipe(i(n=>{let o=typeof n=="string"?n.trim():"";return o.length<l?r(null):c(o).pipe(p(null),e(()=>r([])))}))}function s(t){return t!==null&&typeof t=="object"&&t.id!=null?t:null}export{f as a,s as b};
