@@ -27,11 +27,10 @@ import {
 import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable, filter, map, startWith } from 'rxjs';
-import { AuthenticationService } from 'app/core/authentication/authentication.service';
+import { injectHasPermission } from '../../permissions';
 import { FormDialogComponent } from 'app/shared/form-dialog/form-dialog.component';
 import { InputBase } from 'app/shared/form-dialog/formfield/model/input-base';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
-import { environment } from 'environments/environment';
 import { FileTabsComponent } from '../../files/file-tabs/file-tabs.component';
 import { LoanFile, LoanFileService } from '../../files/loan-file.service';
 import { ANSWERS, Answer, Appraisal, AppraisalArea, AppraisalService, Valuation } from '../appraisal.service';
@@ -72,7 +71,7 @@ export class AppraisalTabComponent implements OnInit {
   private translate = inject(TranslateService);
   private fb = inject(FormBuilder);
   private destroyRef = inject(DestroyRef);
-  private auth = inject(AuthenticationService);
+  private hasPermission = injectHasPermission();
 
   readonly answers = ANSWERS;
   readonly loanId = this.route.snapshot.paramMap.get('loanId');
@@ -311,11 +310,5 @@ export class AppraisalTabComponent implements OnInit {
     if (this.form.dirty) {
       event.preventDefault();
     }
-  }
-
-  /** The same rule as the app's permission directive, for the form that is shown but locked without it. */
-  private hasPermission(permission: string): boolean {
-    const granted: string[] = this.auth.getCredentials()?.permissions ?? [];
-    return !environment.productionModeEnableRBAC || granted.includes('ALL_FUNCTIONS') || granted.includes(permission);
   }
 }

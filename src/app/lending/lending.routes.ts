@@ -39,6 +39,25 @@ export const LENDING_ROUTES: Routes = [
     }
   },
   {
+    path: 'files/:loanId/approval',
+    loadComponent: () => import('./approval/approval-tab/approval-tab.component').then((m) => m.ApprovalTabComponent),
+    data: {
+      title: 'Approval',
+      breadcrumb: 'Approval',
+      routeParamBreadcrumb: false,
+      parentBreadcrumb: { label: 'Lending', url: '/lending/files' }
+    }
+  },
+  {
+    path: 'to-confirm',
+    loadComponent: () => import('./approval/to-confirm/to-confirm.component').then((m) => m.ToConfirmComponent),
+    data: {
+      title: 'To confirm',
+      breadcrumb: 'To confirm',
+      parentBreadcrumb: { label: 'Lending', url: '/lending/files' }
+    }
+  },
+  {
     path: 'valuers',
     loadComponent: () => import('./valuers/valuers-list/valuers-list.component').then((m) => m.ValuersListComponent),
     // Kept with the cooperative's other lists under Admin › Organization.

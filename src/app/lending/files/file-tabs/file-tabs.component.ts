@@ -96,7 +96,8 @@ export class FileTabsComponent {
 
   readonly tabs = [
     { path: [] as string[], label: 'lending.file.Documents' },
-    { path: ['appraisal'], label: 'lending.tabs.Appraisal' }
+    { path: ['appraisal'], label: 'lending.tabs.Appraisal' },
+    { path: ['approval'], label: 'lending.tabs.Approval' }
   ];
 
   link(path: string[]): (string | number)[] {

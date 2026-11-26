@@ -8098,7 +8098,15 @@
       "ITEM_UNDONE": "Document tick removed",
       "COMPLETED": "File completed",
       "RETURNED": "File returned",
-      "NOTE": "Note"
+      "NOTE": "Note",
+      "APPRAISED": "Appraisal saved",
+      "VALUED": "Property valued",
+      "VALUATION_CHANGED": "Valuation corrected",
+      "VALUATION_REMOVED": "Valuation removed",
+      "RECOMMENDED": "Staff recommended",
+      "DECIDED": "Level decided",
+      "DECISION_VOIDED": "Decision voided",
+      "CONFIRMED": "Approval confirmed at a meeting"
     },
     "documents": {
       "APPLICATION_FORM": "Loan application form, filled in",
@@ -8149,7 +8157,8 @@
       "couldNotLoad": "The list of valuers could not be loaded."
     },
     "tabs": {
-      "Appraisal": "Appraisal"
+      "Appraisal": "Appraisal",
+      "Approval": "Approval"
     },
     "appraisalTab": {
       "Score": "Score",
@@ -8198,6 +8207,48 @@
       "Valuer": "Valuer",
       "valuerRequired": "Pick the valuer.",
       "Valued on": "Valued on"
+    },
+    "Work page": "Work page",
+    "approvalTab": {
+      "notEnforced": "Approval levels are not enforced yet; Fineract's Approve works without them.",
+      "Share of capital": "Share of primary capital",
+      "Who approves": "Who approves",
+      "aboveValuation": "The loan amount is above the valuers' recommended limit.",
+      "Steps": "Steps",
+      "Staff recommendation": "Staff recommendation",
+      "upTo": "up to {{percent}}% of primary capital",
+      "Must approve": "Must approve",
+      "readyForFineract": "Approved at the levels. Now approve the loan itself.",
+      "Approve the loan": "Approve the loan",
+      "decisionOf": "Decision of the {{level}}",
+      "Outcome": "Outcome",
+      "outcome": {
+        "RECOMMEND": "Recommend",
+        "APPROVE": "Approve",
+        "REFUSE": "Refuse"
+      },
+      "amountRequired": "Enter an amount above 0.",
+      "Meeting decision": "Meeting decision",
+      "meetingRequired": "Pick the decision from the committee's meeting.",
+      "noMeetingDecisions": "No decision of this committee is recorded yet. Record it in the meeting register first.",
+      "Save decision": "Save decision",
+      "Decision history": "Decision history",
+      "noDecisions": "Nothing has been recommended or decided yet.",
+      "Void": "Void",
+      "Void decision": "Void decision",
+      "voidedBy": "Voided by {{who}} on {{when}}: {{reason}}",
+      "To confirm": "To confirm",
+      "Above valuation": "Above the valuation",
+      "confirmedBy": "Confirmed by {{decision}}"
+    },
+    "toConfirm": {
+      "To confirm": "To confirm",
+      "hint": "Approvals made in a small office by the person who recommended them, waiting for the next committee meeting.",
+      "Approved by": "Approved by",
+      "When": "When",
+      "confirmTitle": "Confirm the approval for {{member}}",
+      "empty": "No approvals waiting to be confirmed.",
+      "couldNotLoad": "The approvals to confirm could not be loaded."
     }
   },
   "organisationCategory": {

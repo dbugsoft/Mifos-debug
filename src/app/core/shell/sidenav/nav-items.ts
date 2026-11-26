@@ -194,7 +194,14 @@ export const navSections: NavSection[] = [
           'APPROVE_LOAN_CHECKER'
         ]
       },
-      { label: 'lending.Lending', icon: 'request_quote', path: ['/lending/files'], permission: 'READ_LOANFILE' },
+      {
+        label: 'lending.Lending',
+        icon: 'request_quote',
+        children: [
+          { label: 'lending.Work page', path: ['/lending/files'], permission: 'READ_LOANFILE' },
+          { label: 'lending.toConfirm.To confirm', path: ['/lending/to-confirm'], permission: 'READ_LOANFILE' }
+        ]
+      },
       {
         label: 'labels.menus.Loan Calculator',
         icon: 'calculate',
