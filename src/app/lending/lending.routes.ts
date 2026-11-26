@@ -58,6 +58,11 @@ export const LENDING_ROUTES: Routes = [
     }
   },
   {
+    path: 'policy',
+    loadComponent: () => import('./policy/policy-page/policy-page.component').then((m) => m.PolicyPageComponent),
+    data: { title: 'Lending policy', breadcrumb: 'Lending policy' }
+  },
+  {
     path: 'valuers',
     loadComponent: () => import('./valuers/valuers-list/valuers-list.component').then((m) => m.ValuersListComponent),
     // Kept with the cooperative's other lists under Admin › Organization.
