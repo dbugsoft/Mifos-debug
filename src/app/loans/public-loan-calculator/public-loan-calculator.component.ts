@@ -216,8 +216,8 @@ export class PublicLoanCalculatorComponent {
       t('Loan calculator'),
       this.inputsSummary(),
       this.translate.instant(answer.key, answer.params),
-      `${t('Total interest')}: Rs ${money(e.totalInterest)}`,
-      `${t('Total you pay back')}: Rs ${money(e.totalRepayment)}`,
+      `${t('Total interest')}: ${t('Rs')} ${money(e.totalInterest)}`,
+      `${t('Total you pay back')}: ${t('Rs')} ${money(e.totalRepayment)}`,
       `${t('Last payment')}: ${last}`,
       t('estimateNote')
     ].join('\n');

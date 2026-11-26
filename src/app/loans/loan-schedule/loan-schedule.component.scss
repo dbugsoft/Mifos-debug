@@ -72,4 +72,23 @@
   .schedule-table tr {
     break-inside: avoid;
   }
+
+  // The header repeats on every page; the totals print once, at the end.
+  :host ::ng-deep .schedule-table tfoot {
+    display: table-row-group;
+  }
+
+  // Narrower cells and two-line headings keep all six columns on an A4 page with each date on one line.
+  .schedule-table th,
+  .schedule-table td {
+    padding: 0 8px;
+  }
+
+  .schedule-table th {
+    white-space: normal;
+  }
+
+  .mat-column-dueDate {
+    white-space: nowrap;
+  }
 }
