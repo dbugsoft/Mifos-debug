@@ -90,7 +90,13 @@ export const adminCards: MenuCard[] = [
   { label: 'labels.menus.Organization', icon: 'building', path: ['/organization'], permission: 'READ_OFFICE' },
   { label: 'labels.menus.System', icon: 'cogs', path: ['/system'], permission: 'READ_CONFIGURATION' },
   { label: 'labels.menus.Products', icon: 'tags', path: ['/products'], permission: 'READ_PRODUCT' },
-  { label: 'labels.menus.Templates', icon: 'file-alt', path: ['/templates'], permission: 'READ_TEMPLATE' }
+  { label: 'labels.menus.Templates', icon: 'file-alt', path: ['/templates'], permission: 'READ_TEMPLATE' },
+  {
+    label: 'lending.policy.Lending policy',
+    icon: 'hand-holding-usd',
+    path: ['/lending/policy'],
+    permission: 'READ_LOANFILE'
+  }
 ];
 
 /** Pages of the Accounting landing page, in its order. */
@@ -194,7 +200,14 @@ export const navSections: NavSection[] = [
           'APPROVE_LOAN_CHECKER'
         ]
       },
-      { label: 'lending.Lending', icon: 'request_quote', path: ['/lending/files'], permission: 'READ_LOANFILE' },
+      {
+        label: 'lending.Lending',
+        icon: 'request_quote',
+        children: [
+          { label: 'lending.Work page', path: ['/lending/files'], permission: 'READ_LOANFILE' },
+          { label: 'lending.toConfirm.To confirm', path: ['/lending/to-confirm'], permission: 'READ_LOANFILE' }
+        ]
+      },
       {
         label: 'labels.menus.Loan Calculator',
         icon: 'calculate',

@@ -1,0 +1,372 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="container">
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
+
+  @if (view(); as v) {
+    <div class="toolbar">
+      <p class="hint">
+        {{ (v.inForce ? 'lending.policy.inForceHint' : 'lending.policy.sampleHint') | translate }}
+      </p>
+      @if (!editing()) {
+        <button
+          mat-raised-button
+          color="primary"
+          type="button"
+          *mifosxHasPermission="'UPDATE_LENDINGPOLICY'"
+          (click)="startNew()"
+        >
+          {{ 'lending.policy.New version' | translate }}
+        </button>
+      }
+    </div>
+
+    @if (versions.length) {
+      <div class="table-scroll">
+        <table mat-table [dataSource]="versions" class="members-table">
+          <ng-container matColumnDef="version">
+            <th mat-header-cell *matHeaderCellDef>{{ 'lending.policy.Version' | translate }}</th>
+            <td mat-cell *matCellDef="let r">{{ r.version }}</td>
+          </ng-container>
+          <ng-container matColumnDef="effectiveFrom">
+            <th mat-header-cell *matHeaderCellDef>{{ 'lending.policy.Starts on' | translate }}</th>
+            <td mat-cell *matCellDef="let r">{{ date(r.effectiveFrom) }}</td>
+          </ng-container>
+          <ng-container matColumnDef="note">
+            <th mat-header-cell *matHeaderCellDef>{{ 'lending.file.Note' | translate }}</th>
+            <td mat-cell *matCellDef="let r">{{ r.note ?? '—' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="createdBy">
+            <th mat-header-cell *matHeaderCellDef>{{ 'lending.policy.Saved by' | translate }}</th>
+            <td mat-cell *matCellDef="let r">{{ who(r.createdBy) }}</td>
+          </ng-container>
+          <ng-container matColumnDef="createdAt">
+            <th mat-header-cell *matHeaderCellDef>{{ 'lending.policy.Saved on' | translate }}</th>
+            <td mat-cell *matCellDef="let r">{{ date(r.createdAt) }}</td>
+          </ng-container>
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let r">
+              @if (isInForce(r)) {
+                <span class="chip on">{{ 'lending.policy.In force' | translate }}</span>
+              } @else if (isLater(r)) {
+                <span class="chip later">
+                  {{ 'lending.policy.startsOn' | translate: { date: date(r.effectiveFrom) } }}
+                </span>
+              }
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="columns"></tr>
+          <tr mat-row *matRowDef="let row; columns: columns"></tr>
+        </table>
+      </div>
+    } @else {
+      <p class="hint">{{ 'lending.policy.noVersions' | translate }}</p>
+    }
+
+    @if (editing()) {
+      <form [formGroup]="form" class="editor" (ngSubmit)="save()">
+        <h3>{{ 'lending.policy.New version' | translate }}</h3>
+
+        <mat-tab-group mat-stretch-tabs="false" animationDuration="0ms">
+          <!-- 1. Documents -->
+          <mat-tab [label]="'lending.policy.Documents' | translate">
+            <div class="tab-body">
+              <div cdkDropList class="item-list" (cdkDropListDropped)="dropDocument($event)">
+                @for (d of documents.controls; track d; let i = $index) {
+                  <div class="item doc-item" cdkDrag [formGroup]="d">
+                    <mat-icon class="handle" cdkDragHandle [attr.aria-label]="'lending.policy.Drag' | translate">
+                      drag_indicator
+                    </mat-icon>
+                    <mat-form-field class="code">
+                      <mat-label>{{ 'lending.policy.Code' | translate }}</mat-label>
+                      <input matInput formControlName="code" maxlength="40" />
+                      <mat-error>{{ 'lending.policy.codeRule' | translate }}</mat-error>
+                    </mat-form-field>
+                    <mat-form-field class="grow">
+                      <mat-label>{{ 'lending.policy.Label' | translate }}</mat-label>
+                      <input matInput formControlName="label" maxlength="200" />
+                    </mat-form-field>
+                    <mat-form-field class="applies">
+                      <mat-label>{{ 'lending.policy.Applies to' | translate }}</mat-label>
+                      <mat-select formControlName="appliesTo" multiple>
+                        @for (s of securities; track s) {
+                          <mat-option [value]="s">{{ 'lending.security.' + s | translate }}</mat-option>
+                        }
+                      </mat-select>
+                    </mat-form-field>
+                    <mat-form-field class="req">
+                      <mat-label>{{ 'lending.policy.Kind' | translate }}</mat-label>
+                      <mat-select formControlName="required">
+                        <mat-option [value]="true">{{ 'lending.file.Required' | translate }}</mat-option>
+                        <mat-option [value]="false">{{ 'lending.file.If it applies' | translate }}</mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                    <button mat-button type="button" (click)="remove(documents, i)">
+                      {{ 'lending.appraisalTab.Remove' | translate }}
+                    </button>
+                  </div>
+                }
+              </div>
+              <button mat-stroked-button color="primary" type="button" (click)="addDocument()">
+                {{ 'lending.policy.Add document' | translate }}
+              </button>
+            </div>
+          </mat-tab>
+
+          <!-- 2. Checks -->
+          <mat-tab [label]="'lending.policy.Checks' | translate">
+            <div class="tab-body switches">
+              <mat-slide-toggle formControlName="fileRequiredForApproval" color="primary">
+                {{ 'lending.policy.fileRequired' | translate }}
+              </mat-slide-toggle>
+              <ng-container formGroupName="approval">
+                <mat-slide-toggle formControlName="required" color="primary">
+                  {{ 'lending.policy.levelsRequired' | translate }}
+                </mat-slide-toggle>
+                <mat-slide-toggle formControlName="recommenderMayApprove" color="primary">
+                  {{ 'lending.policy.smallOffice' | translate }}
+                </mat-slide-toggle>
+              </ng-container>
+            </div>
+          </mat-tab>
+
+          <!-- 3. Appraisal -->
+          <mat-tab [label]="'lending.tabs.Appraisal' | translate">
+            <div class="tab-body" formGroupName="appraisal">
+              <div class="row">
+                <mat-form-field>
+                  <mat-label>{{ 'lending.policy.Appraisal needed for' | translate }}</mat-label>
+                  <mat-select formControlName="requiredFor" multiple>
+                    @for (s of securities; track s) {
+                      <mat-option [value]="s">{{ 'lending.security.' + s | translate }}</mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+                <mat-form-field>
+                  <mat-label>{{ 'lending.policy.Own share' | translate }}</mat-label>
+                  <input matInput type="number" min="0" max="100" formControlName="minOwnInvestmentPercent" />
+                  <span matTextSuffix>%</span>
+                </mat-form-field>
+              </div>
+
+              <h4>{{ 'lending.policy.Areas' | translate }}</h4>
+              @for (area of areas.controls; track area; let i = $index) {
+                <div class="area" [formGroup]="area">
+                  <div class="item">
+                    <mat-form-field class="code">
+                      <mat-label>{{ 'lending.policy.Code' | translate }}</mat-label>
+                      <input matInput formControlName="code" maxlength="40" />
+                      <mat-error>{{ 'lending.policy.codeRule' | translate }}</mat-error>
+                    </mat-form-field>
+                    <mat-form-field class="grow">
+                      <mat-label>{{ 'lending.policy.Label' | translate }}</mat-label>
+                      <input matInput formControlName="label" maxlength="200" />
+                    </mat-form-field>
+                    <mat-form-field class="points">
+                      <mat-label>{{ 'lending.appraisalTab.answer.GOOD' | translate }}</mat-label>
+                      <input matInput type="number" min="0" formControlName="good" />
+                    </mat-form-field>
+                    <mat-form-field class="points">
+                      <mat-label>{{ 'lending.appraisalTab.answer.OK' | translate }}</mat-label>
+                      <input matInput type="number" min="0" formControlName="ok" />
+                    </mat-form-field>
+                    <mat-form-field class="points">
+                      <mat-label>{{ 'lending.appraisalTab.answer.WEAK' | translate }}</mat-label>
+                      <input matInput type="number" min="0" formControlName="weak" />
+                    </mat-form-field>
+                    <button mat-button type="button" (click)="remove(areas, i)">
+                      {{ 'lending.appraisalTab.Remove' | translate }}
+                    </button>
+                  </div>
+                  <div class="lines">
+                    @for (line of lines(area).controls; track line; let j = $index) {
+                      <div class="item" [formGroup]="line">
+                        <mat-form-field class="code">
+                          <mat-label>{{ 'lending.policy.Code' | translate }}</mat-label>
+                          <input matInput formControlName="code" maxlength="40" />
+                          <mat-error>{{ 'lending.policy.codeRule' | translate }}</mat-error>
+                        </mat-form-field>
+                        <mat-form-field class="grow">
+                          <mat-label>{{ 'lending.policy.Line' | translate }}</mat-label>
+                          <input matInput formControlName="label" maxlength="200" />
+                        </mat-form-field>
+                        <button mat-button type="button" (click)="remove(lines(area), j)">
+                          {{ 'lending.appraisalTab.Remove' | translate }}
+                        </button>
+                      </div>
+                    }
+                    <button mat-button color="primary" type="button" (click)="addLine(area)">
+                      {{ 'lending.policy.Add line' | translate }}
+                    </button>
+                  </div>
+                </div>
+              }
+              <button mat-stroked-button color="primary" type="button" (click)="addArea()">
+                {{ 'lending.policy.Add area' | translate }}
+              </button>
+
+              <h4>{{ 'lending.policy.Score bands' | translate }}</h4>
+              @for (band of bands.controls; track band; let i = $index) {
+                <div class="item" [formGroup]="band">
+                  <mat-form-field class="points">
+                    <mat-label>{{ 'lending.policy.From score' | translate }}</mat-label>
+                    <input matInput type="number" min="0" max="100" formControlName="from" />
+                  </mat-form-field>
+                  <mat-form-field class="applies">
+                    <mat-label>{{ 'lending.policy.Lend percent' | translate }}</mat-label>
+                    <input matInput type="number" min="0" max="100" formControlName="lendPercentOfCost" />
+                    <mat-hint>{{ 'lending.policy.noLoanHint' | translate }}</mat-hint>
+                  </mat-form-field>
+                  <mat-checkbox formControlName="needsLand">{{
+                    'lending.policy.Land needed' | translate
+                  }}</mat-checkbox>
+                  <button mat-button type="button" (click)="remove(bands, i)">
+                    {{ 'lending.appraisalTab.Remove' | translate }}
+                  </button>
+                </div>
+              }
+              <button mat-stroked-button color="primary" type="button" (click)="addBand()">
+                {{ 'lending.policy.Add band' | translate }}
+              </button>
+            </div>
+          </mat-tab>
+
+          <!-- 4. Valuation -->
+          <mat-tab [label]="'lending.policy.Valuation' | translate">
+            <div class="tab-body row" formGroupName="valuation">
+              <mat-form-field>
+                <mat-label>{{ 'lending.policy.Margin' | translate }}</mat-label>
+                <input matInput type="number" min="0" max="100" formControlName="marginPercent" />
+                <span matTextSuffix>%</span>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>{{ 'lending.policy.Tenancy deduction' | translate }}</mat-label>
+                <input matInput type="number" min="0" max="100" formControlName="tenancyDeductionPercent" />
+                <span matTextSuffix>%</span>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>{{ 'lending.policy.Registered valuer from' | translate }}</mat-label>
+                <input matInput type="number" min="0" formControlName="registeredValuerFrom" />
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>{{ 'lending.policy.Hold up to' | translate }}</mat-label>
+                <input matInput type="number" min="0" formControlName="holdUpTo" />
+              </mat-form-field>
+            </div>
+          </mat-tab>
+
+          <!-- 5. Approval levels -->
+          <mat-tab [label]="'lending.policy.Approval levels' | translate">
+            <div class="tab-body" formGroupName="approval">
+              @for (level of levels.controls; track level; let i = $index) {
+                <div class="item" [formGroup]="level">
+                  <mat-form-field class="code">
+                    <mat-label>{{ 'lending.policy.Code' | translate }}</mat-label>
+                    <input matInput formControlName="code" maxlength="40" />
+                    <mat-error>{{ 'lending.policy.codeRule' | translate }}</mat-error>
+                  </mat-form-field>
+                  <mat-form-field class="grow">
+                    <mat-label>{{ 'lending.policy.Label' | translate }}</mat-label>
+                    <input matInput formControlName="label" maxlength="200" />
+                  </mat-form-field>
+                  <mat-form-field class="points">
+                    <mat-label>{{ 'lending.policy.Up to' | translate }}</mat-label>
+                    <input matInput type="number" min="0" max="100" formControlName="upToPercentOfCapital" />
+                    <span matTextSuffix>%</span>
+                  </mat-form-field>
+                  <mat-form-field class="applies">
+                    <mat-label>{{ 'lending.policy.Committee' | translate }}</mat-label>
+                    <mat-select formControlName="committee">
+                      <mat-option [value]="null">{{ 'lending.policy.A person' | translate }}</mat-option>
+                      @for (c of committees(); track c.id) {
+                        <mat-option [value]="c.code">{{ c.name }}</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                  <button mat-button type="button" (click)="remove(levels, i)">
+                    {{ 'lending.appraisalTab.Remove' | translate }}
+                  </button>
+                </div>
+              }
+              <button mat-stroked-button color="primary" type="button" (click)="addLevel()">
+                {{ 'lending.policy.Add level' | translate }}
+              </button>
+
+              <div class="row top-gap">
+                <mat-form-field>
+                  <mat-label>{{ 'lending.policy.Insider level' | translate }}</mat-label>
+                  <mat-select formControlName="insiderLevel">
+                    <mat-option [value]="null">—</mat-option>
+                    @for (l of levelCodes; track l.code) {
+                      <mat-option [value]="l.code">{{ l.label || l.code }}</mat-option>
+                    }
+                  </mat-select>
+                  <mat-hint>{{ 'lending.policy.insiderHint' | translate }}</mat-hint>
+                </mat-form-field>
+                <mat-form-field>
+                  <mat-label>{{ 'lending.policy.Deposit loan limit' | translate }}</mat-label>
+                  <input matInput type="number" min="0" formControlName="depositManagerLimit" />
+                </mat-form-field>
+                <mat-form-field>
+                  <mat-label>{{ 'lending.policy.Deposit percent' | translate }}</mat-label>
+                  <input matInput type="number" min="0" max="100" formControlName="depositPercent" />
+                  <span matTextSuffix>%</span>
+                </mat-form-field>
+              </div>
+            </div>
+          </mat-tab>
+        </mat-tab-group>
+
+        <div class="row top-gap">
+          <mifosx-nepali-date-input
+            [label]="'lending.policy.Starts on' | translate"
+            formControlName="effectiveFrom"
+            [minDate]="today"
+          />
+          <mat-form-field>
+            <mat-label>{{ 'lending.file.Note' | translate }}</mat-label>
+            <input matInput formControlName="note" maxlength="500" />
+            <mat-hint>{{ 'lending.policy.noteHint' | translate }}</mat-hint>
+            <mat-error>{{ 'lending.policy.noteRequired' | translate }}</mat-error>
+          </mat-form-field>
+        </div>
+
+        @if (changes(); as list) {
+          <div class="changes">
+            <h4>{{ 'lending.policy.Changes' | translate }}</h4>
+            @if (list.length) {
+              <ul>
+                @for (c of list; track c) {
+                  <li>{{ c }}</li>
+                }
+              </ul>
+            } @else {
+              <p class="hint">{{ 'lending.policy.noChanges' | translate }}</p>
+            }
+          </div>
+        }
+
+        <div class="actions">
+          <button mat-button type="button" [disabled]="busy()" (click)="editing.set(false)">
+            {{ 'labels.buttons.Cancel' | translate }}
+          </button>
+          <button mat-stroked-button color="primary" type="button" (click)="preview()">
+            {{ 'lending.policy.Preview changes' | translate }}
+          </button>
+          <button mat-raised-button color="primary" type="submit" [disabled]="busy() || changes() === null">
+            {{ 'lending.file.Save' | translate }}
+          </button>
+        </div>
+      </form>
+    }
+  }
+</div>

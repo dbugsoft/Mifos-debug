@@ -27,6 +27,42 @@ export const LENDING_ROUTES: Routes = [
     }
   },
   {
+    path: 'files/:loanId/appraisal',
+    loadComponent: () =>
+      import('./appraisal/appraisal-tab/appraisal-tab.component').then((m) => m.AppraisalTabComponent),
+    canDeactivate: [(tab: { canLeave(): boolean }) => tab.canLeave()],
+    data: {
+      title: 'Appraisal',
+      breadcrumb: 'Appraisal',
+      routeParamBreadcrumb: false,
+      parentBreadcrumb: { label: 'Lending', url: '/lending/files' }
+    }
+  },
+  {
+    path: 'files/:loanId/approval',
+    loadComponent: () => import('./approval/approval-tab/approval-tab.component').then((m) => m.ApprovalTabComponent),
+    data: {
+      title: 'Approval',
+      breadcrumb: 'Approval',
+      routeParamBreadcrumb: false,
+      parentBreadcrumb: { label: 'Lending', url: '/lending/files' }
+    }
+  },
+  {
+    path: 'to-confirm',
+    loadComponent: () => import('./approval/to-confirm/to-confirm.component').then((m) => m.ToConfirmComponent),
+    data: {
+      title: 'To confirm',
+      breadcrumb: 'To confirm',
+      parentBreadcrumb: { label: 'Lending', url: '/lending/files' }
+    }
+  },
+  {
+    path: 'policy',
+    loadComponent: () => import('./policy/policy-page/policy-page.component').then((m) => m.PolicyPageComponent),
+    data: { title: 'Lending policy', breadcrumb: 'Lending policy' }
+  },
+  {
     path: 'valuers',
     loadComponent: () => import('./valuers/valuers-list/valuers-list.component').then((m) => m.ValuersListComponent),
     // Kept with the cooperative's other lists under Admin › Organization.

@@ -16,6 +16,7 @@ import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { DocumentDialogComponent, DocumentDialogData } from '../document-dialog/document-dialog.component';
+import { FileTabsComponent } from '../file-tabs/file-tabs.component';
 import {
   FileDocument,
   FileHistoryEntry,
@@ -39,7 +40,8 @@ const NOTE_MAX = 2000;
   styleUrls: ['./loan-file.component.scss'],
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
-    MatProgressBar
+    MatProgressBar,
+    FileTabsComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })

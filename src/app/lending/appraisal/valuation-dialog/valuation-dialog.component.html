@@ -1,0 +1,118 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<h2 mat-dialog-title>
+  {{ (editing ? 'lending.appraisalTab.Edit valuation' : 'lending.appraisalTab.Add valuation') | translate }}
+</h2>
+<form [formGroup]="form" (ngSubmit)="save()">
+  <mat-dialog-content>
+    @if (data.hold) {
+      <p class="note">{{ 'lending.appraisalTab.holdNote' | translate }}</p>
+    }
+
+    <mat-form-field class="full">
+      <mat-label>{{ 'lending.appraisalTab.Owner' | translate }}</mat-label>
+      <input matInput formControlName="ownerName" maxlength="200" />
+      <mat-error>{{ 'lending.appraisalTab.ownerRequired' | translate }}</mat-error>
+    </mat-form-field>
+
+    <div class="row three">
+      <mat-form-field>
+        <mat-label>{{ 'lending.appraisalTab.District' | translate }}</mat-label>
+        <mat-select formControlName="district">
+          <mat-option [value]="null">—</mat-option>
+          @for (d of districts(); track d.key) {
+            <mat-option [value]="d.key">{{ name(d) }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>{{ 'lending.appraisalTab.Municipality' | translate }}</mat-label>
+        <mat-select formControlName="municipality">
+          @for (l of localLevels(); track l.code) {
+            <mat-option [value]="l.code">{{ name(l) }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>{{ 'lending.appraisalTab.Ward' | translate }}</mat-label>
+        <mat-select formControlName="ward">
+          @for (w of wards(); track w) {
+            <mat-option [value]="w">{{ w }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="row">
+      <mat-form-field>
+        <mat-label>{{ 'lending.appraisalTab.Plot no' | translate }}</mat-label>
+        <input matInput formControlName="plotNo" maxlength="100" />
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>{{ 'lending.appraisalTab.Area' | translate }}</mat-label>
+        <input matInput formControlName="area" maxlength="100" />
+      </mat-form-field>
+    </div>
+
+    <mat-form-field class="full">
+      <mat-label>{{ 'lending.appraisalTab.Description' | translate }}</mat-label>
+      <textarea matInput formControlName="description" rows="2" maxlength="1000"></textarea>
+    </mat-form-field>
+
+    <div class="row three">
+      <mat-form-field>
+        <mat-label>{{ 'lending.appraisalTab.Land value' | translate }}</mat-label>
+        <input matInput type="number" min="0" formControlName="landValue" />
+        <mat-error>{{ 'lending.appraisalTab.landValueRequired' | translate }}</mat-error>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>{{ 'lending.appraisalTab.House value' | translate }}</mat-label>
+        <input matInput type="number" min="0" formControlName="houseValue" />
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>{{ 'lending.appraisalTab.Tenancy value' | translate }}</mat-label>
+        <input matInput type="number" min="0" formControlName="tenancyValue" />
+      </mat-form-field>
+    </div>
+
+    <div class="row">
+      <mat-form-field>
+        <mat-label>{{ 'lending.appraisalTab.Valuer' | translate }}</mat-label>
+        <mat-select formControlName="valuerId">
+          @for (v of valuers(); track v.id) {
+            <mat-option [value]="v.id">
+              {{ v.name }}
+              @if (v.registered) {
+                · {{ v.registrationNo }}
+              }
+            </mat-option>
+          }
+        </mat-select>
+        @if (data.registeredValuerNeeded) {
+          <mat-hint>{{ 'lending.appraisalTab.registeredNeeded' | translate }}</mat-hint>
+        }
+        <mat-error>{{ 'lending.appraisalTab.valuerRequired' | translate }}</mat-error>
+      </mat-form-field>
+      <mifosx-nepali-date-input
+        [label]="'lending.appraisalTab.Valued on' | translate"
+        formControlName="valuedOn"
+        [maxDate]="today"
+      />
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" mat-dialog-close [disabled]="busy()">
+      {{ 'labels.buttons.Cancel' | translate }}
+    </button>
+    <button mat-raised-button color="primary" type="submit" [disabled]="busy()">
+      {{ 'lending.file.Save' | translate }}
+    </button>
+  </mat-dialog-actions>
+</form>

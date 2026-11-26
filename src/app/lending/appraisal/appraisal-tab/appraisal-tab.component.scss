@@ -1,0 +1,173 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+// The Members list's blue-header table.
+@use '../../../shared/styles/list-layout' as *;
+
+// Same frameless page as the other lending screens.
+.container {
+  display: block;
+  width: 90%;
+  max-width: 84rem;
+  margin: 0 auto 24px;
+  padding: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.section {
+  margin-bottom: 16px;
+}
+
+.full {
+  width: 100%;
+}
+
+.hint {
+  margin: 8px 0 0;
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 0.875rem;
+}
+
+.note {
+  margin: 0 0 16px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  color: var(--dk-text-2, #3f4448);
+  background: var(--dk-surface-2, #eceff1);
+}
+
+// Stays in view while the form scrolls under it.
+.summary {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  margin-bottom: 16px;
+  padding: 16px;
+  border: 1px solid var(--dk-border, #e2e8f0);
+  border-radius: 8px;
+  background: var(--dk-surface, #fff);
+
+  .figures {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+  }
+
+  .label {
+    display: block;
+    color: var(--mat-sys-on-surface-variant);
+    font-size: 0.75rem;
+  }
+
+  .value {
+    font-weight: 600;
+  }
+}
+
+.problem {
+  margin: 8px 0 0;
+  color: var(--dk-danger, #b3261e);
+  font-size: 0.875rem;
+}
+
+.unsaved {
+  margin: 8px 0 0;
+  color: var(--dk-warning, #7a4b00);
+  font-size: 0.875rem;
+}
+
+.area-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  margin-bottom: 8px;
+
+  h3 {
+    margin: 0;
+  }
+
+  .points {
+    font-weight: 600;
+  }
+}
+
+.lines {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 16px;
+    padding: 8px;
+    border-bottom: 1px solid var(--dk-border, #e2e8f0);
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    // Still empty after a save.
+    &.unanswered {
+      border-radius: 4px;
+      background: var(--dk-warning-soft, #fff4e0);
+    }
+  }
+
+  .line-label {
+    flex: 1 1 240px;
+  }
+}
+
+.row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 16px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+
+  .unsaved,
+  .hint {
+    margin: 0;
+  }
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+.valuations {
+  .num {
+    text-align: right;
+  }
+
+  .row-actions {
+    white-space: nowrap;
+  }
+}
+
+@media (width <= 600px) {
+  .row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+
+  .lines li {
+    padding: 8px 0;
+  }
+}

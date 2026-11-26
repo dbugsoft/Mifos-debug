@@ -1,0 +1,247 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="container approval">
+  <mifosx-file-tabs [loanId]="loanId" [file]="file()" />
+
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
+
+  @if (approval(); as a) {
+    @if (!a.enforced) {
+      <p class="note">{{ 'lending.approvalTab.notEnforced' | translate }}</p>
+    }
+
+    <mat-card class="section">
+      <mat-card-content>
+        <dl class="facts">
+          <div>
+            <dt>{{ 'lending.work.Amount' | translate }}</dt>
+            <dd>{{ a.amount | number: '1.0-2' }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'lending.approvalTab.Share of capital' | translate }}</dt>
+            <dd>{{ (a.percentOfCapital | number: '1.0-2') ?? '—' }}{{ a.percentOfCapital !== null ? '%' : '' }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'lending.appraisalTab.Max loan' | translate }}</dt>
+            <dd>{{ (a.appraisalLimit | number: '1.0-2') ?? '—' }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'lending.appraisalTab.Valuers limit' | translate }}</dt>
+            <dd>{{ (a.valuationLimit | number: '1.0-2') ?? '—' }}</dd>
+          </div>
+        </dl>
+        @if (a.requiredWhy) {
+          <p class="why">
+            <strong>{{ 'lending.approvalTab.Who approves' | translate }}:</strong>
+            {{ a.requiredWhy }}
+          </p>
+        }
+        @if (aboveValuation) {
+          <p class="amber">{{ 'lending.approvalTab.aboveValuation' | translate }}</p>
+        }
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="section">
+      <mat-card-content>
+        <h3>{{ 'lending.approvalTab.Steps' | translate }}</h3>
+        <ol class="steps">
+          <li [class.done]="staffRecommendation">
+            <div class="step-head">
+              <span class="step-name">{{ 'lending.approvalTab.Staff recommendation' | translate }}</span>
+            </div>
+            @if (staffRecommendation; as d) {
+              <ng-container *ngTemplateOutlet="decisionLine; context: { $implicit: d }" />
+            }
+          </li>
+          @for (level of a.levels; track level.code; let i = $index) {
+            <li [class.done]="level.latest" [class.greyed]="isGreyed(i)" [class.required]="level.required">
+              <div class="step-head">
+                <span class="step-name">{{ level.label }}</span>
+                @if (level.upToPercentOfCapital !== null) {
+                  <span class="muted">
+                    {{ 'lending.approvalTab.upTo' | translate: { percent: level.upToPercentOfCapital } }}
+                  </span>
+                }
+                @if (level.required) {
+                  <span class="chip on">{{ 'lending.approvalTab.Must approve' | translate }}</span>
+                }
+              </div>
+              @if (level.latest; as d) {
+                <ng-container *ngTemplateOutlet="decisionLine; context: { $implicit: d }" />
+              }
+            </li>
+          }
+        </ol>
+
+        @if (a.waitingFor) {
+          <p class="waiting">{{ a.waitingFor }}</p>
+        } @else if (readyForFineract && approveLink) {
+          <p class="ready">
+            {{ 'lending.approvalTab.readyForFineract' | translate }}
+            <a mat-stroked-button color="primary" [routerLink]="approveLink">
+              {{ 'lending.approvalTab.Approve the loan' | translate }}
+            </a>
+          </p>
+        }
+      </mat-card-content>
+    </mat-card>
+
+    @if (next(); as step) {
+      @if (mayAct()) {
+        <mat-card class="section">
+          <mat-card-content>
+            <h3>
+              {{
+                step.kind === 'staff'
+                  ? ('lending.approvalTab.Staff recommendation' | translate)
+                  : ('lending.approvalTab.decisionOf' | translate: { level: step.level.label })
+              }}
+            </h3>
+            <form [formGroup]="form" (ngSubmit)="submit()">
+              @if (step.kind === 'level') {
+                <mat-button-toggle-group
+                  formControlName="outcome"
+                  class="outcome"
+                  [attr.aria-label]="'lending.approvalTab.Outcome' | translate"
+                  hideSingleSelectionIndicator
+                >
+                  @if (!isTopLevel(step.level)) {
+                    <mat-button-toggle value="RECOMMEND">
+                      {{ 'lending.approvalTab.outcome.RECOMMEND' | translate }}
+                    </mat-button-toggle>
+                  }
+                  <mat-button-toggle value="APPROVE">{{
+                    'lending.approvalTab.outcome.APPROVE' | translate
+                  }}</mat-button-toggle>
+                  <mat-button-toggle value="REFUSE">{{
+                    'lending.approvalTab.outcome.REFUSE' | translate
+                  }}</mat-button-toggle>
+                </mat-button-toggle-group>
+              }
+              <div class="row">
+                @if (form.controls.outcome.value !== 'REFUSE' || step.kind === 'staff') {
+                  <mat-form-field>
+                    <mat-label>{{ 'lending.work.Amount' | translate }}</mat-label>
+                    <input matInput type="number" min="1" formControlName="amount" />
+                    <mat-error>{{ 'lending.approvalTab.amountRequired' | translate }}</mat-error>
+                  </mat-form-field>
+                }
+                @if (step.kind === 'level' && step.level.committee) {
+                  <mat-form-field>
+                    <mat-label>{{ 'lending.approvalTab.Meeting decision' | translate }}</mat-label>
+                    <mat-select formControlName="govDecisionId">
+                      @for (m of pickable(); track m.id) {
+                        <mat-option [value]="m.id">{{ meetingLabel(m) }}</mat-option>
+                      }
+                    </mat-select>
+                    @if (!pickable().length) {
+                      <mat-hint>{{ 'lending.approvalTab.noMeetingDecisions' | translate }}</mat-hint>
+                    }
+                    <mat-error>{{ 'lending.approvalTab.meetingRequired' | translate }}</mat-error>
+                  </mat-form-field>
+                }
+              </div>
+              <mat-form-field class="full">
+                <mat-label>
+                  {{
+                    (form.controls.outcome.value === 'REFUSE' && step.kind === 'level'
+                      ? 'lending.file.Reason'
+                      : 'lending.file.Note'
+                    ) | translate
+                  }}
+                </mat-label>
+                <textarea matInput formControlName="note" rows="2" maxlength="1000"></textarea>
+                <mat-error>{{ 'lending.file.reasonRequired' | translate }}</mat-error>
+              </mat-form-field>
+              <button mat-raised-button color="primary" type="submit" [disabled]="busy()">
+                {{
+                  (step.kind === 'staff'
+                    ? 'lending.approvalTab.outcome.RECOMMEND'
+                    : 'lending.approvalTab.Save decision'
+                  ) | translate
+                }}
+              </button>
+            </form>
+          </mat-card-content>
+        </mat-card>
+      }
+    }
+
+    <mat-card class="section">
+      <mat-card-content>
+        <h3>{{ 'lending.approvalTab.Decision history' | translate }}</h3>
+        @if (history.length) {
+          <ol class="history">
+            @for (d of history; track d.id) {
+              <li [class.voided]="d.voidedAt">
+                <div class="history-main">
+                  <span class="what">
+                    {{ stepLabel(d) }} · {{ 'lending.approvalTab.outcome.' + d.outcome | translate }}
+                    @if (d.amount !== null) {
+                      · {{ d.amount | number: '1.0-2' }}
+                    }
+                  </span>
+                  @if (mayVoid(d)) {
+                    <button mat-button type="button" [disabled]="busy()" (click)="voidDecision(d)">
+                      {{ 'lending.approvalTab.Void' | translate }}
+                    </button>
+                  }
+                </div>
+                <span class="muted">{{ d.decidedBy }} · {{ date(d.decidedAt) }}</span>
+                @if (d.meetingDecision) {
+                  <span class="muted">{{ d.meetingDecision }}</span>
+                }
+                @if (d.note) {
+                  <span class="muted">{{ d.note }}</span>
+                }
+                @if (d.voidedAt) {
+                  <span class="void-reason">
+                    {{
+                      'lending.approvalTab.voidedBy'
+                        | translate: { who: d.voidedBy ?? '', when: date(d.voidedAt), reason: d.voidReason ?? '' }
+                    }}
+                  </span>
+                }
+              </li>
+            }
+          </ol>
+        } @else {
+          <p class="muted">{{ 'lending.approvalTab.noDecisions' | translate }}</p>
+        }
+      </mat-card-content>
+    </mat-card>
+  }
+</div>
+
+<ng-template #decisionLine let-d>
+  <div class="decision">
+    <span class="chip" [class.on]="d.outcome === 'APPROVE'" [class.refused]="d.outcome === 'REFUSE'">
+      {{ 'lending.approvalTab.outcome.' + d.outcome | translate }}
+    </span>
+    @if (d.amount !== null) {
+      <span>{{ d.amount | number: '1.0-2' }}</span>
+    }
+    <span class="muted">{{ d.decidedBy }} · {{ date(d.decidedAt) }}</span>
+    @if (d.toConfirm && !d.confirmedBy) {
+      <span class="chip amber-chip">{{ 'lending.approvalTab.To confirm' | translate }}</span>
+    }
+    @if (d.aboveValuation) {
+      <span class="chip amber-chip">{{ 'lending.approvalTab.Above valuation' | translate }}</span>
+    }
+  </div>
+  @if (d.meetingDecision) {
+    <div class="muted">{{ d.meetingDecision }}</div>
+  }
+  @if (d.confirmedBy) {
+    <div class="muted">{{ 'lending.approvalTab.confirmedBy' | translate: { decision: d.confirmedBy } }}</div>
+  }
+</ng-template>

@@ -1,0 +1,190 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+// The Members list's blue-header table.
+@use '../../../shared/styles/list-layout' as *;
+
+// Same frameless look as the Members list.
+.container {
+  padding: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.hint {
+  margin: 0;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+.chip {
+  display: inline-block;
+  padding: 0 8px;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 20px;
+  white-space: nowrap;
+
+  &.on {
+    color: var(--dk-success, #1b6b2a);
+    background: var(--dk-success-soft, #e3f3e6);
+  }
+
+  &.later {
+    color: var(--dk-warning, #7a4b00);
+    background: var(--dk-warning-soft, #fff4e0);
+  }
+}
+
+.editor {
+  margin-top: 24px;
+  padding: 16px;
+  border: 1px solid var(--dk-border, #e2e8f0);
+  border-radius: 8px;
+
+  h3 {
+    margin: 0 0 8px;
+  }
+
+  h4 {
+    margin: 24px 0 8px;
+  }
+}
+
+.tab-body {
+  padding: 16px 0;
+}
+
+.switches {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 8px 16px;
+}
+
+.top-gap {
+  margin-top: 16px;
+}
+
+// One editable row: a document, a level, a band, an area or one of its lines.
+.item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 16px;
+
+  .code {
+    width: 200px;
+  }
+
+  .grow {
+    flex: 1 1 240px;
+  }
+
+  .applies {
+    width: 240px;
+  }
+
+  .req {
+    width: 160px;
+  }
+
+  .points {
+    width: 120px;
+  }
+}
+
+.item-list {
+  margin-bottom: 8px;
+}
+
+.doc-item {
+  border-bottom: 1px solid var(--dk-border, #e2e8f0);
+  background: var(--dk-surface, #fff);
+}
+
+.handle {
+  cursor: grab;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.cdk-drag-preview {
+  box-shadow: 0 8px 16px rgb(0 0 0 / 20%);
+}
+
+.cdk-drag-placeholder {
+  opacity: 0.3;
+}
+
+.area {
+  margin-bottom: 16px;
+  padding: 8px 16px;
+  border: 1px solid var(--dk-border, #e2e8f0);
+  border-radius: 8px;
+
+  .lines {
+    padding-left: 24px;
+  }
+}
+
+.changes {
+  margin-top: 16px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  background: var(--dk-surface-2, #eceff1);
+
+  h4 {
+    margin: 8px 0;
+  }
+
+  ul {
+    margin: 0;
+    padding-left: 24px;
+  }
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+@media (width <= 600px) {
+  .item {
+    .code,
+    .applies,
+    .req,
+    .points {
+      width: 100%;
+    }
+  }
+
+  .area .lines {
+    padding-left: 0;
+  }
+}

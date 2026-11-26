@@ -1,0 +1,35 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+// The Members list's blue-header table and empty state.
+@use '../../../shared/styles/list-layout' as *;
+
+// Same frameless look as the Members list.
+.container {
+  padding: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.hint {
+  margin: 0 0 16px;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+.num {
+  text-align: right;
+}
+
+a {
+  color: var(--dk-primary, #2460b9);
+  text-decoration: none;
+}
